@@ -14,7 +14,7 @@ app     = read("src/app.js")
 data    = json.dumps(json.load(open(os.path.join(HERE, "data.json"), encoding="utf-8")),
                      ensure_ascii=False, separators=(",", ":"))
 
-html = f"""<title>لوحة معلومات سكن العمالة — أمانة منطقة الرياض</title>
+html = f"""<title>لوحة معلومات السكن الجماعي للأفراد بمدينة الرياض — أمانة منطقة الرياض</title>
 <script>document.documentElement.setAttribute('dir','rtl');document.documentElement.setAttribute('lang','ar');</script>
 <style>
 html{{direction:rtl}}

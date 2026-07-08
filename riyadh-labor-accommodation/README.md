@@ -1,4 +1,4 @@
-# لوحة معلومات سكن العمالة — أمانة منطقة الرياض
+# لوحة معلومات السكن الجماعي للأفراد بمدينة الرياض — أمانة منطقة الرياض
 
 Executive Arabic (RTL) command-center dashboard for labor accommodation management in Riyadh, plus the fully reconciled dummy dataset that powers it.
 
@@ -26,7 +26,7 @@ Executive Arabic (RTL) command-center dashboard for labor accommodation manageme
 - **Supply:** `Facilities` — 140 licensed facilities with type, sector, district, X/Y map coordinates (0–100 SVG space), licensed/occupied beds, occupancy, license status/date, compliance score, risk level, last inspection.
 - **Licensing:** `Licenses_Monthly` — 24 months × 5 sectors × 3 accommodation types (issuance, requests, processing days; improving trend).
 - **Monitoring:** `Inspections_Monthly` (24 × 5), `Violation_Categories` (6 categories with fines + SME-size + sector splits), `Inspectors` (18, totals reconcile to inspections), `Hotspots` (40 points, skewed south/east).
-- **Strategy:** `Initiatives` (28 across the 7 pillars; 3 close within 90 days of 2026-07-08), `KPIs` (6 strategic + 8 operational, targets, direction, 12 monthly actuals).
+- **Strategy:** `Initiatives` (28 across the 4 strategic pillars; 3 close within 90 days of 2026-07-08), `KPIs` (6 strategic + 8 operational, targets, direction, 12 monthly actuals).
 - **Foresight:** `Predictions` (10 grounded insights + recommendations), `Forecast_Series` (12 months × 3 scenarios with confidence bounds).
 - **Reference:** `README`, `dim_sector`, `dim_district`, `dim_accommodation_type`.
 

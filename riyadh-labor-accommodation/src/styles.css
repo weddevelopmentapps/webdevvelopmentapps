@@ -34,9 +34,9 @@ button{font-family:var(--ff-b);cursor:pointer;border:none;background:none;color:
   display:flex;flex-direction:column;align-items:center;padding:14px 0 12px;
 }
 #rail .logo{
-  width:64px;height:64px;border-radius:15px;background:rgba(255,255,255,.08);
-  border:1px solid rgba(255,255,255,.18);display:flex;flex-direction:column;
-  align-items:center;justify-content:center;gap:2px;margin-bottom:6px;
+  width:62px;height:62px;border-radius:50%;background:none;border:none;
+  display:flex;align-items:center;justify-content:center;margin-bottom:6px;
+  filter:drop-shadow(0 2px 6px rgba(0,0,0,.28));
 }
 #rail .logo svg{display:block}
 #rail .logo-cap{color:#EAF4EF;font-family:var(--ff-d);font-weight:700;font-size:9.5px;
@@ -282,8 +282,9 @@ table.tbl{width:100%;border-collapse:collapse;font-size:12px;min-width:720px}
 .sector-poly.sel{fill:var(--green)}
 .sector-poly.dim{fill:#F2F5F3}
 .sector-label{font-family:var(--ff-d);font-weight:700;font-size:3.4px;fill:#3E544B;
-  text-anchor:middle;pointer-events:none}
-.sector-label.sel{fill:#fff}
+  text-anchor:middle;pointer-events:none;
+  paint-order:stroke;stroke:rgba(250,251,250,.88);stroke-width:1.1px;stroke-linejoin:round}
+.sector-label.sel{fill:#fff;stroke:rgba(14,90,67,.85)}
 .fac-dot{stroke:#fff;stroke-width:.35;cursor:pointer;transition:opacity .2s}
 .fac-dot:hover{opacity:.75}
 .hot-dot{stroke:#fff;stroke-width:.3;cursor:pointer}

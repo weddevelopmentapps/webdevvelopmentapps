@@ -171,8 +171,11 @@ function drawMap(wrapId,{mode,sectorTip,onSector,dots,dotTip,onDot,hotspots}){
   const polys = D.sectors.map(sec=>{
     const g=D.geo[sec], sel=S.sectors.has(sec), dim=S.sectors.size&&!sel;
     return `<polygon class="sector-poly${sel?' sel':dim?' dim':''}" data-sec="${sec}"
-      points="${g.poly.map(p=>p.join(',')).join(' ')}"></polygon>
-      <text class="sector-label${sel?' sel':''}" x="${g.label[0]}" y="${g.label[1]}">${sec.replace('القطاع ','')}</text>`;
+      points="${g.poly.map(p=>p.join(',')).join(' ')}"></polygon>`;
+  }).join('');
+  const labels = D.sectors.map(sec=>{
+    const g=D.geo[sec], sel=S.sectors.has(sec);
+    return `<text class="sector-label${sel?' sel':''}" x="${g.label[0]}" y="${g.label[1]}">${sec.replace('القطاع ','')}</text>`;
   }).join('');
   let dotSvg='';
   if(hotspots){
@@ -188,7 +191,7 @@ function drawMap(wrapId,{mode,sectorTip,onSector,dots,dotTip,onDot,hotspots}){
   }
   wrap.innerHTML = `<svg viewBox="0 0 100 100" role="img" aria-label="خريطة قطاعات الرياض">
     <defs><filter id="soft-${wrapId}"><feDropShadow dx="0" dy=".6" stdDeviation=".7" flood-color="#0E5A43" flood-opacity=".18"/></filter></defs>
-    <g filter="url(#soft-${wrapId})">${polys}</g><g>${dotSvg}</g></svg>`;
+    <g filter="url(#soft-${wrapId})">${polys}</g><g>${dotSvg}</g><g>${labels}</g></svg>`;
   wrap.querySelectorAll('.sector-poly').forEach(p=>{
     const sec=p.dataset.sec;
     p.addEventListener('mousemove',e=>showTip(sectorTip(sec),e.clientX,e.clientY));
@@ -275,7 +278,7 @@ function renderT1(){
   countUp(el('hero-gap'), sf.gap);
   countUp(el('hero-cov'), sf.cov, {decimals:1});
   el('hero-demand-note').textContent = sec? `عامل وافد ضمن ${sec}` : 'عامل وافد ضمن نطاق أمانة منطقة الرياض';
-  el('hero-supply-note').textContent = `سرير مرخص في ${fmt(sf.fs.length)} منشأة سكن عمالة`;
+  el('hero-supply-note').textContent = `سرير مرخص في ${fmt(sf.fs.length)} منشأة سكن جماعي`;
   el('bridge-cap').textContent = `التغطية ${fmt1(sf.cov)}٪ من إجمالي الطلب`;
   const covW = Math.max(2,Math.min(100,sf.cov));
   requestAnimationFrame(()=>{ el('bridge-fill').style.width=covW+'%';
@@ -882,7 +885,7 @@ function renderT4(){
   const due90=inis.filter(i=>i.end>D.meta.today&&i.end<='2026-10-06'&&i.status!=='مكتملة').length;
   const avg=inis.reduce((a,i)=>a+i.completion,0)/inis.length;
   el('t4-kpis').innerHTML =
-    kpiCard('إجمالي المبادرات',`<span id="k4-n">0</span>`,'عبر 7 ركائز استراتيجية','flat')+
+    kpiCard('إجمالي المبادرات',`<span id="k4-n">0</span>`,'عبر 4 ركائز استراتيجية','flat')+
     kpiCard('متوسط نسبة الإنجاز',`<span id="k4-avg">0</span><small>٪</small>`,'المستهدف 70٪','flat')+
     kpiCard('في المسار',`<span id="k4-on">0</span>`,'تسير وفق الخطة','up')+
     kpiCard('متأخرة',`<span id="k4-late">0</span>`,'تحتاج تدخلاً','down')+
@@ -997,10 +1000,6 @@ function gaugeOption({name,unit,actual,target,dir,max,compact}){
         detail:{valueAnimation:!REDUCED,offsetCenter:[0,'62%'],fontSize:compact?16:21,fontFamily:'IBM Plex Sans Arabic',
           fontWeight:'bold',color:C.ink,formatter:v=>fmt1(v)},
         data:[{value:actual}],title:{show:false}},
-      {type:'gauge',startAngle:205,endAngle:-25,min:0,max:mx,
-        axisLine:{show:false},axisTick:{show:false},splitLine:{show:false},axisLabel:{show:false},detail:{show:false},
-        pointer:{length:'82%',width:3,icon:'rect',itemStyle:{color:C.goldUi}},anchor:{show:false},
-        data:[{value:target}],silent:true,z:1},
     ],
   });
 }
