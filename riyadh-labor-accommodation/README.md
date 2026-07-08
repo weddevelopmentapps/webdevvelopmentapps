@@ -52,4 +52,4 @@ Executive Arabic (RTL) command-center dashboard for labor accommodation manageme
 
 ## Verified quality bar
 
-Checked headless (Chromium, 1920×1080 and 1366×768): zero console errors; all six tabs; map hover/click/dots/hotspot toggle; drawers (facility/month/category/inspector/initiative/KPI); cross-filters and reset chips; gauges with inverted "أقل أفضل" logic and gold target ticks; scenario switching; `prefers-reduced-motion` respected; totals in the UI reconcile exactly with the workbook.
+Checked headless (Chromium, 1920×1080 and 1366×768): zero console errors; all six tabs; map hover/click/dots/hotspot toggle; drawers (facility/month/category/inspector/initiative/KPI); cross-filters and reset chips; single-needle gauges with target bands and inverted "أقل أفضل" logic; scenario switching; `prefers-reduced-motion` respected; totals in the UI reconcile exactly with the workbook.
