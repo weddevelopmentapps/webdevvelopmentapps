@@ -45,6 +45,11 @@ Executive Arabic (RTL) command-center dashboard for labor accommodation manageme
 - بيانات الترخيص والرقابة الفعلية (وفق قوالب الأوراق أعلاه)
 - دليل الهوية البصرية الرسمي (الألوان والخطوط المعتمدة)
 
+## Mobile & hosted build
+
+- The dashboard is fully responsive: on phones (≤768px) the right rail becomes a bottom navigation bar, grids collapse to one column, tables scroll inside their own containers, and all tap interactions (sector select, facility drawer, filters) work with touch. Verified at 390×844.
+- `build_artifact.py` produces `artifact.html` — a fully self-contained build (ECharts + Arabic fonts inlined from `vendor/`, zero external requests) for hosting behind a strict CSP. `index.html` remains the CDN-based double-click build.
+
 ## Verified quality bar
 
 Checked headless (Chromium, 1920×1080 and 1366×768): zero console errors; all six tabs; map hover/click/dots/hotspot toggle; drawers (facility/month/category/inspector/initiative/KPI); cross-filters and reset chips; gauges with inverted "أقل أفضل" logic and gold target ticks; scenario switching; `prefers-reduced-motion` respected; totals in the UI reconcile exactly with the workbook.

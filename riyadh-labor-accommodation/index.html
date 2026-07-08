@@ -140,6 +140,7 @@ button{font-family:var(--ff-b);cursor:pointer;border:none;background:none;color:
 
 /* grids */
 .grid{display:grid;gap:16px}
+.grid>*{min-width:0}
 .g2{grid-template-columns:repeat(2,1fr)}
 .g3{grid-template-columns:repeat(3,1fr)}
 .g4{grid-template-columns:repeat(4,1fr)}
@@ -453,6 +454,82 @@ table.tbl{width:100%;border-collapse:collapse;font-size:12px;min-width:720px}
   .g7{grid-template-columns:repeat(2,1fr)}
   .ini-row{grid-template-columns:1.8fr 1fr 90px;row-gap:6px}
   .ini-row .cell-hide{display:none}
+}
+
+
+/* ---------- mobile (phones) ---------- */
+@media(max-width:768px){
+  :root{--rail-w:0px}
+  #shell{margin-right:0}
+  /* rail becomes a bottom navigation bar */
+  #rail{
+    top:auto;bottom:0;right:0;left:0;width:100%;
+    height:calc(60px + env(safe-area-inset-bottom,0px));
+    flex-direction:row;padding:0 2px env(safe-area-inset-bottom,0px);
+    z-index:70;box-shadow:0 -4px 18px rgba(14,90,67,.18);
+  }
+  #rail .logo,#rail .logo-cap,#rail .rail-foot{display:none}
+  #rail nav{flex-direction:row;gap:2px;padding:5px 4px;align-items:stretch}
+  .rail-tab{flex:1;padding:5px 1px 4px;gap:3px;border-radius:9px;justify-content:center;min-width:0}
+  .rail-tab svg{width:18px;height:18px}
+  .rail-tab span{font-size:7.6px;line-height:1.2;white-space:normal;max-width:100%}
+  .rail-tab.active::after{inset-inline-start:22%;width:56%;height:3px;top:auto;bottom:1px}
+  /* header compresses */
+  #topbar{padding:8px 12px;gap:8px}
+  #topbar .tb-title h1{font-size:14.5px}
+  #topbar .tb-title .sub{font-size:10px}
+  .tb-updated{display:none}
+  .tb-controls{gap:5px;width:100%}
+  .btn{padding:6px 9px;font-size:10.5px;gap:4px}
+  .btn svg{width:13px;height:13px}
+  .sel{padding:6px 24px 6px 8px;font-size:10.5px;background-position:right 7px center}
+  /* content */
+  #view{padding:12px 12px calc(84px + env(safe-area-inset-bottom,0px))}
+  .grid{gap:10px}
+  .g2,.g3,.g4,.g6,.g7,.g23,.g32{grid-template-columns:1fr}
+  .grid>.card{grid-column:auto!important}
+  .card{padding:14px}
+  .chart{height:250px}.chart.tall{height:300px}.chart.short{height:210px}
+  .section-h{margin:18px 0 10px;flex-wrap:wrap;row-gap:6px}
+  .section-h .hint{display:none}
+  .tsearch{width:100%;order:9}
+  /* hero */
+  .hero{padding:18px 16px;border-radius:16px}
+  .hero-num{font-size:clamp(34px,10vw,46px);letter-spacing:-.8px}
+  .hero-mid{flex-wrap:wrap;gap:10px;padding-top:0}
+  .gap-badge .gb-val{font-size:19px}
+  .bridge-track{height:26px}
+  .bridge-legend{font-size:9.5px;gap:6px;flex-wrap:wrap}
+  /* filter bars */
+  .filterbar{position:static;padding:8px 10px;gap:6px}
+  .pill{padding:4px 10px;font-size:10.5px}
+  .fdiv{display:none}
+  .f-cap{width:100%;margin-bottom:-2px}
+  /* KPI cards */
+  .kpi .k-val{font-size:24px}
+  .kpi .k-ico{width:28px;height:28px;top:12px}
+  /* initiatives */
+  .ini-row{grid-template-columns:1fr 96px;row-gap:6px;padding:11px 12px}
+  .gantt{overflow-x:auto;grid-auto-columns:minmax(150px,1fr);padding-bottom:6px}
+  /* gauges & drawers */
+  .gauge{height:170px}.gauge.sm{height:140px}
+  #drawer{width:min(430px,100vw)}
+  .dr-body{padding:14px 16px}
+  table.tbl{min-width:620px}
+  /* skeleton */
+  #skel{inset:0 0 60px 0;padding:118px 12px 0}
+  .skel-grid{grid-template-columns:1fr 1fr}
+  .skb.big{grid-column:span 2}
+  /* map side panel + insight cards breathe */
+  .ms-stat .v{font-size:16px}
+  .alert-card p{font-size:12px}
+  .foot{padding-bottom:8px}
+}
+@media(max-width:420px){
+  .rail-tab span{font-size:7.1px}
+  .hero-num{font-size:clamp(30px,11vw,38px)}
+  .skel-grid{grid-template-columns:1fr}
+  .skb.big{grid-column:auto}
 }
 
 /* reduced motion */
