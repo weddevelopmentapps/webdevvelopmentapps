@@ -362,8 +362,11 @@ table.tbl{width:100%;border-collapse:collapse;font-size:12px;min-width:720px}
 .pbar i{display:block;height:100%;border-radius:6px;background:var(--green2);width:0;transition:width 1s cubic-bezier(.25,.8,.3,1)}
 .ini-date{font-size:11px;color:var(--muted);font-weight:600;font-variant-numeric:tabular-nums}
 /* gantt strip */
-.gantt{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:10px}
-.gq{background:var(--tint2);border:1px solid var(--line);border-radius:12px;padding:10px;min-height:96px}
+.gantt{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:10px}
+.gq{background:var(--tint2);border:1px solid var(--line);border-radius:12px;padding:10px;min-height:96px;min-width:0}
+@media(max-width:1200px){
+  .gantt{overflow-x:auto;grid-auto-columns:minmax(150px,1fr);padding-bottom:6px}
+}
 .gq .gq-h{font-size:11px;font-weight:700;color:var(--muted);text-align:center;margin-bottom:8px}
 .gq .gi{font-size:10px;font-weight:700;border-radius:7px;padding:3px 8px;margin-bottom:5px;cursor:pointer;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff;background:var(--green2)}
