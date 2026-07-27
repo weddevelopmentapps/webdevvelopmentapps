@@ -1,17 +1,17 @@
 /* ============================================================
    منصة استدامة كفاءة الإنفاق — الهيئة الملكية لمدينة الرياض
-   Design system: governmental navy / teal / gold — RTL
+   Design system: governmental RCRC green / gold — RTL
    ============================================================ */
 :root{
-  --navy:#0A2A4A; --navy2:#0E3A63; --navy3:#081F38;
-  --teal:#0F7A8A; --teal2:#149AAD; --gold:#C7A34F; --gold2:#A98A3C;
-  --bg:#F5F7FA; --card:#FFFFFF; --line:#DFE6EF; --line2:#EDF1F7;
-  --ink:#16212E; --muted:#5D6B7E; --faint:#8B98A9;
-  --tintN:#EAF0F8; --tintT:#E7F3F5; --tintG:#F7F1E1;
+  --navy:#0B4028; --navy2:#0F5434; --navy3:#062B1A;
+  --teal:#098A4E; --teal2:#14A862; --gold:#C7A34F; --gold2:#A98A3C;
+  --bg:#F4F8F5; --card:#FFFFFF; --line:#DCE8E0; --line2:#EAF2EC;
+  --ink:#152119; --muted:#5C6E63; --faint:#8B9C91;
+  --tintN:#E8F2EC; --tintT:#E6F4EC; --tintG:#F7F1E1;
   --ok:#1E7F5C; --ok-bg:#E6F3EE; --warn:#C88A16; --warn-bg:#FBF3E2;
   --bad:#B3402F; --bad-bg:#F9E9E6; --info:#3A6EA5; --info-bg:#EAF1F9;
-  --shadow:0 1px 2px rgba(10,42,74,.05),0 8px 22px rgba(10,42,74,.07);
-  --shadow-lift:0 2px 5px rgba(10,42,74,.08),0 16px 36px rgba(10,42,74,.12);
+  --shadow:0 1px 2px rgba(11,64,40,.05),0 8px 22px rgba(11,64,40,.07);
+  --shadow-lift:0 2px 5px rgba(11,64,40,.08),0 16px 36px rgba(11,64,40,.12);
   --r:14px; --r-sm:10px;
   --ff-d:"IBM Plex Sans Arabic",sans-serif;
   --ff-b:"Cairo",sans-serif;
@@ -32,12 +32,12 @@ input,select,textarea{font-family:var(--ff-b);font-size:13px;color:var(--ink)}
 
 /* ---------- masthead ---------- */
 #masthead{
-  background:linear-gradient(135deg,var(--navy3) 0%,var(--navy) 52%,#0D3357 100%);
-  color:#EAF1F8;position:relative;overflow:hidden;
+  background:linear-gradient(135deg,var(--navy3) 0%,var(--navy) 52%,#0E5A38 100%);
+  color:#EAF6EE;position:relative;overflow:hidden;
 }
 #masthead::after{
   content:"";position:absolute;inset:0;pointer-events:none;
-  background:radial-gradient(1200px 300px at 85% -60%,rgba(20,154,173,.28),transparent 60%),
+  background:radial-gradient(1200px 300px at 85% -60%,rgba(18,168,98,.28),transparent 60%),
              radial-gradient(900px 260px at 10% 130%,rgba(199,163,79,.14),transparent 60%);
 }
 #masthead .inner{
@@ -52,7 +52,7 @@ input,select,textarea{font-family:var(--ff-b);font-size:13px;color:var(--ink)}
 }
 .logo-plate img{width:100%;height:100%;object-fit:contain;display:block}
 .mast-title h1{color:#FFF;font-size:21px;line-height:1.4;letter-spacing:-.2px}
-.mast-title .sub{color:#B9CBDD;font-size:12px;margin-top:1px}
+.mast-title .sub{color:#B7D3C2;font-size:12px;margin-top:1px}
 .mast-title .entity{color:var(--gold);font-family:var(--ff-d);font-weight:700;font-size:12.5px;margin-top:2px}
 .mast-spacer{flex:1}
 .mast-meta{display:flex;flex-direction:column;align-items:flex-start;gap:6px}
@@ -62,14 +62,14 @@ input,select,textarea{font-family:var(--ff-b);font-size:13px;color:var(--ink)}
   font-size:11px;font-family:var(--ff-d);font-weight:600;white-space:nowrap;
 }
 .chip.demo{background:rgba(199,163,79,.16);color:#E8D191;border:1px solid rgba(199,163,79,.45)}
-.chip.live{background:rgba(20,154,173,.15);color:#9FDCE6;border:1px solid rgba(20,154,173,.4)}
-.chip.live .dot{width:7px;height:7px;border-radius:50%;background:#37C0D4;animation:pulse 2.2s infinite}
+.chip.live{background:rgba(18,168,98,.15);color:#A6E3C2;border:1px solid rgba(18,168,98,.4)}
+.chip.live .dot{width:7px;height:7px;border-radius:50%;background:#3FCC7F;animation:pulse 2.2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
 .mast-actions{display:flex;gap:8px;flex-wrap:wrap}
 .mbtn{
   display:inline-flex;align-items:center;gap:6px;padding:6px 13px;border-radius:9px;
   background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);
-  color:#DEE9F3;font-size:12px;font-family:var(--ff-d);font-weight:600;
+  color:#DDEEE3;font-size:12px;font-family:var(--ff-d);font-weight:600;
   transition:background .2s;
 }
 .mbtn:hover{background:rgba(255,255,255,.16)}
@@ -81,7 +81,7 @@ input,select,textarea{font-family:var(--ff-b);font-size:13px;color:var(--ink)}
 #tabbar{
   position:sticky;top:0;z-index:50;background:rgba(255,255,255,.94);
   backdrop-filter:blur(10px);border-bottom:1px solid var(--line);
-  box-shadow:0 2px 12px rgba(10,42,74,.06);
+  box-shadow:0 2px 12px rgba(11,64,40,.06);
 }
 #tabbar .inner{max-width:1720px;margin:0 auto;padding:0 18px;display:flex;align-items:center;gap:2px;overflow-x:auto;scrollbar-width:thin}
 .tab{
@@ -196,7 +196,7 @@ tbody tr.clickable{cursor:pointer}
 .fsel:focus,.fsearch:focus{outline:2px solid var(--teal);outline-offset:0;border-color:var(--teal)}
 .pillbar{display:inline-flex;background:var(--line2);border-radius:10px;padding:3px;gap:2px}
 .pill{padding:5px 14px;border-radius:8px;font-family:var(--ff-d);font-weight:600;font-size:12px;color:var(--muted);transition:all .2s}
-.pill.on{background:#FFF;color:var(--navy);box-shadow:0 1px 4px rgba(10,42,74,.14)}
+.pill.on{background:#FFF;color:var(--navy);box-shadow:0 1px 4px rgba(11,64,40,.14)}
 .btn{
   display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border-radius:9px;
   font-family:var(--ff-d);font-weight:600;font-size:12.5px;transition:all .2s;border:1px solid transparent;
@@ -254,12 +254,12 @@ tbody tr.clickable{cursor:pointer}
 .ck.y{border-color:rgba(30,127,92,.25)}
 
 /* ---------- drawer ---------- */
-#overlay{position:fixed;inset:0;background:rgba(8,31,56,.44);z-index:80;opacity:0;pointer-events:none;transition:opacity .25s}
+#overlay{position:fixed;inset:0;background:rgba(6,43,26,.44);z-index:80;opacity:0;pointer-events:none;transition:opacity .25s}
 #overlay.on{opacity:1;pointer-events:auto}
 #drawer{
   position:fixed;top:0;left:0;bottom:0;width:min(560px,94vw);background:#FFF;z-index:90;
   transform:translateX(-102%);transition:transform .3s cubic-bezier(.22,.8,.36,1);
-  box-shadow:12px 0 44px rgba(8,31,56,.25);display:flex;flex-direction:column;
+  box-shadow:12px 0 44px rgba(6,43,26,.25);display:flex;flex-direction:column;
 }
 #drawer.on{transform:translateX(0)}
 #drawer .dh{

@@ -25,7 +25,7 @@ MATURITY = {
         {"n": 2, "name": "ناشئ",   "color": "#C88A16"},
         {"n": 3, "name": "متقدم",  "color": "#8A7A2E"},
         {"n": 4, "name": "متمكن",  "color": "#2E7D6B"},
-        {"n": 5, "name": "متميز",  "color": "#0F7A8A"},
+        {"n": 5, "name": "متميز",  "color": "#098A4E"},
     ],
     "thresholds": [  # grade by score (>=)
         {"min": 4.5, "name": "متميز"},

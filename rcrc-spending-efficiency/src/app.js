@@ -84,7 +84,7 @@ function gradeOf(score){
 }
 function gradeColor(name){
   const lv = S.data.maturity.levels.find(l=>l.name===name);
-  return lv ? lv.color : "#5D6B7E";
+  return lv ? lv.color : "#5C6E63";
 }
 function evStats(scope){ // scope: array of criteria
   let total=0, ready=0, prep=0, missing=0;
@@ -159,10 +159,10 @@ function buildAlerts(){
 
 /* ---------------- ECharts helpers ---------------- */
 const CH = {};
-const PALETTE = ["#0A2A4A","#0F7A8A","#C7A34F","#3A6EA5","#149AAD","#8A7A2E","#5D6B7E","#2E7D6B"];
+const PALETTE = ["#0B4028","#098A4E","#C7A34F","#3A6EA5","#14A862","#8A7A2E","#5C6E63","#1B6E52"];
 function ramp(i, total){
-  // navy -> teal interpolation
-  const a=[10,42,74], b=[20,154,173];
+  // deep green -> logo green interpolation
+  const a=[11,64,40], b=[20,168,98];
   const t = total<=1? 0 : i/(total-1);
   const c = a.map((v,k)=>Math.round(v+(b[k]-v)*t));
   return `rgb(${c[0]},${c[1]},${c[2]})`;
@@ -175,13 +175,13 @@ function chart(id){
   return CH[id];
 }
 const TT = {
-  trigger:"item", backgroundColor:"#FFFFFF", borderColor:"#DFE6EF", borderWidth:1,
-  textStyle:{ color:"#16212E", fontFamily:"Cairo", fontSize:12 },
-  extraCssText:"direction:rtl;text-align:right;box-shadow:0 8px 24px rgba(10,42,74,.14);border-radius:10px;padding:10px 14px;",
+  trigger:"item", backgroundColor:"#FFFFFF", borderColor:"#DCE8E0", borderWidth:1,
+  textStyle:{ color:"#152119", fontFamily:"Cairo", fontSize:12 },
+  extraCssText:"direction:rtl;text-align:right;box-shadow:0 8px 24px rgba(11,64,40,.14);border-radius:10px;padding:10px 14px;",
 };
 function ttRow(k, v, color){
   return `<div style="display:flex;justify-content:space-between;gap:18px;align-items:center;margin:2px 0">
-    <span style="color:#5D6B7E">${color?`<span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${color};margin-left:6px"></span>`:""}${k}</span>
+    <span style="color:#5C6E63">${color?`<span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${color};margin-left:6px"></span>`:""}${k}</span>
     <b style="font-family:'IBM Plex Sans Arabic'">${v}</b></div>`;
 }
 function base(extra){
@@ -194,32 +194,32 @@ function base(extra){
 }
 function catAxis(data){
   return { type:"category", data, inverse:true,
-    axisLine:{ lineStyle:{ color:"#DFE6EF" } }, axisTick:{ show:false },
-    axisLabel:{ color:"#5D6B7E", fontFamily:"Cairo", fontSize:11 } };
+    axisLine:{ lineStyle:{ color:"#DCE8E0" } }, axisTick:{ show:false },
+    axisLabel:{ color:"#5C6E63", fontFamily:"Cairo", fontSize:11 } };
 }
 function valAxis(fmt){
   return { type:"value", position:"right",
-    splitLine:{ lineStyle:{ color:"#EDF1F7" } }, axisLabel:{ color:"#8B98A9", fontFamily:"IBM Plex Sans Arabic", fontSize:10.5, formatter:fmt } };
+    splitLine:{ lineStyle:{ color:"#EAF2EC" } }, axisLabel:{ color:"#8B9C91", fontFamily:"IBM Plex Sans Arabic", fontSize:10.5, formatter:fmt } };
 }
 /* RTL horizontal bars: bars grow right<-left, category labels on the RIGHT */
 function hxAxis(fmt, max){
   const a = { type:"value", inverse:true,
-    splitLine:{ lineStyle:{ color:"#EDF1F7" } },
-    axisLabel:{ color:"#8B98A9", fontFamily:"IBM Plex Sans Arabic", fontSize:10.5, formatter:fmt } };
+    splitLine:{ lineStyle:{ color:"#EAF2EC" } },
+    axisLabel:{ color:"#8B9C91", fontFamily:"IBM Plex Sans Arabic", fontSize:10.5, formatter:fmt } };
   if(max!=null) a.max = max;
   return a;
 }
 function hyAxis(data, labelWidth){
   return { type:"category", data, position:"right", inverse:true,
-    axisLine:{ lineStyle:{ color:"#DFE6EF" } }, axisTick:{ show:false },
-    axisLabel:{ color:"#5D6B7E", fontFamily:"Cairo", fontSize:11,
+    axisLine:{ lineStyle:{ color:"#DCE8E0" } }, axisTick:{ show:false },
+    axisLabel:{ color:"#5C6E63", fontFamily:"Cairo", fontSize:11,
       width: labelWidth||null, overflow: labelWidth? "truncate":"none" } };
 }
 /* RTL vertical charts: category x-axis reads right -> left */
 function catXAxis(data, extra){
   return Object.assign({ type:"category", data, inverse:true,
-    axisLine:{ lineStyle:{ color:"#DFE6EF" } }, axisTick:{ show:false },
-    axisLabel:{ color:"#5D6B7E", fontFamily:"Cairo", fontSize:11 } }, extra||{});
+    axisLine:{ lineStyle:{ color:"#DCE8E0" } }, axisTick:{ show:false },
+    axisLabel:{ color:"#5C6E63", fontFamily:"Cairo", fontSize:11 } }, extra||{});
 }
 let resizeT=null;
 addEventListener("resize", ()=>{ clearTimeout(resizeT); resizeT=setTimeout(()=>Object.values(CH).forEach(c=>c.resize()),150); });
@@ -406,7 +406,7 @@ RENDER.home = {
         let h = `<b>${ps[0].axisValue}</b>`;
         ps.forEach(p=>h+=ttRow(p.seriesName, `${n(p.value)} م.ر`, p.color));
         return h; }}),
-      legend:{ icon:"circle", itemWidth:9, itemHeight:9, textStyle:{fontFamily:"Cairo",fontSize:11,color:"#5D6B7E"}, top:0 },
+      legend:{ icon:"circle", itemWidth:9, itemHeight:9, textStyle:{fontFamily:"Cairo",fontSize:11,color:"#5C6E63"}, top:0 },
       xAxis: catXAxis(m.map(x=>x.m)),
       yAxis: valAxis(v=>n(v)),
       grid:{ top:34, bottom:26, right:46, left:12 },
@@ -414,8 +414,8 @@ RENDER.home = {
         { name:"المخطط", type:"line", data:m.map(x=>x.plan), smooth:true, symbol:"circle", symbolSize:6,
           lineStyle:{color:"#C7A34F",width:2.5,type:"dashed"}, itemStyle:{color:"#C7A34F"} },
         { name:"المحقق", type:"line", data:m.map(x=>x.real), smooth:true, symbol:"circle", symbolSize:6,
-          lineStyle:{color:"#0F7A8A",width:3}, itemStyle:{color:"#0F7A8A"},
-          areaStyle:{color:{type:"linear",x:0,y:0,x2:0,y2:1,colorStops:[{offset:0,color:"rgba(15,122,138,.22)"},{offset:1,color:"rgba(15,122,138,0)"}]}} },
+          lineStyle:{color:"#098A4E",width:3}, itemStyle:{color:"#098A4E"},
+          areaStyle:{color:{type:"linear",x:0,y:0,x2:0,y2:1,colorStops:[{offset:0,color:"rgba(9,138,78,.22)"},{offset:1,color:"rgba(9,138,78,0)"}]}} },
       ],
     }));
     // gauge
@@ -430,7 +430,7 @@ RENDER.home = {
       yAxis: hyAxis(INI_STAGES),
       grid:{ top:12, bottom:26, right:86, left:34 },
       series:[{ type:"bar", data: INI_STAGES.map((s,i)=>({value:sc[s], itemStyle:{color:ramp(i,6), borderRadius:[6,0,0,6]}})),
-        barWidth:16, label:{show:true, position:"left", fontFamily:"IBM Plex Sans Arabic", color:"#5D6B7E", formatter:p=>n(p.value)} }],
+        barWidth:16, label:{show:true, position:"left", fontFamily:"IBM Plex Sans Arabic", color:"#5C6E63", formatter:p=>n(p.value)} }],
     }));
   },
 };
@@ -455,18 +455,18 @@ function mountScoreGauge(id, val, grade){
     animation:false,   // stills/prints must always show the final value
     series:[{
       type:"gauge", startAngle:205, endAngle:-25, min:0, max:5, radius:"96%", center:["50%","58%"], splitNumber:5,
-      progress:{ show:true, width:16, roundCap:true, itemStyle:{ color:{type:"linear",x:0,y:0,x2:1,y2:0,colorStops:[{offset:0,color:"#0A2A4A"},{offset:1,color:"#149AAD"}]} } },
-      axisLine:{ lineStyle:{ width:16, color:[[tgt/5,"#EDF1F7"],[1,"rgba(199,163,79,.38)"]] } },
-      pointer:{ show:true, length:"58%", width:4, itemStyle:{color:"#0A2A4A"} },
-      anchor:{ show:true, size:8, itemStyle:{color:"#0A2A4A"} },
-      axisTick:{ distance:-24, length:4, lineStyle:{color:"#B9C4D2"} },
-      splitLine:{ distance:-28, length:8, lineStyle:{color:"#B9C4D2",width:1.5} },
-      axisLabel:{ distance:-14, color:"#8B98A9", fontSize:10, fontFamily:"IBM Plex Sans Arabic" },
+      progress:{ show:true, width:16, roundCap:true, itemStyle:{ color:{type:"linear",x:0,y:0,x2:1,y2:0,colorStops:[{offset:0,color:"#0B4028"},{offset:1,color:"#14A862"}]} } },
+      axisLine:{ lineStyle:{ width:16, color:[[tgt/5,"#EAF2EC"],[1,"rgba(199,163,79,.38)"]] } },
+      pointer:{ show:true, length:"58%", width:4, itemStyle:{color:"#0B4028"} },
+      anchor:{ show:true, size:8, itemStyle:{color:"#0B4028"} },
+      axisTick:{ distance:-24, length:4, lineStyle:{color:"#B5C9BC"} },
+      splitLine:{ distance:-28, length:8, lineStyle:{color:"#B5C9BC",width:1.5} },
+      axisLabel:{ distance:-14, color:"#8B9C91", fontSize:10, fontFamily:"IBM Plex Sans Arabic" },
       detail:{ valueAnimation:false, offsetCenter:[0,"30%"],
         formatter:v=>`{v|${v.toFixed(1)}}\n{g|${grade}}\n{s|المحاكاة المستقلة ${sim.toFixed(1)} — ${gradeOf(sim)}}`,
-        rich:{ v:{fontSize:30,fontWeight:700,fontFamily:"IBM Plex Sans Arabic",color:"#0A2A4A"},
+        rich:{ v:{fontSize:30,fontWeight:700,fontFamily:"IBM Plex Sans Arabic",color:"#0B4028"},
                g:{fontSize:13,fontFamily:"IBM Plex Sans Arabic",fontWeight:600,color:gradeColor(grade),padding:[6,0,0,0]},
-               s:{fontSize:11,fontFamily:"Cairo",color:"#5D6B7E",padding:[7,0,0,0]} } },
+               s:{fontSize:11,fontFamily:"Cairo",color:"#5C6E63",padding:[7,0,0,0]} } },
       data:[{value:val}],
       title:{show:false},
     }],
@@ -478,18 +478,18 @@ function mountRadar(id){
   c.setOption({
     animation:!REDUCED,
     tooltip: Object.assign({},TT),
-    legend:{ icon:"circle", itemWidth:9, itemHeight:9, bottom:0, textStyle:{fontFamily:"Cairo",fontSize:11,color:"#5D6B7E"} },
+    legend:{ icon:"circle", itemWidth:9, itemHeight:9, bottom:0, textStyle:{fontFamily:"Cairo",fontSize:11,color:"#5C6E63"} },
     radar:{
       indicator:P.map(p=>({name:p.short, max:5})),
       radius:"64%", center:["50%","47%"], splitNumber:5,
-      axisName:{ color:"#5D6B7E", fontFamily:"Cairo", fontSize:11.5 },
-      splitArea:{ areaStyle:{ color:["#FFFFFF","#F5F8FB"] } },
-      splitLine:{ lineStyle:{ color:"#E4EAF2" } }, axisLine:{ lineStyle:{ color:"#DFE6EF" } },
+      axisName:{ color:"#5C6E63", fontFamily:"Cairo", fontSize:11.5 },
+      splitArea:{ areaStyle:{ color:["#FFFFFF","#F3F8F4"] } },
+      splitLine:{ lineStyle:{ color:"#E2EDE5" } }, axisLine:{ lineStyle:{ color:"#DCE8E0" } },
     },
     series:[{ type:"radar", symbolSize:4,
       data:[
-        { name:"الذاتي", value:P.map(p=>pillarScore(p,"self")), lineStyle:{color:"#0F7A8A",width:2.5}, itemStyle:{color:"#0F7A8A"}, areaStyle:{color:"rgba(15,122,138,.14)"} },
-        { name:"المحاكاة", value:P.map(p=>pillarScore(p,"sim")), lineStyle:{color:"#0A2A4A",width:2}, itemStyle:{color:"#0A2A4A"} },
+        { name:"الذاتي", value:P.map(p=>pillarScore(p,"self")), lineStyle:{color:"#098A4E",width:2.5}, itemStyle:{color:"#098A4E"}, areaStyle:{color:"rgba(9,138,78,.14)"} },
+        { name:"المحاكاة", value:P.map(p=>pillarScore(p,"sim")), lineStyle:{color:"#0B4028",width:2}, itemStyle:{color:"#0B4028"} },
         { name:"الدورة 6", value:P.map(p=>pillarScore(p,"prev")), lineStyle:{color:"#C7A34F",width:1.6,type:"dashed"}, itemStyle:{color:"#C7A34F"} },
       ]}],
   });
@@ -588,7 +588,7 @@ RENDER.skep = {
       series:[
         { type:"bar", barWidth:18,
           data: P.map((p,i)=>({ value:pillarScore(p,mode), itemStyle:{ color:ramp(i,7), borderRadius:[9,0,0,9] } })),
-          label:{ show:true, position:"left", formatter:p=>n(p.value,2), fontFamily:"IBM Plex Sans Arabic", fontWeight:700, color:"#5D6B7E" },
+          label:{ show:true, position:"left", formatter:p=>n(p.value,2), fontFamily:"IBM Plex Sans Arabic", fontWeight:700, color:"#5C6E63" },
           markLine:{ symbol:"none", lineStyle:{color:"#C7A34F",type:"dashed",width:2},
             label:{ show:false },
             data:[{xAxis:4.5}] } },
@@ -975,21 +975,21 @@ RENDER.impact = {
     // waterfall: محدد -> غير معتمد -> معتمد -> محقق -> موثق
     const identified = it.identified, approved = it.approved, realized = it.realized, doc = it.documented;
     const steps = [
-      { name:"الأثر المحدد", base:0, val:identified, color:"#5D6B7E" },
-      { name:"قيد الدراسة/الاعتماد", base:approved, val:identified-approved, color:"#B9C4D2" },
-      { name:"المعتمد", base:0, val:approved, color:"#0A2A4A" },
-      { name:"المحقق", base:0, val:realized, color:"#0F7A8A" },
+      { name:"الأثر المحدد", base:0, val:identified, color:"#5C6E63" },
+      { name:"قيد الدراسة/الاعتماد", base:approved, val:identified-approved, color:"#B5C9BC" },
+      { name:"المعتمد", base:0, val:approved, color:"#0B4028" },
+      { name:"المحقق", base:0, val:realized, color:"#098A4E" },
       { name:"الموثق بالإقفال", base:0, val:doc, color:"#C7A34F" },
     ];
     chart("ch-imp-water").setOption(base({
       tooltip: Object.assign({},TT,{formatter:p=> p.seriesIndex===1? `<b>${p.name}</b>`+ttRow("القيمة",`${n(steps[p.dataIndex].val)} م.ر`, steps[p.dataIndex].color):""}),
-      xAxis: catXAxis(steps.map(s=>s.name), { axisLabel:{color:"#5D6B7E",fontFamily:"Cairo",fontSize:11,interval:0} }),
+      xAxis: catXAxis(steps.map(s=>s.name), { axisLabel:{color:"#5C6E63",fontFamily:"Cairo",fontSize:11,interval:0} }),
       yAxis: valAxis(v=>n(v)),
       grid:{ top:24, bottom:30, right:50, left:14 },
       series:[
         { type:"bar", stack:"w", itemStyle:{color:"transparent"}, emphasis:{itemStyle:{color:"transparent"}}, data:steps.map(s=>s.base), barWidth:44, silent:true },
         { type:"bar", stack:"w", data:steps.map(s=>({value:s.val, itemStyle:{color:s.color, borderRadius:[7,7,0,0]}})),
-          label:{show:true, position:"top", fontFamily:"IBM Plex Sans Arabic", fontWeight:700, color:"#5D6B7E", formatter:p=>n(steps[p.dataIndex].val)} },
+          label:{show:true, position:"top", fontFamily:"IBM Plex Sans Arabic", fontWeight:700, color:"#5C6E63", formatter:p=>n(steps[p.dataIndex].val)} },
       ],
     }));
     // by type
@@ -1002,13 +1002,13 @@ RENDER.impact = {
     chart("ch-imp-type").setOption(base({
       tooltip: Object.assign({},TT,{trigger:"axis", formatter:ps=>{
         let h=`<b>${ps[0].axisValue}</b>`; ps.forEach(p=>h+=ttRow(p.seriesName,`${n(p.value)} م.ر`,p.color)); return h; }}),
-      legend:{ icon:"circle", itemWidth:9, itemHeight:9, top:0, textStyle:{fontFamily:"Cairo",fontSize:11,color:"#5D6B7E"} },
+      legend:{ icon:"circle", itemWidth:9, itemHeight:9, top:0, textStyle:{fontFamily:"Cairo",fontSize:11,color:"#5C6E63"} },
       xAxis: hxAxis(v=>n(v)),
       yAxis: hyAxis(types),
       grid:{ top:34, bottom:26, right:90, left:20 },
       series:[
-        { name:"محقق", type:"bar", stack:"t", barWidth:20, color:"#0F7A8A", data:types.map(t=>bt[t].realized) },
-        { name:"متبقٍ من المحدد", type:"bar", stack:"t", color:"#DCE5EE", data:types.map(t=>({value:Math.max(0,bt[t].identified-bt[t].realized), itemStyle:{borderRadius:[6,0,0,6]}})) },
+        { name:"محقق", type:"bar", stack:"t", barWidth:20, color:"#098A4E", data:types.map(t=>bt[t].realized) },
+        { name:"متبقٍ من المحدد", type:"bar", stack:"t", color:"#DDEBE2", data:types.map(t=>({value:Math.max(0,bt[t].identified-bt[t].realized), itemStyle:{borderRadius:[6,0,0,6]}})) },
       ],
     }));
     // by program / category (two similar charts)
@@ -1026,13 +1026,13 @@ RENDER.impact = {
       chart(cid).setOption(base({
         tooltip: Object.assign({},TT,{trigger:"axis", formatter:ps=>{
           let h=`<b>${ps[0].axisValue}</b>`; ps.forEach(p=>h+=ttRow(p.seriesName,`${n(p.value)} م.ر`,p.color)); return h; }}),
-        legend:{ icon:"circle", itemWidth:9, itemHeight:9, top:0, textStyle:{fontFamily:"Cairo",fontSize:11,color:"#5D6B7E"} },
+        legend:{ icon:"circle", itemWidth:9, itemHeight:9, top:0, textStyle:{fontFamily:"Cairo",fontSize:11,color:"#5C6E63"} },
         xAxis: hxAxis(v=>n(v)),
         yAxis: hyAxis(rows.map(r=>r[0]), 155),
         grid:{ top:34, bottom:26, right:168, left:20 },
         series:[
-          { name:"محقق", type:"bar", stack:"s", barWidth:13, color:"#0F7A8A", data:rows.map(r=>r[1].realized) },
-          { name:"متبقٍ", type:"bar", stack:"s", color:"#DCE5EE", data:rows.map(r=>({value:Math.max(0,r[1].identified-r[1].realized), itemStyle:{borderRadius:[6,0,0,6]}})) },
+          { name:"محقق", type:"bar", stack:"s", barWidth:13, color:"#098A4E", data:rows.map(r=>r[1].realized) },
+          { name:"متبقٍ", type:"bar", stack:"s", color:"#DDEBE2", data:rows.map(r=>({value:Math.max(0,r[1].identified-r[1].realized), itemStyle:{borderRadius:[6,0,0,6]}})) },
         ],
       }));
     });
@@ -1274,7 +1274,7 @@ RENDER.studies = {
       yAxis: hyAxis(rows.map(r=>r[0]), 130),
       grid:{ top:12, bottom:26, right:142, left:34 },
       series:[{ type:"bar", barWidth:14, data:rows.map((r,i)=>({value:r[1], itemStyle:{color:ramp(i,rows.length), borderRadius:[6,0,0,6]}})),
-        label:{show:true, position:"left", fontFamily:"IBM Plex Sans Arabic", color:"#5D6B7E", formatter:p=>n(p.value)} }],
+        label:{show:true, position:"left", fontFamily:"IBM Plex Sans Arabic", color:"#5C6E63", formatter:p=>n(p.value)} }],
     }));
   },
 };
@@ -1347,8 +1347,8 @@ RENDER.services = {
         const s = S.data.services[p.dataIndex];
         return `<b>${s.name}</b>` + ttRow("تكلفة المعاملة",`${n(s.unitCost,1)} ألف ريال`) + ttRow("الجودة",n(s.qualityScore)) + ttRow("التكلفة الإجمالية",`${n(s.totalCost,1)} م.ر`) + ttRow("التصنيف",s.classification);
       }}),
-      xAxis: Object.assign(valAxis(v=>n(v)), { name:"الجودة", inverse:true, nameLocation:"start", nameGap:8, nameTextStyle:{fontFamily:"Cairo",color:"#8B98A9"}, min:60, max:100, position:"bottom" }),
-      yAxis: Object.assign(valAxis(v=>n(v)), { name:"تكلفة المعاملة (ألف ريال)", nameGap:16, nameTextStyle:{fontFamily:"Cairo",color:"#8B98A9",align:"left"} }),
+      xAxis: Object.assign(valAxis(v=>n(v)), { name:"الجودة", inverse:true, nameLocation:"start", nameGap:8, nameTextStyle:{fontFamily:"Cairo",color:"#8B9C91"}, min:60, max:100, position:"bottom" }),
+      yAxis: Object.assign(valAxis(v=>n(v)), { name:"تكلفة المعاملة (ألف ريال)", nameGap:16, nameTextStyle:{fontFamily:"Cairo",color:"#8B9C91",align:"left"} }),
       grid:{ top:44, bottom:44, right:64, left:24 },
       series:[{ type:"scatter",
         data:S.data.services.map(s=>({ value:[s.qualityScore, s.unitCost], symbolSize:Math.max(10,Math.sqrt(s.totalCost)*4),
@@ -1363,7 +1363,7 @@ RENDER.services = {
       grid:{ top:12, bottom:26, right:110, left:34 },
       series:[{ type:"bar", barWidth:22,
         data:Object.entries(cc).map(([k,v])=>({value:v, itemStyle:{color:cls[k], borderRadius:[7,0,0,7]}})),
-        label:{show:true, position:"left", fontFamily:"IBM Plex Sans Arabic", fontWeight:700, color:"#5D6B7E", formatter:p=>n(p.value)} }],
+        label:{show:true, position:"left", fontFamily:"IBM Plex Sans Arabic", fontWeight:700, color:"#5C6E63", formatter:p=>n(p.value)} }],
     }));
   },
 };
@@ -1434,18 +1434,18 @@ RENDER.budget = {
       tooltip: Object.assign({},TT,{trigger:"axis", formatter:ps=>{
         const c = B[ps[0].dataIndex];
         let h=`<b>${c.name}</b>`;
-        h+=ttRow("المعتمد",`${n(c.approved)} م.ر`,"#0A2A4A");
-        h+=ttRow("المنصرف",`${n(c.spent)} م.ر`,"#0F7A8A");
+        h+=ttRow("المعتمد",`${n(c.approved)} م.ر`,"#0B4028");
+        h+=ttRow("المنصرف",`${n(c.spent)} م.ر`,"#098A4E");
         h+=ttRow("فرص الكفاءة",`${n(c.opportunities)} م.ر`,"#C7A34F");
         h+=ttRow("حالة المراجعة",c.reviewStatus);
         return h; }}),
-      legend:{ icon:"circle", itemWidth:9, itemHeight:9, top:0, textStyle:{fontFamily:"Cairo",fontSize:11,color:"#5D6B7E"} },
+      legend:{ icon:"circle", itemWidth:9, itemHeight:9, top:0, textStyle:{fontFamily:"Cairo",fontSize:11,color:"#5C6E63"} },
       xAxis: hxAxis(v=>n(v)),
       yAxis: hyAxis(B.map(c=>c.name), 175),
       grid:{ top:34, bottom:26, right:188, left:20 },
       series:[
-        { name:"المعتمد", type:"bar", barGap:"-100%", barWidth:16, color:"#E2E9F2", data:B.map(c=>({value:c.approved, itemStyle:{borderRadius:[8,0,0,8]}})), silent:true },
-        { name:"المنصرف", type:"bar", barWidth:16, color:"#0F7A8A", data:B.map(c=>({value:c.spent, itemStyle:{borderRadius:[8,0,0,8]}})) },
+        { name:"المعتمد", type:"bar", barGap:"-100%", barWidth:16, color:"#E0EEE5", data:B.map(c=>({value:c.approved, itemStyle:{borderRadius:[8,0,0,8]}})), silent:true },
+        { name:"المنصرف", type:"bar", barWidth:16, color:"#098A4E", data:B.map(c=>({value:c.spent, itemStyle:{borderRadius:[8,0,0,8]}})) },
         { name:"فرص الكفاءة", type:"scatter", symbol:"diamond", symbolSize:12, color:"#C7A34F", data:B.map(c=>c.opportunities) },
       ],
     }));
@@ -1529,16 +1529,16 @@ function openKpi(id){
   requestAnimationFrame(()=>{
     const c = chart("ch-kpi-trend"); if(!c) return;
     c.setOption(base({
-      tooltip: Object.assign({},TT,{trigger:"axis", formatter:ps=>`<b>${ps[0].axisValue}</b>`+ttRow("القيمة",`${n(ps[0].value, ps[0].value%1?1:0)} ${k.unit}`,"#0F7A8A")}),
-      xAxis: catXAxis(k.series.map(s=>s.p), { axisLabel:{color:"#5D6B7E",fontFamily:"Cairo",fontSize:10, interval:0, rotate:k.series.length>4?26:0} }),
+      tooltip: Object.assign({},TT,{trigger:"axis", formatter:ps=>`<b>${ps[0].axisValue}</b>`+ttRow("القيمة",`${n(ps[0].value, ps[0].value%1?1:0)} ${k.unit}`,"#098A4E")}),
+      xAxis: catXAxis(k.series.map(s=>s.p), { axisLabel:{color:"#5C6E63",fontFamily:"Cairo",fontSize:10, interval:0, rotate:k.series.length>4?26:0} }),
       yAxis: Object.assign(valAxis(v=>n(v)), {
         max: v=>Math.max(v.max, k.target)*1.08,
         min: v=>Math.min(v.min, k.direction==="down"? k.target : v.min)*0.9,
       }),
       grid:{ top:20, bottom:44, right:50, left:16, containLabel:true },
       series:[{ type:"line", data:k.series.map(s=>s.v), smooth:true, symbol:"circle", symbolSize:7,
-        lineStyle:{color:"#0F7A8A",width:3}, itemStyle:{color:"#0F7A8A"},
-        areaStyle:{color:{type:"linear",x:0,y:0,x2:0,y2:1,colorStops:[{offset:0,color:"rgba(15,122,138,.2)"},{offset:1,color:"rgba(15,122,138,0)"}]}},
+        lineStyle:{color:"#098A4E",width:3}, itemStyle:{color:"#098A4E"},
+        areaStyle:{color:{type:"linear",x:0,y:0,x2:0,y2:1,colorStops:[{offset:0,color:"rgba(9,138,78,.2)"},{offset:1,color:"rgba(9,138,78,0)"}]}},
         markLine:{ symbol:"none", lineStyle:{color:"#C7A34F",type:"dashed",width:2},
           label:{formatter:`المستهدف ${n(k.target,k.target%1?1:0)}`, fontFamily:"Cairo", color:"#A98A3C", position:"insideStartTop"},
           data:[{yAxis:k.target}] } }],
@@ -1773,14 +1773,14 @@ RENDER.capability = {
   mount(){
     const C = S.data.capability;
     chart("ch-cap-aw").setOption(base({
-      tooltip: Object.assign({},TT,{trigger:"axis", formatter:ps=>`<b>${ps[0].axisValue}</b>`+ttRow("نسبة الوعي",pct(ps[0].value),"#0F7A8A")}),
+      tooltip: Object.assign({},TT,{trigger:"axis", formatter:ps=>`<b>${ps[0].axisValue}</b>`+ttRow("نسبة الوعي",pct(ps[0].value),"#098A4E")}),
       xAxis: catXAxis(C.awareness.surveys.map(s=>s.label)),
       yAxis: Object.assign(valAxis(v=>n(v)+"%"), {max:100}),
       grid:{ top:22, bottom:28, right:46, left:12 },
       series:[{ type:"line", data:C.awareness.surveys.map(s=>s.score), smooth:true, symbol:"circle", symbolSize:8,
-        lineStyle:{color:"#0F7A8A",width:3}, itemStyle:{color:"#0F7A8A"},
-        label:{show:true, position:"top", fontFamily:"IBM Plex Sans Arabic", fontWeight:700, color:"#0A2A4A", formatter:p=>n(p.value)+"%"},
-        areaStyle:{color:{type:"linear",x:0,y:0,x2:0,y2:1,colorStops:[{offset:0,color:"rgba(15,122,138,.18)"},{offset:1,color:"rgba(15,122,138,0)"}]}},
+        lineStyle:{color:"#098A4E",width:3}, itemStyle:{color:"#098A4E"},
+        label:{show:true, position:"top", fontFamily:"IBM Plex Sans Arabic", fontWeight:700, color:"#0B4028", formatter:p=>n(p.value)+"%"},
+        areaStyle:{color:{type:"linear",x:0,y:0,x2:0,y2:1,colorStops:[{offset:0,color:"rgba(9,138,78,.18)"},{offset:1,color:"rgba(9,138,78,0)"}]}},
         markLine:{ symbol:"none", lineStyle:{color:"#C7A34F",type:"dashed",width:2},
           label:{formatter:`المستهدف ${C.awareness.target}%`, fontFamily:"Cairo", color:"#A98A3C", position:"insideStartTop"},
           data:[{yAxis:C.awareness.target}] } }],
