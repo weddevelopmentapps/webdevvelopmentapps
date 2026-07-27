@@ -1913,9 +1913,12 @@ function buildReport(type){
   }
   rv.innerHTML = `
     <div class="rv-head">
-      <div>
-        <h1>${title}</h1>
-        <div class="rv-meta">${esc(S.data.meta.entity)} — فريق كفاءة الإنفاق · تاريخ الإصدار: ${asOf} · ${S.data.meta.demo? "بيانات تجريبية لأغراض العرض":""}</div>
+      <div style="display:flex;align-items:center;gap:18px;min-width:0">
+        <img src="__LOGO_FULL__" alt="شعار الهيئة الملكية لمدينة الرياض" style="height:72px;flex:0 0 auto">
+        <div style="min-width:0">
+          <h1>${title}</h1>
+          <div class="rv-meta">${esc(S.data.meta.entity)} — فريق كفاءة الإنفاق · تاريخ الإصدار: ${asOf} · ${S.data.meta.demo? "بيانات تجريبية لأغراض العرض":""}</div>
+        </div>
       </div>
       <div style="display:flex;gap:8px" class="no-print">
         <button class="btn primary" id="rv-print">طباعة / PDF</button>
