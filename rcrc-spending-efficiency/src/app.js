@@ -38,7 +38,7 @@ function save(){
   }, 250);
 }
 function resetData(){
-  if(!confirm("سيتم استرجاع بيانات العرض الأصلية وفقدان كل التعديلات المحلية. المتابعة؟")) return;
+  if(!confirm("سيجري استرجاع بيانات العرض الأصلية وستُفقد جميع التعديلات المحلية. هل تريد المتابعة؟")) return;
   localStorage.removeItem(LS_KEY);
   S.data = deepClone(SEED);
   refresh(); toast("تم استرجاع البيانات الأصلية");
@@ -148,7 +148,7 @@ function buildAlerts(){
     A.push({sev:"warn", t:`طلب تمويل معاد للاستكمال: ${r.name}`, d:r.note||"استكمال المتطلبات قبل إعادة الرفع.", tab:"funding"}));
   const missing = allCriteria().filter(c=>c.evidence.some(e=>e.status==="غير متوفر"));
   if(missing.length)
-    A.push({sev:"warn", t:`${n(missing.length)} معايير تنقصها وثائق داعمة`, d:"استكمال الوثائق شرط أساسي لدرجة «متميز» في التقييم.", tab:"skep"});
+    A.push({sev:"warn", t:`${n(missing.length)} من المعايير تنقصها وثائق داعمة`, d:"استكمال الوثائق شرط أساسي لدرجة «متميز» في التقييم.", tab:"skep"});
   const weak = allCriteria().filter(c=>c.simScore<=2);
   weak.forEach(c=>A.push({sev:"bad", t:`معيار منخفض في تقييم المحاكاة: ${c.code} ${c.name}`, d:"يتطلب خطة معالجة عاجلة قبل التقييم النهائي.", tab:"skep"}));
   const dLeft = daysBetween(asOf, S.data.assessmentCycle.selfDue);
@@ -260,11 +260,11 @@ const TABS = [
   { id:"skep", name:"ركائز الاستدامة", icon:"skep", kicker:"برنامج ركائز استدامة كفاءة الإنفاق",
     desc:"الركائز السبع لدورة حياة الإنفاق — التقييم الذاتي ومحاكاة التقييم المستقل والوثائق الداعمة وخطط المعالجة." },
   { id:"initiatives", name:"المبادرات", icon:"bulb", kicker:"دورة حياة المبادرات",
-    desc:"من بطاقة الفرصة إلى الإقفال، مع بوابة التحقق المالي وقاعدة مرجعية لممارسات الجهات الحكومية." },
+    desc:"من بطاقة الفرصة إلى الإقفال، مع اشتراط التحقق المالي وقاعدة مرجعية لممارسات الجهات الحكومية." },
   { id:"impact", name:"الأثر المالي", icon:"coins", kicker:"قياس الأثر",
     desc:"سجل الوفورات المعتمد: وفر مباشر وتجنب تكلفة وتعظيم إيراد، بخطوط أساس موثقة وتحقق مالي قبل الاعتماد." },
   { id:"funding", name:"طلبات التمويل", icon:"doc", kicker:"التخطيط والإعداد",
-    desc:"لائحة التعقب وسلسلة المراجعة الرباعية وبوابة اكتمال الدراسات الخمس ودراسات السعة والطلب." },
+    desc:"لائحة التعقب وسلسلة المراجعة الرباعية واشتراط اكتمال الدراسات الخمس ودراسات السعة والطلب." },
   { id:"studies", name:"الدراسات", icon:"book", kicker:"أتمتة المنهجيات",
     desc:"دراسات السعة والطلب والدراسات الخمس والهندسة القيمية، مع مكتبة المنهجيات والمقارنات المعيارية." },
   { id:"services", name:"الخدمات", icon:"gridic", kicker:"مراجعة الخدمات",
@@ -272,11 +272,11 @@ const TABS = [
   { id:"budget", name:"الميزانية والمراجعة", icon:"pie", kicker:"مراجعة الإنفاق",
     desc:"أبواب الميزانية وعوامل التكلفة ومسببات الطلب وسجل مراجعات الإنفاق وفرصها." },
   { id:"kpis", name:"مؤشرات الأداء", icon:"chartic", kicker:"إدارة الأداء",
-    desc:"عائلات المؤشرات الأربع وفق النموذج التشغيلي لفرق كفاءة الإنفاق، بمعادلاتها واتجاهاتها." },
+    desc:"مجموعات المؤشرات الأربع وفق النموذج التشغيلي لفرق كفاءة الإنفاق، بمعادلاتها واتجاهاتها." },
   { id:"governance", name:"الحوكمة", icon:"shield", kicker:"الحوكمة والتنظيم",
     desc:"التنظيم الإداري وملاك الركائز واللجان وسجل السياسات وسلم التصعيد مع هيئة كفاءة الإنفاق." },
   { id:"capability", name:"القدرات والثقافة", icon:"users", kicker:"بناء القدرات وإدارة التغيير",
-    desc:"التدريب وقياس الوعي وسلم التبني وخطط التعاقب وإدارة المعرفة وآلية التحفيز." },
+    desc:"التدريب وقياس الوعي ومستويات التبني وخطط التعاقب وإدارة المعرفة وآلية التحفيز." },
   { id:"reports", name:"التقارير", icon:"file", kicker:"التقارير الدورية",
     desc:"تقارير حية جاهزة للطباعة والرفع: الربع سنوية والسنوية وجاهزية الركائز وحزمة إكسبرو." },
 ];
@@ -408,7 +408,7 @@ RENDER.home = {
             <div class="s">${n(evs.ready)} من ${n(evs.total)} وثيقة متوفرة</div>
           </div>
           <div class="hero-cell">
-            <div class="l">التقييم الذاتي بعد</div>
+            <div class="l">المتبقي للتقييم الذاتي</div>
             <div class="v num">${n(dLeft)}</div>
             <div class="s">يوماً · ${fmtDate(S.data.assessmentCycle.selfDue)}</div>
           </div>
@@ -423,7 +423,7 @@ RENDER.home = {
           <div class="meter-mark" style="right:${pos(ovPrev)}%"><b class="num">${n(ovPrev,1)}</b><span class="ml">الدورة السادسة</span></div>
           <div class="meter-mark" style="right:${pos(ovSim)}%"><b class="num">${n(ovSim,1)}</b><span class="ml">المحاكاة المستقلة</span></div>
           <div class="meter-mark strong" style="right:${pos(ov)}%"><b class="num">${n(ov,1)}</b><span class="ml">التقييم الذاتي</span></div>
-          <div class="meter-mark gold" style="right:${pos(S.data.maturity.targetScore)}%"><b class="num">${n(S.data.maturity.targetScore,1)}</b><span class="ml">عتبة «متميز»</span></div>
+          <div class="meter-mark gold" style="right:${pos(S.data.maturity.targetScore)}%"><b class="num">${n(S.data.maturity.targetScore,1)}</b><span class="ml">درجة «متميز»</span></div>
         </div>
       </div>
     </section>
@@ -443,13 +443,13 @@ RENDER.home = {
 
     <div class="grid g2 mt">
       <div class="card">
-        <h3>خط أنابيب المبادرات</h3>
-        <div class="subt">عدد المبادرات في كل مرحلة من دورة الحياة</div>
+        <h3>المبادرات حسب مراحل دورة الحياة</h3>
+        <div class="subt">عدد المبادرات في كل مرحلة</div>
         <div id="ch-home-pipe" class="chart ch-260"></div>
       </div>
       <div class="card">
-        <h3>تنبيهات تتطلب الانتباه</h3>
-        <div class="subt">مشتقة آلياً من بيانات المنصة</div>
+        <h3>تنبيهات تستدعي اتخاذ إجراء</h3>
+        <div class="subt">تُستخلص تلقائياً من بيانات المنصة</div>
         <div style="max-height:260px;overflow-y:auto">
           ${alerts.slice(0,7).map(a=>`
             <div class="alert ${a.sev}" role="button" data-goto="${a.tab}" style="cursor:pointer">
@@ -462,7 +462,7 @@ RENDER.home = {
 
     <div class="grid g21 mt">
       <div class="card">
-        <h3>قراءة تنفيذية</h3>
+        <h3>الملخص التنفيذي</h3>
         <div class="subt">أبرز الملاحظات المستخلصة من الوضع الراهن</div>
         ${homeInsights()}
       </div>
@@ -508,7 +508,7 @@ RENDER.home = {
     // pipeline
     const sc = statusCount();
     chart("ch-home-pipe").setOption(base({
-      tooltip: Object.assign({},TT,{formatter: p=>ttRow(p.name, `${n(p.value)} مبادرة`, p.color)}),
+      tooltip: Object.assign({},TT,{formatter: p=>ttRow(p.name, p.value>=3&&p.value<=10? `${n(p.value)} مبادرات` : p.value===2? "مبادرتان" : p.value===1? "مبادرة واحدة" : `${n(p.value)} مبادرة`, p.color)}),
       xAxis: hxAxis(v=>n(v)),
       yAxis: hyAxis(INI_STAGES),
       grid:{ top:12, bottom:26, right:86, left:34 },
@@ -525,10 +525,10 @@ function homeInsights(){
   const real2026 = S.data.impact.monthly2026.reduce((s,m)=>s+m.real,0);
   const tgt = S.data.meta.impactTarget2026;
   return `
-    <div class="insight navy">التقييم الذاتي الشامل ${ltr(n(overallScore("self"),1))} ومحاكاة التقييم المستقل ${ltr(n(overallScore("sim"),1))} من 5 — الفجوة الواقعية إلى «متميز» تُقاس على المحاكاة (${ltr(n(Math.max(0,S.data.maturity.targetScore-overallScore("sim")),1))} نقطة)، ويتركز الجهد المطلوب في ركيزتي <b>قياس الأثر</b> و<b>الأصول والمرافق</b>.</div>
-    <div class="insight">تحقق ${pct(real2026/tgt*100)} من مستهدف الأثر المالي لعام 2026 حتى نهاية يوليو، مع خط أنابيب معتمد بقيمة ${money(it.approved)} يدعم بلوغ المستهدف قبل نهاية العام.</div>
-    <div class="insight gold">${n(gaps)} معياراً دون درجة «متمكن» في تقييم المحاكاة المستقلة — معالجة هذه المعايير مع رفع اكتمال الوثائق (حالياً ${pct(evs.coverage)}) هي أقصر طريق لدرجة «متميز».</div>
-    <div class="insight">جودة طلبات التمويل داخل سلسلة المراجعة عند ${pct(fr)} من حيث اكتمال الدراسات الخمس ودراسات السعة والطلب قبل الرفع لوزارة المالية.</div>`;
+    <div class="insight navy">التقييم الذاتي الشامل ${ltr(n(overallScore("self"),1))} ومحاكاة التقييم المستقل ${ltr(n(overallScore("sim"),1))} من 5 — الفجوة الفعلية إلى «متميز» تُقاس على نتيجة المحاكاة (${ltr(n(Math.max(0,S.data.maturity.targetScore-overallScore("sim")),1))} نقطة)، ويتركز الجهد المطلوب في ركيزتي <b>قياس الأثر</b> و<b>الأصول والمرافق</b>.</div>
+    <div class="insight">تحقق ${pct(real2026/tgt*100)} من مستهدف الأثر المالي لعام 2026 حتى نهاية يوليو، مع فرص معتمدة من الشؤون المالية بقيمة ${money(it.approved)} بما يدعم بلوغ المستهدف قبل نهاية العام.</div>
+    <div class="insight gold">${n(gaps)} معياراً دون درجة «متمكن» في تقييم المحاكاة المستقلة — معالجة هذه المعايير مع رفع اكتمال الوثائق (حالياً ${pct(evs.coverage)}) هي المسار الأسرع لبلوغ درجة «متميز».</div>
+    <div class="insight">جودة طلبات التمويل المسجلة في لائحة التعقب عند ${pct(fr)} من حيث اكتمال الدراسات الخمس ودراسات السعة والطلب قبل الرفع لوزارة المالية.</div>`;
 }
 function mountRadar(id){
   const c = chart(id); if(!c) return;
@@ -611,7 +611,7 @@ RENDER.skep = {
         <div class="subt">درجة كل معيار في وضع «${mode==="self"?"الذاتي":"المحاكاة"}» — اضغط أي خلية للتفاصيل</div>
         <div style="overflow-x:auto">${heatmapHTML(mode)}</div>
         <div class="legend-dots">${S.data.maturity.levels.map(l=>`<span><i style="background:${l.color}"></i>${l.name} (${l.n})</span>`).join("")}</div>
-        <div class="mini-note" style="margin-top:6px">سلّم نضج استرشادي قابل للتهيئة — تُعاير المسميات والحدود وفق الدليل الإرشادي المعتمد لدورة التقييم.</div>
+        <div class="mini-note" style="margin-top:6px">مقياس نضج استرشادي قابل للمعايرة — تُعاير المسميات والحدود وفق الدليل الإرشادي المعتمد لدورة التقييم.</div>
       </div>
       <div class="card">
         <h3>فجوات الوصول إلى «متميز»</h3>
@@ -799,7 +799,7 @@ RENDER.initiatives = {
     </div>
 
     <div class="section-head"><h2>قاعدة بيانات مبادرات الجهات الحكومية (مرجعية)</h2>
-      <span class="hint">المخرج الخامس — ممارسات مطبقة مصنفة حسب الفئات مع مصادر الهدر وآلية احتساب الأثر (أنواع الجهات معمّاة للعرض)</span></div>
+      <span class="hint">المخرج الخامس — ممارسات مطبقة مصنفة حسب الفئات مع مصادر الهدر وآلية احتساب الأثر (أسماء الجهات معمّاة لأغراض العرض)</span></div>
     <div class="card">
       <div class="tblwrap">
         <table>
@@ -862,7 +862,7 @@ function openIni(id){
     </div>
     <div class="dsec"><h4>الأثر المالي (مليون ريال)</h4>
       <div class="fld"><b>المقدر</b><span class="num">${n(i.estImpact)}</span></div>
-      <div class="fld"><b>المعتمد من المالية</b><span class="num">${n(i.approvedImpact)}</span></div>
+      <div class="fld"><b>المعتمد من الشؤون المالية</b><span class="num">${n(i.approvedImpact)}</span></div>
       <div class="fld"><b>المحقق</b><span class="num">${n(i.realizedImpact)}</span></div>
       <div class="fld"><b>التحقق المالي</b><span><span class="st ${i.financeValidated?"ok":"warn"}">${i.financeValidated?"معتمد من الشؤون المالية":"بانتظار التحقق المالي"}</span></span></div>
       <div class="fld"><b>طلبات التغيير</b><span class="num">${n(i.changeRequests)}</span></div>
@@ -883,10 +883,10 @@ function openIni(id){
     </div>`:""}
     ${i.note && !i.flag? `<div class="dsec"><h4>ملاحظات</h4><div class="mini-note">${esc(i.note)}</div></div>`:""}
     <div class="dsec" style="display:flex;gap:8px;flex-wrap:wrap">
-      ${canAdvance? `<button class="btn primary" id="d-advance" ${gateBlocked?"disabled style='opacity:.5;cursor:not-allowed'":""}>ترقية إلى «${nextStage}»</button>`:""}
+      ${canAdvance? `<button class="btn primary" id="d-advance" ${gateBlocked?"disabled style='opacity:.5;cursor:not-allowed'":""}>نقل إلى مرحلة «${nextStage}»</button>`:""}
       ${!i.financeValidated? `<button class="btn ghost" id="d-validate">تأكيد التحقق المالي</button>`:""}
       <button class="btn ghost" id="d-edit">تعديل البيانات</button>
-      ${i.flag? `<button class="btn ghost" id="d-unflag">إزالة راية «${i.flag}»</button>`:""}
+      ${i.flag? `<button class="btn ghost" id="d-unflag">إلغاء حالة «${i.flag}»</button>`:""}
     </div>
     ${gateBlocked? `<div class="mini-note mt">⚠ ${gateMsg}</div>`:""}`;
   openDrawer(`${i.id} — ${i.name}`, body);
@@ -895,7 +895,7 @@ function openIni(id){
     if(gateBlocked) return;
     i.status = nextStage;
     if(nextStage==="مقفلة") i.progress = 100;
-    save(); refresh(); openIni(id); toast(`تم ترقية المبادرة إلى «${nextStage}»`);
+    save(); refresh(); openIni(id); toast(`انتقلت المبادرة إلى مرحلة «${nextStage}»`);
   });
   if(el("d-validate")) el("d-validate").addEventListener("click",()=>{
     i.financeValidated = true;
@@ -903,7 +903,7 @@ function openIni(id){
     save(); refresh(); openIni(id); toast("تم تسجيل التحقق المالي");
   });
   if(el("d-unflag")) el("d-unflag").addEventListener("click",()=>{
-    i.flag = null; save(); refresh(); openIni(id); toast("تمت إزالة الراية");
+    i.flag = null; save(); refresh(); openIni(id); toast("تم إلغاء الحالة");
   });
   if(el("d-edit")) el("d-edit").addEventListener("click",()=>{ closeDrawer(); iniForm(i); });
 }
@@ -972,15 +972,15 @@ RENDER.impact = {
     const share = Math.round(real2026 / S.data.meta.budgetApproved * 1000)/10;
     return `
     <div class="stat-strip">
-      ${kpiTile("bulb","","أثر محدد (خط الأنابيب)", `${ltr(n(it.identified))} <small>مليون ريال</small>`, `<span>${n(S.data.initiatives.length)} مبادرة وفرصة</span>`)}
-      ${kpiTile("check","","أثر معتمد من المالية", `${ltr(n(it.approved))} <small>مليون ريال</small>`, `<span>${pct(it.identified? it.approved/it.identified*100:0)} من المحدد</span>`)}
+      ${kpiTile("bulb","","الأثر المالي المحدد (الفرص المرصودة)", `${ltr(n(it.identified))} <small>مليون ريال</small>`, `<span>${n(S.data.initiatives.length)} مبادرة وفرصة</span>`)}
+      ${kpiTile("check","","أثر معتمد من الشؤون المالية", `${ltr(n(it.approved))} <small>مليون ريال</small>`, `<span>${pct(it.identified? it.approved/it.identified*100:0)} من المحدد</span>`)}
       ${kpiTile("coins","g","أثر محقق تراكمي", `${ltr(n(it.realized))} <small>مليون ريال</small>`, `<span>منه ${moneyShort(it.documented)} موثق بالإقفال</span>`)}
       ${kpiTile("gauge","n","نسبة الأثر من الميزانية المعتمدة 2026", pct(share,1), `<span>محقق 2026: ${moneyShort(real2026)} من ميزانية ${moneyShort(S.data.meta.budgetApproved)}</span>`)}
     </div>
 
     <div class="grid g21 mt">
       <div class="card">
-        <h3>شلال بناء الأثر المالي</h3>
+        <h3>مراحل تحقق الأثر المالي</h3>
         <div class="subt">من الأثر المحدد إلى الموثق (مليون ريال) — منهجية: وفر مباشر، تجنب تكلفة، تعظيم إيراد</div>
         <div id="ch-imp-water" class="chart ch-340"></div>
       </div>
@@ -1109,13 +1109,13 @@ RENDER.funding = {
     return `
     <div class="stat-strip">
       ${kpiTile("doc","","طلبات التمويل المسجلة", `${ltr(n(FR.length))}`, `<span>بقيمة إجمالية ${money(total)}</span>`)}
-      ${kpiTile("check","","اكتمال متطلبات الطلبات المسجلة", pct(comp), `<span class="st ${comp>=80?"ok":"warn"}">جودة الاستلام</span><span>بوابة الدخول تضمن 100% داخل سلسلة المراجعة</span>`)}
+      ${kpiTile("check","","اكتمال متطلبات الطلبات المسجلة", pct(comp), `<span class="st ${comp>=80?"ok":"warn"}">جودة الطلبات عند التسجيل</span><span>لا يدخل سلسلة المراجعة إلا طلب مكتمل المتطلبات</span>`)}
       ${kpiTile("clock","g","طلبات معادة للاستكمال", `${ltr(n(returned))}`, `<span>تتطلب استيفاء الملاحظات قبل إعادة الدخول</span>`)}
       ${kpiTile("coins","n","طلبات معتمدة", `${ltr(n(approved))}`, `<span>${money(FR.filter(r=>r.stage==="معتمد").reduce((s,r)=>s+r.amount,0))}</span>`)}
     </div>
 
     <div class="section-head"><h2>لائحة التعقب — سلسلة المراجعة الرباعية</h2>
-      <span class="hint">المقيّم ← قائد الفريق ← الشؤون المالية ← المسؤول الأول، مع بوابة اكتمال الدراسات</span>
+      <span class="hint">المقيّم ← قائد الفريق ← الشؤون المالية ← المسؤول الأول، مع اشتراط اكتمال الدراسات</span>
       <button class="btn primary" id="fr-add">${svgi("doc")} طلب تمويل جديد</button></div>
     <div class="card">
       <div class="tblwrap">
@@ -1137,7 +1137,7 @@ RENDER.funding = {
           </tbody>
         </table>
       </div>
-      <div class="mini-note mt">بوابة الاكتمال: لا يدخل الطلب سلسلة المراجعة إلا باكتمال الدراسات الخمس (الاستراتيجية، الاقتصادية، التجارية، المالية، الإدارية) ودراسة السعة والطلب ووثيقتي النطاق والقيمة — وفق تعليمات تنفيذ الميزانية ومتطلبات هيئة كفاءة الإنفاق والمشروعات الحكومية.
+      <div class="mini-note mt">ضابط الاكتمال: لا يُحال الطلب إلى سلسلة المراجعة إلا باكتمال الدراسات الخمس (الاستراتيجية، الاقتصادية، التجارية، المالية، الإدارية) ودراسة السعة والطلب ووثيقتي النطاق والقيمة — وفق تعليمات تنفيذ الميزانية ومتطلبات هيئة كفاءة الإنفاق والمشروعات الحكومية.
       مرحلة «مرفوع لوزارة المالية» امتداد خاص بالهيئة لطلبات الميزانية الجديدة؛ وبعد الاعتماد يُؤرشف الطلب وتُحدَّث لائحة التعقب وفق النموذج التشغيلي.</div>
     </div>`;
   },
@@ -1192,19 +1192,19 @@ function openFR(id){
     <div class="fld"><b>النوع</b><span>${esc(r.type)}</span></div>
     <div class="fld"><b>القيمة</b><span>${money(r.amount)}</span></div>
     ${r.note && r.stage!=="معاد للاستكمال"? `<div class="fld"><b>ملاحظات</b><span>${esc(r.note)}</span></div>`:""}
-    <div class="dsec"><h4>بوابة اكتمال المتطلبات — اضغط لتحديث الحالة</h4>
+    <div class="dsec"><h4>متطلبات الاكتمال — اضغط لتحديث الحالة</h4>
       <div class="cklist">
         ${checks.map(c=>`<button class="ck ${c.val?"y":"n"}" data-ck="${c.key}"><span class="box">${c.val?"✓":""}</span><span style="flex:1;text-align:right">${c.label}</span></button>`).join("")}
       </div>
     </div>
     <div class="dsec" style="display:flex;gap:8px;flex-wrap:wrap">
       ${r.stage==="الإعداد"||r.stage==="معاد للاستكمال" ?
-        `<button class="btn primary" id="fr-submit" ${!complete?"disabled style='opacity:.5;cursor:not-allowed' title='استكمال المتطلبات أولاً'":""}>إدخال في سلسلة المراجعة</button>`:
+        `<button class="btn primary" id="fr-submit" ${!complete?"disabled style='opacity:.5;cursor:not-allowed' title='استكمال المتطلبات أولاً'":""}>إحالة إلى سلسلة المراجعة</button>`:
        chainIdx>=1 && chainIdx<FR_CHAIN.length-1 ?
-        `<button class="btn primary" id="fr-advance">ترقية إلى «${FR_CHAIN[chainIdx+1]}»</button>
+        `<button class="btn primary" id="fr-advance">نقل إلى مرحلة «${FR_CHAIN[chainIdx+1]}»</button>
          <button class="btn danger" id="fr-return">إعادة للاستكمال</button>`:""}
     </div>
-    ${!complete && (r.stage==="الإعداد"||r.stage==="معاد للاستكمال")? `<div class="mini-note mt">⚠ البوابة مغلقة: يجب اكتمال المتطلبات الثمانية قبل دخول سلسلة المراجعة.</div>`:""}`;
+    ${!complete && (r.stage==="الإعداد"||r.stage==="معاد للاستكمال")? `<div class="mini-note mt">⚠ لا يمكن الإحالة قبل اكتمال المتطلبات الثمانية.</div>`:""}`;
   openDrawer(`${r.id} — ${r.name}`, body);
   document.querySelectorAll("#drawer-body [data-ck]").forEach(btn=>{
     btn.addEventListener("click",()=>{
@@ -1220,12 +1220,12 @@ function openFR(id){
   if(el("fr-submit")) el("fr-submit").addEventListener("click",()=>{
     if(!frComplete(r)) return;
     r.stage = "مراجعة المقيّم"; r.note = "";
-    save(); refresh(); openFR(id); toast("دخل الطلب سلسلة المراجعة");
+    save(); refresh(); openFR(id); toast("أُحيل الطلب إلى سلسلة المراجعة");
   });
   if(el("fr-advance")) el("fr-advance").addEventListener("click",()=>{
-    if(!frComplete(r)){ toast("لا يمكن الترقية — أعد الطلب للاستكمال لمعالجة النواقص"); return; }
+    if(!frComplete(r)){ toast("لا يمكن نقل الطلب — يُعاد للاستكمال لمعالجة النواقص"); return; }
     r.stage = FR_CHAIN[chainIdx+1];
-    save(); refresh(); openFR(id); toast(`تمت الترقية إلى «${r.stage}»`);
+    save(); refresh(); openFR(id); toast(`انتقل الطلب إلى مرحلة «${r.stage}»`);
   });
   if(el("fr-return")) el("fr-return").addEventListener("click",()=>{
     r.stage = "معاد للاستكمال"; r.note = "أعيد الطلب لاستيفاء ملاحظات المراجعة.";
@@ -1248,13 +1248,13 @@ RENDER.studies = {
     return `
     <div class="stat-strip">
       ${kpiTile("book","","إجمالي الدراسات", `${ltr(n(S.data.studies.length))}`, `<span>${n(S.data.studies.filter(s=>s.status==="معتمدة"||s.status==="مكتملة").length)} معتمدة/مكتملة</span>`)}
-      ${kpiTile("gauge","","متوسط اكتمال دراسات السعة والطلب", pct(avg("سعة وطلب")), `<span>منهجية السبع خطوات حسب فئة الأصول</span>`)}
+      ${kpiTile("gauge","","متوسط اكتمال دراسات السعة والطلب", pct(avg("سعة وطلب")), `<span>منهجية الخطوات السبع حسب فئة الأصول</span>`)}
       ${kpiTile("doc","n","متوسط اكتمال الدراسات الخمس", pct(avg("الدراسات الخمس")), `<span>النموذج الخماسي للجدوى</span>`)}
       ${kpiTile("bulb","g","دراسات الهندسة القيمية", `${ltr(n(S.data.studies.filter(s=>s.type==="هندسة قيمية").length))}`, `<span>وفق منهجية SAVE ومراحل العمل الثماني</span>`)}
     </div>
 
     <div class="section-head"><h2>سجل الدراسات</h2>
-      <span class="hint">أتمتة إعداد ومتابعة دراسات السعة والطلب والدراسات الخمس — المسار الثالث من نطاق العمل</span></div>
+      <span class="hint">أتمتة إعداد دراسات السعة والطلب والدراسات الخمس ومتابعتها — المسار الثالث من نطاق العمل</span></div>
     <div class="card">
       <div class="toolbar">
         <div class="pillbar">
@@ -1326,7 +1326,7 @@ RENDER.studies = {
     S.data.studies.forEach(s=>{ m[s.assetClass]=(m[s.assetClass]||0)+1; });
     const rows = Object.entries(m).sort((a,b)=>b[1]-a[1]);
     chart("ch-st-class").setOption(base({
-      tooltip: Object.assign({},TT,{formatter:p=>ttRow(p.name,`${n(p.value)} دراسات`,p.color)}),
+      tooltip: Object.assign({},TT,{formatter:p=>ttRow(p.name, p.value>=3&&p.value<=10? `${n(p.value)} دراسات` : p.value===2? "دراستان" : p.value===1? "دراسة واحدة" : `${n(p.value)} دراسة`,p.color)}),
       xAxis: hxAxis(v=>n(v)),
       yAxis: hyAxis(rows.map(r=>r[0]), 130),
       grid:{ top:12, bottom:26, right:142, left:34 },
@@ -1357,7 +1357,7 @@ RENDER.services = {
     <div class="grid g21 mt">
       <div class="card">
         <h3>التكلفة مقابل الجودة</h3>
-        <div class="subt">كل نقطة خدمة — الحجم يمثل التكلفة الإجمالية، اضغط نقطة للتفاصيل</div>
+        <div class="subt">كل نقطة تمثل خدمة، وحجمها يعكس تكلفتها الإجمالية — اضغط أي نقطة للتفاصيل</div>
         <div id="ch-svc-scatter" class="chart ch-340"></div>
       </div>
       <div class="card">
@@ -1440,7 +1440,7 @@ RENDER.budget = {
       ${kpiTile("pie","","الميزانية المعتمدة 2026", `${ltr(n(total/1000,1))} <small>مليار ريال</small>`, `<span>${n(B.length)} أبواب رئيسية</span>`)}
       ${kpiTile("chartic","","نسبة المنصرف حتى تاريخه", pct(spent/total*100), `<span>${money(spent)} حتى ${fmtDate(S.data.meta.asOf)}</span>`)}
       ${kpiTile("book","n","تغطية مراجعات الإنفاق", `${ltr(n(reviewed))} <small>من ${n(B.length)}</small>`, `<span>وفق منهجية هيئة كفاءة الإنفاق</span>`)}
-      ${kpiTile("bulb","g","فرص كفاءة محددة من المراجعات", `${ltr(n(opp))} <small>م.ر</small>`, `<span>تغذي خط أنابيب المبادرات</span>`)}
+      ${kpiTile("bulb","g","فرص كفاءة محددة من المراجعات", `${ltr(n(opp))} <small>م.ر</small>`, `<span>تُغذّي محفظة المبادرات</span>`)}
     </div>
 
     <div class="grid g21 mt">
@@ -1467,7 +1467,7 @@ RENDER.budget = {
     </div>
 
     <div class="section-head"><h2>سجل مراجعات الإنفاق</h2>
-      <span class="hint">خدمة مراجعة الإنفاق تُنفذ بالتكامل مع هيئة كفاءة الإنفاق وتُختم بفرص محددة ودروس مستفادة</span></div>
+      <span class="hint">خدمة مراجعة الإنفاق تُنفذ بالتكامل مع هيئة كفاءة الإنفاق وتُختتم بفرص محددة ودروس مستفادة</span></div>
     <div class="grid g2">
       ${S.data.spendingReviews.map(r=>`
         <div class="card lift">
@@ -1542,7 +1542,7 @@ RENDER.kpis = {
     </div>
 
     <div class="section-head"><h2>مؤشرات إدارة الأداء ${f!=="الكل"?`— ${f}`:""}</h2>
-      <span class="hint">العائلات الأربع وفق النموذج التشغيلي لفرق كفاءة الإنفاق (القسم 2.7) — اضغط أي مؤشر للاتجاه الزمني</span>
+      <span class="hint">المجموعات الأربع وفق النموذج التشغيلي لفرق كفاءة الإنفاق (القسم 2.7) — اضغط أي مؤشر لعرض تطوره الزمني</span>
       ${f!=="الكل"?`<button class="btn ghost" id="kpi-all">عرض الكل</button>`:""}</div>
     <div class="grid g3" style="grid-template-columns:repeat(auto-fill,minmax(330px,1fr))">
       ${KP.map(k=>{
@@ -1557,7 +1557,7 @@ RENDER.kpis = {
           </div>
           <div style="display:flex;align-items:baseline;gap:9px;margin-top:6px">
             <span class="pscore" style="font-size:24px">${ltr(n(v, v%1?1:0))}</span>
-            <span class="mini-note">${esc(k.unit)} · المستهدف ${ltr(n(k.target, k.target%1?1:0))} ${k.direction==="down"?"(أقل أفضل)":""}</span>
+            <span class="mini-note">${esc(k.unit)} · المستهدف ${ltr(n(k.target, k.target%1?1:0))} ${k.direction==="down"?"(الأقل أفضل)":""}</span>
             ${better!=null? `<span class="delta ${better?"up":"dn"}">${better?"تحسن":"تراجع"}</span>`:""}
           </div>
           <div class="bar-mini" style="margin-top:8px"><i style="width:${progress}%;${st==="bad"?"background:var(--bad)":st==="warn"?"background:var(--warn)":""}"></i></div>
@@ -1575,13 +1575,13 @@ RENDER.kpis = {
 function openKpi(id){
   const k = S.data.kpis.find(x=>x.id===id); if(!k) return;
   const body = `
-    <div class="fld"><b>العائلة</b><span>${esc(k.family)}</span></div>
+    <div class="fld"><b>المجموعة</b><span>${esc(k.family)}</span></div>
     <div class="fld"><b>الدورية</b><span>${esc(k.freq)}</span></div>
-    <div class="fld"><b>الاتجاه</b><span>${k.direction==="up"?"أعلى أفضل":"أقل أفضل"}</span></div>
+    <div class="fld"><b>الاتجاه</b><span>${k.direction==="up"?"الأعلى أفضل":"الأقل أفضل"}</span></div>
     <div class="fld"><b>المستهدف</b><span class="num">${n(k.target, k.target%1?1:0)} ${esc(k.unit)}</span></div>
     <div class="fld"><b>المالك</b><span>${esc(k.owner)}</span></div>
     ${k.formula? `<div class="fld"><b>المعادلة</b><span>${esc(k.formula)}</span></div>`:""}
-    <div class="dsec"><h4>الاتجاه الزمني</h4><div id="ch-kpi-trend" class="chart ch-220"></div></div>`;
+    <div class="dsec"><h4>التطور الزمني</h4><div id="ch-kpi-trend" class="chart ch-220"></div></div>`;
   openDrawer(k.name, body);
   requestAnimationFrame(()=>{
     const c = chart("ch-kpi-trend"); if(!c) return;
@@ -1748,19 +1748,19 @@ RENDER.capability = {
     return `
     <div class="stat-strip">
       ${kpiTile("users","","تغطية مصفوفة المهارات", pct(C.skillsCoverage), `<span>المستهدف ${pct(C.skillsTarget)}</span>`)}
-      ${kpiTile("check","","نسبة الوعي بكفاءة الإنفاق", pct(last.score), `<span>آخر قياس: ${esc(last.label)} (${n(last.respondents)} مشاركاً)</span>`)}
+      ${kpiTile("check","","نسبة الوعي بكفاءة الإنفاق", pct(last.score), `<span>آخر قياس: ${esc(last.label)} (عدد المشاركين: ${n(last.respondents)})</span>`)}
       ${kpiTile("book","n","البرامج التدريبية", `${ltr(n(done))} <small>من ${n(C.trainings.length)} مكتملة</small>`, `<span>${n(C.trainings.reduce((s,t)=>s+t.hours,0))} ساعة تدريبية</span>`)}
       ${kpiTile("flag","g","مستوى تبني كفاءة الإنفاق", `${esc(C.adoption.current)}`, `<span>المستهدف «${esc(C.adoption.target)}» 2026–2027</span>`)}
     </div>
 
     <div class="grid g21 mt">
       <div class="card">
-        <h3>منحنى الوعي بكفاءة الإنفاق</h3>
-        <div class="subt">حلقة القياس المغلقة: قياس ← فجوات ← تدخلات ← إعادة قياس (المستهدف ${pct(C.awareness.target)})</div>
+        <h3>تطور نسبة الوعي بكفاءة الإنفاق</h3>
+        <div class="subt">دورة قياس وتحسين متكاملة: قياس ← تحديد الفجوات ← تدخلات ← إعادة قياس (المستهدف ${pct(C.awareness.target)})</div>
         <div id="ch-cap-aw" class="chart ch-260"></div>
       </div>
       <div class="card">
-        <h3>سلم التبني</h3>
+        <h3>مستويات التبني</h3>
         <div class="subt">خطة إدارة التغيير وآلية التحفيز</div>
         <div class="stepper" style="margin-top:16px">
           ${C.adoption.levels.map((l,i)=>`
@@ -1784,7 +1784,7 @@ RENDER.capability = {
         <h3>خطة التعاقب الوظيفي</h3>
         <div class="subt">تغطية الأدوار الحرجة: ${pct(C.succession.coverage)} — المستهدف ${pct(C.succession.target)}</div>
         <div class="bar-mini" style="margin:8px 0 12px"><i style="width:${C.succession.coverage}%"></i></div>
-        ${C.succession.roles.map(r=>`<div class="fld"><b>${esc(r.role)}</b><span><span class="st ${r.status==="مغطى"?"ok":"warn"}">${esc(r.status)}</span> ${n(r.ready)} ${r.ready>1?"مرشحان جاهزان":"مرشح جاهز"}</span></div>`).join("")}
+        ${C.succession.roles.map(r=>`<div class="fld"><b>${esc(r.role)}</b><span><span class="st ${r.status==="مغطى"?"ok":"warn"}">${esc(r.status)}</span> ${r.ready>1?"مرشحان جاهزان":"مرشح واحد جاهز"}</span></div>`).join("")}
         <div class="mini-note mt">${esc(C.succession.note)}</div>
       </div>
       <div class="card">
@@ -1851,7 +1851,7 @@ RENDER.capability = {
 RENDER.reports = {
   html(){
     return `
-    <div class="section-head"><h2>مولّد التقارير</h2>
+    <div class="section-head"><h2>إنشاء التقارير</h2>
       <span class="hint">تقارير جاهزة للطباعة والرفع — تُبنى لحظياً من بيانات المنصة الحية</span></div>
     <div class="grid g4" style="grid-template-columns:repeat(auto-fit,minmax(250px,1fr))">
       ${[
@@ -1920,7 +1920,7 @@ function buildReport(type){
     title = "التقرير الربع سنوي لأعمال فريق كفاءة الإنفاق";
     body = `
       <h2>الملخص التنفيذي</h2>
-      <p>بلغ التقييم الذاتي الشامل ${n(overallScore("self"),1)} من 5 (${gradeOf(overallScore("self"))})، وبلغ الأثر المالي المحقق التراكمي ${n(it.realized)} مليون ريال (منه ${n(it.documented)} مليون موثق بالإقفال)، بنسبة التزام بالمبادرات ${n(ist.commitment,1)}%.</p>
+      <p>بلغ التقييم الذاتي الشامل ${n(overallScore("self"),1)} من 5 (${gradeOf(overallScore("self"))})، وبلغ الأثر المالي المحقق التراكمي ${n(it.realized)} مليون ريال (منه ${n(it.documented)} مليون ريال موثق بالإقفال)، فيما بلغت نسبة الالتزام بالمبادرات ${n(ist.commitment,1)}%.</p>
       <h2>المبادرات حسب المرحلة</h2>
       <table><thead><tr><th>المرحلة</th><th>العدد</th></tr></thead><tbody>
         ${INI_STAGES.map(s=>`<tr><td>${s}</td><td class="num">${n(statusCount()[s])}</td></tr>`).join("")}
@@ -1940,7 +1940,7 @@ function buildReport(type){
       <table><tbody>
         <tr><td>التقييم الذاتي الشامل (الدورة السابعة)</td><td class="num">${n(overallScore("self"),1)} / 5 — ${gradeOf(overallScore("self"))}</td></tr>
         <tr><td>تقييم الدورة السادسة</td><td class="num">${n(overallScore("prev"),1)} / 5</td></tr>
-        <tr><td>الأثر المالي المحدد (خط الأنابيب)</td><td class="num">${n(it.identified)} مليون ريال</td></tr>
+        <tr><td>الأثر المالي المحدد (إجمالي الفرص)</td><td class="num">${n(it.identified)} مليون ريال</td></tr>
         <tr><td>الأثر المعتمد من الشؤون المالية</td><td class="num">${n(it.approved)} مليون ريال</td></tr>
         <tr><td>الأثر المحقق التراكمي</td><td class="num">${n(it.realized)} مليون ريال</td></tr>
         <tr><td>اكتمال الوثائق الداعمة</td><td class="num">${evs.coverage}%</td></tr>
@@ -1951,7 +1951,7 @@ function buildReport(type){
         ${S.data.pillars.map(p=>`<tr><td>${esc(p.name)}</td><td class="num">${n(pillarScore(p,"self"),2)}</td><td class="num">${n(pillarScore(p,"sim"),2)}</td><td class="num">${n(pillarScore(p,"prev"),2)}</td><td>${esc(p.owner)}</td></tr>`).join("")}
       </tbody></table>
       <h2>قصص النجاح</h2>
-      ${S.data.initiatives.filter(i=>i.status==="مقفلة").map(i=>`<p><b>${esc(i.name)}:</b> ${esc(i.wasteSource)} — عولجت عبر ${esc(i.treatment)}، بأثر موثق ${n(i.realizedImpact)} مليون ريال.</p>`).join("")}`;
+      ${S.data.initiatives.filter(i=>i.status==="مقفلة").map(i=>`<p><b>${esc(i.name)}:</b> ${esc(i.wasteSource)} — عولج مصدر الهدر عبر ${esc(i.treatment)}، بأثر موثق قدره ${n(i.realizedImpact)} مليون ريال.</p>`).join("")}`;
   } else {
     title = "حزمة الرفع الدوري — منصة فرق كفاءة الإنفاق";
     body = `
