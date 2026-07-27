@@ -22,9 +22,9 @@ AS_OF = "2026-07-27"
 MATURITY = {
     "levels": [
         {"n": 1, "name": "مبتدئ",  "color": "#B3402F"},
-        {"n": 2, "name": "ناشئ",   "color": "#C88A16"},
-        {"n": 3, "name": "متقدم",  "color": "#8A7A2E"},
-        {"n": 4, "name": "متمكن",  "color": "#2E7D6B"},
+        {"n": 2, "name": "ناشئ",   "color": "#B77A12"},
+        {"n": 3, "name": "متقدم",  "color": "#75837B"},
+        {"n": 4, "name": "متمكن",  "color": "#2E7D57"},
         {"n": 5, "name": "متميز",  "color": "#098A4E"},
     ],
     "thresholds": [  # grade by score (>=)

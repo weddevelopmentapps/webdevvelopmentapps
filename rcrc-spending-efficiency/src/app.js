@@ -175,14 +175,14 @@ function chart(id){
   return CH[id];
 }
 const TT = {
-  trigger:"item", backgroundColor:"#FFFFFF", borderColor:"#DCE8E0", borderWidth:1,
-  textStyle:{ color:"#152119", fontFamily:"Cairo", fontSize:12 },
-  extraCssText:"direction:rtl;text-align:right;box-shadow:0 8px 24px rgba(11,64,40,.14);border-radius:10px;padding:10px 14px;",
+  trigger:"item", backgroundColor:"#131D17", borderColor:"transparent", borderWidth:0,
+  textStyle:{ color:"#F1F5F2", fontFamily:"Cairo", fontSize:12 },
+  extraCssText:"direction:rtl;text-align:right;box-shadow:0 14px 40px rgba(10,20,15,.35);border-radius:13px;padding:11px 15px;",
 };
 function ttRow(k, v, color){
   return `<div style="display:flex;justify-content:space-between;gap:18px;align-items:center;margin:2px 0">
-    <span style="color:#5C6E63">${color?`<span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${color};margin-left:6px"></span>`:""}${k}</span>
-    <b style="font-family:'IBM Plex Sans Arabic'">${v}</b></div>`;
+    <span style="color:#A9B6AE">${color?`<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${color};margin-left:6px"></span>`:""}${k}</span>
+    <b style="font-family:'IBM Plex Sans Arabic';color:#FFF">${v}</b></div>`;
 }
 function base(extra){
   return Object.assign({
@@ -192,34 +192,35 @@ function base(extra){
     grid:{ top:30, bottom:28, right:14, left:52, containLabel:false },
   }, extra);
 }
+const AX_LINE = "rgba(17,24,21,.1)", AX_SPLIT = "rgba(17,24,21,.055)", AX_LBL = "#93A099", AX_CAT = "#6B7870";
 function catAxis(data){
   return { type:"category", data, inverse:true,
-    axisLine:{ lineStyle:{ color:"#DCE8E0" } }, axisTick:{ show:false },
-    axisLabel:{ color:"#5C6E63", fontFamily:"Cairo", fontSize:11 } };
+    axisLine:{ lineStyle:{ color:AX_LINE } }, axisTick:{ show:false },
+    axisLabel:{ color:AX_CAT, fontFamily:"Cairo", fontSize:11 } };
 }
 function valAxis(fmt){
   return { type:"value", position:"right",
-    splitLine:{ lineStyle:{ color:"#EAF2EC" } }, axisLabel:{ color:"#8B9C91", fontFamily:"IBM Plex Sans Arabic", fontSize:10.5, formatter:fmt } };
+    splitLine:{ lineStyle:{ color:AX_SPLIT } }, axisLabel:{ color:AX_LBL, fontFamily:"IBM Plex Sans Arabic", fontSize:10.5, formatter:fmt } };
 }
 /* RTL horizontal bars: bars grow right<-left, category labels on the RIGHT */
 function hxAxis(fmt, max){
   const a = { type:"value", inverse:true,
-    splitLine:{ lineStyle:{ color:"#EAF2EC" } },
-    axisLabel:{ color:"#8B9C91", fontFamily:"IBM Plex Sans Arabic", fontSize:10.5, formatter:fmt } };
+    splitLine:{ lineStyle:{ color:AX_SPLIT } },
+    axisLabel:{ color:AX_LBL, fontFamily:"IBM Plex Sans Arabic", fontSize:10.5, formatter:fmt } };
   if(max!=null) a.max = max;
   return a;
 }
 function hyAxis(data, labelWidth){
   return { type:"category", data, position:"right", inverse:true,
-    axisLine:{ lineStyle:{ color:"#DCE8E0" } }, axisTick:{ show:false },
-    axisLabel:{ color:"#5C6E63", fontFamily:"Cairo", fontSize:11,
+    axisLine:{ lineStyle:{ color:"transparent" } }, axisTick:{ show:false },
+    axisLabel:{ color:AX_CAT, fontFamily:"Cairo", fontSize:11,
       width: labelWidth||null, overflow: labelWidth? "truncate":"none" } };
 }
 /* RTL vertical charts: category x-axis reads right -> left */
 function catXAxis(data, extra){
   return Object.assign({ type:"category", data, inverse:true,
-    axisLine:{ lineStyle:{ color:"#DCE8E0" } }, axisTick:{ show:false },
-    axisLabel:{ color:"#5C6E63", fontFamily:"Cairo", fontSize:11 } }, extra||{});
+    axisLine:{ lineStyle:{ color:AX_LINE } }, axisTick:{ show:false },
+    axisLabel:{ color:AX_CAT, fontFamily:"Cairo", fontSize:11 } }, extra||{});
 }
 let resizeT=null;
 addEventListener("resize", ()=>{ clearTimeout(resizeT); resizeT=setTimeout(()=>Object.values(CH).forEach(c=>c.resize()),150); });
@@ -256,22 +257,73 @@ function svgi(name, cls){ return `<svg class="${cls||""}" viewBox="0 0 24 24" fi
 /* ---------------- tabs ---------------- */
 const TABS = [
   { id:"home", name:"الرئيسية", icon:"home" },
-  { id:"skep", name:"ركائز الاستدامة", icon:"skep" },
-  { id:"initiatives", name:"المبادرات", icon:"bulb" },
-  { id:"impact", name:"الأثر المالي", icon:"coins" },
-  { id:"funding", name:"طلبات التمويل", icon:"doc" },
-  { id:"studies", name:"الدراسات", icon:"book" },
-  { id:"services", name:"الخدمات", icon:"gridic" },
-  { id:"budget", name:"الميزانية والمراجعة", icon:"pie" },
-  { id:"kpis", name:"مؤشرات الأداء", icon:"chartic" },
-  { id:"governance", name:"الحوكمة", icon:"shield" },
-  { id:"capability", name:"القدرات والثقافة", icon:"users" },
-  { id:"reports", name:"التقارير", icon:"file" },
+  { id:"skep", name:"ركائز الاستدامة", icon:"skep", kicker:"برنامج ركائز استدامة كفاءة الإنفاق",
+    desc:"الركائز السبع لدورة حياة الإنفاق — التقييم الذاتي ومحاكاة التقييم المستقل والوثائق الداعمة وخطط المعالجة." },
+  { id:"initiatives", name:"المبادرات", icon:"bulb", kicker:"دورة حياة المبادرات",
+    desc:"من بطاقة الفرصة إلى الإقفال، مع بوابة التحقق المالي وقاعدة مرجعية لممارسات الجهات الحكومية." },
+  { id:"impact", name:"الأثر المالي", icon:"coins", kicker:"قياس الأثر",
+    desc:"سجل الوفورات المعتمد: وفر مباشر وتجنب تكلفة وتعظيم إيراد، بخطوط أساس موثقة وتحقق مالي قبل الاعتماد." },
+  { id:"funding", name:"طلبات التمويل", icon:"doc", kicker:"التخطيط والإعداد",
+    desc:"لائحة التعقب وسلسلة المراجعة الرباعية وبوابة اكتمال الدراسات الخمس ودراسات السعة والطلب." },
+  { id:"studies", name:"الدراسات", icon:"book", kicker:"أتمتة المنهجيات",
+    desc:"دراسات السعة والطلب والدراسات الخمس والهندسة القيمية، مع مكتبة المنهجيات والمقارنات المعيارية." },
+  { id:"services", name:"الخدمات", icon:"gridic", kicker:"مراجعة الخدمات",
+    desc:"دليل خدمات الهيئة بتكلفة المعاملة وتصنيف الجودة ونقاط المراجعة والنسبة الرقمية." },
+  { id:"budget", name:"الميزانية والمراجعة", icon:"pie", kicker:"مراجعة الإنفاق",
+    desc:"أبواب الميزانية وعوامل التكلفة ومسببات الطلب وسجل مراجعات الإنفاق وفرصها." },
+  { id:"kpis", name:"مؤشرات الأداء", icon:"chartic", kicker:"إدارة الأداء",
+    desc:"عائلات المؤشرات الأربع وفق النموذج التشغيلي لفرق كفاءة الإنفاق، بمعادلاتها واتجاهاتها." },
+  { id:"governance", name:"الحوكمة", icon:"shield", kicker:"الحوكمة والتنظيم",
+    desc:"التنظيم الإداري وملاك الركائز واللجان وسجل السياسات وسلم التصعيد مع هيئة كفاءة الإنفاق." },
+  { id:"capability", name:"القدرات والثقافة", icon:"users", kicker:"بناء القدرات وإدارة التغيير",
+    desc:"التدريب وقياس الوعي وسلم التبني وخطط التعاقب وإدارة المعرفة وآلية التحفيز." },
+  { id:"reports", name:"التقارير", icon:"file", kicker:"التقارير الدورية",
+    desc:"تقارير حية جاهزة للطباعة والرفع: الربع سنوية والسنوية وجاهزية الركائز وحزمة إكسبرو." },
 ];
+const BN_MAIN = ["home","skep","initiatives","impact"];
 function renderTabbar(){
   document.getElementById("tabbar-inner").innerHTML = TABS.map(t=>
     `<button class="tab ${S.tab===t.id?"on":""}" data-tab="${t.id}" ${S.tab===t.id?'aria-current="page"':""}>${svgi(t.icon)}${t.name}</button>`
   ).join("");
+  renderBottomNav();
+}
+function renderBottomNav(){
+  const bn = document.getElementById("bn-inner");
+  if(!bn) return;
+  const inMore = !BN_MAIN.includes(S.tab);
+  bn.innerHTML = BN_MAIN.map(id=>{
+    const t = TABS.find(x=>x.id===id);
+    return `<button class="bn-item ${S.tab===id?"on":""}" data-tab="${id}">${svgi(t.icon)}${t.name}</button>`;
+  }).join("") + `<button class="bn-item ${inMore?"on":""}" id="bn-more">${svgi("gridic")}المزيد</button>`;
+  bn.querySelectorAll("[data-tab]").forEach(b=>b.addEventListener("click",()=>{ closeMoreSheet(); go(b.dataset.tab); }));
+  document.getElementById("bn-more").addEventListener("click", openMoreSheet);
+}
+function openMoreSheet(){
+  const ms = document.getElementById("ms-body");
+  ms.innerHTML = `
+    <h4>الأقسام</h4>
+    <div class="ms-grid">
+      ${TABS.filter(t=>!BN_MAIN.includes(t.id)).map(t=>
+        `<button class="ms-item ${S.tab===t.id?"on":""}" data-tab="${t.id}">${svgi(t.icon)}${t.name}</button>`).join("")}
+    </div>
+    <h4>البيانات</h4>
+    <div class="ms-grid">
+      <button class="ms-item" data-act="export">${svgi("doc")}تصدير</button>
+      <button class="ms-item" data-act="import">${svgi("doc")}استيراد</button>
+      <button class="ms-item" data-act="print">${svgi("file")}طباعة</button>
+      <button class="ms-item" data-act="reset">${svgi("clock")}استرجاع</button>
+    </div>`;
+  ms.querySelectorAll("[data-tab]").forEach(b=>b.addEventListener("click",()=>{ closeMoreSheet(); go(b.dataset.tab); }));
+  ms.querySelectorAll("[data-act]").forEach(b=>b.addEventListener("click",()=>{
+    closeMoreSheet();
+    ({ export:doExport, import:doImport, print:()=>window.print(), reset:resetData })[b.dataset.act]();
+  }));
+  document.getElementById("moresheet").classList.add("on");
+  OV.classList.add("on");
+}
+function closeMoreSheet(){
+  document.getElementById("moresheet").classList.remove("on");
+  if(!DR.classList.contains("on") && !MO.classList.contains("on")) OV.classList.remove("on");
 }
 document.getElementById("tabbar-inner").addEventListener("click", e=>{
   const b = e.target.closest("[data-tab]");
@@ -290,7 +342,15 @@ const APP = document.getElementById("app");
 function refresh(){
   renderTabbar();
   const R = RENDER[S.tab] || RENDER.home;
-  APP.innerHTML = R.html();
+  const t = TABS.find(x=>x.id===S.tab);
+  const head = (!R.hero && t && t.desc)
+    ? `<header class="page-head">
+         <div class="kicker">${esc(t.kicker||"")}</div>
+         <h1>${esc(t.name)}</h1>
+         <div class="desc">${esc(t.desc)}</div>
+       </header>`
+    : "";
+  APP.innerHTML = head + R.html();
   R.mount && R.mount();
   resizeAll();
 }
@@ -299,8 +359,7 @@ function refresh(){
    TAB: home
    ============================================================ */
 function kpiTile(icon, iconCls, label, value, foot){
-  return `<div class="kpi lift">
-    <div class="icn ${iconCls||""}">${svgi(icon)}</div>
+  return `<div class="kpi">
     <div class="lbl">${label}</div>
     <div class="val">${value}</div>
     <div class="foot">${foot||""}</div>
@@ -309,11 +368,12 @@ function kpiTile(icon, iconCls, label, value, foot){
 const RENDER = {};
 
 RENDER.home = {
+  hero: true,
   html(){
     const ov = overallScore("self");
     const ovSim = overallScore("sim");
+    const ovPrev = overallScore("prev");
     const g = gradeOf(ov);
-    const it = impactTotals();
     const ist = iniStats();
     const evs = evStats(allCriteria());
     const alerts = buildAlerts();
@@ -321,22 +381,52 @@ RENDER.home = {
     const m2026 = S.data.impact.monthly2026;
     const real2026 = m2026.reduce((s,m)=>s+m.real,0);
     const tgt = S.data.meta.impactTarget2026;
+    const MIN = 2.5, MAX = 5;
+    const pos = v=>Math.max(0, Math.min(100, (v-MIN)/(MAX-MIN)*100));
     return `
-    <div class="grid g4">
-      ${kpiTile("skep","n","التقييم الذاتي الشامل — الدورة السابعة",
-        `${ltr(n(ov,1))} <small>من 5</small>`,
-        `<span class="grade" style="background:${gradeColor(g)}22;color:${gradeColor(g)}">${g}</span>
-         <span>المحاكاة المستقلة: ${ltr(n(ovSim,1))}</span>`)}
-      ${kpiTile("coins","","الأثر المالي المحقق 2026",
-        `${ltr(n(real2026))} <small>مليون ريال</small>`,
-        `<span class="st ${real2026/tgt>=0.58?"ok":"warn"}">${pct(real2026/tgt*100)} من المستهدف</span><span>المستهدف السنوي ${moneyShort(tgt)}</span>`)}
-      ${kpiTile("bulb","g","الالتزام بالمبادرات التحسينية",
-        `${pct(ist.commitment,1)}`,
-        `<span class="st ${ist.commitment>=92?"ok":"warn"}">المستهدف ${pct(92)}</span><span>${n(ist.total)} مبادرة — ${n(ist.flagged)} متأخرة/متعثرة</span>`)}
-      ${kpiTile("doc","n","اكتمال الوثائق الداعمة للركائز",
-        `${pct(evs.coverage)}`,
-        `<span>${n(evs.ready)} من ${n(evs.total)} وثيقة متوفرة</span>`)}
-    </div>
+    <section class="hero">
+      <div class="hero-top">
+        <div class="hero-main">
+          <div class="lbl">الجاهزية الشاملة لبرنامج ركائز استدامة كفاءة الإنفاق — الدورة السابعة</div>
+          <div class="hero-score"><span class="big num">${n(ov,1)}</span><span class="of">من 5</span></div>
+          <div class="hero-grade"><i></i> ${g} — التقييم الذاتي · المحاكاة المستقلة ${ltr(n(ovSim,1))} (${gradeOf(ovSim)})</div>
+        </div>
+        <div class="hero-side">
+          <div class="hero-cell">
+            <div class="l">الأثر المالي المحقق 2026</div>
+            <div class="v num">${n(real2026)}</div>
+            <div class="s">مليون ريال · ${pct(real2026/tgt*100)} من المستهدف</div>
+          </div>
+          <div class="hero-cell">
+            <div class="l">الالتزام بالمبادرات</div>
+            <div class="v num">${n(ist.commitment,1)}%</div>
+            <div class="s">المستهدف ${pct(92)} · ${n(ist.flagged)} متأخرة/متعثرة</div>
+          </div>
+          <div class="hero-cell">
+            <div class="l">الوثائق الداعمة</div>
+            <div class="v num">${evs.coverage}%</div>
+            <div class="s">${n(evs.ready)} من ${n(evs.total)} وثيقة متوفرة</div>
+          </div>
+          <div class="hero-cell">
+            <div class="l">التقييم الذاتي بعد</div>
+            <div class="v num">${n(dLeft)}</div>
+            <div class="s">يوماً · ${fmtDate(S.data.assessmentCycle.selfDue)}</div>
+          </div>
+        </div>
+      </div>
+      <div class="meter" aria-label="مسار النضج نحو متميز">
+        <div class="meter-track">
+          <div class="meter-zone" style="right:${pos(S.data.maturity.targetScore)}%;left:0"></div>
+          <div class="meter-fill" style="width:${pos(ov)}%"></div>
+        </div>
+        <div class="meter-marks">
+          <div class="meter-mark" style="right:${pos(ovPrev)}%"><b class="num">${n(ovPrev,1)}</b><span class="ml">الدورة السادسة</span></div>
+          <div class="meter-mark" style="right:${pos(ovSim)}%"><b class="num">${n(ovSim,1)}</b><span class="ml">المحاكاة المستقلة</span></div>
+          <div class="meter-mark strong" style="right:${pos(ov)}%"><b class="num">${n(ov,1)}</b><span class="ml">التقييم الذاتي</span></div>
+          <div class="meter-mark gold" style="right:${pos(S.data.maturity.targetScore)}%"><b class="num">${n(S.data.maturity.targetScore,1)}</b><span class="ml">عتبة «متميز»</span></div>
+        </div>
+      </div>
+    </section>
 
     <div class="grid g21 mt">
       <div class="card">
@@ -345,27 +435,22 @@ RENDER.home = {
         <div id="ch-home-monthly" class="chart ch-290"></div>
       </div>
       <div class="card">
-        <h3>الجاهزية نحو «متميز»</h3>
-        <div class="subt">التقييم الذاتي مقابل مستهدف الدرجة ${ltr(n(S.data.maturity.targetScore,1))} — المنطقة الذهبية هي نطاق «متميز»</div>
-        <div id="ch-home-gauge" class="chart ch-290"></div>
+        <h3>نضج الركائز السبع</h3>
+        <div class="subt">ذاتي / محاكاة / الدورة السادسة</div>
+        <div id="ch-home-radar" class="chart ch-290"></div>
       </div>
     </div>
 
-    <div class="grid g3 mt">
-      <div class="card">
-        <h3>نضج الركائز السبع</h3>
-        <div class="subt">ذاتي / محاكاة / الدورة السادسة</div>
-        <div id="ch-home-radar" class="chart ch-300"></div>
-      </div>
+    <div class="grid g2 mt">
       <div class="card">
         <h3>خط أنابيب المبادرات</h3>
         <div class="subt">عدد المبادرات في كل مرحلة من دورة الحياة</div>
-        <div id="ch-home-pipe" class="chart ch-300"></div>
+        <div id="ch-home-pipe" class="chart ch-260"></div>
       </div>
       <div class="card">
         <h3>تنبيهات تتطلب الانتباه</h3>
         <div class="subt">مشتقة آلياً من بيانات المنصة</div>
-        <div style="max-height:300px;overflow-y:auto">
+        <div style="max-height:260px;overflow-y:auto">
           ${alerts.slice(0,7).map(a=>`
             <div class="alert ${a.sev}" role="button" data-goto="${a.tab}" style="cursor:pointer">
               <div class="ai">${svgi(a.sev==="bad"?"alertT":a.sev==="warn"?"clock":"info")}</div>
@@ -381,10 +466,10 @@ RENDER.home = {
         <div class="subt">أبرز الملاحظات المستخلصة من الوضع الراهن</div>
         ${homeInsights()}
       </div>
-      <div class="card goldrule" style="border-top:3px solid var(--gold)">
+      <div class="card goldrule">
         <h3>دورة التقييم السابعة</h3>
         <div class="subt">${esc(S.data.assessmentCycle.name)}</div>
-        <div class="countdown" style="margin:10px 0 14px">
+        <div class="countdown" style="margin:12px 0 16px">
           <div class="cd-box"><b>${n(dLeft)}</b><span>يوماً للتقييم الذاتي</span></div>
           <div class="cd-box"><b>${n(daysBetween(S.data.meta.asOf, S.data.assessmentCycle.docsDue))}</b><span>يوماً لرفع الوثائق</span></div>
         </div>
@@ -418,8 +503,6 @@ RENDER.home = {
           areaStyle:{color:{type:"linear",x:0,y:0,x2:0,y2:1,colorStops:[{offset:0,color:"rgba(9,138,78,.22)"},{offset:1,color:"rgba(9,138,78,0)"}]}} },
       ],
     }));
-    // gauge
-    mountScoreGauge("ch-home-gauge", overallScore("self"), gradeOf(overallScore("self")));
     // radar
     mountRadar("ch-home-radar");
     // pipeline
@@ -429,8 +512,8 @@ RENDER.home = {
       xAxis: hxAxis(v=>n(v)),
       yAxis: hyAxis(INI_STAGES),
       grid:{ top:12, bottom:26, right:86, left:34 },
-      series:[{ type:"bar", data: INI_STAGES.map((s,i)=>({value:sc[s], itemStyle:{color:ramp(i,6), borderRadius:[6,0,0,6]}})),
-        barWidth:16, label:{show:true, position:"left", fontFamily:"IBM Plex Sans Arabic", color:"#5C6E63", formatter:p=>n(p.value)} }],
+      series:[{ type:"bar", data: INI_STAGES.map(s=>({value:sc[s], itemStyle:{color:"#098A4E", borderRadius:[6,0,0,6]}})),
+        barWidth:14, label:{show:true, position:"left", fontFamily:"IBM Plex Sans Arabic", color:"#6B7870", formatter:p=>n(p.value)} }],
     }));
   },
 };
@@ -446,31 +529,6 @@ function homeInsights(){
     <div class="insight">تحقق ${pct(real2026/tgt*100)} من مستهدف الأثر المالي لعام 2026 حتى نهاية يوليو، مع خط أنابيب معتمد بقيمة ${money(it.approved)} يدعم بلوغ المستهدف قبل نهاية العام.</div>
     <div class="insight gold">${n(gaps)} معياراً دون درجة «متمكن» في تقييم المحاكاة المستقلة — معالجة هذه المعايير مع رفع اكتمال الوثائق (حالياً ${pct(evs.coverage)}) هي أقصر طريق لدرجة «متميز».</div>
     <div class="insight">جودة طلبات التمويل داخل سلسلة المراجعة عند ${pct(fr)} من حيث اكتمال الدراسات الخمس ودراسات السعة والطلب قبل الرفع لوزارة المالية.</div>`;
-}
-function mountScoreGauge(id, val, grade){
-  const c = chart(id); if(!c) return;
-  const tgt = S.data.maturity.targetScore;
-  const sim = overallScore("sim");
-  c.setOption({
-    animation:false,   // stills/prints must always show the final value
-    series:[{
-      type:"gauge", startAngle:205, endAngle:-25, min:0, max:5, radius:"96%", center:["50%","58%"], splitNumber:5,
-      progress:{ show:true, width:16, roundCap:true, itemStyle:{ color:{type:"linear",x:0,y:0,x2:1,y2:0,colorStops:[{offset:0,color:"#0B4028"},{offset:1,color:"#14A862"}]} } },
-      axisLine:{ lineStyle:{ width:16, color:[[tgt/5,"#EAF2EC"],[1,"rgba(199,163,79,.38)"]] } },
-      pointer:{ show:true, length:"58%", width:4, itemStyle:{color:"#0B4028"} },
-      anchor:{ show:true, size:8, itemStyle:{color:"#0B4028"} },
-      axisTick:{ distance:-24, length:4, lineStyle:{color:"#B5C9BC"} },
-      splitLine:{ distance:-28, length:8, lineStyle:{color:"#B5C9BC",width:1.5} },
-      axisLabel:{ distance:-14, color:"#8B9C91", fontSize:10, fontFamily:"IBM Plex Sans Arabic" },
-      detail:{ valueAnimation:false, offsetCenter:[0,"30%"],
-        formatter:v=>`{v|${v.toFixed(1)}}\n{g|${grade}}\n{s|المحاكاة المستقلة ${sim.toFixed(1)} — ${gradeOf(sim)}}`,
-        rich:{ v:{fontSize:30,fontWeight:700,fontFamily:"IBM Plex Sans Arabic",color:"#0B4028"},
-               g:{fontSize:13,fontFamily:"IBM Plex Sans Arabic",fontWeight:600,color:gradeColor(grade),padding:[6,0,0,0]},
-               s:{fontSize:11,fontFamily:"Cairo",color:"#5C6E63",padding:[7,0,0,0]} } },
-      data:[{value:val}],
-      title:{show:false},
-    }],
-  });
 }
 function mountRadar(id){
   const c = chart(id); if(!c) return;
@@ -490,7 +548,7 @@ function mountRadar(id){
       data:[
         { name:"الذاتي", value:P.map(p=>pillarScore(p,"self")), lineStyle:{color:"#098A4E",width:2.5}, itemStyle:{color:"#098A4E"}, areaStyle:{color:"rgba(9,138,78,.14)"} },
         { name:"المحاكاة", value:P.map(p=>pillarScore(p,"sim")), lineStyle:{color:"#0B4028",width:2}, itemStyle:{color:"#0B4028"} },
-        { name:"الدورة 6", value:P.map(p=>pillarScore(p,"prev")), lineStyle:{color:"#C7A34F",width:1.6,type:"dashed"}, itemStyle:{color:"#C7A34F"} },
+        { name:"الدورة 6", value:P.map(p=>pillarScore(p,"prev")), lineStyle:{color:"#9AA8A0",width:1.6,type:"dashed"}, itemStyle:{color:"#9AA8A0"} },
       ]}],
   });
 }
@@ -531,7 +589,7 @@ RENDER.skep = {
 
     <div class="section-head"><h2>الركائز السبع — دورة حياة الإنفاق</h2>
       <span class="hint">الوثائق الداعمة: ${n(evs.ready)} متوفرة · ${n(evs.prep)} قيد الإعداد · ${n(evs.missing)} غير متوفرة</span></div>
-    <div class="grid g4" style="grid-template-columns:repeat(auto-fit,minmax(205px,1fr))">
+    <div class="grid g4" style="grid-template-columns:repeat(auto-fit,minmax(192px,1fr))">
       ${S.data.pillars.map((p,i)=>{
         const s = pillarScore(p,mode); const pg = gradeOf(s);
         const pe = evStats(p.criteria);
@@ -565,7 +623,6 @@ RENDER.skep = {
             <div style="flex:1"><b>${esc(c.code)} — ${esc(c.name)}</b>
               <div class="at">${esc(c.pillar.name)} · الدرجة الحالية ${ltr(n(critScore(c,mode)))} · ${c.actions.length? esc(c.actions[0].name) : "لا توجد إجراءات مسجلة — أضف إجراء معالجة"}</div>
             </div>
-            <span class="pscore" style="font-size:18px">${ltr(n(critScore(c,mode)))}</span>
           </div>`).join("")}
         </div>
       </div>
@@ -586,8 +643,8 @@ RENDER.skep = {
       yAxis: hyAxis(P.map(p=>p.short)),
       grid:{ top:14, bottom:26, right:96, left:44 },
       series:[
-        { type:"bar", barWidth:18,
-          data: P.map((p,i)=>({ value:pillarScore(p,mode), itemStyle:{ color:ramp(i,7), borderRadius:[9,0,0,9] } })),
+        { type:"bar", barWidth:16,
+          data: P.map(p=>({ value:pillarScore(p,mode), itemStyle:{ color:"#098A4E", borderRadius:[9,0,0,9] } })),
           label:{ show:true, position:"left", formatter:p=>n(p.value,2), fontFamily:"IBM Plex Sans Arabic", fontWeight:700, color:"#5C6E63" },
           markLine:{ symbol:"none", lineStyle:{color:"#C7A34F",type:"dashed",width:2},
             label:{ show:false },
@@ -610,7 +667,7 @@ function heatmapHTML(mode){
       if(!c){ h+=`<td style="padding:4px 5px"><div class="heat-cell" style="background:var(--line2);color:var(--faint)">—</div></td>`; continue; }
       const s = critScore(c,mode);
       const lv = S.data.maturity.levels.find(l=>l.n===Math.round(s)) || S.data.maturity.levels[0];
-      h += `<td style="padding:4px 5px"><div class="heat-cell" data-pillar="${p.id}" title="${esc(c.code)} ${esc(c.name)}" style="background:${lv.color};cursor:pointer">${n(s)}</div></td>`;
+      h += `<td style="padding:4px 5px"><div class="heat-cell" data-pillar="${p.id}" title="${esc(c.code)} ${esc(c.name)}" style="background:${lv.color}1F;color:${lv.color};border:1px solid ${lv.color}33;cursor:pointer">${n(s)}</div></td>`;
     }
     h += `</tr>`;
   });
@@ -680,10 +737,10 @@ RENDER.initiatives = {
       (!f.iniQ || (i.name+i.id+i.category+i.owner).includes(f.iniQ)));
     const it = impactTotals();
     return `
-    <div class="grid g4">
+    <div class="stat-strip">
       ${kpiTile("bulb","","إجمالي المبادرات", `${ltr(n(ist.total))}`, `<span>${n(sc["تنفيذ"]+sc["قياس الأثر"])} قيد التنفيذ والقياس</span>`)}
       ${kpiTile("check","","نسبة الالتزام بالخط الزمني", pct(ist.commitment,1),
-        `<span class="delta ${ist.commitment>=90?"up":"dn"}">المستهدف ${pct(92)}</span><span>${n(ist.flagged)} متأخرة/متعثرة</span>`)}
+        `<span>المستهدف ${pct(92)}</span><span class="st ${ist.commitment>=92?"ok":"warn"}">${n(ist.flagged)} متأخرة/متعثرة</span>`)}
       ${kpiTile("coins","g","الأثر المقدر للمحفظة", `${ltr(n(it.identified))} <small>مليون ريال</small>`, `<span>المعتمد ${moneyShort(it.approved)}</span>`)}
       ${kpiTile("doc","n","متوسط طلبات التغيير", `${ltr(n(ist.crAvg,2))}`, `<span>لكل مبادرة — المستهدف: ${ltr("0.5")} أو أقل</span>`)}
     </div>
@@ -914,7 +971,7 @@ RENDER.impact = {
     const tgt = S.data.meta.impactTarget2026;
     const share = Math.round(real2026 / S.data.meta.budgetApproved * 1000)/10;
     return `
-    <div class="grid g4">
+    <div class="stat-strip">
       ${kpiTile("bulb","","أثر محدد (خط الأنابيب)", `${ltr(n(it.identified))} <small>مليون ريال</small>`, `<span>${n(S.data.initiatives.length)} مبادرة وفرصة</span>`)}
       ${kpiTile("check","","أثر معتمد من المالية", `${ltr(n(it.approved))} <small>مليون ريال</small>`, `<span>${pct(it.identified? it.approved/it.identified*100:0)} من المحدد</span>`)}
       ${kpiTile("coins","g","أثر محقق تراكمي", `${ltr(n(it.realized))} <small>مليون ريال</small>`, `<span>منه ${moneyShort(it.documented)} موثق بالإقفال</span>`)}
@@ -975,11 +1032,11 @@ RENDER.impact = {
     // waterfall: محدد -> غير معتمد -> معتمد -> محقق -> موثق
     const identified = it.identified, approved = it.approved, realized = it.realized, doc = it.documented;
     const steps = [
-      { name:"الأثر المحدد", base:0, val:identified, color:"#5C6E63" },
-      { name:"قيد الدراسة/الاعتماد", base:approved, val:identified-approved, color:"#B5C9BC" },
-      { name:"المعتمد", base:0, val:approved, color:"#0B4028" },
+      { name:"الأثر المحدد", base:0, val:identified, color:"#75837B" },
+      { name:"قيد الدراسة/الاعتماد", base:0, val:identified-approved, color:"#C9D3CD" },
+      { name:"المعتمد", base:0, val:approved, color:"#2E7D57" },
       { name:"المحقق", base:0, val:realized, color:"#098A4E" },
-      { name:"الموثق بالإقفال", base:0, val:doc, color:"#C7A34F" },
+      { name:"الموثق بالإقفال", base:0, val:doc, color:"#0B4028" },
     ];
     chart("ch-imp-water").setOption(base({
       tooltip: Object.assign({},TT,{formatter:p=> p.seriesIndex===1? `<b>${p.name}</b>`+ttRow("القيمة",`${n(steps[p.dataIndex].val)} م.ر`, steps[p.dataIndex].color):""}),
@@ -1050,7 +1107,7 @@ RENDER.funding = {
     const approved = FR.filter(r=>r.stage==="معتمد").length;
     const total = FR.reduce((s,r)=>s+r.amount,0);
     return `
-    <div class="grid g4">
+    <div class="stat-strip">
       ${kpiTile("doc","","طلبات التمويل المسجلة", `${ltr(n(FR.length))}`, `<span>بقيمة إجمالية ${money(total)}</span>`)}
       ${kpiTile("check","","اكتمال متطلبات الطلبات المسجلة", pct(comp), `<span class="st ${comp>=80?"ok":"warn"}">جودة الاستلام</span><span>بوابة الدخول تضمن 100% داخل سلسلة المراجعة</span>`)}
       ${kpiTile("clock","g","طلبات معادة للاستكمال", `${ltr(n(returned))}`, `<span>تتطلب استيفاء الملاحظات قبل إعادة الدخول</span>`)}
@@ -1189,7 +1246,7 @@ RENDER.studies = {
       return l.length? Math.round(l.reduce((x,s)=>x+s.completeness,0)/l.length):0;
     };
     return `
-    <div class="grid g4">
+    <div class="stat-strip">
       ${kpiTile("book","","إجمالي الدراسات", `${ltr(n(S.data.studies.length))}`, `<span>${n(S.data.studies.filter(s=>s.status==="معتمدة"||s.status==="مكتملة").length)} معتمدة/مكتملة</span>`)}
       ${kpiTile("gauge","","متوسط اكتمال دراسات السعة والطلب", pct(avg("سعة وطلب")), `<span>منهجية السبع خطوات حسب فئة الأصول</span>`)}
       ${kpiTile("doc","n","متوسط اكتمال الدراسات الخمس", pct(avg("الدراسات الخمس")), `<span>النموذج الخماسي للجدوى</span>`)}
@@ -1273,8 +1330,8 @@ RENDER.studies = {
       xAxis: hxAxis(v=>n(v)),
       yAxis: hyAxis(rows.map(r=>r[0]), 130),
       grid:{ top:12, bottom:26, right:142, left:34 },
-      series:[{ type:"bar", barWidth:14, data:rows.map((r,i)=>({value:r[1], itemStyle:{color:ramp(i,rows.length), borderRadius:[6,0,0,6]}})),
-        label:{show:true, position:"left", fontFamily:"IBM Plex Sans Arabic", color:"#5C6E63", formatter:p=>n(p.value)} }],
+      series:[{ type:"bar", barWidth:12, data:rows.map(r=>({value:r[1], itemStyle:{color:"#098A4E", borderRadius:[6,0,0,6]}})),
+        label:{show:true, position:"left", fontFamily:"IBM Plex Sans Arabic", color:"#6B7870", formatter:p=>n(p.value)} }],
     }));
   },
 };
@@ -1290,7 +1347,7 @@ RENDER.services = {
     const needs = S.data.services.filter(s=>s.classification==="يحتاج تحسين").length;
     const digital = Math.round(S.data.services.reduce((s,x)=>s+x.digitalShare*x.volume,0)/S.data.services.reduce((s,x)=>s+x.volume,0));
     return `
-    <div class="grid g4">
+    <div class="stat-strip">
       ${kpiTile("gridic","","خدمات الدليل المعتمد", `${ltr(n(S.data.services.length))}`, `<span>تكلفة سنوية ${money(totalCost)}</span>`)}
       ${kpiTile("check","","متوسط جودة الخدمة", `${ltr(n(avgQ))} <small>/ 100</small>`, `<span class="delta ${avgQ>=85?"up":"fl"}">المستهدف ${ltr("85")}</span>`)}
       ${kpiTile("chartic","n","النسبة الرقمية المرجحة", pct(digital), `<span>من إجمالي المعاملات</span>`)}
@@ -1379,7 +1436,7 @@ RENDER.budget = {
     const opp = B.reduce((s,c)=>s+c.opportunities,0);
     const reviewed = B.filter(c=>c.reviewStatus==="مكتملة").length;
     return `
-    <div class="grid g4">
+    <div class="stat-strip">
       ${kpiTile("pie","","الميزانية المعتمدة 2026", `${ltr(n(total/1000,1))} <small>مليار ريال</small>`, `<span>${n(B.length)} أبواب رئيسية</span>`)}
       ${kpiTile("chartic","","نسبة المنصرف حتى تاريخه", pct(spent/total*100), `<span>${money(spent)} حتى ${fmtDate(S.data.meta.asOf)}</span>`)}
       ${kpiTile("book","n","تغطية مراجعات الإنفاق", `${ltr(n(reviewed))} <small>من ${n(B.length)}</small>`, `<span>وفق منهجية هيئة كفاءة الإنفاق</span>`)}
@@ -1480,7 +1537,7 @@ RENDER.kpis = {
           <div class="icn ${i%2?"n":""}">${svgi(["coins","shield","chartic","bulb"][i])}</div>
           <div class="lbl">${fs.fam}</div>
           <div class="val">${ltr(n(fs.ok))} <small>من ${n(fs.total)} ضمن المستهدف</small></div>
-          <div class="foot"><span class="st ${fs.near?"warn":"mut"}">${n(fs.near)} قريب من المستهدف</span><div class="bar-mini" style="flex:1"><i style="width:${fs.total? (fs.ok+fs.near*0.5)/fs.total*100:0}%"></i></div></div>
+          <div class="foot"><span class="st ${fs.near?"warn":"mut"}">${n(fs.near)} قريب من المستهدف</span><div class="bar-mini" style="flex:1"><i style="width:${fs.total? (fs.ok+fs.near*0.5)/fs.total*100:0}%;${fs.ok===0? (fs.near? "background:var(--warn)":"background:var(--bad)"):""}"></i></div></div>
         </div>`).join("")}
     </div>
 
@@ -1689,8 +1746,8 @@ RENDER.capability = {
     const last = aw[aw.length-1];
     const done = C.trainings.filter(t=>t.status==="مكتمل").length;
     return `
-    <div class="grid g4">
-      ${kpiTile("users","","تغطية مصفوفة المهارات", pct(C.skillsCoverage), `<span class="delta ${C.skillsCoverage>=C.skillsTarget?"up":"dn"}">المستهدف ${pct(C.skillsTarget)}</span>`)}
+    <div class="stat-strip">
+      ${kpiTile("users","","تغطية مصفوفة المهارات", pct(C.skillsCoverage), `<span>المستهدف ${pct(C.skillsTarget)}</span>`)}
       ${kpiTile("check","","نسبة الوعي بكفاءة الإنفاق", pct(last.score), `<span>آخر قياس: ${esc(last.label)} (${n(last.respondents)} مشاركاً)</span>`)}
       ${kpiTile("book","n","البرامج التدريبية", `${ltr(n(done))} <small>من ${n(C.trainings.length)} مكتملة</small>`, `<span>${n(C.trainings.reduce((s,t)=>s+t.hours,0))} ساعة تدريبية</span>`)}
       ${kpiTile("flag","g","مستوى تبني كفاءة الإنفاق", `${esc(C.adoption.current)}`, `<span>المستهدف «${esc(C.adoption.target)}» 2026–2027</span>`)}
@@ -1774,15 +1831,15 @@ RENDER.capability = {
     const C = S.data.capability;
     chart("ch-cap-aw").setOption(base({
       tooltip: Object.assign({},TT,{trigger:"axis", formatter:ps=>`<b>${ps[0].axisValue}</b>`+ttRow("نسبة الوعي",pct(ps[0].value),"#098A4E")}),
-      xAxis: catXAxis(C.awareness.surveys.map(s=>s.label)),
+      xAxis: catXAxis(C.awareness.surveys.map(s=>s.label), { boundaryGap:false }),
       yAxis: Object.assign(valAxis(v=>n(v)+"%"), {max:100}),
-      grid:{ top:22, bottom:28, right:46, left:12 },
+      grid:{ top:22, bottom:28, right:46, left:24 },
       series:[{ type:"line", data:C.awareness.surveys.map(s=>s.score), smooth:true, symbol:"circle", symbolSize:8,
         lineStyle:{color:"#098A4E",width:3}, itemStyle:{color:"#098A4E"},
         label:{show:true, position:"top", fontFamily:"IBM Plex Sans Arabic", fontWeight:700, color:"#0B4028", formatter:p=>n(p.value)+"%"},
         areaStyle:{color:{type:"linear",x:0,y:0,x2:0,y2:1,colorStops:[{offset:0,color:"rgba(9,138,78,.18)"},{offset:1,color:"rgba(9,138,78,0)"}]}},
-        markLine:{ symbol:"none", lineStyle:{color:"#C7A34F",type:"dashed",width:2},
-          label:{formatter:`المستهدف ${C.awareness.target}%`, fontFamily:"Cairo", color:"#A98A3C", position:"insideStartTop"},
+        markLine:{ symbol:"none", lineStyle:{color:"#B8963E",type:"dashed",width:1.6},
+          label:{formatter:`المستهدف ${C.awareness.target}%`, fontFamily:"Cairo", color:"#9A7D33", position:"insideEndTop"},
           data:[{yAxis:C.awareness.target}] } }],
     }));
   },
@@ -1803,11 +1860,13 @@ RENDER.reports = {
         { id:"annual", icon:"book", t:"التقرير السنوي 2026", d:"الحصاد السنوي الشامل لكفاءة الإنفاق في الهيئة" },
         { id:"expro", icon:"doc", t:"حزمة منصة فرق كفاءة الإنفاق", d:"ملخص الرفع الدوري: مبادرات، وفورات، مؤشرات، حالة الركائز" },
       ].map(r=>`
-        <div class="card lift" style="cursor:pointer;text-align:center;padding:26px 18px" data-report="${r.id}">
-          <div style="width:52px;height:52px;border-radius:15px;background:var(--tintN);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;color:var(--navy)">${svgi(r.icon)}</div>
-          <h3>${r.t}</h3>
-          <div class="mini-note" style="margin-top:6px">${r.d}</div>
-          <button class="btn primary mt" style="margin-top:14px">إنشاء التقرير</button>
+        <div class="card lift" style="cursor:pointer;padding:22px 20px" data-report="${r.id}">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+            <div style="width:38px;height:38px;border-radius:11px;background:var(--green-soft);display:flex;align-items:center;justify-content:center;color:var(--green);flex:0 0 auto">${svgi(r.icon)}</div>
+            <h3>${r.t}</h3>
+          </div>
+          <div class="mini-note">${r.d}</div>
+          <div style="margin-top:14px;font-family:var(--ff-d);font-weight:600;font-size:12px;color:var(--green)">إنشاء التقرير ←</div>
         </div>`).join("")}
     </div>
 
@@ -1944,8 +2003,8 @@ function openDrawer(title, body){
 }
 function closeDrawer(){ DR.classList.remove("on"); OV.classList.remove("on"); }
 document.getElementById("drawer-x").addEventListener("click",closeDrawer);
-OV.addEventListener("click",()=>{ closeDrawer(); closeModal(); });
-addEventListener("keydown",e=>{ if(e.key==="Escape"){ closeDrawer(); closeModal(); } });
+OV.addEventListener("click",()=>{ closeDrawer(); closeModal(); closeMoreSheet(); });
+addEventListener("keydown",e=>{ if(e.key==="Escape"){ closeDrawer(); closeModal(); closeMoreSheet(); } });
 
 const MO = document.getElementById("modal");
 function openModal(title, body, buttons){
@@ -1970,15 +2029,17 @@ function toast(msg){
 }
 
 /* ---------------- export / import / print / reset ---------------- */
-document.getElementById("btn-export").addEventListener("click",()=>{
+function doExport(){
   const blob = new Blob([JSON.stringify(S.data,null,1)],{type:"application/json"});
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
   a.download = `rcrc-spending-efficiency-${S.data.meta.asOf}.json`;
   a.click(); URL.revokeObjectURL(a.href);
   toast("تم تصدير البيانات");
-});
-document.getElementById("btn-import").addEventListener("click",()=>document.getElementById("import-file").click());
+}
+function doImport(){ document.getElementById("import-file").click(); }
+document.getElementById("btn-export").addEventListener("click",doExport);
+document.getElementById("btn-import").addEventListener("click",doImport);
 document.getElementById("import-file").addEventListener("change",e=>{
   const f = e.target.files[0]; if(!f) return;
   const rd = new FileReader();

@@ -14,7 +14,7 @@ def data_uri(path):
 css     = read("src/styles.css")
 markup  = read("src/markup.html")
 app     = read("src/app.js")
-fonts   = read("vendor/fonts-embedded.css")
+fonts   = read("vendor/fonts-embedded.css") + "\n" + read("vendor/fonts-light.css")
 echarts = read("vendor/echarts.min.js")
 logo_emblem = data_uri("assets/logo-emblem.png")
 logo_full   = data_uri("assets/logo-full.png")
