@@ -82,7 +82,16 @@
   };
 
   /* ---------------- guards ---------------- */
-  function isOwner(req, u) { return req.createdById === u.id || (u.delegatedBy && req.createdById === u.delegatedBy); }
+  /* owner = creator, the creator's principal, or the principal's delegate —
+     the principal supervises everything filed on his deed (dev-review M1) */
+  function isOwner(req, u) {
+    if (req.createdById === u.id) return true;
+    if (u.delegatedBy && req.createdById === u.delegatedBy) return true;
+    var creator = RGP.store.user(req.createdById);
+    if (creator && creator.delegatedBy === u.id) return true;
+    return false;
+  }
+  RGP.isRequestOwner = isOwner;
   function isAssignee(req, u) { return req.assigneeId === u.id; }
 
   /* Which actions the given user may take on the request right now.
@@ -107,6 +116,26 @@
     if (WF.OPEN_STATES.indexOf(s) >= 0 && mgr) a.push("cancel_admin", "reassign", "note");
     if (WF.DECIDED_STATES.indexOf(s) >= 0 && mgr) a.push("close");
     return a;
+  };
+
+  /* ---------------- service eligibility (delegation scope + persona) ---------------- */
+  WF.serviceEligible = function (svc, u) {
+    if (!svc || !u || u.role !== "project_rep") return false;
+    if (u.allowedServiceIds && u.allowedServiceIds.indexOf(svc.id) < 0) return false;
+    if (svc.personas && svc.personas.length) {
+      var ok = u.personaType && svc.personas.indexOf(u.personaType) >= 0;
+      if (u.delegatedBy && svc.personas.indexOf("engineering_office") >= 0) ok = true;
+      if (!ok) return false;
+    }
+    return true;
+  };
+
+  /* priority rule (rmun-notes §1.1): fast-track IFF the request's project is in
+     the giga registry AND the service is fast-track eligible */
+  WF.computePriority = function (projectId, serviceId) {
+    var p = projectId && RGP.store.project(projectId);
+    var svc = RGP.store.service(serviceId);
+    return (p && p.isGiga && svc && svc.gigaFastTrack) ? "fast_track" : "normal";
   };
 
   /* ---------------- auto-assignment (§3.4) ---------------- */
@@ -164,6 +193,9 @@
     switch (from + "→" + to) {
       case "draft→submitted": {
         if (!(u.role === "project_rep" && isOwner(req, u))) deny();
+        var subSvc = RGP.store.service(req.serviceId);
+        if (!WF.serviceEligible(subSvc, u)) throw new Error("wf:notEligible");
+        req.priority = WF.computePriority(req.projectId, req.serviceId);
         req.submittedAt = RGP.nowISO();
         WF.startClock(req);
         WF.autoAssign(req);
@@ -200,6 +232,7 @@
       case "in_review→returned":
       case "decision_due→returned": {
         if (!(u.role === "platform_manager" || isAssignee(req, u))) deny();
+        if ((req.returnNotes || []).length >= 2) throw new Error("wf:maxReturns");
         if (!ctx.missingItems || !ctx.missingItems.length) throw new Error("wf:needMissingItems");
         req.returnNotes.push({ at: RGP.nowISO(), byId: u.id, items: ctx.missingItems, note: ctx.note || "" });
         req.sla.pauseStartAt = RGP.todayISO();
@@ -280,12 +313,20 @@
       }
       case "decision_due→approved": {
         if (!(u.role === "platform_manager" || isAssignee(req, u))) deny();
-        if (req.priority === "fast_track" && u.role !== "platform_manager" && !ctx.coSign) throw new Error("wf:needCoSign");
-        var permitNo = RGP.store.nextPermitNo();
+        var aSvc = RGP.store.service(req.serviceId);
+        var feeBearing = !!(aSvc && aSvc.fees && aSvc.fees.model !== "none");
+        /* segregation of duties (rmun-notes §3): fee-bearing or fast-track decisions
+           by the reviewing specialist require the section-head/GPO co-sign */
+        if ((req.priority === "fast_track" || feeBearing) && u.role !== "platform_manager" && !ctx.coSign) throw new Error("wf:needCoSign");
+        var permitNo = RGP.store.nextPermitNo(req.serviceId);
         req.decision = {
           type: "approved", decidedAt: RGP.nowISO(), deciderId: u.id,
           permitNo: permitNo, conditions: ctx.conditions || null, note: ctx.note || null
         };
+        if (feeBearing) {
+          /* سداد invoice (simulated — live SADAD integration at the CRM phase) */
+          req.decision.sadadInvoiceNo = "SADAD-" + new Date().getFullYear() + "-" + RGP.zeroPad(100000 + (RGP.hash32(req.id + permitNo) % 900000), 6);
+        }
         req.sla.breached = RGP.todayISO() > req.sla.dueAt;
         WF.event(req, "decision", { fromState: from, toState: to, payload: { permitNo: permitNo } });
         RGP.store.audit("request.approved", "request", req.id, { permitNo: permitNo });
@@ -297,6 +338,11 @@
         if (!(u.role === "platform_manager" || isAssignee(req, u))) deny();
         if (!ctx.reason || String(ctx.reason).trim().length < 30) throw new Error("wf:needReason30");
         if (!ctx.regulationRef) throw new Error("wf:needRegulation");
+        var rSvc = RGP.store.service(req.serviceId);
+        var rFee = !!(rSvc && rSvc.fees && rSvc.fees.model !== "none");
+        if ((req.priority === "fast_track" || rFee) && u.role !== "platform_manager" && !ctx.coSign) throw new Error("wf:needCoSign");
+        var regMatch = (RGP.store.state.settings.regulations || []).filter(function (rg) { return rg.id === ctx.regulationRef; })[0];
+        if (regMatch) ctx.regulationRef = td(regMatch.label);
         req.decision = {
           type: "rejected", decidedAt: RGP.nowISO(), deciderId: u.id,
           reason: ctx.reason, regulationRef: ctx.regulationRef, note: ctx.note || null
@@ -405,13 +451,27 @@
       /* escalation */
       if (WF.RUNNING_STATES.indexOf(req.state) >= 0 && req.sla && req.sla.startAt) {
         var band = WF.slaBand(req);
-        if (band === "amber" && req.sla.escalation === "none") { req.sla.escalation = "amber"; changed++; }
+        if (band === "amber" && req.sla.escalation === "none") {
+          req.sla.escalation = "amber";
+          changed++;
+          /* escalation ladder level 1: proactive alert to the specialist + section head */
+          S.notify((req.assigneeId ? [req.assigneeId] : []).concat(S.managerIds()), {
+            kind: "warning",
+            title: { ar: "اقتراب موعد الاستحقاق — متابعة استباقية", en: "Approaching due date — proactive follow-up" },
+            body: { ar: "بلغ الطلب " + req.id + " ثمانين بالمئة من مدته المحددة", en: "Request " + req.id + " reached 80% of its allotted time" },
+            link: "#/work/review/" + req.id
+          });
+        }
         if (band === "red" && req.sla.escalation !== "red") {
           req.sla.escalation = "red";
           req.sla.breached = true;
           changed++;
           RGP.store.audit("request.escalated", "request", req.id);
-          WF.event(req, "action", { payload: { escalated: true } });
+          WF.event(req, "action", {
+            textAr: "تصعيد آلي: تجاوز الطلب مدته المحددة وأُشعر مدير مكتب المشاريع الكبرى",
+            textEn: "Automatic escalation: the request exceeded its allotted time; the GPO director was notified",
+            payload: { escalated: true }
+          });
           S.notify(S.managerIds().concat(req.assigneeId ? [req.assigneeId] : []), {
             kind: "danger",
             title: { ar: "تجاوز مدة الإنجاز — تصعيد", en: "SLA breached — escalated" },
@@ -457,6 +517,7 @@
     var u = RGP.auth.current();
     var project = payload.projectId ? RGP.store.project(payload.projectId) : null;
     var svc = RGP.store.service(payload.serviceId);
+    if (!WF.serviceEligible(svc, u)) throw new Error("wf:notEligible");
     var req = {
       id: RGP.store.nextRequestId(),
       projectId: payload.projectId || null,
@@ -475,7 +536,7 @@
       returnNotes: [],
       resubmissionCount: 0,
       sla: { startAt: null, dueAt: null, pausedDays: 0, pauseStartAt: null, breached: false, escalation: "none" },
-      priority: ((project && project.isGiga) || (svc && svc.fastTrack && u.personaType === "giga_entity")) ? "fast_track" : "normal",
+      priority: WF.computePriority(payload.projectId, payload.serviceId),
       assigneeId: null,
       firstResponseAt: null,
       decision: null,

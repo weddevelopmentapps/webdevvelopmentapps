@@ -13,15 +13,40 @@
     var S = RGP.store.state;
     var k = RGP.kpi.compute();
     var trend = RGP.kpi.weeklyTrend();
+    var cmp = RGP.kpi.compare();
+    var compareCaption = { ar: "مقارنة بالثلاثين يومًا السابقة", en: "vs. previous 30 days" };
+    var dAvg = (cmp.cur.avgProcessing != null && cmp.prev.avgProcessing != null)
+      ? Math.round((cmp.cur.avgProcessing - cmp.prev.avgProcessing) * 10) / 10 : null;
+    var dOnTime = (cmp.cur.onTimePct != null && cmp.prev.onTimePct != null)
+      ? cmp.cur.onTimePct - cmp.prev.onTimePct : null;
+    /* weekly resolved-challenge counts for the closure sparkline */
+    var chSpark = (function () {
+      var out = [];
+      for (var w2 = 11; w2 >= 0; w2--) {
+        var from = RGP.daysAgo((w2 + 1) * 7), to = RGP.daysAgo(w2 * 7);
+        out.push(S.challenges.filter(function (c) {
+          var d2 = c.resolvedAt && c.resolvedAt.slice(0, 10);
+          return d2 && d2 > from && d2 <= to;
+        }).length);
+      }
+      return out;
+    })();
 
     var band = h("div.kpi-band.six.mbs-3", null,
       UI.kpi({ label: t("kpi.avgProcessing"), value: k.avgProcessing, dec: 1, unit: t("kpi.workdaysUnit"),
+        delta: dAvg, deltaGood: dAvg != null ? dAvg <= 0 : null, compare: dAvg != null ? compareCaption : null,
+        spark: trend.decided,
         onclick: function () { drill(t("kpi.avgProcessing"), k.decidedList); } }),
       UI.kpi({ label: t("kpi.challengeClosure"), value: k.challengeClosure, suffix: "%",
+        spark: chSpark,
         onclick: function () { RGP.router.go("#/manager/challenges"); } }),
       UI.kpi({ label: t("kpi.firstResponse"), value: k.firstResponse, dec: 1, unit: t("kpi.workdaysUnit"),
+        spark: trend.submitted,
         onclick: function () { drill(t("kpi.firstResponse"), k.firstRespList); } }),
       UI.kpi({ label: t("kpi.slaCompliance"), value: k.onTimePct, suffix: "%",
+        delta: dOnTime, deltaGood: dOnTime != null ? dOnTime >= 0 : null, deltaPct: true,
+        compare: dOnTime != null ? compareCaption : null,
+        spark: trend.decided,
         onclick: function () { drill(t("kpi.slaCompliance"), k.openList); } }),
       UI.kpi({ label: t("kpi.satisfaction"), value: k.satisfaction, dec: 1, unit: "/5",
         onclick: function () { drill(t("kpi.satisfaction"), k.ratedList); } }),
@@ -87,7 +112,7 @@
               h("span.id-cell.num.t-caption", { style: { fontWeight: 600 } }, r.id),
               h("span.grow.t-caption.mut.ellipsis", { style: { fontWeight: 500 } }, svc ? td(svc.name) : ""),
               UI.slaChip(r));
-          }) : h("div.t-sub.mut", { style: { padding: "8px 0" } }, RGP.i18n.lang === "ar" ? "لا تجاوزات — جميع الطلبات ضمن المدد." : "No breaches — everything on time."),
+          }) : h("div.t-sub.mut", { style: { padding: "8px 0" } }, RGP.i18n.lang === "ar" ? "لا توجد تجاوزات، وجميع الطلبات ضمن مددها المحددة." : "No breaches; all requests are within their timelines."),
           attention.length > 5 ? h("a.btn.tertiary.sm", { href: "#/work/queue" }, t("common.showAll")) : null),
         h("div.card.elev-1.card-pad-dense", null,
           h("div.flex.between.mbe-1", null,
@@ -100,7 +125,7 @@
                 h("div.t-caption.ellipsis", { style: { fontWeight: 600, maxWidth: "240px" } }, td(c.title)),
                 h("div.t-caption.mut", { style: { fontWeight: 500 } },
                   (c.responsibleEntity ? td(RGP.entityName(c.responsibleEntity)) + " · " : "") +
-                  RGP.challengeAge(c) + " " + t("common.workdays"))),
+                  RGP.fmtWorkdays(RGP.challengeAge(c)))),
               RGP.chStatePill(c.state));
           }))));
 
@@ -118,8 +143,8 @@
       h("h1.t-title1", null, t("gpo.dashboard")),
       h("p.desc.t-sub", null,
         RGP.i18n.lang === "ar"
-          ? "الصورة الحية لتمكين المشاريع الكبرى: الطلبات، المدد، التحديات، والجهات — في مكان واحد."
-          : "The live picture of giga-project enablement: requests, SLAs, challenges, and entities — in one place."),
+          ? "متابعة حالة الطلبات والمدد والتحديات والجهات المعنية بتمكين المشاريع الكبرى."
+          : "Monitor the requests, timelines, challenges, and entities involved in giga-project enablement."),
       h("div.actions", null,
         h("a.btn.primary", { href: "#/manager/reports" }, UI.icon("doc", 16), t("rep.generate")),
         h("button.btn.secondary", { onclick: function () { RGP.challengeForm(); } }, UI.icon("flag", 16), t("ch.new"))));
@@ -224,8 +249,8 @@
       h("div.kicker", null, t("role.platform_manager")),
       h("h1.t-title1", null, t("gpo.registry")),
       h("p.desc.t-sub", null, RGP.i18n.lang === "ar"
-        ? "قاعدة البيانات الموحدة لحصر المشاريع الكبرى في مدينة الرياض — البيانات والموقع والمرحلة والخدمات والحالة."
-        : "The unified giga-projects registry — data, location, phase, services and status."),
+        ? "قاعدة البيانات الموحدة للمشاريع الكبرى في مدينة الرياض، وتشمل بيانات المشروع وموقعه ومرحلته وخدماته وحالته."
+        : "The unified registry of giga projects in Riyadh, covering each project's data, location, phase, services and status."),
       h("div.actions", null,
         h("button.btn.primary", { onclick: function () { projectForm(null); } }, UI.icon("plus", 16), t("gpo.addProject")),
         h("div.segmented", null,
@@ -399,17 +424,56 @@
       h("div.actions", null,
         h("button.btn.primary", { onclick: function () { RGP.challengeForm(); } }, UI.icon("plus", 16), t("ch.new"))));
 
-    var board = h("div.kanban.mbs-2", null, RGP.CH_STATES.map(function (st) {
-      var items = S.challenges.filter(function (c) { return c.state === st; });
-      return h("div.kb-col", null,
-        h("div.kb-head", null,
-          RGP.chStatePill(st),
-          h("span.t-caption.mut.num", { style: { fontWeight: 600 } }, String(items.length))),
-        items.map(function (c) { return RGP.challengeCard(c); }),
-        !items.length ? h("div.t-caption.mut", { style: { textAlign: "center", padding: "16px 0", fontWeight: 500 } }, "—") : null);
-    }));
+    var view = "board";
+    var content = h("div.mbs-2");
+    function renderCh() {
+      content.innerHTML = "";
+      if (view === "table") {
+        content.appendChild(UI.table({
+          rows: S.challenges,
+          pageSize: 12,
+          cols: [
+            { key: "id", label: { ar: "الرقم", en: "ID" }, render: function (c) { return h("span.id-cell.num", null, c.id); } },
+            { key: "title", label: { ar: "التحدي", en: "Challenge" }, render: function (c) {
+                return h("span.ellipsis", { style: { maxWidth: "280px", display: "inline-block" } }, td(c.title)); } },
+            { key: "proj", label: t("req.project"), render: function (c) {
+                var p2 = c.projectId && RGP.store.project(c.projectId); return p2 ? td(p2.name) : "—"; } },
+            { key: "owner", label: t("ch.owner"), render: function (c) {
+                return c.responsibleEntity ? h("span.pill.plain.sm", null, td(RGP.entityName(c.responsibleEntity))) : "—"; } },
+            { key: "age", label: t("ch.resolutionDays"), end: true, render: function (c) {
+                return h("span.num", null, String(RGP.challengeAge(c))); },
+              sortVal: function (c) { return RGP.challengeAge(c); } },
+            { key: "state", label: t("common.status"), render: function (c) { return RGP.chStatePill(c.state); } }
+          ],
+          onRow: function (c) { RGP.challengeDetail(c); }
+        }));
+        return;
+      }
+      content.appendChild(h("div.kanban", null, RGP.CH_STATES.map(function (st) {
+        var items = S.challenges.filter(function (c) { return c.state === st; });
+        return h("div.kb-col", null,
+          h("div.kb-head", null,
+            RGP.chStatePill(st),
+            h("span.t-caption.mut.num", { style: { fontWeight: 600 } }, String(items.length))),
+          items.map(function (c) { return RGP.challengeCard(c); }),
+          !items.length ? h("div.t-caption.mut", { style: { textAlign: "center", padding: "16px 0", fontWeight: 500 } }, "—") : null);
+      })));
+    }
+    renderCh();
+    head.querySelector(".actions").appendChild(
+      h("div.segmented", null,
+        [["board", { ar: "لوحة", en: "Board" }], ["table", { ar: "جدول", en: "Table" }]].map(function (x) {
+          return h("button" + (view === x[0] ? ".active" : ""), {
+            onclick: function (e) {
+              view = x[0];
+              RGP.$$("button", e.target.closest(".segmented")).forEach(function (b) { b.classList.remove("active"); });
+              e.target.closest("button").classList.add("active");
+              renderCh();
+            }
+          }, td(x[1]));
+        })));
 
-    return RGP.shell(h("div", null, head, board), { context: t("gpo.challenges") });
+    return RGP.shell(h("div", null, head, content), { context: t("gpo.challenges") });
   }
 
   /* ---------------- KPIs screen ---------------- */
@@ -425,8 +489,8 @@
       h("div.kicker", null, t("role.platform_manager")),
       h("h1.t-title1", null, t("gpo.kpis")),
       h("p.desc.t-sub", null, RGP.i18n.lang === "ar"
-        ? "منظومة مؤشرات الأداء المعتمدة في المسار التاسع — محسوبة حيًا من بيانات المنصة."
-        : "The Track-9 KPI system — computed live from platform data."));
+        ? "مؤشرات الأداء المعتمدة في المسار التاسع، محسوبة من بيانات المنصة."
+        : "The performance indicators adopted in Track 9, computed from platform data."));
 
     var band = h("div.kpi-band.six.mbs-3", null,
       UI.kpi({ label: t("kpi.avgProcessing"), value: k.avgProcessing, dec: 1, unit: t("kpi.workdaysUnit") }),
@@ -480,7 +544,8 @@
       ["projects", t("rep.projects"), "building"],
       ["requests", t("rep.requests"), "docs"],
       ["challenges", t("rep.challenges"), "flag"],
-      ["coordination", t("rep.coordination"), "globe"]
+      ["coordination", t("rep.coordination"), "globe"],
+      ["escalations", { ar: "تقرير التصعيدات الأسبوعي — مكتب الأمين", en: "Weekly escalations report — Mayor's office" }, "alert"]
     ];
 
     function build() {
@@ -540,6 +605,44 @@
               h("td.num", null, String(RGP.challengeAge(c))),
               h("td", null, t("ch." + c.state)));
           })));
+      } else if (type === "escalations") {
+        /* rmun-notes §4 level 3: cases at or beyond 120% of SLA + escalated challenges */
+        var overdueReqs = S.requests.filter(function (r2) {
+          if (RGP.lifecycle.OPEN_STATES.indexOf(r2.state) < 0 || !r2.sla || !r2.sla.startAt) return false;
+          return RGP.lifecycle.consumedPct(r2) >= 100;
+        });
+        var escCh = S.challenges.filter(function (c2) { return c2.state === "escalated"; });
+        body = h("div", null,
+          h("div.t-headline.mbe-1", null, RGP.i18n.lang === "ar" ? "طلبات متجاوزة للمدة المحددة" : "Requests beyond their allotted time"),
+          h("table.p-table.tbl", { style: { width: "100%" } },
+            h("thead", null, h("tr", null,
+              [{ ar: "الطلب", en: "Request" }, { ar: "الخدمة", en: "Service" }, { ar: "المشروع", en: "Project" },
+               { ar: "نسبة الاستهلاك", en: "Consumed" }, { ar: "التجاوز (أيام عمل)", en: "Overdue (wd)" }, { ar: "الأخصائي", en: "Specialist" }]
+                .map(function (c3) { return h("th", null, td(c3)); }))),
+            h("tbody", null, overdueReqs.length ? overdueReqs.map(function (r2) {
+              var svc2 = RGP.store.service(r2.serviceId);
+              var p2 = r2.projectId && RGP.store.project(r2.projectId);
+              return h("tr", null,
+                h("td.num", null, r2.id),
+                h("td", null, svc2 ? td(svc2.name) : "—"),
+                h("td", null, p2 ? td(p2.name) : "—"),
+                h("td.num", null, RGP.lifecycle.consumedPct(r2) + "%"),
+                h("td.num", null, String(Math.max(0, -RGP.lifecycle.remainingDays(r2)))),
+                h("td", null, r2.assigneeId ? td(RGP.store.userName(r2.assigneeId)) : "—"));
+            }) : h("tr", null, h("td", { colspan: "6" }, RGP.i18n.lang === "ar" ? "لا توجد تجاوزات قائمة." : "No active breaches.")))),
+          h("div.t-headline.mbs-3.mbe-1", null, RGP.i18n.lang === "ar" ? "تحديات مصعّدة" : "Escalated challenges"),
+          h("table.p-table.tbl", { style: { width: "100%" } },
+            h("thead", null, h("tr", null,
+              [{ ar: "التحدي", en: "Challenge" }, { ar: "المشروع", en: "Project" }, { ar: "الجهة المسؤولة", en: "Owner" }, { ar: "العمر (أيام عمل)", en: "Age (wd)" }]
+                .map(function (c3) { return h("th", null, td(c3)); }))),
+            h("tbody", null, escCh.length ? escCh.map(function (c2) {
+              var p3 = c2.projectId && RGP.store.project(c2.projectId);
+              return h("tr", null,
+                h("td", null, td(c2.title)),
+                h("td", null, p3 ? td(p3.name) : "—"),
+                h("td", null, c2.responsibleEntity ? td(RGP.entityName(c2.responsibleEntity)) : "—"),
+                h("td.num", null, String(RGP.challengeAge(c2))));
+            }) : h("tr", null, h("td", { colspan: "4" }, RGP.i18n.lang === "ar" ? "لا توجد تحديات مصعّدة." : "No escalated challenges.")))));
       } else {
         /* coordination: referrals per external entity */
         var agg = {};
@@ -619,8 +722,8 @@
       h("div.kicker", null, t("role.platform_manager")),
       h("h1.t-title1", null, t("gpo.catalog")),
       h("p.desc.t-sub", null, RGP.i18n.lang === "ar"
-        ? "دليل الخدمات البلدية للمشاريع الكبرى (المسار الثالث) — التوصيف والمدد والرسوم والجهات الداعمة."
-        : "The giga-projects municipal service catalog (Track 3) — definitions, SLAs, fees and supporting entities."));
+        ? "دليل الخدمات البلدية للمشاريع الكبرى (المسار الثالث)، ويشمل توصيف الخدمات ومددها ورسومها والجهات الداعمة."
+        : "The giga-projects municipal service catalog (Track 3), covering service definitions, timelines, fees and supporting entities."));
 
     var tbl = UI.table({
       rows: S.services,
@@ -686,7 +789,7 @@
           h("span.t-caption.mut", { style: { fontWeight: 500 } }, a.entityType + " · "),
           h("span.t-caption.accent.num", { style: { fontWeight: 600 } }, a.entityId),
           h("span.grow"),
-          h("span.t-caption.mut.num", { style: { fontWeight: 500 } }, RGP.fmtDateTime(a.at))));
+          h("span.t-caption.mut.num-date", { style: { fontWeight: 500 } }, RGP.fmtDateTime(a.at))));
       });
     }
     refresh();
@@ -695,8 +798,8 @@
       h("div.kicker", null, t("role.platform_manager")),
       h("h1.t-title1", null, t("gpo.audit")),
       h("p.desc.t-sub", null, RGP.i18n.lang === "ar"
-        ? "سجل غير قابل للتعديل لكل إجراء على المنصة — الأرشفة الإلكترونية المعتمدة."
-        : "An append-only record of every platform action — the electronic archive."),
+        ? "سجل غير قابل للتعديل يوثق جميع الإجراءات على المنصة وفق متطلبات الأرشفة الإلكترونية."
+        : "An append-only record documenting every platform action per electronic-archiving requirements."),
       h("div.actions", null,
         h("div.select-wrap", { style: { width: "220px" } },
           h("select.input.sm", { onchange: function (e) { typeFilter = e.target.value; refresh(); } },
@@ -736,17 +839,43 @@
         return h("div.doc-row", null, dot,
           h("div.grow", null,
             h("div.t-footnote", { style: { fontWeight: 600 } }, td(c.name)),
-            h("div.t-caption.mut.num", { style: { fontWeight: 500 } },
+            h("div.t-caption.mut.num-date", { style: { fontWeight: 500 } },
               c.lastPingAt ? (RGP.i18n.lang === "ar" ? "آخر فحص: " : "Last ping: ") + RGP.fmtDateTime(c.lastPingAt) : (RGP.i18n.lang === "ar" ? "لم يُفحص بعد" : "Not pinged yet"))),
           h("span.pill.info.sm", null, RGP.i18n.lang === "ar" ? "محاكاة" : "Simulated"),
           pingBtn);
       }));
 
+    var holidayList = h("div.flex.g1.wrap");
+    function renderHolidays() {
+      holidayList.innerHTML = "";
+      S.settings.holidays.forEach(function (d, idx) {
+        holidayList.appendChild(h("span.pill.plain.num", null, d,
+          h("button.iconbtn", { style: { width: "18px", height: "18px" }, "aria-label": "remove",
+            onclick: function () {
+              S.settings.holidays.splice(idx, 1);
+              RGP.store.audit("settings.updated", "settings", "holidays");
+              RGP.store.save(); renderHolidays();
+            } }, UI.icon("x", 10))));
+      });
+    }
+    renderHolidays();
+    var newHoliday = h("input.input.sm.num-field", { type: "date", style: { width: "170px" } });
     var holidays = h("div.card.elev-1.card-pad.mbs-2", null,
       h("div.t-headline.mbe-1", null, RGP.i18n.lang === "ar" ? "أيام العطل الرسمية (تُستثنى من المدد)" : "Official holidays (excluded from SLAs)"),
-      h("div.flex.g1.wrap", null, S.settings.holidays.map(function (d) {
-        return h("span.pill.plain.num", null, d);
-      })));
+      holidayList,
+      h("div.flex.g1.mbs-2", null, newHoliday,
+        h("button.btn.secondary.sm", {
+          onclick: function () {
+            if (!newHoliday.value) return;
+            if (S.settings.holidays.indexOf(newHoliday.value) < 0) {
+              S.settings.holidays.push(newHoliday.value);
+              S.settings.holidays.sort();
+              RGP.store.audit("settings.updated", "settings", "holidays");
+              RGP.store.save(); renderHolidays();
+            }
+            newHoliday.value = "";
+          }
+        }, UI.icon("plus", 14), t("common.add"))));
 
     var sla = h("div.card.elev-1.card-pad.mbs-2", null,
       h("div.t-headline.mbe-2", null, RGP.i18n.lang === "ar" ? "سياسة اتفاقيات مستوى الخدمة" : "SLA policy"),

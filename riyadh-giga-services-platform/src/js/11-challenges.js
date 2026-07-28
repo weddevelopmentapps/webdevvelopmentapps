@@ -34,7 +34,7 @@
         proj ? h("span.t-caption.mut", { style: { fontWeight: 500 } }, td(proj.name)) : null,
         c.responsibleEntity ? h("span.pill.plain.sm", null, td(RGP.entityName(c.responsibleEntity))) : null,
         h("span.t-caption.mut.num.flex.g05", { style: { fontWeight: 500 } }, UI.icon("clock", 11),
-          RGP.challengeAge(c) + " " + t("common.workdays")),
+          RGP.fmtWorkdays(RGP.challengeAge(c))),
         c.requestId ? h("span.t-caption.accent.num", { style: { fontWeight: 600 } }, c.requestId) : null));
   };
 
@@ -95,8 +95,8 @@
           kv(t("req.project"), proj ? td(proj.name) : "—"),
           kv(t("ch.owner"), c.responsibleEntity ? td(RGP.entityName(c.responsibleEntity)) : "—"),
           kv({ ar: "فتح بواسطة", en: "Opened by" }, td(RGP.store.userName(c.openedById))),
-          kv({ ar: "تاريخ الفتح", en: "Opened" }, h("span.num", null, RGP.fmtDate(c.openedAt.slice(0, 10)))),
-          kv(t("ch.resolutionDays"), h("span.num", null, RGP.challengeAge(c) + " "), t("common.workdays")),
+          kv({ ar: "تاريخ الفتح", en: "Opened" }, h("span.num-date", null, RGP.fmtDate(c.openedAt.slice(0, 10)))),
+          kv(t("ch.resolutionDays"), RGP.fmtWorkdays(RGP.challengeAge(c))),
           kv(t("ch.linkedRequest"), c.requestId ? h("a.num", { href: "#/portal/requests/" + c.requestId, onclick: function () { modal.close(); } }, c.requestId) : "—")),
         (c.proposedSolutions || []).length ? h("div.mbe-2", null,
           h("div.t-headline.mbe-1", null, t("ch.resolution")),
@@ -107,7 +107,7 @@
         c.resolution ? h("div.well.card-pad-dense", null,
           h("div.t-footnote.ok-fg.mbe-1", { style: { fontWeight: 600 } }, RGP.i18n.lang === "ar" ? "المعالجة النهائية" : "Final resolution"),
           h("div.t-sub", null, td(c.resolution.text)),
-          h("div.t-caption.mut.mbs-1.num", { style: { fontWeight: 500 } }, RGP.fmtDate(c.resolution.resolvedAt.slice(0, 10)))) : null),
+          h("div.t-caption.mut.mbs-1.num-date", { style: { fontWeight: 500 } }, RGP.fmtDate(c.resolution.resolvedAt.slice(0, 10)))) : null),
       actions: function (closeFn) {
         closeRef = closeFn;
         return [h("span.grow")].concat(actions.length ? actions : [h("button.btn.secondary", { onclick: closeFn }, t("common.close"))]);

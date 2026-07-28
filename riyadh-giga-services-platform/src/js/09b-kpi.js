@@ -87,6 +87,30 @@
     };
   };
 
+  /* current-vs-previous 30-day window comparison for KPI tile deltas */
+  K.compare = function () {
+    var S = RGP.store.state;
+    function windowOf(fromDays, toDays) {
+      var from = RGP.daysAgo(fromDays), to = RGP.daysAgo(toDays);
+      var reqs = S.requests.filter(function (r) {
+        var d = r.submittedAt && r.submittedAt.slice(0, 10);
+        return d && d > from && d <= to;
+      });
+      var dec = reqs.filter(function (r) { return r.decision; });
+      var onTime = dec.filter(function (r) { return r.decision.decidedAt.slice(0, 10) <= r.sla.dueAt; });
+      var avg = dec.length ? dec.reduce(function (a, r) {
+        return a + Math.max(0, RGP.workingDaysBetween(r.sla.startAt, r.decision.decidedAt.slice(0, 10)) - (r.sla.pausedDays || 0));
+      }, 0) / dec.length : null;
+      return {
+        submitted: reqs.length,
+        decided: dec.length,
+        avgProcessing: avg,
+        onTimePct: dec.length ? Math.round(100 * onTime.length / dec.length) : null
+      };
+    }
+    return { cur: windowOf(30, 0), prev: windowOf(60, 30) };
+  };
+
   /* 12-week submission trend */
   K.weeklyTrend = function () {
     var S = RGP.store.state;

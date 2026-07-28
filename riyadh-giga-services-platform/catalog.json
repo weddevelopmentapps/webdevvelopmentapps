@@ -40,7 +40,7 @@
     {
       "id": "during",
       "name": {"ar": "أثناء التطوير", "en": "During Development"},
-      "description": {"ar": "مرحلة التنفيذ: المخططات التفصيلية، اعتماد تصاميم شبكات البنية التحتية مع الجهات الخدمية، رخص البناء وتصاريح التمكين الإنشائي (حفريات، إغلاق طرق، رافعات، سياج)، وصولاً إلى الاعتماد النهائي وشهادة الإتمام.", "en": "Execution phase: detailed plans, infrastructure network design approvals with service entities, building permits and construction enablement permits (excavation, road closures, cranes, hoarding), through to final approval and the Certificate of Completion."},
+      "description": {"ar": "مرحلة التنفيذ: المخططات التفصيلية، اعتماد تصاميم شبكات البنية التحتية مع الجهات الخدمية، رخص البناء وتصاريح التمكين الإنشائي (حفريات، إغلاق طرق، رافعات، سياج)، وصولًا إلى الاعتماد النهائي وشهادة الإتمام.", "en": "Execution phase: detailed plans, infrastructure network design approvals with service entities, building permits and construction enablement permits (excavation, road closures, cranes, hoarding), through to final approval and the Certificate of Completion."},
       "stagesByPersona": {
         "giga_entity": [
           {"ar": "تقديم المخططات التفصيلية والدراسات التصميمية لشبكات البنية التحتية", "en": "Submit detailed plans and infrastructure network design studies"},
@@ -133,7 +133,7 @@
       "personas": ["developer", "giga_entity", "engineering_office"],
       "description": {"ar": "إصدار القرار المساحي للأرض الخام أو الأرض ضمن مخطط هيكلي، كخطوة أولى في رحلة مشاريع التخطيط قبل التقديم على طلب التخطيط.", "en": "Issue the survey decision for raw land or land within a structural master plan, as the first step of the planning-projects journey before the planning request."},
       "prerequisites": [
-        {"ar": "صك ملكية إلكتروني ساري", "en": "Valid electronic title deed"},
+        {"ar": "صك ملكية إلكتروني سارٍ", "en": "Valid electronic title deed"},
         {"ar": "تفويض المكتب الهندسي في حال التقديم بالإنابة", "en": "Engineering office delegation when submitting on behalf of the owner"}
       ],
       "requiredDocuments": [
@@ -161,7 +161,7 @@
       "personas": ["developer", "giga_entity", "engineering_office"],
       "description": {"ar": "التقديم على طلب التخطيط عبر المنصة، حيث تتم مراجعة الطلب والدراسات الأولية والحصول على المحددات التخطيطية.", "en": "Submit the planning request via the platform; the request and preliminary studies are reviewed and the planning constraints are issued."},
       "prerequisites": [
-        {"ar": "قرار مساحي ساري", "en": "Valid survey decision"},
+        {"ar": "قرار مساحي سارٍ", "en": "Valid survey decision"},
         {"ar": "المشروع مسجل في السجل الموحد (للمشاريع الكبرى)", "en": "Project registered in the unified registry (for giga projects)"}
       ],
       "requiredDocuments": [
@@ -495,7 +495,7 @@
       "personas": ["investor", "operator", "giga_entity"],
       "description": {"ar": "طلب التصريح البيئي لمرحلة التشغيل من المركز الوطني للرقابة على الالتزام البيئي قبل بدء النشاط.", "en": "Request the operation-phase environmental permit from the National Center for Environmental Compliance before activity commencement."},
       "prerequisites": [
-        {"ar": "تصريح بيئي للإنشاء ساري", "en": "Valid construction-phase environmental permit"},
+        {"ar": "تصريح بيئي للإنشاء سارٍ", "en": "Valid construction-phase environmental permit"},
         {"ar": "اكتمال الأعمال الإنشائية", "en": "Construction works completed"}
       ],
       "requiredDocuments": [
@@ -574,7 +574,7 @@
       "personas": ["giga_entity", "developer"],
       "description": {"ar": "تصريح لإقامة منشآت وأعمال مؤقتة داخل نطاق المشروع (مكاتب موقع، مستودعات مؤقتة، خلاطات، ساحات تشوين).", "en": "Permit for temporary facilities and works within the project boundary (site offices, temporary warehouses, batching plants, laydown yards)."},
       "prerequisites": [
-        {"ar": "رخصة بناء أو قرار اعتماد ساري للمشروع", "en": "Valid building permit or approval decision for the project"},
+        {"ar": "رخصة بناء أو قرار اعتماد سارٍ للمشروع", "en": "Valid building permit or approval decision for the project"},
         {"ar": "خطة سلامة للموقع", "en": "Site safety plan"}
       ],
       "requiredDocuments": [
@@ -710,7 +710,7 @@
       "personas": ["giga_entity", "developer"],
       "description": {"ar": "تصريح تركيب سياج الموقع والحواجز المؤقتة وفق دليل التصميم الحضري لأمانة منطقة الرياض بما يشمل المحتوى الإعلاني على السياج.", "en": "Permit for site hoarding and temporary barriers per the Riyadh Region Municipality urban design guidelines, including hoarding graphics."},
       "prerequisites": [
-        {"ar": "رخصة بناء أو تصريح أعمال ساري", "en": "Valid building permit or works permit"}
+        {"ar": "رخصة بناء أو تصريح أعمال سارٍ", "en": "Valid building permit or works permit"}
       ],
       "requiredDocuments": [
         {"name": {"ar": "مخطط مسار السياج وارتفاعاته", "en": "Hoarding alignment and heights drawing"}, "formats": ["pdf", "dwg"]},
@@ -719,7 +719,7 @@
       "formFields": [
         {"key": "lengthM", "label": {"ar": "طول السياج (م)", "en": "Hoarding length (m)"}, "type": "number", "required": true},
         {"key": "heightM", "label": {"ar": "الارتفاع (م)", "en": "Height (m)"}, "type": "number", "required": true},
-        {"key": "hasGraphics", "label": {"ar": "يتضمن محتوى إعلانياً", "en": "Includes advertising content"}, "type": "select", "options": [{"ar": "نعم", "en": "Yes"}, {"ar": "لا", "en": "No"}], "required": true}
+        {"key": "hasGraphics", "label": {"ar": "يتضمن محتوى إعلانيًا", "en": "Includes advertising content"}, "type": "select", "options": [{"ar": "نعم", "en": "Yes"}, {"ar": "لا", "en": "No"}], "required": true}
       ],
       "fees": {"model": "perSqm", "note": {"ar": "تحتسب رسوم المحتوى الإعلاني على مسطح السياج وفق لائحة الرسوم", "en": "Advertising content fees computed on hoarding surface per the fees schedule"}},
       "slaDays": 3,
@@ -836,7 +836,7 @@
       "category": "enablement",
       "phase": "during",
       "personas": ["giga_entity", "developer", "operator", "investor"],
-      "description": {"ar": "تصريح إشغال مؤقت للأرصفة والمرافق العامة لأغراض الأعمال الإنشائية أو التشغيلية مقابل مالي.", "en": "Temporary occupation permit for sidewalks and public facilities for construction or operational purposes, against a financial consideration."},
+      "description": {"ar": "تصريح إشغال مؤقت للأرصفة والمرافق العامة لأغراض الأعمال الإنشائية أو التشغيلية بمقابل مالي.", "en": "Temporary occupation permit for sidewalks and public facilities for construction or operational purposes, against a financial consideration."},
       "prerequisites": [
         {"ar": "تصريح أعمال أو رخصة سارية", "en": "Valid works permit or license"},
         {"ar": "خطة الحفاظ على حركة المشاة", "en": "Pedestrian movement preservation plan"}
@@ -887,7 +887,7 @@
       "personas": ["giga_entity", "developer"],
       "description": {"ar": "تصريح تصريف مياه نزح الحفريات أو المياه السطحية إلى شبكات التصريف المعتمدة مع اشتراطات جودة المياه.", "en": "Permit to discharge dewatering or surface water to approved drainage networks, with water-quality requirements."},
       "prerequisites": [
-        {"ar": "تصريح حفريات ساري حيثما ينطبق", "en": "Valid excavation permit where applicable"},
+        {"ar": "تصريح حفريات سارٍ حيثما ينطبق", "en": "Valid excavation permit where applicable"},
         {"ar": "تحليل جودة المياه من مختبر معتمد", "en": "Water-quality analysis from an accredited laboratory"}
       ],
       "requiredDocuments": [
@@ -988,7 +988,7 @@
       "category": "investment",
       "phase": "after",
       "personas": ["investor", "operator"],
-      "description": {"ar": "إعداد تقرير فني عن حالة الموقع والأصول ومشاركته للأمانة تمهيداً لتجديد العقد أو إنهائه ضمن مرحلة التجديد أو الإنهاء في رحلة المستثمر.", "en": "Prepare a technical report on site and asset condition and share it with the Amanah ahead of contract renewal or termination, per the investor journey's renewal-or-termination stage."},
+      "description": {"ar": "إعداد تقرير فني عن حالة الموقع والأصول ومشاركته للأمانة تمهيدًا لتجديد العقد أو إنهائه ضمن مرحلة التجديد أو الإنهاء في رحلة المستثمر.", "en": "Prepare a technical report on site and asset condition and share it with the Amanah ahead of contract renewal or termination, per the investor journey's renewal-or-termination stage."},
       "prerequisites": [
         {"ar": "عقد استثماري قائم عبر منصة فرص", "en": "Active investment contract via the Furas platform"}
       ],

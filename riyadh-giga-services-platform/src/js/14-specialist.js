@@ -78,7 +78,7 @@
               return h("span.t-footnote", null, td(r.personaSnapshot.name));
             } },
           { key: "sub", label: { ar: "الاستلام", en: "Received" }, render: function (r) {
-              return h("span.num.t-footnote", null, r.submittedAt ? RGP.fmtDate(r.submittedAt.slice(0, 10)) : "—");
+              return h("span.num-date.t-footnote", null, r.submittedAt ? RGP.fmtDate(r.submittedAt.slice(0, 10)) : "—");
             }, sortVal: function (r) { return r.submittedAt || ""; } },
           { key: "sla", label: t("work.slaLeft"), render: function (r) { return UI.slaChip(r) || "—"; },
             sortVal: function (r) { return r.sla && r.sla.dueAt || "9999"; } },
@@ -89,8 +89,8 @@
             } }
         ],
         onRow: function (r) { RGP.router.go("#/work/review/" + r.id); },
-        empty: UI.empty("inbox", { ar: "لا طلبات في هذه القائمة", en: "Nothing in this list" },
-          { ar: "قوائم فارغة تعني مددًا ملتزمة — أحسنت.", en: "Empty queues mean SLAs kept — well done." }, null, true)
+        empty: UI.empty("inbox", { ar: "لا توجد طلبات في هذه القائمة", en: "No requests in this list" },
+          null, null, true)
       }));
     }
 
@@ -140,7 +140,7 @@
       h("h1.t-title1", null, t("work.queue")),
       h("p.desc.t-sub", null,
         (RGP.i18n.lang === "ar" ? "متوسط زمن المعالجة: " : "Avg processing: "),
-        h("b.num", null, String(kpis.avgProcessing)), " " + t("common.workdays") + " · ",
+        h("b", null, RGP.fmtWorkdays(kpis.avgProcessing)), " · ",
         (RGP.i18n.lang === "ar" ? "الالتزام بالمواعيد: " : "On-time: "),
         h("b.num", null, kpis.onTimePct + "%")),
       h("div.actions", null, seg));
@@ -184,7 +184,7 @@
           UI.ring(Math.min(RGP.lifecycle.consumedPct(r), 100), 64, RGP.lifecycle.slaBand(r) === "paused" ? null : RGP.lifecycle.slaBand(r)),
           h("div", null,
             h("div.t-caption.mut", { style: { fontWeight: 500 } }, t("sla.due")),
-            h("div.t-footnote.num", { style: { fontWeight: 600 } }, RGP.fmtDate(r.sla.dueAt)),
+            h("div.t-footnote.num-date", { style: { fontWeight: 600 } }, RGP.fmtDate(r.sla.dueAt)),
             h("div.mbs-1", null, UI.slaChip(r)))) : null),
       h("div.card.elev-1.card-pad-dense", null,
         h("div.t-footnote.mut.mbe-1", null, t("req.applicant")),
@@ -195,7 +195,16 @@
             h("div.t-caption.mut", { style: { fontWeight: 500 } },
               t("persona." + (r.personaSnapshot.personaType || "developer")) + " · " + td(r.personaSnapshot.org)))),
         r.personaSnapshot.delegatedBy ? h("div.t-caption.mut.mbs-1", { style: { fontWeight: 500 } },
-          (RGP.i18n.lang === "ar" ? "بالإنابة عن: " : "Delegate of: ") + td(RGP.store.userName(r.personaSnapshot.delegatedBy))) : null),
+          (RGP.i18n.lang === "ar" ? "بالإنابة عن: " : "Delegate of: ") + td(RGP.store.userName(r.personaSnapshot.delegatedBy)),
+          (function () {
+            var creator = RGP.store.user(r.createdById);
+            if (!creator || !creator.allowedServiceIds) return null;
+            var inScope = creator.allowedServiceIds.indexOf(r.serviceId) >= 0;
+            return h("div.mbs-05", null,
+              h("span.pill." + (inScope ? "ok" : "dang") + ".sm", null,
+                inScope ? (RGP.i18n.lang === "ar" ? "الخدمة ضمن نطاق التفويض" : "Within delegation scope")
+                        : (RGP.i18n.lang === "ar" ? "الخدمة خارج نطاق التفويض" : "Outside delegation scope")));
+          })()) : null),
       proj ? h("div.card.elev-1.card-pad-dense", null,
         h("div.t-footnote.mut.mbe-1", null, t("req.project")),
         h("div.flex.g15", null,
@@ -206,7 +215,20 @@
         h("div.flex.g1.mbs-1.wrap", null,
           h("span.pill." + (proj.status === "enabled" ? "ok" : "info") + ".sm", null, td(RGP.projectStatusLabel(proj.status))),
           proj.isGiga ? h("span.pill.plain.sm", null, RGP.i18n.lang === "ar" ? "سجل المشاريع الكبرى" : "Giga registry") : null)) : null,
-      priorHistory());
+      priorHistory(),
+      (function () {
+        var linked = RGP.store.state.challenges.filter(function (c) { return c.requestId === r.id; });
+        if (!linked.length) return null;
+        return h("div.card.elev-1.card-pad-dense", null,
+          h("div.t-footnote.mut.mbe-1", null, RGP.i18n.lang === "ar" ? "تحديات مرتبطة" : "Linked challenges"),
+          linked.map(function (c) {
+            return h("div.flex.g1.hairline-b", { style: { padding: "6px 0", cursor: "pointer" }, onclick: function () { RGP.challengeDetail(c); } },
+              h("span.sev-dot." + (c.severity || "medium")),
+              h("span.t-caption.accent.num", { style: { fontWeight: 600 } }, c.id),
+              h("span.grow"),
+              RGP.chStatePill(c.state));
+          }));
+      })());
 
     function priorHistory() {
       var prior = RGP.store.state.requests.filter(function (x) {
@@ -367,6 +389,16 @@
           : h("div.t-sub", null, r.decision.reason)) : null);
 
     /* ---- decision modals ---- */
+    var feeBearing = !!(svc && svc.fees && svc.fees.model !== "none");
+    function coSignRow(cb) {
+      /* segregation of duties (rmun-notes §3): fee-bearing or fast-track decisions
+         by the reviewing specialist require the section-head / GPO co-sign */
+      if (u.role === "platform_manager" || (r.priority !== "fast_track" && !feeBearing)) return null;
+      var label = r.priority === "fast_track"
+        ? { ar: "تم الحصول على اعتماد مدير مكتب المشاريع الكبرى (توقيع مشترك لمسار الأولوية)", en: "GPO director co-sign obtained (required for fast-track decisions)" }
+        : { ar: "تم الحصول على اعتماد رئيس القسم (فصل المهام للخدمات ذات المقابل المالي)", en: "Section-head co-sign obtained (segregation of duties for fee-bearing services)" };
+      return h("label.checkbox-row.well.card-pad-dense", null, cb, h("span.t-sub", null, td(label)));
+    }
     function approveModal() {
       var pendingDocs = r.documents.filter(function (d) { return d.verifyState !== "verified"; });
       var conditions = h("textarea.input", { placeholder: t("work.conditionsOpt") });
@@ -382,12 +414,11 @@
               (RGP.i18n.lang === "ar" ? "تنبيه: " : "Note: ") + pendingDocs.length +
               (RGP.i18n.lang === "ar" ? " مستند لم يكتمل التحقق منه" : " document(s) not yet verified"))) : null,
           h("div.field", null, h("label", null, t("work.conditionsOpt")), conditions),
-          r.priority === "fast_track" && u.role !== "platform_manager"
-            ? h("label.checkbox-row.well.card-pad-dense", null, coSign,
-                h("span.t-sub", null, RGP.i18n.lang === "ar"
-                  ? "تم الحصول على موافقة مدير مكتب المشاريع الكبرى (توقيع مشترك لمسار الأولوية)"
-                  : "GPO director co-sign obtained (required for fast-track approvals)"))
-            : null),
+          feeBearing ? h("p.t-caption.mut.mbe-1", { style: { fontWeight: 500 } },
+            RGP.i18n.lang === "ar"
+              ? "خدمة ذات مقابل مالي: تصدر فاتورة سداد مع القرار ويُسلَّم التصريح بعد إتمام السداد."
+              : "Fee-bearing service: a SADAD invoice is issued with the decision; the permit is released after payment.") : null,
+          coSignRow(coSign)),
         actions: function (close) {
           return [
             h("button.btn.secondary", { onclick: close }, t("common.cancel")),
@@ -400,7 +431,7 @@
                   rerender();
                 } catch (e) {
                   if (String(e.message).indexOf("needCoSign") >= 0)
-                    UI.toast("warn", { ar: "اعتماد مسار الأولوية يتطلب توقيع مدير المكتب المشترك", en: "Fast-track approval needs the GPO co-sign" });
+                    UI.toast("warn", { ar: "يتطلب هذا القرار توقيعًا مشتركًا — يرجى تأكيد الحصول عليه", en: "This decision requires a co-sign — confirm it first" });
                   else UI.toast("danger", { ar: "تعذر الاعتماد", en: "Couldn't approve" });
                 }
               }
@@ -411,6 +442,20 @@
     }
 
     function returnModal() {
+      if ((r.returnNotes || []).length >= 2) {
+        UI.modal({
+          title: { ar: "بلوغ الحد الأقصى لدورات الإعادة", en: "Return-cycle limit reached" },
+          size: "sm",
+          body: h("div.t-body", null, RGP.i18n.lang === "ar"
+            ? "أعيد هذا الطلب لممثل المشروع مرتين، وهو الحد الأقصى المقرر. عند استمرار عدم الاكتمال يوصى برفض الطلب مع بيان الأسباب والسند النظامي، ويحق لممثل المشروع التقدم بطلب جديد."
+            : "This request has been returned twice — the maximum allowed. If it remains incomplete, decline it with the reason and regulatory reference; the representative may file a new request."),
+          actions: function (close) {
+            return [h("button.btn.secondary", { onclick: close }, t("common.close")),
+              h("button.btn.destructive", { onclick: function () { close(); rejectModal(); } }, t("work.reject"))];
+          }
+        });
+        return;
+      }
       var checks = [];
       var extraItems = [];
       var note = h("textarea.input", { placeholder: RGP.i18n.lang === "ar" ? "توضيح إضافي للعميل… (اختياري)" : "Extra context for the customer… (optional)" });
@@ -459,6 +504,7 @@
     }
 
     function rejectModal() {
+      var rejCoSign = h("input", { type: "checkbox" });
       var reason = h("textarea.input", { placeholder: t("work.reasonPh") });
       var counter = h("span.t-caption.mut.num", { style: { fontWeight: 500 } }, "0 / 30");
       reason.addEventListener("input", function () { counter.textContent = reason.value.trim().length + " / 30"; });
@@ -480,7 +526,8 @@
             reason),
           h("div.field", null,
             h("label", null, t("req.regulationRef"), h("span.req", null, "*")),
-            h("div.select-wrap", null, regSel), regOther)),
+            h("div.select-wrap", null, regSel), regOther),
+          coSignRow(rejCoSign)),
         actions: function (close) {
           return [
             h("button.btn.secondary", { onclick: close }, t("common.cancel")),
@@ -493,11 +540,15 @@
                 }
                 if (!reg) { UI.toast("warn", { ar: "حدد السند النظامي", en: "Choose the regulation" }); return; }
                 try {
-                  RGP.lifecycle.transition(r, "rejected", { reason: reason.value.trim(), regulationRef: reg });
+                  RGP.lifecycle.transition(r, "rejected", { reason: reason.value.trim(), regulationRef: reg, coSign: rejCoSign.checked });
                   close();
                   UI.toast("ok", { ar: t("toast.rejected"), en: t("toast.rejected") });
                   rerender();
-                } catch (e) { UI.toast("danger", { ar: "تعذر الرفض", en: "Couldn't decline" }); }
+                } catch (e) {
+                  if (String(e.message).indexOf("needCoSign") >= 0)
+                    UI.toast("warn", { ar: "يتطلب هذا القرار توقيعًا مشتركًا — يرجى تأكيد الحصول عليه", en: "This decision requires a co-sign — confirm it first" });
+                  else UI.toast("danger", { ar: "تعذر الرفض", en: "Couldn't decline" });
+                }
               }
             }, t("work.reject"))
           ];

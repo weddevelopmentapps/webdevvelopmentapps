@@ -73,11 +73,11 @@
     "state.draft":            { ar: "مسودة", en: "Draft" },
     "state.submitted":        { ar: "مقدَّم", en: "Submitted" },
     "state.screening":        { ar: "فرز أولي", en: "Screening" },
-    "state.in_review":        { ar: "قيد المراجعة", en: "In review" },
-    "state.returned":         { ar: "معاد للعميل", en: "Returned" },
-    "state.resubmitted":      { ar: "أعيد تقديمه", en: "Resubmitted" },
+    "state.in_review":        { ar: "قيد الدراسة", en: "In review" },
+    "state.returned":         { ar: "مُعاد للاستكمال", en: "Returned" },
+    "state.resubmitted":      { ar: "أُعيد التقديم", en: "Resubmitted" },
     "state.external_review":  { ar: "لدى الجهات الخارجية", en: "External review" },
-    "state.decision_due":     { ar: "بانتظار القرار", en: "Decision due" },
+    "state.decision_due":     { ar: "قرار مستحق", en: "Decision due" },
     "state.approved":         { ar: "معتمد", en: "Approved" },
     "state.rejected":         { ar: "مرفوض", en: "Declined" },
     "state.cancelled":        { ar: "ملغى", en: "Cancelled" },
@@ -224,7 +224,7 @@
     "work.reasonPh":          { ar: "سبب الرفض…", en: "Reason…" },
     "work.regulationPh":      { ar: "مثال: المادة (12) من لائحة اشتراطات البناء", en: "e.g., Article 12, Building Code Regulations" },
     "work.externalTitle":     { ar: "إحالة لجهات خارجية", en: "Refer to external entities" },
-    "work.externalNote":      { ar: "اختر الجهات المطلوب مرئياتها قبل القرار.", en: "Choose the entities whose clearance is required before decision." },
+    "work.externalNote":      { ar: "حدد الجهات المطلوب أخذ مرئياتها قبل إصدار القرار.", en: "Choose the entities whose clearance is required before the decision." },
     "work.slaLeft":           { ar: "المتبقي على الاستحقاق", en: "Time to due" },
     "work.overdueBy":         { ar: "متجاوز بمقدار", en: "Overdue by" },
     "work.filters.state":     { ar: "الحالة", en: "State" },
@@ -292,8 +292,8 @@
 
     /* ---- notifications ---- */
     "ntf.title":              { ar: "الإشعارات", en: "Notifications" },
-    "ntf.markAll":            { ar: "تعليم الكل كمقروء", en: "Mark all read" },
-    "ntf.empty":              { ar: "لا إشعارات جديدة — كل شيء تحت السيطرة.", en: "No new notifications — all clear." },
+    "ntf.markAll":            { ar: "تحديد الكل كمقروء", en: "Mark all read" },
+    "ntf.empty":              { ar: "لا توجد إشعارات جديدة.", en: "No new notifications." },
 
     /* ---- external ---- */
     "ext.inbox":              { ar: "الإحالات الواردة", en: "Incoming referrals" },
@@ -305,7 +305,7 @@
 
     /* ---- executive ---- */
     "exec.title":             { ar: "الملخص التنفيذي", en: "Executive summary" },
-    "exec.sub":               { ar: "نظرة معالي الأمين على تمكين المشاريع الكبرى", en: "The Mayor's view of giga-project enablement" },
+    "exec.sub":               { ar: "موجز مؤشرات تمكين المشاريع الكبرى المعد لمكتب الأمين", en: "Giga-project enablement summary for the Mayor's office" },
 
     /* ---- profile/settings ---- */
     "prof.title":             { ar: "الملف الشخصي", en: "Profile" },

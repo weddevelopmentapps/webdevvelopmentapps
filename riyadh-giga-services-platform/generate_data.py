@@ -51,7 +51,7 @@ AR = lambda ar, en: {"ar": ar, "en": en}
 PW = "Demo@2026"
 USERS = [
     dict(id="u-gpo-mgr", role="platform_manager", personaType=None,
-         name=AR("م. عبدالعزيز الحمدان", "Eng. Abdulaziz Alhamdan"),
+         name=AR("م. عبدالعزيز بن ناصر الحمدان", "Eng. Abdulaziz bin Nasser Alhamdan"),
          title=AR("مدير مكتب المشاريع الكبرى", "Director, Giga Projects Office"),
          org=AR("أمانة منطقة الرياض", "Riyadh Region Municipality"),
          email="a.alhamdan@rrm.gov.sa"),
@@ -81,7 +81,7 @@ USERS = [
          org=AR("مجموعة روشن", "ROSHN Group"),
          email="b.alrashed@roshn.sa", projectIds=["roshn-sedra"]),
     dict(id="u-investor", role="project_rep", personaType="investor",
-         name=AR("أحمد الجريسي", "Ahmed Aljeraisy"),
+         name=AR("أحمد بن سليمان الجريسي", "Ahmed bin Sulaiman Aljeraisy"),
          title=AR("مستثمر عقاري — شركة رافد للاستثمار", "Real-estate investor — Rafd Investment"),
          org=AR("شركة رافد للاستثمار", "Rafd Investment Co."),
          email="a.aljeraisy@rafd-invest.sa", projectIds=[]),
@@ -107,9 +107,39 @@ USERS = [
          title=AR("ممثل شركة المياه الوطنية", "National Water Company representative"),
          org=AR("شركة المياه الوطنية", "National Water Company"),
          email="a.alhogbani@nwc.com.sa", entityId="nwc"),
+    dict(id="u-giga-qid", role="project_rep", personaType="giga_entity", showInLogin=False,
+         name=AR("م. ناصر الغامدي", "Eng. Nasser Alghamdi"),
+         title=AR("مدير التصاريح — القدية", "Permits director — Qiddiya"),
+         org=AR("شركة القدية للاستثمار", "Qiddiya Investment Company"),
+         email="n.alghamdi@qiddiya.sa", projectIds=["qiddiya"]),
+    dict(id="u-giga-sb", role="project_rep", personaType="giga_entity", showInLogin=False,
+         name=AR("م. طلال الحربي", "Eng. Talal Alharbi"),
+         title=AR("مدير التصاريح — المسار الرياضي", "Permits director — Sports Boulevard"),
+         org=AR("مؤسسة المسار الرياضي", "Sports Boulevard Foundation"),
+         email="t.alharbi@sportsboulevard.sa", projectIds=["sports-boulevard"]),
+    dict(id="u-giga-ksia", role="project_rep", personaType="giga_entity", showInLogin=False,
+         name=AR("م. يوسف باداود", "Eng. Yousef Badawood"),
+         title=AR("مدير التصاريح — مطار الملك سلمان الدولي", "Permits director — KSIA"),
+         org=AR("شركة مطار الملك سلمان الدولي للتطوير", "King Salman International Airport Development Co."),
+         email="y.badawood@ksia.sa", projectIds=["ksia"]),
+    dict(id="u-giga-expo", role="project_rep", personaType="giga_entity", showInLogin=False,
+         name=AR("م. عبدالرحمن السويلم", "Eng. Abdulrahman Alsuwailem"),
+         title=AR("مدير التصاريح — إكسبو 2030 الرياض", "Permits director — Expo 2030 Riyadh"),
+         org=AR("شركة إكسبو 2030 الرياض", "Expo 2030 Riyadh Company"),
+         email="a.alsuwailem@expo2030.sa", projectIds=["expo-2030"]),
+    dict(id="u-op-misk", role="project_rep", personaType="operator", showInLogin=False,
+         name=AR("م. نوف الدخيل", "Eng. Nouf Aldakheel"),
+         title=AR("مدير التشغيل — مدينة مسك", "Operations director — Misk City"),
+         org=AR("مؤسسة محمد بن سلمان (مسك)", "Misk Foundation"),
+         email="n.aldakheel@misk.org.sa", projectIds=["misk-city"]),
+    dict(id="u-amanah-dept", role="amanah_specialist", personaType=None,
+         name=AR("م. نورة الشهري", "Eng. Noura Alshehri"),
+         title=AR("منسقة الإدارة العامة للتخطيط العمراني", "Coordinator — GD of Urban Planning"),
+         org=AR("الإدارة العامة للتخطيط العمراني", "GD of Urban Planning"),
+         email="n.alshehri@rrm.gov.sa"),
     dict(id="u-viewer", role="viewer", personaType=None,
          name=AR("د. فهد السديري", "Dr. Fahad Alsudairi"),
-         title=AR("مستشار — مكتب الأمين", "Advisor — Mayor's Office"),
+         title=AR("مستشار — مكتب الأمين (مستخدم مشاهد)", "Advisor — Mayor's Office (viewer)"),
          org=AR("مكتب أمين منطقة الرياض", "Office of the Mayor of Riyadh Region"),
          email="f.alsudairi@rrm.gov.sa"),
 ]
@@ -117,8 +147,13 @@ for u in USERS:
     u.setdefault("projectIds", [])
     u["password"] = PW
     u["active"] = True
-    parts = u["name"]["en"].replace("Eng. ", "").replace("Dr. ", "").split()
-    u["avatarInitials"] = (parts[0][0] + (parts[-1][0] if len(parts) > 1 else "")).upper()
+    ar_name = u["name"]["ar"]
+    for pfx in ("م. ", "د. ", "أ. "):
+        if ar_name.startswith(pfx):
+            ar_name = ar_name[len(pfx):]
+    aw = [w for w in ar_name.split() if w not in ("بن", "بنت")]
+    u["avatarInitials"] = (aw[0][0] + " " + aw[-1][0]) if len(aw) > 1 else aw[0][0]
+    u.setdefault("showInLogin", True)
     u["createdAt"] = ts(days_ago(220))
 
 # ----------------------------------------------------------------------------
@@ -147,12 +182,18 @@ DISTRICTS = {
     "misk-city": AR("مدينة مسك — إرقاح", "Misk City — Irqah"),
     "green-riyadh": AR("عموم مدينة الرياض", "City-wide"),
 }
+SECTOR_ENUM = {
+    "diriyah": "cultural", "qiddiya": "entertainment", "king-salman-park": "environment",
+    "sports-boulevard": "sports", "new-murabba": "mixed-use", "roshn-sedra": "residential",
+    "ksia": "transport", "expo-2030": "commercial", "misk-city": "education", "green-riyadh": "environment",
+}
 PROJECTS = []
 for gp in CATALOG["gigaProjects"]:
     phase, status = PHASE_MAP.get(gp["id"], ("construction", "active"))
     PROJECTS.append(dict(
         id=gp["id"], name=gp["name"], owner=gp["owner"], developer=gp["developer"],
-        sector=gp["sector"], isGiga=True, phase=phase, status=status,
+        sector=SECTOR_ENUM.get(gp["id"], "mixed-use"), sectorDetail=gp["sector"],
+        isGiga=True, phase=phase, status=status,
         monogram=gp["monogram"],
         location=dict(district=DISTRICTS[gp["id"]], lat=gp["lat"], lng=gp["lng"], areaKm2=gp["areaKm2"]),
         description=gp["description"],
@@ -263,6 +304,8 @@ JOURNEYS = [
              step("service", "تصاريح الفعاليات والأنشطة الموسمية", "Events & seasonal activity permits", *("مدير الأصول", "Operator"), service="events-permit", sla=3),
              step("service", "شهادة الامتثال الدورية", "Periodic compliance certificate", *("مدير الأصول", "Operator"), service="periodic-compliance-certificate", sla=10),
              step("service", "تجديد الرخص البلدية", "Municipal license renewals", *("مدير الأصول", "Operator"), service="license-renewal", sla=3),
+             step("service", "إعداد التقرير الفني للتجديد أو الإنهاء ومشاركته مع الأمانة", "Prepare and share the technical report for renewal or termination", *("مدير الأصول", "Operator"), service="technical-report-renewal-termination", sla=10),
+             step("service", "عند الإنهاء: تسليم الموقع لمكاتب مدينتي", "On termination: hand the site over to Madinati offices", *("مدير الأصول", "Operator"), service="site-handover-madinati", sla=5),
          ]),
     dict(id="industrial", phase="during",
          name=AR("رحلة المشاريع الصناعية", "Industrial-projects journey"),
@@ -282,6 +325,39 @@ JOURNEYS = [
 # ----------------------------------------------------------------------------
 SERVICES = {s["id"]: s for s in CATALOG["services"]}
 
+# official document-classification codes (rmun-notes §3: RRM-{YYYY}-{code}-{seq})
+SERVICE_CODES = {
+    "survey-decision": "SRV", "planning-request": "PLN", "concept-master-plan": "CMP",
+    "initial-approval-dmp": "DMP", "detailed-plans-submission": "DTL", "infra-design-studies": "IDS",
+    "infra-final-handover": "IFH", "partial-conveyance": "PCV", "final-plan-approval": "FPA",
+    "certificate-of-completion": "COC", "building-permit": "BLD", "demolition-permit": "DEM",
+    "building-completion-occupancy": "BCO", "env-construction-permit": "EVC", "env-operation-permit": "EVO",
+    "power-connection": "PWR", "operation-license": "OPL", "temporary-works-permit": "TWP",
+    "road-closure-permit": "RCL", "excavation-permit": "EXC", "utility-relocation": "UTR",
+    "tower-crane-permit": "CRN", "site-hoarding-permit": "HRD", "temporary-sales-center": "TSC",
+    "events-permit": "EVT", "naming-signage-approval": "SGN", "labor-housing-permit": "LHP",
+    "public-realm-occupation": "PRO", "npx-coordination": "NPX", "dewatering-permit": "DWT",
+    "commercial-activity-license": "LIC", "license-renewal": "RNW", "periodic-compliance-certificate": "PCC",
+    "technical-report-renewal-termination": "TRP", "site-handover-madinati": "SHM",
+    "modon-building-permit": "MBP", "giga-project-onboarding": "ONB", "challenge-escalation": "CHE",
+}
+for _sid, _svc in SERVICES.items():
+    _svc["code"] = SERVICE_CODES.get(_sid, "GEN")
+# events permits are requested during construction activations AND in operation
+SERVICES["events-permit"]["phases"] = ["during", "after"]
+
+# journey-step SLAs must equal the service catalog for service steps (single source of truth);
+# review-step SLAs are the official guide figures and stay as authored
+for _jr in JOURNEYS:
+    for _st in _jr["steps"]:
+        if _st.get("serviceId") and _st["serviceId"] in SERVICES:
+            _st["slaDays"] = SERVICES[_st["serviceId"]]["slaDays"]
+    for _pathd in _jr.get("paths", []):
+        for _st in _pathd["steps"]:
+            if _st.get("serviceId") and _st["serviceId"] in SERVICES:
+                _st["slaDays"] = SERVICES[_st["serviceId"]]["slaDays"]
+
+
 def doc_list(svc_id, state="pending", missing_key=None):
     docs = []
     for i, d in enumerate(SERVICES[svc_id].get("requiredDocuments", [])):
@@ -298,19 +374,46 @@ def doc_list(svc_id, state="pending", missing_key=None):
     return docs
 
 def form_fill(svc_id, extra=None):
-    """Plausible values for the smart-form fields of a service."""
+    """Plausible, field-aware values for the smart-form fields of a service."""
+    KEY_VALUES = {
+        "floors": 12, "builtUpArea": 84500, "areaSqm": 24500, "lengthM": 420, "heightM": 3,
+        "itemsCount": 24, "expectedAttendance": 12000, "cranesCount": 8, "depthM": 12,
+        "unitsCount": 640, "workersCount": 250, "capacityMW": 40, "plotsCount": 380,
+    }
+    TEXT_VALUES = {
+        "roadName": "طريق الأمير محمد بن سعد بن عبدالعزيز",
+        "eventName": "فعاليات موسم الرياض — المنطقة الشمالية",
+        "shopName": "مركز خدمات الزوار",
+        "engineeringOffice": "مكتب العمران الهندسي",
+        "contractNo": "C-2024-0187",
+        "deedNumber": "310114488213",
+        "activityCode": "ISIC-9321",
+        "planNo": "م/2451",
+        "ownerName": "شركة التطوير المالكة",
+        "consultantName": "مكتب العمران الهندسي",
+        "contractorName": "شركة الإنشاءات الوطنية",
+        "licenseNo": "LIC-2025-4471",
+    }
     out = {}
     for f in SERVICES[svc_id].get("formFields", []):
         t, k = f.get("type"), f["key"]
         if extra and k in extra:
             out[k] = extra[k]; continue
-        if t == "number": out[k] = 25000
-        elif t == "date": out[k] = iso(add_workdays(TODAY, 10))
-        elif t == "select" and f.get("options"): out[k] = f["options"][0]["v"] if isinstance(f["options"][0], dict) and "v" in f["options"][0] else (f["options"][0] if isinstance(f["options"][0], str) else f["options"][0].get("value", ""))
-        elif t == "parcel-id": out[k] = "1010-" + str(2000 + hash(svc_id) % 7000)
-        elif t == "map-point": out[k] = "24.7136, 46.6753"
-        elif t == "textarea": out[k] = "وفق نطاق الأعمال المعتمد للمشروع والمتطلبات النظامية ذات العلاقة."
-        else: out[k] = "أ ب/" + str(100 + hash(k + svc_id) % 900)
+        if t == "number":
+            out[k] = KEY_VALUES.get(k, 500)
+        elif t == "date":
+            out[k] = iso(add_workdays(TODAY, 10 if "start" in k.lower() else 40))
+        elif t == "select" and f.get("options"):
+            o = f["options"][1] if len(f["options"]) > 1 else f["options"][0]
+            out[k] = o.get("v") if isinstance(o, dict) and "v" in o else (o["ar"] if isinstance(o, dict) and "ar" in o else str(o))
+        elif t == "parcel-id":
+            out[k] = "1010-" + str(2000 + hash(svc_id) % 7000)
+        elif t == "map-point":
+            out[k] = "24.7136, 46.6753"
+        elif t == "textarea":
+            out[k] = "وفق نطاق الأعمال المعتمد للمشروع والاشتراطات النظامية ذات العلاقة."
+        else:
+            out[k] = TEXT_VALUES.get(k, "وفق الموضح في المستندات المرفقة")
     return out
 
 REQ_SEQ = [0]
@@ -340,11 +443,16 @@ def timeline_for(req, sub_d, first_d=None, decided_d=None, extra_events=None):
 REQUESTS = []
 PERMIT_SEQ = [100]
 
-def mk(num, svc, proj, user_id, state, sub_days_ago, priority="fast_track", **kw):
-    """Assemble a seeded request with consistent SLA math and timeline."""
+def mk(num, svc, proj, user_id, state, sub_days_ago, priority=None, **kw):
+    """Assemble a seeded request with consistent SLA math and timeline.
+    Priority follows rmun-notes §1.1: fast-track IFF registry project AND
+    gigaFastTrack service — the explicit arg only exists for edge overrides."""
     svc_def = SERVICES[svc]
     u = [x for x in USERS if x["id"] == user_id][0]
     sub_d = days_ago(sub_days_ago)
+    proj_rec = next((p for p in PROJECTS if p["id"] == proj), None) if proj else None
+    if priority is None:
+        priority = "fast_track" if (proj_rec and proj_rec["isGiga"] and svc_def.get("gigaFastTrack")) else "normal"
     sla_days = svc_def["slaDays"]
     if priority == "fast_track":
         sla_days = max(1, -(-svc_def["slaDays"] // 2))  # ceil(x*0.5)
@@ -382,10 +490,15 @@ def mk(num, svc, proj, user_id, state, sub_days_ago, priority="fast_track", **kw
     REQUESTS.append(req)
     return req
 
-def approved(permit_code=None):
+def approved(svc_id):
     PERMIT_SEQ[0] += 1
-    return dict(type="approved", decidedAt="", deciderId="u-spec-1",
-                permitNo="RGP-2026-%04d" % PERMIT_SEQ[0], conditions=None, note=None)
+    code = SERVICE_CODES.get(svc_id, "GEN")
+    d = dict(type="approved", decidedAt="", deciderId="u-spec-1",
+             permitNo="RRM-2026-%s-%04d" % (code, PERMIT_SEQ[0]), conditions=None, note=None)
+    fees = SERVICES[svc_id].get("fees") or {}
+    if fees.get("model") and fees["model"] != "none":
+        d["sadadInvoiceNo"] = "SADAD-2026-%06d" % (100000 + (abs(hash(svc_id)) + PERMIT_SEQ[0]) % 900000)
+    return d
 
 E = lambda d, by, role, typ, **kw: ((d, by, role, typ), kw)
 
@@ -393,10 +506,10 @@ E = lambda d, by, role, typ, **kw: ((d, by, role, typ), kw)
 # ROSHN Sedra planning journey (developer):
 r = mk(141, "survey-decision", "roshn-sedra", "u-dev-roshn", "closed", 44, first=43, decided=40, closed=33,
        assignee="u-spec-1", docState="verified",
-       decision=approved(), satisfaction=dict(score=5, comment="إنجاز قبل الموعد", at=ts(days_ago(38))))
+       decision=approved("survey-decision"), satisfaction=dict(score=5, comment="أُنجز الطلب قبل الموعد المحدد", at=ts(days_ago(38))))
 r["decision"]["decidedAt"] = ts(days_ago(40), 13)
 r = mk(152, "planning-request", "roshn-sedra", "u-dev-roshn", "closed", 36, first=35, decided=34, closed=27,
-       assignee="u-spec-1", docState="verified", decision=approved(),
+       assignee="u-spec-1", docState="verified", decision=approved("planning-request"),
        satisfaction=dict(score=5, comment=None, at=ts(days_ago(30))))
 r["decision"]["decidedAt"] = ts(days_ago(34), 11)
 r = mk(166, "concept-master-plan", "roshn-sedra", "u-eng-office", "external_review", 13, first=12,
@@ -405,8 +518,8 @@ r = mk(166, "concept-master-plan", "roshn-sedra", "u-eng-office", "external_revi
        events=[E(days_ago(11), "u-spec-1", "amanah_specialist", "state", fromState="screening", toState="in_review"),
                E(days_ago(9), "u-spec-1", "amanah_specialist", "referral", fromState="in_review", toState="external_review",
                  payload={"entities": ["rcrc"]})],
-       note=AR("ضمن نطاق NPX — محال للجنة التخطيط العمراني بالتنسيق مع الهيئة الملكية",
-               "Within NPX scope — referred to the Urban Planning Committee with RCRC"))
+       note=AR("ضمن نطاق NPX، ومحال إلى لجنة التخطيط العمراني بالتنسيق مع الهيئة الملكية لمدينة الرياض",
+               "Within NPX scope; referred to the Urban Planning Committee in coordination with RCRC"))
 # Diriyah infra (escalated red):
 r = mk(170, "infra-design-studies", "diriyah", "u-giga-dgda", "external_review", 22, first=21,
        assignee="u-spec-1", docState="verified", breached=True, escalation="red",
@@ -417,10 +530,10 @@ r = mk(170, "infra-design-studies", "diriyah", "u-giga-dgda", "external_review",
                E(days_ago(19), "u-spec-1", "amanah_specialist", "referral", fromState="in_review", toState="external_review",
                  payload={"entities": ["sec", "nwc", "telecom-operators"]}),
                E(days_ago(2), "u-gpo-mgr", "platform_manager", "action", payload={"escalated": True})],
-       note=AR("متأخر لدى الجهات الخدمية — مصعّد لمدير مكتب المشاريع الكبرى",
-               "Delayed with utility entities — escalated to the GPO director"))
+       note=AR("متأخر لدى الجهات الخدمية، ومصعّد إلى مدير مكتب المشاريع الكبرى",
+               "Delayed with utility entities; escalated to the GPO director"))
 # Sports Boulevard road closure:
-mk(173, "road-closure-permit", "sports-boulevard", "u-giga-nm", "in_review", 6, first=5, assignee="u-spec-2",
+mk(173, "road-closure-permit", "sports-boulevard", "u-giga-sb", "in_review", 6, first=5, assignee="u-spec-2",
    docState="verified",
    events=[E(days_ago(4), "u-spec-2", "amanah_specialist", "state", fromState="screening", toState="in_review"),
            E(days_ago(3), "u-spec-2", "amanah_specialist", "note",
@@ -437,84 +550,84 @@ mk(175, "building-permit", "new-murabba", "u-giga-nm", "returned", 16, first=15,
            E(days_ago(12), "u-spec-2", "amanah_specialist", "state", fromState="in_review", toState="returned",
              payload={"items": ["وثيقة التأمين ضد العيوب الخفية", "دراسة حركة مرورية حسب نوع المشروع"]})])
 # KSIA tower cranes (approved):
-r = mk(178, "tower-crane-permit", "ksia", "u-giga-dgda", "approved", 9, first=8, decided=6, assignee="u-spec-2",
-       docState="verified", decision=approved(),
+r = mk(178, "tower-crane-permit", "ksia", "u-giga-ksia", "approved", 9, first=8, decided=6, assignee="u-spec-2",
+       docState="verified", decision=approved("tower-crane-permit"),
        events=[E(days_ago(7), "u-spec-2", "amanah_specialist", "state", fromState="screening", toState="in_review"),
                E(days_ago(7), "u-spec-2", "amanah_specialist", "state", fromState="in_review", toState="decision_due")],
-       note=AR("8 رافعات برجية — تنسيق الارتفاعات مع الهيئة العامة للطيران المدني",
-               "8 tower cranes — heights coordinated with GACA"))
+       note=AR("8 رافعات برجية، مع تنسيق الارتفاعات مع الهيئة العامة للطيران المدني",
+               "8 tower cranes; heights coordinated with GACA"))
 r["decision"]["decidedAt"] = ts(days_ago(6), 12)
 # Qiddiya excavation (screening):
-mk(180, "excavation-permit", "qiddiya", "u-giga-dgda", "screening", 1, first=0, assignee="u-spec-2")
+mk(180, "excavation-permit", "qiddiya", "u-giga-qid", "screening", 1, first=0, assignee="u-spec-2")
 # New Murabba sales center (submitted, unassigned):
 mk(181, "temporary-sales-center", "new-murabba", "u-giga-nm", "submitted", 0, assignee="u-spec-1")
 # Diriyah events permit (rejected):
-r = mk(169, "events-permit", "diriyah", "u-giga-dgda", "rejected", 23, first=22, decided=20, assignee="u-spec-2",
+r = mk(169, "events-permit", "diriyah", "u-giga-dgda", "rejected", 9, first=8, decided=2, assignee="u-spec-2",
        docState="verified",
-       decision=dict(type="rejected", decidedAt=ts(days_ago(20), 13), deciderId="u-spec-2",
-                     reason="تعارض موعد الفعالية المقترح مع أعمال إنشائية قائمة ضمن نطاق الموقع وخطة سلامة غير مستوفية لاشتراطات الدفاع المدني",
+       decision=dict(type="rejected", decidedAt=ts(days_ago(2), 13), deciderId="u-spec-2",
+                     reason="تعارض موعد الفعالية المقترح مع أعمال إنشائية قائمة ضمن نطاق الموقع، وعدم استيفاء خطة السلامة لاشتراطات الدفاع المدني",
                      regulationRef="اشتراطات تصاريح الفعاليات المؤقتة — المادة 6"),
-       events=[E(days_ago(21), "u-spec-2", "amanah_specialist", "state", fromState="screening", toState="in_review"),
-               E(days_ago(21), "u-spec-2", "amanah_specialist", "state", fromState="in_review", toState="decision_due")])
+       events=[E(days_ago(6), "u-spec-2", "amanah_specialist", "state", fromState="screening", toState="in_review"),
+               E(days_ago(3), "u-spec-2", "amanah_specialist", "state", fromState="in_review", toState="decision_due")])
 # KSP commercial license (closed + CSAT):
 r = mk(155, "commercial-activity-license", "king-salman-park", "u-operator", "closed", 29, first=28, decided=27, closed=20,
-       assignee="u-spec-2", docState="verified", decision=approved(),
+       assignee="u-spec-2", docState="verified", decision=approved("commercial-activity-license"),
        satisfaction=dict(score=4, comment=None, at=ts(days_ago(24))))
 r["decision"]["decidedAt"] = ts(days_ago(27), 15)
 # Investor technical report (in_review, normal lane):
 mk(176, "technical-report-renewal-termination", None, "u-investor", "in_review", 8, first=7, assignee="u-spec-1",
-   priority="normal", docState="verified",
+   docState="verified", form={"intent": "تجديد العقد"},
    events=[E(days_ago(6), "u-spec-1", "amanah_specialist", "state", fromState="screening", toState="in_review")],
-   note=AR("فرصة استثمارية — مركز خدمات على طريق الملك عبدالعزيز؛ الرغبة: تجديد العقد",
-           "Investment opportunity — services center on King Abdulaziz Rd; intent: renew"))
+   note=AR("فرصة استثمارية: مركز خدمات على طريق الملك عبدالعزيز، والرغبة تجديد العقد",
+           "Investment opportunity: services center on King Abdulaziz Rd; intent to renew"))
 # more coverage:
 mk(183, "utility-relocation", "diriyah", "u-giga-dgda", "decision_due", 12, first=11, assignee="u-spec-1",
    docState="verified",
    events=[E(days_ago(10), "u-spec-1", "amanah_specialist", "state", fromState="screening", toState="in_review"),
            E(days_ago(4), "u-spec-1", "amanah_specialist", "state", fromState="in_review", toState="decision_due")],
    note=AR("نقل كيبل جهد عالٍ متعارض مع حفر النفق الغربي", "Relocating an HV cable conflicting with the west tunnel excavation"))
-mk(184, "site-hoarding-permit", "new-murabba", "u-giga-nm", "resubmitted", 18, first=17, assignee="u-spec-2",
-   resubmissionCount=1, pausedDays=4, docState="verified",
-   returnNotes=[dict(at=ts(days_ago(14), 11), byId="u-spec-2",
+mk(184, "site-hoarding-permit", "new-murabba", "u-giga-nm", "resubmitted", 7, first=6, assignee="u-spec-2",
+   resubmissionCount=1, pausedDays=3, docState="verified",
+   returnNotes=[dict(at=ts(days_ago(5), 11), byId="u-spec-2",
                      items=["مخطط مواقع السياج على الرفع المساحي"], note="")],
-   events=[E(days_ago(15), "u-spec-2", "amanah_specialist", "state", fromState="screening", toState="in_review"),
-           E(days_ago(14), "u-spec-2", "amanah_specialist", "state", fromState="in_review", toState="returned",
+   events=[E(days_ago(6), "u-spec-2", "amanah_specialist", "state", fromState="screening", toState="in_review"),
+           E(days_ago(5), "u-spec-2", "amanah_specialist", "state", fromState="in_review", toState="returned",
              payload={"items": ["مخطط مواقع السياج على الرفع المساحي"]}),
-           E(days_ago(8), "u-giga-nm", "project_rep", "state", fromState="returned", toState="resubmitted")])
-mk(185, "labor-housing-permit", "qiddiya", "u-giga-dgda", "in_review", 5, first=4, assignee="u-spec-1",
+           E(days_ago(1), "u-giga-nm", "project_rep", "state", fromState="returned", toState="resubmitted")])
+mk(185, "labor-housing-permit", "qiddiya", "u-giga-qid", "in_review", 5, first=4, assignee="u-spec-1",
    docState="pending",
    events=[E(days_ago(3), "u-spec-1", "amanah_specialist", "state", fromState="screening", toState="in_review")])
-r = mk(160, "excavation-permit", "sports-boulevard", "u-giga-nm", "closed", 40, first=39, decided=37, closed=30,
-       assignee="u-spec-2", docState="verified", decision=approved(),
+r = mk(160, "excavation-permit", "sports-boulevard", "u-giga-sb", "closed", 40, first=39, decided=37, closed=30,
+       assignee="u-spec-2", docState="verified", decision=approved("excavation-permit"),
        satisfaction=dict(score=5, comment=None, at=ts(days_ago(33))))
 r["decision"]["decidedAt"] = ts(days_ago(37), 10)
-r = mk(147, "env-construction-permit", "expo-2030", "u-giga-dgda", "approved", 33, first=32, decided=28,
-       assignee="u-spec-1", docState="verified", decision=approved(),
+r = mk(147, "env-construction-permit", "expo-2030", "u-giga-expo", "approved", 33, first=32, decided=28,
+       assignee="u-spec-1", docState="verified", decision=approved("env-construction-permit"),
        satisfaction=dict(score=4, comment=None, at=ts(days_ago(26))))
 r["decision"]["decidedAt"] = ts(days_ago(28), 14)
-mk(186, "npx-coordination", "expo-2030", "u-giga-dgda", "screening", 2, first=1, assignee="u-spec-1")
-mk(187, "dewatering-permit", "ksia", "u-giga-dgda", "submitted", 1, assignee="u-spec-2")
-r = mk(158, "periodic-compliance-certificate", "misk-city", "u-operator", "approved", 26, first=25, decided=22,
-       assignee="u-spec-2", docState="verified", priority="normal", decision=approved())
+mk(186, "npx-coordination", "expo-2030", "u-giga-expo", "screening", 2, first=1, assignee="u-spec-1")
+mk(187, "dewatering-permit", "ksia", "u-giga-ksia", "submitted", 1, assignee="u-spec-2")
+r = mk(158, "periodic-compliance-certificate", "misk-city", "u-op-misk", "approved", 26, first=25, decided=22,
+       assignee="u-spec-2", docState="verified", decision=approved("periodic-compliance-certificate"))
 r["decision"]["decidedAt"] = ts(days_ago(22), 9)
 mk(188, "events-permit", "king-salman-park", "u-operator", "decision_due", 4, first=3, assignee="u-spec-2",
    docState="verified",
    events=[E(days_ago(2), "u-spec-2", "amanah_specialist", "state", fromState="screening", toState="in_review"),
            E(days_ago(1), "u-spec-2", "amanah_specialist", "state", fromState="in_review", toState="decision_due")],
-   note=AR("فعالية موسم الرياض — المنطقة الشمالية للحديقة", "Riyadh Season activation — park north zone"))
-mk(189, "license-renewal", "misk-city", "u-operator", "cancelled", 15, first=14, assignee="u-spec-1", priority="normal",
+   note=AR("فعالية موسم الرياض في المنطقة الشمالية للحديقة", "Riyadh Season event in the park's north zone"))
+mk(189, "license-renewal", "misk-city", "u-op-misk", "cancelled", 15, first=14, assignee="u-spec-1",
    events=[E(days_ago(13), "u-operator", "project_rep", "state", fromState="screening", toState="cancelled",
              payload={"reason": "تقديم مكرر"})])
 mk(190, "building-permit", "roshn-sedra", "u-eng-office", "draft", 3)
-mk(191, "road-closure-permit", "qiddiya", "u-giga-dgda", "draft", 1)
+mk(191, "road-closure-permit", "qiddiya", "u-giga-qid", "draft", 1)
 r = mk(150, "survey-decision", "new-murabba", "u-giga-nm", "closed", 47, first=46, decided=43, closed=36,
-       assignee="u-spec-1", docState="verified", decision=approved(),
-       satisfaction=dict(score=3, comment="نتمنى تسريع الإحالة للجهات", at=ts(days_ago(40))))
+       assignee="u-spec-1", docState="verified", decision=approved("survey-decision"),
+       satisfaction=dict(score=3, comment="نأمل تسريع الإحالة إلى الجهات الخارجية", at=ts(days_ago(40))))
 r["decision"]["decidedAt"] = ts(days_ago(43), 12)
-mk(192, "temporary-works-permit", "sports-boulevard", "u-giga-nm", "in_review", 7, first=6, assignee="u-spec-1",
+mk(192, "temporary-works-permit", "sports-boulevard", "u-giga-sb", "in_review", 7, first=6, assignee="u-spec-1",
    docState="verified",
    events=[E(days_ago(5), "u-spec-1", "amanah_specialist", "state", fromState="screening", toState="in_review")])
-mk(193, "naming-signage-approval", "misk-city", "u-operator", "submitted", 2, priority="normal", assignee="u-spec-2")
+mk(193, "naming-signage-approval", "misk-city", "u-op-misk", "submitted", 2, assignee="u-spec-2")
 r = mk(168, "power-connection", "roshn-sedra", "u-dev-roshn", "external_review", 14, first=13, assignee="u-spec-2",
        docState="verified",
        referrals=[dict(entityId="sec", sentAt=ts(days_ago(10)), answeredAt=None, opinion=None, note=None)],
@@ -557,13 +670,13 @@ CHALLENGES = [
     ch(12, "ksia", None, "coordination", "high", "escalated",
        "تأخر محاضر التنسيق بين الجهات الخدمية لممرات المرافق الشمالية",
        "Delayed inter-entity coordination minutes for the northern utility corridors",
-       "gpo", 21, started_ago=18, escalated_ago=4, opener="u-giga-dgda", target=10,
+       "gpo", 21, started_ago=18, escalated_ago=4, opener="u-giga-ksia", target=10,
        sol_ar="غرفة تنسيق أسبوعية موحدة برئاسة مكتب المشاريع الكبرى",
        sol_en="A unified weekly coordination room chaired by the GPO"),
     ch(13, "sports-boulevard", "RQ-2026-0173", "permits", "high", "open",
        "تعدد تصاريح الإغلاق المطلوبة لتقاطعات المسار مع الطرق الرئيسية",
        "Multiple closure permits required at main-road crossings",
-       "traffic-department", 14, opener="u-giga-nm", target=15,
+       "traffic-department", 14, opener="u-giga-sb", target=15,
        sol_ar="تصريح إطاري موحد للتقاطعات بمراحل ربع سنوية",
        sol_en="A unified framework permit for crossings in quarterly phases"),
     ch(14, "new-murabba", None, "fees", "medium", "open",
@@ -575,7 +688,7 @@ CHALLENGES = [
     ch(9, "qiddiya", None, "technical", "medium", "closed",
        "اشتراطات تصريف مياه الأمطار في المناطق الجبلية خارج النطاق العمراني",
        "Stormwater requirements for mountainous zones outside the urban boundary",
-       "construction-projects-agency", 65, started_ago=60, resolved_ago=19, closed_ago=12, opener="u-giga-dgda", target=30,
+       "construction-projects-agency", 65, started_ago=60, resolved_ago=19, closed_ago=12, opener="u-giga-qid", target=30,
        sol_ar="دليل تصميم خاص بالمواقع الجبلية بالتنسيق مع الهيئة الملكية",
        sol_en="A mountain-sites design guide coordinated with RCRC",
        res_ar="اعتماد دليل تصميم خاص بالمواقع الجبلية بالتنسيق مع الهيئة الملكية لمدينة الرياض",
@@ -583,7 +696,7 @@ CHALLENGES = [
     ch(15, "expo-2030", None, "regulatory", "high", "in_progress",
        "غياب مسار تنظيمي للمنشآت المؤقتة القابلة للفك وإعادة الاستخدام بعد المعرض",
        "No regulatory track for demountable, reusable post-expo structures",
-       "gd-building-permits", 7, started_ago=5, opener="u-giga-dgda", target=25,
+       "gd-building-permits", 7, started_ago=5, opener="u-giga-expo", target=25,
        sol_ar="فئة رخصة مؤقتة خاصة بمنشآت إكسبو تحال لاعتماد وكالة التعمير والمشاريع",
        sol_en="A dedicated temporary-license class for expo structures via the Construction Agency"),
     ch(16, "king-salman-park", "RQ-2026-0188", "coordination", "low", "resolved",
@@ -643,9 +756,15 @@ NOTIFS = [
 AUDIT = []
 for r_ in REQUESTS:
     for e in r_["timeline"]:
-        if e["type"] in ("state", "decision") and e.get("toState") not in (None, "draft"):
+        AUDIT_NAMES = {"submitted": "request.submitted", "screening": "request.screening_started",
+                       "in_review": "request.review_started", "returned": "request.returned",
+                       "resubmitted": "request.resubmitted", "external_review": "request.referred",
+                       "decision_due": "request.decision_pending", "approved": "request.approved",
+                       "rejected": "request.rejected", "cancelled": "request.cancelled",
+                       "closed": "request.closed"}
+        if e["type"] in ("state", "decision") and e.get("toState") in AUDIT_NAMES:
             AUDIT.append(dict(id="aud-%s-%s" % (r_["id"], e["id"]), at=e["at"], actorId=e["byId"],
-                              actorRole=e["byRole"], type="request." + (e.get("toState") or "event"),
+                              actorRole=e["byRole"], type=AUDIT_NAMES[e["toState"]],
                               entityType="request", entityId=r_["id"], payload=e.get("payload")))
 AUDIT.sort(key=lambda a: a["at"], reverse=True)
 

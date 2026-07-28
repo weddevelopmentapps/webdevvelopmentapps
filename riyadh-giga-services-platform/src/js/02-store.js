@@ -98,10 +98,14 @@
       s.requestSeq = (s.requestSeq || 0) + 1;
       return "RQ-" + new Date().getFullYear() + "-" + RGP.zeroPad(s.requestSeq, 4);
     },
-    nextPermitNo: function () {
-      var s = Store.state.settings;
-      s.permitSeq = (s.permitSeq || 0) + 1;
-      return "RGP-" + new Date().getFullYear() + "-" + RGP.zeroPad(s.permitSeq, 4);
+    /* official decision-document number: RRM-{YYYY}-{serviceCode}-{seq}
+       (rmun-notes §3 — the service code classifies archived documents) */
+    nextPermitNo: function (serviceId) {
+      var st = Store.state.settings;
+      st.permitSeq = (st.permitSeq || 0) + 1;
+      var svc = serviceId ? Store.service(serviceId) : null;
+      var code = (svc && svc.code) || "GEN";
+      return "RRM-" + new Date().getFullYear() + "-" + code + "-" + RGP.zeroPad(st.permitSeq, 4);
     },
     nextChallengeId: function () {
       var s = Store.state.settings;

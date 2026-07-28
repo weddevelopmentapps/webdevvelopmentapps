@@ -10,7 +10,10 @@
 
   function myRequests(u) {
     return RGP.store.state.requests.filter(function (r) {
-      return r.createdById === u.id || (u.delegatedBy && r.createdById === u.delegatedBy);
+      if (r.createdById === u.id) return true;
+      if (u.delegatedBy && r.createdById === u.delegatedBy) return true;
+      var creator = RGP.store.user(r.createdById);
+      return !!(creator && creator.delegatedBy === u.id);  /* principal sees delegate filings */
     });
   }
   function myProjects(u) {
@@ -35,8 +38,8 @@
       h("h1.t-title1", null, t("portal.welcome") + "، " + td(u.name).split("—")[0]),
       h("p.desc.t-sub", null,
         RGP.i18n.lang === "ar"
-          ? "تابع طلباتك ومشاريعك، وابدأ خدمة جديدة في دقائق — بمدد إنجاز ملتزمة."
-          : "Track your requests and projects, and start a new service in minutes — on committed timelines."),
+          ? "متابعة الطلبات والمشاريع وتقديم طلبات الخدمات البلدية وفق مدد إنجاز معتمدة."
+          : "Track your requests and projects and submit municipal service requests within approved timelines."),
       h("div.actions", null,
         h("a.btn.primary", { href: "#/wizard" }, UI.icon("plus", 18), t("portal.newRequest")),
         h("a.btn.secondary", { href: "#/portal/journeys" }, UI.icon("map", 18), t("portal.journeyExplorer"))));
@@ -63,7 +66,7 @@
         h("button.btn.primary.sm", { onclick: function () { RGP.router.go("#/portal/requests/" + r.id); } },
           r.state === "draft" ? (RGP.i18n.lang === "ar" ? "إكمال المسودة" : "Complete draft") : t("req.resubmit")));
     }) : [UI.empty("checkCircle", { ar: "لا إجراءات مطلوبة منك", en: "Nothing needs your action" },
-      { ar: "سنشعرك فور الحاجة لأي استكمال.", en: "We'll notify you the moment anything is needed." }, null, true)];
+      { ar: "سيصلك إشعار عند وجود أي إجراء مطلوب منك.", en: "You will be notified when any action is required." }, null, true)];
 
     /* my projects */
     var projCards = myProjects(u).map(function (p) {
@@ -115,7 +118,7 @@
             return p ? td(p.name) : "—";
           } },
         { key: "date", label: t("common.date"), render: function (r) {
-            return h("span.num.t-footnote", null, RGP.fmtDate(r.submittedAt ? r.submittedAt.slice(0, 10) : r.createdAt.slice(0, 10)));
+            return h("span.num-date.t-footnote", null, RGP.fmtDate(r.submittedAt ? r.submittedAt.slice(0, 10) : r.createdAt.slice(0, 10)));
           }, sortVal: function (r) { return r.submittedAt || r.createdAt; } },
         { key: "sla", label: t("common.sla"), render: function (r) { return UI.slaChip(r) || h("span.mut", null, "—"); } },
         { key: "state", label: t("common.status"), render: function (r) { return UI.statePill(r.state); },
@@ -123,7 +126,7 @@
       ],
       onRow: function (r) { RGP.router.go("#/portal/requests/" + r.id); },
       empty: UI.empty("docs", { ar: "لا توجد طلبات بعد", en: "No requests yet" },
-        { ar: "ابدأ بتقديم أول طلب خدمة لمشروعك، وستجد هنا حالته خطوة بخطوة.", en: "Submit your first service request and track every step here." },
+        { ar: "يمكنك تقديم طلب خدمة جديد لمشروعك ومتابعة حالته من هذه الصفحة.", en: "You can submit a new service request for your project and track its status from this page." },
         h("a.btn.primary", { href: "#/wizard" }, t("portal.newRequest")))
     });
   }
@@ -177,7 +180,7 @@
     var svc = RGP.store.service(r.serviceId);
     var proj = r.projectId && RGP.store.project(r.projectId);
 
-    var isOwner = r.createdById === u.id || (u.delegatedBy && r.createdById === u.delegatedBy);
+    var isOwner = RGP.isRequestOwner(r, u);
     if (u.role === "project_rep" && !isOwner) {
       return RGP.shell(UI.empty("shield", { ar: "لا تملك صلاحية عرض هذا الطلب", en: "You can't view this request" }), {});
     }
@@ -233,14 +236,34 @@
       } else if (e.type === "note") {
         cls = "hollow";
         text = RGP.i18n.lang === "ar" ? "ملاحظة" : "Note";
+      } else if (e.payload && e.payload.external_opinion) {
+        var opMap = {
+          approve_recommend: { ar: "لا مانع", en: "No objection" },
+          reject_recommend: { ar: "توصية بعدم الموافقة", en: "Recommend decline" },
+          info_needed: { ar: "مطلوب معلومات إضافية", en: "More information needed" }
+        };
+        text = (RGP.i18n.lang === "ar" ? "وردت مرئيات " : "Opinion received from ") +
+          td(RGP.entityName(e.payload.entityId)) + ": " + td(opMap[e.payload.external_opinion] || {});
+        if (e.payload.external_opinion === "reject_recommend") cls = "warn";
+      } else if (e.payload && e.payload.escalated) {
+        cls = "danger";
+        text = RGP.i18n.lang === "ar"
+          ? "تصعيد آلي: تجاوز الطلب مدته المحددة وأُشعر مدير مكتب المشاريع الكبرى"
+          : "Automatic escalation: SLA exceeded; the GPO director was notified";
+      } else if (e.payload && e.payload.reassigned) {
+        cls = "hollow";
+        text = (RGP.i18n.lang === "ar" ? "إعادة إسناد الطلب إلى " : "Reassigned to ") + td(RGP.store.userName(e.payload.reassigned.to));
       } else {
         cls = "hollow";
-        text = RGP.i18n.lang === "ar" ? "إجراء" : "Action";
+        text = (e.textAr || e.textEn)
+          ? (RGP.i18n.lang === "ar" ? (e.textAr || e.textEn) : (e.textEn || e.textAr))
+          : (RGP.i18n.lang === "ar" ? "إجراء إداري" : "Administrative action");
       }
       var quote = null;
       if (e.type === "note" && (e.textAr || e.textEn)) quote = RGP.i18n.lang === "ar" ? (e.textAr || e.textEn) : (e.textEn || e.textAr);
       if (e.payload && e.payload.items) quote = (RGP.i18n.lang === "ar" ? "المطلوب استكماله: " : "To complete: ") + e.payload.items.join("، ");
       if (e.payload && e.payload.reason) quote = e.payload.reason + (e.payload.regulationRef ? " — " + e.payload.regulationRef : "");
+      if (e.payload && e.payload.note && e.type === "state") quote = e.payload.note;
 
       return h("div.tl-item" + (cls ? "." + cls : ""), null,
         h("span.tl-node"),
@@ -251,7 +274,7 @@
         h("div.t-sub", null, text),
         quote ? h("div.tl-quote", null, quote) : null,
         h("div.t-caption.mut.mbs-05", { style: { fontWeight: 500 } },
-          h("span.num", null, RGP.fmtDateTime(e.at)), " · " + RGP.fmtAgo(e.at)));
+          h("span.num-date", null, RGP.fmtDateTime(e.at)), " · " + RGP.fmtAgo(e.at)));
     }));
 
     /* side stack */
@@ -267,12 +290,15 @@
           UI.ring(Math.min(pct, 100), 76, band === "paused" ? null : band),
           h("div", null,
             h("div.t-sub", null, t("sla.due") + ":"),
-            h("div.t-headline.num", null, RGP.fmtDate(RGP.lifecycle.TERMINAL_STATES.indexOf(r.state) < 0 ? r.sla.dueAt : (r.decision ? r.decision.decidedAt.slice(0, 10) : r.sla.dueAt))),
+            h("div.t-headline.num-date", null, RGP.fmtDate(RGP.lifecycle.TERMINAL_STATES.indexOf(r.state) < 0 ? r.sla.dueAt : (r.decision ? r.decision.decidedAt.slice(0, 10) : r.sla.dueAt))),
             band === "paused" ? h("div.t-caption.warn-fg.mbs-05", { style: { fontWeight: 600 } }, t("sla.paused")) :
               RGP.lifecycle.TERMINAL_STATES.indexOf(r.state) < 0 ?
               h("div.t-caption.mut.mbs-05", { style: { fontWeight: 500 } },
                 t("sla.elapsed") + " ", h("span.num", null, String(RGP.lifecycle.elapsedDays(r))),
-                " " + t("common.of") + " ", h("span.num", null, String(RGP.lifecycle.slaDaysFor(r))), " " + t("common.workdays")) : null))));
+                " " + t("common.of") + " " + RGP.fmtWorkdays(RGP.lifecycle.slaDaysFor(r))) : null,
+            (r.sla.pausedDays || 0) > 0 ? h("div.t-caption.mut.mbs-05", { style: { fontWeight: 500 } },
+              (RGP.i18n.lang === "ar" ? "المدة لدى ممثل المشروع: " : "Time with the representative: ") +
+              RGP.fmtWorkdays(r.sla.pausedDays)) : null))));
     }
 
     /* documents card */
@@ -291,15 +317,53 @@
           h("span.d-state", null, stateIcon));
       }) : h("div.card-pad-dense.t-sub.mut", null, RGP.i18n.lang === "ar" ? "لا مستندات مطلوبة لهذه الخدمة" : "No documents required"))));
 
-    /* entities card */
+    /* entities card — referral states, opinions and dates in full */
     if (r.involvedEntities.length) {
+      var opLabel = {
+        approve_recommend: { ar: "لا مانع", en: "No objection" },
+        reject_recommend: { ar: "توصية بعدم الموافقة", en: "Recommend decline" },
+        info_needed: { ar: "مطلوب معلومات إضافية", en: "More information needed" }
+      };
       side.appendChild(h("div.card.elev-1.card-pad-dense", null,
         h("div.t-footnote.mut.mbe-1", null, RGP.i18n.lang === "ar" ? "الجهات المعنية" : "Involved entities"),
-        h("div.flex.g1.wrap", null, r.involvedEntities.map(function (eid) {
+        h("div.flex-col.g1", null, r.involvedEntities.map(function (eid) {
           var ref = r.referrals.filter(function (x) { return x.entityId === eid; })[0];
-          return h("span.pill." + (ref ? (ref.answeredAt ? "ok" : "info") : "plain"), null, td(RGP.entityName(eid)),
-            ref && !ref.answeredAt ? "…" : "");
+          if (!ref) return h("div.flex.g1", null, h("span.pill.plain.sm", null, td(RGP.entityName(eid))));
+          if (ref.answeredAt) {
+            return h("div.hairline-b", { style: { padding: "6px 0" } },
+              h("div.flex.g1", null,
+                h("span.pill." + (ref.opinion === "reject_recommend" ? "dang" : ref.opinion === "info_needed" ? "warn" : "ok") + ".sm", null,
+                  td(RGP.entityName(eid))),
+                h("span.t-caption", { style: { fontWeight: 600 } }, td(opLabel[ref.opinion] || {})),
+                h("span.grow"),
+                h("span.t-caption.mut.num-date", { style: { fontWeight: 500 } }, RGP.fmtDate(ref.answeredAt.slice(0, 10)))),
+              ref.note ? h("div.t-caption.mut.mbs-05", { style: { fontWeight: 500 } }, ref.note) : null);
+          }
+          var pendingDays = RGP.workingDaysBetween(ref.sentAt.slice(0, 10), RGP.todayISO());
+          return h("div.flex.g1.hairline-b", { style: { padding: "6px 0" } },
+            h("span.pill.info.sm", null, td(RGP.entityName(eid))),
+            h("span.t-caption.mut", { style: { fontWeight: 500 } },
+              (RGP.i18n.lang === "ar" ? "أُحيلت في " : "Referred ") ),
+            h("span.t-caption.mut.num-date", { style: { fontWeight: 500 } }, RGP.fmtDate(ref.sentAt.slice(0, 10))),
+            h("span.grow"),
+            h("span.t-caption.warn-fg", { style: { fontWeight: 600 } },
+              (RGP.i18n.lang === "ar" ? "بانتظار الرد منذ " : "Awaiting reply for ") + RGP.fmtWorkdays(pendingDays)));
         }))));
+    }
+
+    /* linked challenges (bidirectional link — it-review AC28) */
+    var linkedCh = RGP.store.state.challenges.filter(function (c) { return c.requestId === r.id; });
+    if (linkedCh.length) {
+      side.appendChild(h("div.card.elev-1.card-pad-dense", null,
+        h("div.t-footnote.mut.mbe-1", null, RGP.i18n.lang === "ar" ? "تحديات مرتبطة بالطلب" : "Linked challenges"),
+        linkedCh.map(function (c) {
+          return h("div.flex.g1.hairline-b", { style: { padding: "6px 0", cursor: "pointer" }, onclick: function () { RGP.challengeDetail(c); } },
+            h("span.sev-dot." + (c.severity || "medium")),
+            h("span.t-caption.accent.num", { style: { fontWeight: 600 } }, c.id),
+            h("span.t-caption.ellipsis", { style: { fontWeight: 500, maxWidth: "200px" } }, td(c.title)),
+            h("span.grow"),
+            RGP.chStatePill(c.state));
+        })));
     }
 
     /* decision card */
@@ -310,7 +374,9 @@
           ? h("div", null,
               h("div.flex.g1.mbe-1", null, h("span.ok-fg", null, UI.icon("checkCircle", 20)), h("span.t-headline", null, t("state.approved"))),
               h("div.t-sub", null, t("req.documentNo") + ": ", h("b.num", null, r.decision.permitNo)),
-              h("div.t-sub.num", null, RGP.fmtDate(r.decision.decidedAt.slice(0, 10))),
+              r.decision.sadadInvoiceNo ? h("div.t-sub.flex.g05", null,
+                (RGP.i18n.lang === "ar" ? "فاتورة سداد: " : "SADAD invoice: "), h("b.num", null, r.decision.sadadInvoiceNo), UI.simBadge()) : null,
+              h("div.t-sub.num-date", null, RGP.fmtDate(r.decision.decidedAt.slice(0, 10))),
               r.decision.conditions ? h("div.tl-quote.mbs-1", null, r.decision.conditions) : null,
               h("button.btn.secondary.sm.mbs-2", { onclick: function () { RGP.print.permit(r); } }, UI.icon("print", 16), t("req.printPermit")))
           : h("div", null,
@@ -392,8 +458,8 @@
     var note = h("textarea.input", { placeholder: RGP.i18n.lang === "ar" ? "أوضح ما تم استكماله… (اختياري)" : "Describe what was completed… (optional)" });
     var body = h("div", null,
       h("p.t-sub.mut.mbe-2", null, RGP.i18n.lang === "ar"
-        ? "أكد استكمال جميع البنود المطلوبة، وستستأنف مدة الإنجاز من تاريخ إعادة التقديم."
-        : "Confirm every requested item is complete — the SLA clock resumes on resubmission."),
+        ? "أكد استكمال جميع البنود المطلوبة، وتُستأنف مدة الإنجاز من تاريخ إعادة التقديم."
+        : "Confirm every requested item is complete; the SLA clock resumes on resubmission."),
       last.items.map(function (item, i) {
         var cb = h("input", { type: "checkbox", id: "ri-" + i });
         checks.push(cb);
@@ -438,7 +504,10 @@
   function journeys() {
     var u = RGP.auth.current();
     var J = RGP.store.state.journeys;
-    var openJourney = J[0].id;
+    var defaultByPersona = { operator: "operation", investor: "investor", giga_entity: "planning", developer: "planning" };
+    var openJourney = (u.personaType && defaultByPersona[u.personaType] &&
+      J.some(function (x) { return x.id === defaultByPersona[u.personaType]; }))
+      ? defaultByPersona[u.personaType] : J[0].id;
     var openPath = null;
 
     var wrap = h("div");
@@ -468,8 +537,16 @@
             h("div.t-headline", null, td(s.title)),
             h("div.flex.g2.wrap.mbs-05", null,
               h("span.t-caption.mut.flex.g05", { style: { fontWeight: 500 } }, UI.icon("user", 12), td(s.actor)),
-              s.slaDays ? h("span.t-caption.mut.flex.g05.num", { style: { fontWeight: 500 } }, UI.icon("clock", 12),
-                String(s.slaDays) + " " + t("common.workdays")) : null,
+              s.slaDays ? h("span.t-caption.mut.flex.g05", { style: { fontWeight: 500 } }, UI.icon("clock", 12),
+                RGP.fmtWorkdays(s.slaDays),
+                (function () {
+                  var svcJ = s.serviceId && RGP.store.service(s.serviceId);
+                  if (u.personaType === "giga_entity" && svcJ && svcJ.gigaFastTrack) {
+                    return h("span", { style: { color: "var(--sand-deep)", fontWeight: 600 } },
+                      " · " + (RGP.i18n.lang === "ar" ? "بمسار الأولوية: " : "fast-track: ") + RGP.fmtWorkdays(Math.max(1, Math.ceil(s.slaDays * 0.5))));
+                  }
+                  return null;
+                })()) : null,
               s.note ? h("span.t-caption.mut", { style: { fontWeight: 500 } }, td(s.note)) : null)),
           svc && u.role === "project_rep" ? h("a.btn.tertiary.sm", { href: "#/wizard?service=" + svc.id },
             RGP.i18n.lang === "ar" ? "ابدأ الطلب" : "Start", UI.fwd(14)) : null));
@@ -497,7 +574,7 @@
                   h("div.t-sub", { style: { fontWeight: 600 } }, td(s.title)),
                   h("div.flex.g2.mbs-05", null,
                     h("span.t-caption.mut", { style: { fontWeight: 500 } }, td(s.actor)),
-                    s.slaDays ? h("span.t-caption.mut.num", { style: { fontWeight: 500 } }, s.slaDays + " " + t("common.workdays")) : null)),
+                    s.slaDays ? h("span.t-caption.mut", { style: { fontWeight: 500 } }, RGP.fmtWorkdays(s.slaDays)) : null)),
                 svc && u.role === "project_rep" ? h("a.btn.tertiary.sm", { href: "#/wizard?service=" + svc.id },
                   RGP.i18n.lang === "ar" ? "ابدأ" : "Start") : null);
             })) : null));
@@ -510,8 +587,8 @@
       h("div.kicker", null, t("brand.short")),
       h("h1.t-title1", null, t("portal.journeyExplorer")),
       h("p.desc.t-sub", null, RGP.i18n.lang === "ar"
-        ? "الرحلات الرسمية للمطور والمستثمر العقاري كما اعتمدتها أمانة منطقة الرياض — يوليو 2026."
-        : "The official developer & investor journeys as adopted by the Amanah — July 2026."));
+        ? "الرحلات الرسمية للمطور والمستثمر العقاري كما اعتمدتها أمانة منطقة الرياض في يوليو 2026."
+        : "The official developer and investor journeys as adopted by the Amanah in July 2026."));
 
     return RGP.shell(h("div", null, head, wrap), { context: t("portal.journeyExplorer"), narrow: true });
   }
@@ -527,14 +604,14 @@
       h("div.kicker", null, t("brand.short")),
       h("h1.t-title1", null, t("ch.title")),
       h("p.desc.t-sub", null, RGP.i18n.lang === "ar"
-        ? "سجّل أي معوق يواجه مشروعك وسيتولى مكتب المشاريع الكبرى إدارته حتى الإغلاق."
-        : "Log any obstacle facing your project — the GPO drives it to closure."),
+        ? "تسجيل المعوقات التي تواجه المشروع، ويتولى مكتب المشاريع الكبرى متابعتها حتى الإغلاق."
+        : "Log the obstacles facing the project; the Giga Projects Office follows them up to closure."),
       h("div.actions", null,
         h("button.btn.primary", { onclick: function () { RGP.challengeForm(); } }, UI.icon("plus", 18), t("ch.new"))));
 
     var list = mine.length ? h("div.grid.cols-2.mbs-2", null, mine.map(function (c) { return RGP.challengeCard(c, false); }))
       : UI.empty("flag", { ar: "لا تحديات مسجلة", en: "No challenges logged" },
-        { ar: "نتمنى ألا تحتاج هذه الصفحة أبدًا — وإن احتجتها فنحن هنا.", en: "We hope you never need this page — but we're here if you do." });
+        { ar: "عند تسجيل تحدٍّ يتولى مكتب المشاريع الكبرى متابعته حتى الإغلاق.", en: "When a challenge is logged, the Giga Projects Office follows it up to closure." });
 
     return RGP.shell(h("div", null, head, list), { context: t("ch.title") });
   }
@@ -586,6 +663,17 @@
         u.personaType ? h("span.pill.plain", null, t("persona." + u.personaType)) : null,
         u.delegatedBy ? h("span.pill.plain.sm", null,
           (RGP.i18n.lang === "ar" ? "بالإنابة عن: " : "Delegate of: ") + td(RGP.store.userName(u.delegatedBy))) : null));
+
+    var delegationCard = u.delegatedBy ? h("div.card.elev-1.card-pad.mbs-2", null,
+      h("div.t-headline.mbe-1", null, RGP.i18n.lang === "ar" ? "نطاق التفويض" : "Delegation scope"),
+      h("p.t-caption.mut.mbe-2", { style: { fontWeight: 500 } },
+        RGP.i18n.lang === "ar"
+          ? "الخدمات المفوض لمكتبكم التقديم عليها بالإنابة عن " + td(RGP.store.userName(u.delegatedBy)) + ":"
+          : "Services your office may file on behalf of " + td(RGP.store.userName(u.delegatedBy)) + ":"),
+      h("div.flex.g1.wrap", null, (u.allowedServiceIds || []).map(function (sid) {
+        var s2 = RGP.store.service(sid);
+        return h("span.pill.plain", null, s2 ? td(s2.name) : sid);
+      }))) : null;
 
     var theme = document.documentElement.getAttribute("data-theme") || "light";
     var prefs = h("div.card.elev-1.card-pad.mbs-2", null,
@@ -647,13 +735,13 @@
           }
         }, t("common.reset")) : null));
 
-    return RGP.shell(h("div", null, head, idCard, prefs, data), { context: t("prof.title"), narrow: true });
+    return RGP.shell(h("div", null, head, idCard, delegationCard, prefs, data), { context: t("prof.title"), narrow: true });
   }
 
   RGP.router.register("#/portal", ["project_rep"], home);
   RGP.router.register("#/portal/journeys", ["project_rep", "amanah_specialist", "platform_manager", "viewer"], journeys);
   RGP.router.register("#/portal/requests", ["project_rep"], requestsList);
-  RGP.router.register("#/portal/requests/:id", ["project_rep", "viewer"], requestDetail);
+  RGP.router.register("#/portal/requests/:id", ["project_rep"], requestDetail);
   RGP.router.register("#/portal/challenges", ["project_rep"], challenges);
   RGP.router.register("#/portal/inbox", ["project_rep", "amanah_specialist", "platform_manager", "external_entity", "viewer"], inbox);
   RGP.router.register("#/portal/profile", ["project_rep", "amanah_specialist", "platform_manager", "external_entity", "viewer"], profile);

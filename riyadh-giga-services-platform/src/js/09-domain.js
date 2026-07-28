@@ -193,6 +193,31 @@
         UI.icon(item.icon, 22), td(item.label));
     }));
 
+    /* chrome-minimal boardroom layout (ux-spec §7.12): no rail, identity strip only */
+    if (opts.chromeMinimal) {
+      var minibar = h("header.topbar", null,
+        h("img", { src: window.ASSETS.logo, style: { width: "36px", height: "36px", borderRadius: "50%" }, alt: t("brand.owner") }),
+        h("div", null,
+          h("div", { style: { fontFamily: "var(--ff-display)", fontWeight: 700, fontSize: "13.5px" } }, t("brand.owner")),
+          h("div.t-caption.mut", { style: { fontWeight: 500 } }, opts.context ? td(opts.context) : t("brand.name"))),
+        h("span.grow"),
+        h("button.iconbtn", { "aria-label": "language", onclick: function () { RGP.i18n.toggle(); RGP.router.render(); } }, UI.icon("lang", 20)),
+        h("button.iconbtn", { "aria-label": "theme", onclick: function () { RGP.toggleTheme(); } },
+          UI.icon(document.documentElement.getAttribute("data-theme") === "dark" ? "sun" : "moon", 19)),
+        h("button.iconbtn", {
+          "aria-label": "profile",
+          onclick: function (e) {
+            UI.menu(e.currentTarget, [
+              { icon: "user", label: { ar: "الملف الشخصي", en: "Profile" }, onclick: function () { RGP.router.go("#/portal/profile"); } },
+              "-",
+              { icon: "logout", label: { ar: "تسجيل الخروج", en: "Sign out" }, danger: true, onclick: function () { RGP.auth.signOut(); RGP.router.go("#/"); } }
+            ]);
+          }
+        }, UI.avatar(user)));
+      return h("div", null, minibar,
+        h("main.content.page-in", null, contentEl));
+    }
+
     return h("div.shell", null, rail,
       h("div.main", null, topbar,
         h("main.content" + (opts.narrow ? ".narrow" : "") + ".page-in", null, contentEl),
@@ -219,7 +244,14 @@
   RGP.notifPopover = function (anchor) {
     var user = RGP.auth.current();
     var existing = RGP.$(".menu"); if (existing) existing.remove();
-    var list = RGP.store.state.notifications.filter(function (n) { return n.userId === user.id; }).slice(0, 30);
+    var filter = "all";
+    var all = RGP.store.state.notifications.filter(function (n) { return n.userId === user.id; }).slice(0, 30);
+    function applyFilter() {
+      if (filter === "req") return all.filter(function (n) { return (n.link || "").indexOf("request") >= 0 || (n.link || "").indexOf("review") >= 0; });
+      if (filter === "ch") return all.filter(function (n) { return (n.link || "").indexOf("challenge") >= 0; });
+      return all;
+    }
+    var list = applyFilter();
 
     var m = h("div.menu.ntf-pop", null,
       h("div.flex.between.g2", { style: { padding: "10px 14px" } },
@@ -230,6 +262,19 @@
             RGP.store.save(); m.remove(); RGP.router.render();
           }
         }, t("ntf.markAll"))),
+      h("div", { style: { padding: "0 14px 10px" } },
+        h("div.segmented", { style: { height: "30px" } },
+          [["all", t("common.all")], ["req", { ar: "الطلبات", en: "Requests" }], ["ch", { ar: "التحديات", en: "Challenges" }]].map(function (x) {
+            return h("button" + (filter === x[0] ? ".active" : ""), {
+              onclick: function (e) {
+                e.stopPropagation();
+                filter = x[0];
+                m.remove();
+                RGP.notifPopover(anchor);
+              },
+              style: { fontSize: "11px", paddingInline: "10px" }
+            }, td(x[1]));
+          }))),
       h("div.hairline-b"),
       list.length ? h("div.ntf-list", null, list.map(function (n) {
         var iconName = n.kind === "success" ? "checkCircle" : n.kind === "danger" ? "alert" : n.kind === "warning" ? "alert" : "infoC";
@@ -244,8 +289,8 @@
             h("div.t-footnote", { style: { fontWeight: 600 } }, td(n.title)),
             n.body ? h("div.t-caption.mut.clamp2", { style: { fontWeight: 500 } }, td(n.body)) : null,
             h("div.t-caption.mut.mbs-05", { style: { fontWeight: 500 } }, RGP.fmtAgo(n.at))));
-      })) : UI.empty("bell", { ar: "لا إشعارات جديدة", en: "No new notifications" },
-        { ar: "كل شيء تحت السيطرة.", en: "All clear." }, null, true));
+      })) : UI.empty("bell", { ar: "لا توجد إشعارات جديدة", en: "No new notifications" },
+        null, null, true));
 
     document.body.appendChild(m);
     var r = anchor.getBoundingClientRect();

@@ -81,7 +81,9 @@
           h("div.t-headline", null, svc ? td(svc.name) : ""),
           h("div.t-caption.mut", { style: { fontWeight: 500 } },
             (proj ? td(proj.name) + " · " : "") +
-            (RGP.i18n.lang === "ar" ? "وردت " : "Received ") + RGP.fmtAgo(myRef.sentAt))),
+            (RGP.i18n.lang === "ar" ? "وردت " : "Received ") + RGP.fmtAgo(myRef.sentAt)),
+          h("div.t-caption.mut.num", { style: { fontWeight: 500 } },
+            (RGP.i18n.lang === "ar" ? "مرجع التنسيق: " : "Coordination ref: ") + "GPO-" + r.id)),
         done
           ? h("div.flex.g1", null,
               h("span.pill." + (myRef.opinion === "reject_recommend" ? "dang" : myRef.opinion === "info_needed" ? "warn" : "ok"), null,
@@ -99,8 +101,8 @@
       h("h2.t-title3.mbe-2", null, RGP.i18n.lang === "ar" ? "بانتظار مرئياتكم" : "Awaiting your opinion",
         " ", h("span.pill.warn.sm.num", null, String(pending.length))),
       pending.length ? pending.map(function (r) { return row(r, false); })
-        : UI.empty("checkCircle", { ar: "لا إحالات معلقة", en: "No pending referrals" },
-          { ar: "أنجزتم جميع الإحالات — شكرًا لتجاوبكم.", en: "All referrals answered — thank you." }, null, true),
+        : UI.empty("checkCircle", { ar: "لا توجد إحالات معلقة", en: "No pending referrals" },
+          null, null, true),
       answered.length ? h("div.mbs-4", null,
         h("h2.t-title3.mbe-2", null, RGP.i18n.lang === "ar" ? "إحالات سابقة" : "Previous referrals"),
         answered.map(function (r) { return row(r, true); })) : null);
@@ -129,7 +131,7 @@
 
     var trendBox = h("div.chart-box");
     var highlights = h("div.card.elev-1.card-pad", null,
-      h("div.t-headline.mbe-2", null, RGP.i18n.lang === "ar" ? "أبرز ملامح الأسبوع" : "Weekly highlights"),
+      h("div.t-headline.mbe-2", null, RGP.i18n.lang === "ar" ? "أبرز مستجدات الأسبوع" : "Weekly highlights"),
       h("ul", null, buildHighlights().map(function (x) {
         return h("li.flex.g1.t-sub", { style: { padding: "6px 0", alignItems: "flex-start" } },
           h("span." + x.cls, { style: { marginTop: "3px" } }, UI.icon(x.icon, 15)), x.text);
@@ -145,13 +147,13 @@
       out.push({
         icon: "checkCircle", cls: "ok-fg",
         text: RGP.i18n.lang === "ar"
-          ? RGP.fmtNum(approvedWeek.length, { dec: 0 }) + " وثيقة اعتماد صدرت خلال الأسبوع الأخير للمشاريع الكبرى."
+          ? RGP.fmtNum(approvedWeek.length, { dec: 0 }) + " وثيقة اعتماد صدرت للمشاريع الكبرى خلال الأسبوع الأخير."
           : approvedWeek.length + " approval documents issued for giga projects in the last week."
       });
       if (red.length) out.push({
         icon: "alert", cls: "danger-fg",
         text: RGP.i18n.lang === "ar"
-          ? RGP.fmtNum(red.length, { dec: 0 }) + " طلبات تجاوزت مددها وتخضع للتصعيد لمكتب المشاريع الكبرى."
+          ? RGP.fmtNum(red.length, { dec: 0 }) + " طلبات تجاوزت مددها المحددة وجرى تصعيدها إلى مكتب المشاريع الكبرى."
           : red.length + " requests breached their SLA and are escalated to the GPO."
       });
       if (esc.length) out.push({
@@ -163,7 +165,7 @@
       out.push({
         icon: "chart", cls: "accent",
         text: RGP.i18n.lang === "ar"
-          ? "الالتزام بالمواعيد عند " + k.onTimePct + "% ومتوسط المعالجة " + k.avgProcessing + " يوم عمل."
+          ? "بلغت نسبة الالتزام بالمواعيد " + k.onTimePct + "% وبلغ متوسط زمن المعالجة " + k.avgProcessing + " يوم عمل."
           : "On-time performance at " + k.onTimePct + "% with average processing of " + k.avgProcessing + " working days."
       });
       return out;
@@ -171,6 +173,8 @@
 
     var mapCard = RGP.map.render({ projects: S.projects, showLabels: true });
 
+    band.classList.add("exec-band");
+    RGP.$$(".kpi", band).forEach(function (tile) { tile.classList.add("exec-tile"); });
     var root = RGP.shell(h("div", null, head, band,
       h("div.grid.cols-21.mbs-2", null,
         h("div.chart-card.elev-1", null,
@@ -178,7 +182,7 @@
         highlights),
       h("div.mbs-2", null,
         h("div.t-headline.mbe-1", null, t("gpo.map")), mapCard)),
-      { context: t("exec.title") });
+      { context: t("exec.title"), chromeMinimal: true });
 
     requestAnimationFrame(function () {
       RGP.charts.area(trendBox, trend.labels, [

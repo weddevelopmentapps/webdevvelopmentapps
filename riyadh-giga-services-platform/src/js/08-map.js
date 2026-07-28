@@ -86,8 +86,66 @@
     var pop = null;
     function closePop() { if (pop) { pop.remove(); pop = null; } }
 
-    (opts.projects || []).forEach(function (prj) {
-      var cx = px(prj.location.lng), cy = py(prj.location.lat);
+    /* --- proximity clustering (§6.13): group markers closer than ~34 viewBox units --- */
+    var pts = (opts.projects || []).map(function (prj) {
+      return { prj: prj, x: px(prj.location.lng), y: py(prj.location.lat), cluster: -1 };
+    });
+    var clusters = [];
+    pts.forEach(function (pt) {
+      for (var ci = 0; ci < clusters.length; ci++) {
+        var c = clusters[ci];
+        var dx = c.x - pt.x, dy = c.y - pt.y;
+        if (Math.sqrt(dx * dx + dy * dy) < 34) { c.items.push(pt); pt.cluster = ci;
+          c.x = c.items.reduce(function (a, i2) { return a + i2.x; }, 0) / c.items.length;
+          c.y = c.items.reduce(function (a, i2) { return a + i2.y; }, 0) / c.items.length;
+          return; }
+      }
+      clusters.push({ x: pt.x, y: pt.y, items: [pt] });
+      pt.cluster = clusters.length - 1;
+    });
+
+    clusters.filter(function (c) { return c.items.length > 1; }).forEach(function (c) {
+      var g = document.createElementNS(svgNS, "g");
+      g.setAttribute("class", "rmap-marker");
+      var circle = document.createElementNS(svgNS, "circle");
+      circle.setAttribute("cx", c.x); circle.setAttribute("cy", c.y); circle.setAttribute("r", 13);
+      circle.setAttribute("fill", "var(--accent)");
+      circle.setAttribute("class", "core");
+      g.appendChild(circle);
+      var txt = document.createElementNS(svgNS, "text");
+      txt.setAttribute("x", c.x); txt.setAttribute("y", c.y + 3.5);
+      txt.setAttribute("text-anchor", "middle");
+      txt.setAttribute("style", "font-family:var(--ff-display);font-size:11px;font-weight:700;fill:var(--on-accent);pointer-events:none");
+      txt.textContent = String(c.items.length);
+      g.appendChild(txt);
+      g.addEventListener("click", function (e) {
+        e.stopPropagation();
+        closePop();
+        pop = h("div.map-pop", null,
+          h("div.t-footnote.mut.mbe-1", { style: { fontWeight: 600 } },
+            (RGP.i18n.lang === "ar" ? "مشاريع متقاربة: " : "Nearby projects: ") + c.items.length),
+          c.items.map(function (pt2) {
+            return h("div.flex.g1.hairline-b", {
+              style: { padding: "6px 0", cursor: opts.onSelect ? "pointer" : "default" },
+              onclick: opts.onSelect ? function () { closePop(); opts.onSelect(pt2.prj); } : null
+            },
+              h("span.lg-dot", { style: { width: "8px", height: "8px", borderRadius: "8px", background: MAP.statusColor(pt2.prj.status) } }),
+              h("span.t-footnote", { style: { fontWeight: 600 } }, td(pt2.prj.name)),
+              h("span.grow"),
+              h("span.t-caption.mut", { style: { fontWeight: 500 } }, td(RGP.projectPhaseLabel(pt2.prj.phase))));
+          }));
+        var rect = wrap.getBoundingClientRect();
+        var sx = rect.width / 900, sy = rect.height / 640;
+        pop.style.left = RGP.clamp(c.x * sx - 140, 8, rect.width - 288) + "px";
+        pop.style.top = Math.max(8, c.y * sy - 160) + "px";
+        wrap.appendChild(pop);
+      });
+      svg.appendChild(g);
+    });
+
+    pts.filter(function (pt) { return clusters[pt.cluster].items.length === 1; }).forEach(function (pt) {
+      var prj = pt.prj;
+      var cx = pt.x, cy = pt.y;
       var g = document.createElementNS(svgNS, "g");
       g.setAttribute("class", "rmap-marker");
       var color = MAP.statusColor(prj.status);

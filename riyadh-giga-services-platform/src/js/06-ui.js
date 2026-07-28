@@ -210,10 +210,15 @@
     if (band === "paused") label = t("sla.paused");
     else if (RGP.lifecycle.TERMINAL_STATES.indexOf(req.state) >= 0) {
       label = band === "red" ? t("sla.red") : t("sla.ok");
+    } else if (remaining === 0) {
+      label = RGP.i18n.lang === "ar" ? "يستحق اليوم" : "Due today";
+      if (band === "ok") band = "amber";
+    } else if (band === "red" && remaining < 0) {
+      label = t("work.overdueBy") + " " + RGP.fmtWorkdays(Math.abs(remaining));
     } else if (band === "red") {
-      label = t("work.overdueBy") + " " + RGP.fmtNum(Math.abs(remaining), { dec: 0 }) + " " + t("common.workdays");
+      label = t("sla.red");
     } else {
-      label = t("sla.remaining") + " " + RGP.fmtNum(remaining, { dec: 0 }) + " " + t("common.workdays");
+      label = t("sla.remaining") + " " + RGP.fmtWorkdays(remaining);
     }
     return h("span.sla-chip." + band, null, UI.icon("clock", 12), label);
   };
@@ -492,8 +497,10 @@
       validate: function () {
         var bad = [];
         fields.forEach(function (f) { if (!validateField(f, false)) bad.push(f); });
-        if (bad.length) refs[bad[0].key].input.focus();
         return bad;
+      },
+      focusField: function (key) {
+        if (refs[key]) refs[key].input.focus();
       }
     };
   };

@@ -29,7 +29,16 @@
     };
     if (preService) {
       var pre = RGP.store.service(preService);
-      if (pre) { state.phase = pre.phase; state.step = state.projectId || !myProjects().length ? 2 : 1; }
+      if (pre && RGP.lifecycle.serviceEligible(pre, u)) {
+        state.phase = pre.phase;
+        state.step = state.projectId || !myProjects().length ? 2 : 1;
+      } else if (pre) {
+        state.serviceId = null;
+        setTimeout(function () {
+          RGP.ui.toast("warn",
+            { ar: "الخدمة المطلوبة خارج نطاق صلاحياتكم أو التفويض الممنوح لكم", en: "The requested service is outside your role or delegation scope" });
+        }, 300);
+      }
     }
     if (draft) {
       var dsvc = RGP.store.service(draft.serviceId);
@@ -43,20 +52,21 @@
     function myProjects() {
       return RGP.store.state.projects.filter(function (p) { return (u.projectIds || []).indexOf(p.id) >= 0; });
     }
-    function availableServices() {
+    function servicePhases(s) { return s.phases || [s.phase]; }
+    function availableServices(phaseOverride) {
+      var ph = phaseOverride !== undefined ? phaseOverride : state.phase;
       return RGP.store.state.services.filter(function (s) {
-        if (state.phase && s.phase !== state.phase) return false;
-        if (u.allowedServiceIds && u.allowedServiceIds.indexOf(s.id) < 0) return false;
-        if (u.personaType && s.personas && s.personas.length && s.personas.indexOf(u.personaType) < 0
-            && !(u.delegatedBy && s.personas.indexOf("engineering_office") >= 0)) return false;
-        return true;
+        if (ph && servicePhases(s).indexOf(ph) < 0) return false;
+        return RGP.lifecycle.serviceEligible(s, u);
       });
+    }
+    function isEligible(serviceId) {
+      var s = serviceId && RGP.store.service(serviceId);
+      return !!(s && RGP.lifecycle.serviceEligible(s, u));
     }
     function svc() { return state.serviceId ? RGP.store.service(state.serviceId) : null; }
     function isFastTrack() {
-      var p = state.projectId && RGP.store.project(state.projectId);
-      var s = svc();
-      return !!((p && p.isGiga) || (s && s.gigaFastTrack && u.personaType === "giga_entity"));
+      return state.serviceId ? RGP.lifecycle.computePriority(state.projectId, state.serviceId) === "fast_track" : false;
     }
     function slaDays() {
       var s = svc(); if (!s) return null;
@@ -149,7 +159,7 @@
             h("div", null,
               h("div.t-headline", null, t("phase." + ph)),
               h("div.t-caption.mut.num", { style: { fontWeight: 500 } },
-                RGP.store.state.services.filter(function (s) { return s.phase === ph; }).length +
+                availableServices(ph).length +
                 (RGP.i18n.lang === "ar" ? " خدمة" : " services"))));
         })));
     }
@@ -159,7 +169,14 @@
       return h("div.card-lg.elev-1.card-pad", null,
         h("h2.t-title3.mbe-1", null, t("wizard.chooseService")),
         h("p.t-sub.mut.mbe-3", null,
-          (RGP.i18n.lang === "ar" ? "الخدمات المتاحة لدورك ضمن مرحلة " : "Services available to your role in ") + t("phase." + state.phase)),
+          (RGP.i18n.lang === "ar" ? "الخدمات المتاحة لدوركم ضمن مرحلة " : "Services available to your role in ") + t("phase." + state.phase)),
+        u.delegatedBy ? h("div.well.card-pad-dense.mbe-2.flex.g1", null,
+          UI.icon("shield", 16),
+          h("span.t-footnote", { style: { fontWeight: 500 } },
+            (RGP.i18n.lang === "ar" ? "نطاق التفويض الممنوح لكم: " : "Your delegation scope: ") +
+            (u.allowedServiceIds || []).map(function (sid) {
+              var s2 = RGP.store.service(sid); return s2 ? td(s2.name) : sid;
+            }).join("، "))) : null,
         list.length ? h("div.flex-col.g15", null, list.map(function (s) {
           return h("button.pick-card" + (state.serviceId === s.id ? ".selected" : ""), {
             onclick: function () { state.serviceId = s.id; render(); }
@@ -169,8 +186,16 @@
               h("div.t-headline", null, td(s.name)),
               h("div.t-caption.mut.clamp2", { style: { fontWeight: 500, maxWidth: "560px" } }, td(s.description)),
               h("div.flex.g2.mbs-1.wrap", null,
-                h("span.t-caption.mut.flex.g05.num", { style: { fontWeight: 600 } }, UI.icon("clock", 12),
-                  (isFastTrack() && s.gigaFastTrack ? Math.max(1, Math.ceil(s.slaDays * 0.5)) : s.slaDays) + " " + t("common.workdays")),
+                (function () {
+                  var p2 = state.projectId && RGP.store.project(state.projectId);
+                  var ft = !!(p2 && p2.isGiga && s.gigaFastTrack);
+                  var ftDays = Math.max(1, Math.ceil(s.slaDays * 0.5));
+                  return h("span.t-caption.mut.flex.g05", { style: { fontWeight: 600 } }, UI.icon("clock", 12),
+                    ft ? [h("s.num", { style: { opacity: .55 } }, String(s.slaDays)),
+                          h("span", null, " ← "),
+                          h("b", null, RGP.fmtWorkdays(ftDays))]
+                       : RGP.fmtWorkdays(s.slaDays));
+                })(),
                 h("span.t-caption.mut.flex.g05", { style: { fontWeight: 600 } }, UI.icon("docs", 12),
                   h("span.num", null, String((s.requiredDocuments || []).length)), RGP.i18n.lang === "ar" ? "مستندات" : "docs"),
                 s.fees && s.fees.model !== "none"
@@ -281,9 +306,16 @@
           rv(t("req.service"), td(s.name)),
           rv(t("req.project"), p ? td(p.name) : t("common.none")),
           rv(t("req.applicant"), td(u.name) + " — " + td(u.org)),
-          rv(t("common.sla"), h("span.num", null, String(slaDays())), " " + t("common.workdays")),
-          rv(t("wizard.expectedBy"), h("span.num", null, RGP.fmtDate(due))),
-          rv(t("common.fees"), s.fees && s.fees.model !== "none" ? td(s.fees.note) : (RGP.i18n.lang === "ar" ? "لا رسوم" : "None"))),
+          rv(t("common.sla"), RGP.fmtWorkdays(slaDays())),
+          rv(t("wizard.expectedBy"), h("span.num-date", null, RGP.fmtDate(due))),
+          rv(t("common.fees"), s.fees && s.fees.model !== "none" ? td(s.fees.note) : (RGP.i18n.lang === "ar" ? "لا توجد رسوم" : "None"))),
+        s.fees && s.fees.model !== "none" ? h("div.well.card-pad-dense.mbe-3.flex.g1", null,
+          UI.icon("infoC", 16),
+          h("span.t-footnote", { style: { fontWeight: 500 } },
+            RGP.i18n.lang === "ar"
+              ? "تصدر فاتورة سداد بعد اعتماد الطلب، ويُسلَّم التصريح بعد إتمام السداد."
+              : "A SADAD invoice is issued upon approval; the permit is released after payment."),
+          UI.simBadge()) : null,
         h("div.t-headline.mbe-1", null, t("req.formData")),
         h("div.review-grid.mbe-3", null, (s.formFields || []).map(function (f) {
           return rv(td(f.label), vals[f.key] != null && vals[f.key] !== "" ? String(vals[f.key]) : "—");
@@ -310,7 +342,7 @@
           h("h2.t-title2", null, t("wizard.submitted")),
           h("p.t-sub.mut.mbs-1", null,
             t("wizard.submittedSub") + ": ", h("b.num", null, req.id),
-            " — " + t("wizard.expectedBy") + " ", h("b.num", null, RGP.fmtDate(req.sla.dueAt))),
+            " — " + t("wizard.expectedBy") + " ", h("b.num-date", null, RGP.fmtDate(req.sla.dueAt))),
           req.priority === "fast_track" ? h("div.mbs-2", null, UI.gigaBadge()) : null,
           h("div.flex.g15.mbs-4", null,
             h("a.btn.primary", { href: "#/portal/requests/" + req.id }, t("wizard.track"), UI.fwd(16)),
@@ -340,7 +372,7 @@
       var slaBar = s ? h("div.flex.between.wrap.g2.mbe-2", null,
         h("span.sla-note", null, UI.icon("clock", 14),
           (RGP.i18n.lang === "ar" ? "المدة المتوقعة للمعالجة: " : "Expected processing: "),
-          h("span.num", null, String(slaDays())), " " + t("common.workdays") +
+          RGP.fmtWorkdays(slaDays()) +
           (RGP.i18n.lang === "ar" ? " وفق اتفاقية مستوى الخدمة" : " per the SLA")),
         isFastTrack() ? UI.gigaBadge() : null) : null;
 
@@ -352,7 +384,7 @@
 
       var canNext =
         state.step === 1 ? !!state.phase :
-        state.step === 2 ? !!state.serviceId :
+        state.step === 2 ? (!!state.serviceId && isEligible(state.serviceId)) :
         true;
 
       var foot = h("div.wiz-foot", null,
@@ -371,11 +403,27 @@
               onclick: function () {
                 if (state.step === 3) {
                   if ((svc().prerequisites || []).length && !state.prereqOk) {
-                    UI.toast("warn", { ar: "أكد توفر المتطلبات المسبقة أولًا", en: "Confirm the prerequisites first" });
+                    UI.toast("warn", { ar: "يرجى تأكيد توفر المتطلبات المسبقة أولًا", en: "Confirm the prerequisites first" });
                     return;
                   }
                   var bad = formEngine.validate();
-                  if (bad.length) return;
+                  var oldSummary = RGP.$("#wiz-errsum");
+                  if (oldSummary) oldSummary.remove();
+                  if (bad.length) {
+                    var sumBox = h("div.error-summary#wiz-errsum", null,
+                      h("div.t-footnote.danger-fg.mbe-1", { style: { fontWeight: 600 } },
+                        RGP.i18n.lang === "ar" ? "يتعذر المتابعة قبل استكمال الحقول التالية:" : "Complete the following fields to continue:"),
+                      h("div.flex.g2.wrap", null, bad.map(function (f) {
+                        return h("a", {
+                          href: "#",
+                          onclick: function (e) { e.preventDefault(); formEngine.focusField(f.key); }
+                        }, td(f.label));
+                      })));
+                    var pane = RGP.$(".wiz-pane .card-lg");
+                    if (pane) pane.prepend(sumBox);
+                    formEngine.focusField(bad[0].key);
+                    return;
+                  }
                   state.formData = formEngine.values();
                 }
                 if (state.step === 4) {
@@ -388,7 +436,7 @@
             }, t("common.next"), UI.fwd(16))
           : h("button.btn.primary.lg", {
               onclick: function () {
-                if (!state.declared) { UI.toast("warn", { ar: "أقر بصحة البيانات للمتابعة", en: "Accept the declaration to continue" }); return; }
+                if (!state.declared) { UI.toast("warn", { ar: "يلزم الإقرار بصحة البيانات قبل المتابعة", en: "Accept the declaration to continue" }); return; }
                 var d = saveDraft(true);
                 try {
                   RGP.lifecycle.transition(d, "submitted", {});

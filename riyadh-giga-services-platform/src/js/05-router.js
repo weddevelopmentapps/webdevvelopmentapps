@@ -55,6 +55,11 @@
     /* background sweeps before each render keep SLA/escalation live */
     try { RGP.lifecycle.sweep(); } catch (e) { /* pre-init */ }
 
+    /* stale modals/popovers must never survive navigation (review M) */
+    var overlayRoot = RGP.$("#overlay-root");
+    if (overlayRoot) overlayRoot.innerHTML = "";
+    RGP.$$(".menu").forEach(function (m) { m.remove(); });
+
     var root = RGP.$("#app");
     root.innerHTML = "";
     try {
