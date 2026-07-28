@@ -1,0 +1,42 @@
+name: fetch-brand-assets
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Pillow
+        run: pip3 install --quiet pillow
+      - name: Download and convert imagery
+        run: |
+          cd riyadh-giga-services-platform/assets
+          curl -sSL -o hero.png "https://d8j0ntlcm91z4.cloudfront.net/user_39Ow9EnYlPATc0d7kEzhjPIj2oa/hf_20260728_155332_da8ce0e0-67a5-4ce0-9ad9-07b4d8519bbf.png"
+          curl -sSL -o diriyah.png "https://d8j0ntlcm91z4.cloudfront.net/user_39Ow9EnYlPATc0d7kEzhjPIj2oa/hf_20260728_211522_2416254a-55ac-4681-bfd6-0bf358696107.png"
+          curl -sSL -o metro.png "https://d8j0ntlcm91z4.cloudfront.net/user_39Ow9EnYlPATc0d7kEzhjPIj2oa/hf_20260728_211528_4a6ad689-93f0-41a2-94ef-63f3bfa8f95f.png"
+          curl -sSL -o night.png "https://d8j0ntlcm91z4.cloudfront.net/user_39Ow9EnYlPATc0d7kEzhjPIj2oa/hf_20260728_211530_6a9b8eca-03f8-403d-8a00-1a1c2f9c61df.png"
+          python3 - <<'EOF'
+          from PIL import Image
+          import os
+          for src, out, mw, q in [("hero.png", "hero-riyadh.webp", 1600, 80),
+                                  ("diriyah.png", "diriyah-heritage.webp", 900, 80),
+                                  ("metro.png", "metro-station.webp", 1200, 78),
+                                  ("night.png", "riyadh-night.webp", 1200, 78)]:
+              im = Image.open(src).convert("RGB")
+              if im.width > mw:
+                  im = im.resize((mw, int(im.height * mw / im.width)), Image.LANCZOS)
+              im.save(out, "WEBP", quality=q, method=6)
+              print(out, im.size, os.path.getsize(out) // 1024, "KB")
+              os.remove(src)
+          EOF
+      - name: Commit assets
+        run: |
+          git config user.name "brand-assets-bot"
+          git config user.email "actions@github.com"
+          git add riyadh-giga-services-platform/assets/*.webp
+          git commit -m "Add generated brand imagery (hero, Diriyah, metro, night skyline)"
+          git push
