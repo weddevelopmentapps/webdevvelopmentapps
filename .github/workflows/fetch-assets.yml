@@ -1,6 +1,9 @@
 name: fetch-brand-assets
 on:
   workflow_dispatch:
+  push:
+    branches: ["claude/riyadh-giga-services-platform-tafdfj"]
+    paths: [".github/workflows/fetch-assets.yml", ".github/asset-manifest.txt"]
 
 permissions:
   contents: write
