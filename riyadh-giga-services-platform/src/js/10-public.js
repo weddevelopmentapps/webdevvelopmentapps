@@ -141,18 +141,27 @@
       });
     }
 
-    /* hero — line-art Riyadh skyline (Kingdom Centre, Al Faisaliah) over the
-       sovereign gradient; drawn locally, no external imagery */
+    /* hero — cinematic full-bleed photograph, duotone-graded, notch-masked
+       into the page surface (flagship spec §1.1) */
 
-    var hero = h("section.hero", null,
-      window.ASSETS.hero ? h("img.hero-photo", { src: window.ASSETS.hero, alt: "" }) : h("div.hero-fallback"),
-      RGP.skylineSvg(0.85),
-      h("div.pub-section", null,
+    var heroMedia = window.ASSETS.hero
+      ? h("img.hero-media", { src: window.ASSETS.hero, alt: "" })
+      : h("div.hero-fallback");
+    var heroSkyline = RGP.skylineSvg(0.55);
+    var heroNotch = h("div.hero-notch", { "aria-hidden": "true", html:
+      '<svg viewBox="0 0 1440 96" preserveAspectRatio="none">' +
+      '<path d="M0 66 C 320 108 620 6 900 28 C 1130 46 1310 90 1440 58 L1440 96 L0 96 Z"/></svg>' });
+
+    var hero = h("section.hero.hero-v2", null,
+      heroMedia,
+      h("div.hero-grade"),
+      heroSkyline,
+      h("div.pub-section.hero-inner", null,
         h("div.kicker", null, t("brand.owner")),
         h("h1", null, t("landing.heroTitle")),
         h("p.hero-sub", null, t("landing.heroSub")),
         h("div.flex.g15.mbs-4.wrap", null,
-          h("a.btn.primary.lg", { href: RGP.auth.current() ? "#/wizard" : "#/login" }, t("landing.cta"), UI.fwd(18)),
+          h("a.btn.primary.lg.btn-sheen", { href: RGP.auth.current() ? "#/wizard" : "#/login" }, t("landing.cta"), UI.fwd(18)),
           h("a.btn.secondary.lg", {
             href: "#services",
             style: { background: "rgba(255,255,255,.1)", borderColor: "rgba(255,255,255,.3)", color: "#fff" },
@@ -167,7 +176,7 @@
             during: { ar: "رخص البناء، تصاريح التمكين الإنشائي، البنية التحتية، التصاريح البيئية.", en: "Building permits, construction enablement, infrastructure, environmental permits." },
             after: { ar: "رخص التشغيل والأنشطة، الفعاليات، الامتثال الدوري، التجديد أو الإنهاء.", en: "Operating licenses, events, periodic compliance, renewal or exit." }
           };
-          return h("button.journey-card", {
+          var card = h("button.journey-card", {
             onclick: function () {
               phaseFilter = ph; refreshSvc();
               document.getElementById("services").scrollIntoView({ behavior: "smooth" });
@@ -176,7 +185,14 @@
             h("div.jc-num.num", null, "0" + (i + 1)),
             h("h3", null, t("phase." + ph)),
             h("p", null, td(descs[ph])));
-        }))));
+          if (RGP.motion) RGP.motion.specular(card);
+          return card;
+        }))),
+      heroNotch);
+    if (RGP.motion && window.ASSETS.hero) {
+      RGP.motion.parallax(heroMedia, 0.14, 64);
+      RGP.motion.parallax(heroSkyline, 0.06, 28);
+    }
 
     /* stats band — the projects label agrees with its dynamic count (تمييز العدد) */
     var projStatLabel = (function (n) {
@@ -186,17 +202,19 @@
       if (n >= 3 && n <= 10) return "مشاريع كبرى ممكّنة";
       return t("landing.statsProjects");
     })(kpis.enabledProjects);
-    var stats = h("section.stats-band", null,
-      h("div.pub-section", null,
-        h("div.grid", null,
-          statBig(kpis.enabledProjects, projStatLabel),
-          statBig(S.services.length, t("landing.statsServices")),
-          statBig(kpis.onTimePct, t("landing.statsOnTime"), "%"),
-          statBig(kpis.avgProcessing, t("landing.statsAvg")))));
+    var stats = h("div.stats-slab", { "data-io": "" },
+      UI.sadu({ tone: "white" }),
+      h("div.stat-grid", null,
+        statBig(kpis.enabledProjects, projStatLabel),
+        statBig(S.services.length, t("landing.statsServices")),
+        statBig(kpis.onTimePct, t("landing.statsOnTime"), "%"),
+        statBig(kpis.avgProcessing, t("landing.statsAvg"))));
 
     function statBig(v, label, suffix) {
-      var el = h("div.stat-big", null, h("div.v", null, "0"), h("div.l", null, label));
-      UI.countUp(RGP.$(".v", el), v, { dec: suffix ? 0 : (v % 1 ? 1 : 0), suffix: suffix || "" });
+      var el = h("div.stat-big", null, h("div.v.num", null, "0"), h("div.l", null, label), h("div.u"));
+      var opts = { dec: suffix ? 0 : (v % 1 ? 1 : 0), suffix: suffix || "" };
+      if (RGP.motion && RGP.motion.countUp) RGP.motion.countUp(RGP.$(".v", el), v, opts);
+      else UI.countUp(RGP.$(".v", el), v, opts);
       return el;
     }
 
@@ -213,11 +231,13 @@
     svcSection = h("div.mbs-3");
     svcSection.appendChild(svcCards());
 
-    var services = h("section.pub-section#services", { style: { paddingBlock: "72px 0" } },
-      h("div.kicker", null, t("brand.short")),
-      h("h2.t-title1", null, t("landing.servicesTitle")),
-      h("p.t-body.mut.mbs-1", { style: { maxWidth: "620px" } }, t("landing.servicesSub")),
-      h("div.flex.g2.mbs-3.wrap", null,
+    var services = h("section.sec.svc-sec.pub-section#services", null,
+      UI.sadu({ tone: "ink" }),
+      h("div", { "data-io": "", style: { position: "relative" } },
+        h("div.kicker", null, t("brand.short")),
+        h("h2.t-title1", null, t("landing.servicesTitle")),
+        h("p.t-body.mut.mbs-1", { style: { maxWidth: "620px" } }, t("landing.servicesSub"))),
+      h("div.flex.g2.mbs-3.wrap", { style: { position: "relative" } },
         h("div.topbar-search", { style: { marginInlineStart: "0" } },
           UI.icon("search", 18),
           h("input", {
@@ -227,44 +247,73 @@
           })),
         chipsRow),
       svcSection);
+    svcSection.style.position = "relative";
 
-    /* five official journeys (it-spec AC2) */
-    var journeysStrip = h("section.pub-section", { style: { paddingBlock: "72px 0" } },
-      h("div.kicker", null, RGP.i18n.lang === "ar" ? "الدليل الاسترشادي للمطور والمستثمر العقاري" : "The developer & investor guide"),
-      h("h2.t-title1", null, RGP.i18n.lang === "ar" ? "الرحلات الرسمية الخمس" : "The five official journeys"),
-      h("div.grid.mbs-3", { style: { gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" } },
-        (S.journeys || []).map(function (jr) {
-          return h("a.svc-card", { href: RGP.auth.current() ? "#/portal/journeys" : "#/login", style: { textDecoration: "none", color: "inherit" } },
-            h("span.sc-icon", null, UI.icon(jr.id === "planning" ? "map" : jr.id === "building" ? "building" : jr.id === "investor" ? "briefcase" : jr.id === "operation" ? "key" : "hammer", 20)),
-            h("h4", null, td(jr.name)),
-            h("div.t-caption.mut.clamp2", { style: { fontWeight: 500 } }, td(jr.audience)),
-            h("div.sc-meta", null,
-              h("span.t-footnote.mut.flex.g05", null, UI.icon("layers", 13),
-                h("span.num", null, String(jr.steps.length)), RGP.i18n.lang === "ar" ? " خطوات" : " steps"),
-              h("span.pill.info.sm", null, t("phase." + jr.phase))));
-        })));
+    /* the five official journeys — connected canvas strip (journey spec §6.1) */
+    var journeysStrip = h("section.sec.pub-section", null,
+      h("div", { "data-io": "" },
+        h("div.kicker", null, RGP.i18n.lang === "ar" ? "الدليل الاسترشادي" : "The official guide"),
+        h("h2.t-title1", null, RGP.i18n.lang === "ar" ? "رحلتك من الفكرة إلى التشغيل" : "Your journey, from concept to operation"),
+        h("p.t-body.mut.mbs-1", { style: { maxWidth: "640px" } },
+          RGP.i18n.lang === "ar"
+            ? "خمس رحلات رسمية مرسومة بخطواتها ومددها المعتمدة — قبل التطوير، أثناء التنفيذ، بعد الإنجاز."
+            : "Five official journeys drawn step by step with adopted timelines — before development, during delivery, after completion.")),
+      h("div.mbs-4", null,
+        RGP.journeyCanvas ? RGP.journeyCanvas.compact() :
+          h("div.grid", { style: { gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" } },
+            (S.journeys || []).map(function (jr) {
+              return h("a.svc-card", { href: RGP.auth.current() ? "#/portal/journeys" : "#/login", style: { textDecoration: "none", color: "inherit" } },
+                h("h4", null, td(jr.name)),
+                h("span.num", null, String(jr.steps.length)));
+            }))));
+
+    /* impact band — bleeding sand-duotone photograph + live impact counters */
+    var impactBand = h("section.sec.impact-sec.pub-section#impact", null,
+      h("div.impact-wrap", null,
+        h("figure.impact-fig", { "data-io": "" },
+          h("img", { src: window.ASSETS.night || window.ASSETS.hero || "", alt: "" })),
+        h("div", { "data-io": "" },
+          h("div.kicker", null, RGP.i18n.lang === "ar" ? "مكتب المشاريع الكبرى" : "Giga Projects Office"),
+          h("h2.t-title1", null, RGP.i18n.lang === "ar" ? "أثرٌ يُقاس بمدنٍ تُبنى" : "Impact measured in cities being built"),
+          h("p.t-body.mut.mbs-1.mbe-3", null,
+            RGP.i18n.lang === "ar"
+              ? "تقليل زمن الخدمات يعني رأس مال يُستثمر أبكر، ووظائف تُدعم، وناتجًا محليًا ينمو."
+              : "Faster services mean capital deployed earlier, jobs supported, and a growing city economy."),
+          RGP.impact && RGP.impact.band ? RGP.impact.band("landing") : null)));
 
     /* public Riyadh projects map (Track 9 — الواجهة الرئيسية) */
-    var publicMap = h("section.pub-section#rmap", { style: { paddingBlock: "72px 0" } },
-      h("div.kicker", null, t("brand.owner")),
-      h("h2.t-title1", null, RGP.i18n.lang === "ar" ? "خريطة المشاريع الكبرى في الرياض" : "The giga-projects map of Riyadh"),
-      h("p.t-body.mut.mbs-1", { style: { maxWidth: "620px" } },
-        RGP.i18n.lang === "ar"
-          ? "المشاريع المسجلة في السجل الموحد لدى مكتب المشاريع الكبرى، بحسب حالتها ومرحلتها."
-          : "Projects in the unified registry of the Giga Projects Office, by status and phase."),
+    var publicMap = h("section.sec.after-impact.pub-section#rmap", null,
+      h("div", { "data-io": "" },
+        h("div.kicker", null, t("brand.owner")),
+        h("h2.t-title1", null, RGP.i18n.lang === "ar" ? "خريطة المشاريع الكبرى في الرياض" : "The giga-projects map of Riyadh"),
+        h("p.t-body.mut.mbs-1", { style: { maxWidth: "620px" } },
+          RGP.i18n.lang === "ar"
+            ? "المشاريع المسجلة في السجل الموحد لدى مكتب المشاريع الكبرى، بحسب حالتها ومرحلتها."
+            : "Projects in the unified registry of the Giga Projects Office, by status and phase.")),
       h("div.mbs-3", null, RGP.map.render({ projects: S.projects, showLabels: true })));
 
     /* how it works */
-    var how = h("section.pub-section", { style: { paddingBlock: "88px 0" } },
-      h("h2.t-title1", null, t("landing.howTitle")),
-      h("div.how-steps.mbs-4", null, [1, 2, 3, 4].map(function (n) {
+    var how = h("section.sec.pub-section", null,
+      h("h2.t-title1", { "data-io": "" }, t("landing.howTitle")),
+      h("div.how-steps.mbs-4", { "data-io": "group" }, [1, 2, 3, 4].map(function (n) {
         return h("div.how-step", null,
           h("div.h-num.num", null, String(n)),
           h("div.t-headline", null, t("landing.how" + n)));
       })));
 
-    /* governance & methodology */
-    var methodology = h("section.pub-section", { style: { paddingBlock: "88px 0" } },
+    /* governance & methodology — with the heritage bleed portrait */
+    var methodology = h("section.sec.pub-section", null,
+      window.ASSETS.diriyah ? h("div.herit-wrap.mbe-4", null,
+        h("div", { "data-io": "" },
+          h("div.kicker", null, RGP.i18n.lang === "ar" ? "من الدرعية إلى المربع الجديد" : "From Diriyah to New Murabba"),
+          h("h2.t-title2", null, RGP.i18n.lang === "ar" ? "خدمات بلدية بمقياس مدن المستقبل" : "Municipal services at the scale of future cities"),
+          h("p.t-body.mut.mbs-1", null,
+            RGP.i18n.lang === "ar"
+              ? "من مواقع التراث المسجلة في اليونسكو إلى أحياء الأعمال الناشئة، تصل المنصة عشرة من كبرى مشاريع الرياض بجهة بلدية واحدة ومسار موحد للتصاريح والرخص — بمددٍ معلنة يمكن قياسها ومساءلتها."
+              : "From UNESCO-listed heritage grounds to rising business districts, the platform connects ten of Riyadh's largest projects to a single municipal counterpart and one permit pathway — with published, accountable timelines.")),
+        h("figure.herit-fig", { "data-io": "" },
+          h("img", { src: window.ASSETS.diriyah, alt: "" }),
+          h("figcaption.cap", null, RGP.i18n.lang === "ar" ? "حي الطريف التاريخي — الدرعية" : "At-Turaif historic district — Diriyah"))) : null,
       h("div.grid.cols-21", null,
         h("div.card-lg.elev-1.card-pad", null,
           h("div.kicker", null, RGP.i18n.lang === "ar" ? "منهجية العمل التشغيلية" : "Operating methodology"),
@@ -305,6 +354,7 @@
 
     /* footer */
     var footer = h("footer.pub-footer", null,
+      UI.sadu({ tone: "white", opacity: 0.045 }),
       h("div.pub-section", null,
         h("div.cols", null,
           h("div", null,
@@ -345,11 +395,15 @@
         h("a", { href: "#/" }, RGP.i18n.lang === "ar" ? "الرئيسية" : "Home"),
         h("a", { href: "#services", onclick: function (e) { e.preventDefault(); document.getElementById("services").scrollIntoView({ behavior: "smooth" }); } }, t("landing.servicesTitle")),
         h("a", { href: "#rmap", onclick: function (e) { e.preventDefault(); var el2 = document.getElementById("rmap"); if (el2) el2.scrollIntoView({ behavior: "smooth" }); } }, RGP.i18n.lang === "ar" ? "خريطة المشاريع" : "Projects map")),
-      h("button.iconbtn", { style: { marginInlineStart: "auto" }, "aria-label": "language", onclick: function () { RGP.i18n.toggle(); } }, UI.icon("lang", 20)),
+      h("button.iconbtn", { style: { marginInlineStart: "auto" }, "aria-label": t("common.search"),
+        onclick: function () { if (RGP.palette) RGP.palette.open(); } }, UI.icon("search", 19)),
+      h("button.iconbtn", { "aria-label": t("prefs.title"),
+        onclick: function () { if (RGP.prefs) RGP.prefs.openSheet(); } }, UI.icon("sliders", 19)),
+      h("button.iconbtn", { "aria-label": "language", onclick: function () { RGP.i18n.toggle(); } }, UI.icon("lang", 20)),
       h("a.btn.primary.sm", { href: "#/login", style: { marginInlineStart: "8px" } }, t("common.signin")));
     nav.querySelector(".links").style.marginInlineStart = "auto";
 
-    return h("div.page-in", null, nav, hero, stats, services, journeysStrip, publicMap, how, methodology, entities, footer);
+    return h("div.page-in", null, nav, hero, stats, journeysStrip, services, impactBand, publicMap, how, methodology, entities, footer);
   }
 
   /* ---------------- login ---------------- */
@@ -375,7 +429,9 @@
     ];
 
     var brand = h("div.login-brand", null,
-      h("svg.brand-pattern", { html: sadu() }),
+      window.ASSETS.metro ? h("img.login-photo", { src: window.ASSETS.metro, alt: "" }) : null,
+      window.ASSETS.metro ? h("div.login-photo-scrim") : null,
+      UI.sadu({ tone: "white", opacity: 0.06 }),
       RGP.skylineSvg(0.5),
       h("div.flex.g15", null,
         h("img", { src: window.ASSETS.logo, style: { width: "52px", height: "52px", borderRadius: "50%", background: "#fff" }, alt: "" }),
@@ -385,16 +441,6 @@
       h("div", null,
         h("h1", { style: { fontFamily: "var(--ff-display)", fontWeight: 700, fontSize: "clamp(24px, 2.6vw, 34px)", lineHeight: 1.3, maxWidth: "420px" } }, t("brand.name")),
         h("p", { style: { color: "rgba(255,255,255,.72)", marginTop: "12px", fontSize: "14px", maxWidth: "380px" } }, t("brand.tagline"))));
-
-    function sadu() {
-      /* subtle geometric sadu-inspired pattern, 6% white */
-      var cells = "";
-      for (var y = 0; y < 14; y++) for (var x = 0; x < 10; x++) {
-        var cx2 = x * 90 + (y % 2) * 45, cy2 = y * 78;
-        cells += '<path d="M' + cx2 + " " + cy2 + " l32 -26 l32 26 l-32 26 z\" fill=\"none\" stroke=\"rgba(255,255,255,.06)\" stroke-width=\"1.4\"/>";
-      }
-      return '<svg width="100%" height="100%" viewBox="0 0 900 1100" preserveAspectRatio="xMidYMid slice">' + cells + "</svg>";
-    }
 
     var form = h("div.login-form", null,
       h("a.t-footnote.mut.flex.g05", { href: "#/", style: { marginBottom: "24px", display: "inline-flex" } },

@@ -105,6 +105,7 @@
           return RGP.store.state.challenges.filter(function (c) { return ["open", "escalated"].indexOf(c.state) >= 0; }).length;
         } },
       { route: "#/manager/kpis", icon: "chart", label: { ar: "مؤشرات الأداء", en: "KPIs" } },
+      { route: "#/manager/impact", icon: "spark", label: { ar: "الأثر", en: "Impact" } },
       { route: "#/manager/reports", icon: "doc", label: { ar: "التقارير", en: "Reports" } },
       { section: { ar: "الإدارة", en: "Administration" } },
       { route: "#/manager/services", icon: "layers", label: { ar: "دليل الخدمات", en: "Catalog" } },
@@ -157,20 +158,20 @@
       h("div.topbar-search", null,
         UI.icon("search", 18),
         h("input", {
-          type: "search",
-          placeholder: RGP.i18n.lang === "ar" ? "ابحث عن طلب أو مشروع أو خدمة…" : "Search requests, projects, services…",
+          type: "search", readonly: true,
+          placeholder: t("pal.placeholder"),
           "aria-label": t("common.search"),
-          onkeydown: function (e) {
-            if (e.key === "Enter" && e.target.value.trim()) {
-              RGP.globalSearch(e.target.value.trim());
-            }
-          }
-        })),
+          onclick: function () { if (RGP.palette) RGP.palette.open(); },
+          onfocus: function (e) { if (RGP.palette) { e.target.blur(); RGP.palette.open(); } }
+        }),
+        h("span.kbd", { "aria-hidden": "true" }, RGP.isMac ? "⌘K" : "Ctrl K")),
       h("button.iconbtn", {
         "aria-label": t("ntf.title"),
         onclick: function (e) { RGP.notifPopover(e.currentTarget); }
       }, UI.icon("bell", 20), unread ? h("span.dotbadge.num", null, String(Math.min(unread, 99))) : null),
       h("button.iconbtn", { "aria-label": "language", title: t("common.language"), onclick: function () { RGP.i18n.toggle(); } }, UI.icon("lang", 20)),
+      h("button.iconbtn", { "aria-label": t("prefs.title"), title: t("prefs.title"),
+        onclick: function () { if (RGP.prefs) RGP.prefs.openSheet(); } }, UI.icon("sliders", 19)),
       h("button.iconbtn", {
         "aria-label": "theme",
         onclick: function () { RGP.toggleTheme(); }

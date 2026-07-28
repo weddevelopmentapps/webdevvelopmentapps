@@ -71,6 +71,8 @@
     road: 'M4 21 9 3h6l5 18M12 5v3M12 11v3M12 17v3',
     hammer: 'M14 6 8 12M10 4l6 6M3 21l7-7 2 2-5.5 5.5zM14 4l6 6',
     export: 'M12 15V3M7 7.5 12 3l5 4.5M4 15v6h16v-6',
+    sliders: 'M4 6h9M17 6h3M15 3.5v5M4 12h3M11 12h9M7 9.5v5M4 18h11M19 18h1M17 15.5v5',
+    spark: 'M13 2 4.5 13.5h5L11 22l8.5-11.5h-5L13 2',
   };
   UI.icon = function (name, size, cls) {
     var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -544,5 +546,65 @@
       })(i);
     }
     return wrap;
+  };
+
+  /* ---------------- «نقشة السدو» — generative brand texture ----------------
+     96×96 diamond lattice + interlock counter-lattice + solid kernels + weft
+     lines. tone: "ink" | "white" | "sand". Pattern ids uniquified per call. */
+  var saduSeq = 0;
+  UI.sadu = function (opts) {
+    opts = opts || {};
+    var tone = opts.tone || "ink";
+    var id = "rgpSadu-" + (++saduSeq);
+    var svgNS = "http://www.w3.org/2000/svg";
+    var svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("class", "sadu-layer sadu-" + tone);
+    svg.setAttribute("aria-hidden", "true");
+    svg.setAttribute("preserveAspectRatio", "xMidYMid slice");
+    if (opts.opacity != null) svg.style.opacity = String(opts.opacity);
+    var defs = document.createElementNS(svgNS, "defs");
+    var pat = document.createElementNS(svgNS, "pattern");
+    pat.setAttribute("id", id);
+    pat.setAttribute("width", "96"); pat.setAttribute("height", "96");
+    pat.setAttribute("patternUnits", "userSpaceOnUse");
+    function path(d, attrs) {
+      var p = document.createElementNS(svgNS, "path");
+      p.setAttribute("d", d);
+      for (var k in attrs) p.setAttribute(k, attrs[k]);
+      pat.appendChild(p);
+    }
+    path("M0 24 24 0 48 24 24 48Z M48 24 72 0 96 24 72 48Z M0 72 24 48 48 72 24 96Z M48 72 72 48 96 72 72 96Z",
+      { fill: "none", stroke: "currentColor", "stroke-width": "1.25" });
+    path("M24 48 48 24 72 48 48 72Z M-24 48 0 24 24 48 0 72Z M72 48 96 24 120 48 96 72Z",
+      { fill: "none", stroke: "currentColor", "stroke-width": "0.75", opacity: "0.6" });
+    path("M24 16 32 24 24 32 16 24Z", { fill: "currentColor", opacity: "0.5" });
+    path("M72 64 80 72 72 80 64 72Z", { fill: "currentColor", opacity: "0.5" });
+    path("M0 0H96 M0 48H96", { stroke: "currentColor", "stroke-width": "0.5", opacity: "0.35" });
+    defs.appendChild(pat);
+    svg.appendChild(defs);
+    var rect = document.createElementNS(svgNS, "rect");
+    rect.setAttribute("width", "100%"); rect.setAttribute("height", "100%");
+    rect.setAttribute("fill", "url(#" + id + ")");
+    svg.appendChild(rect);
+    return svg;
+  };
+
+  /* single corner motif — the tile's center diamond ×2 with kernels */
+  UI.saduMark = function (tone) {
+    var svgNS = "http://www.w3.org/2000/svg";
+    var svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("class", "sadu-mark sadu-" + (tone || "ink"));
+    svg.setAttribute("viewBox", "0 0 160 160");
+    svg.setAttribute("aria-hidden", "true");
+    function p(d, attrs) {
+      var el = document.createElementNS(svgNS, "path");
+      el.setAttribute("d", d);
+      for (var k in attrs) el.setAttribute(k, attrs[k]);
+      svg.appendChild(el);
+    }
+    p("M80 8 152 80 80 152 8 80Z", { fill: "none", stroke: "currentColor", "stroke-width": "2" });
+    p("M80 32 128 80 80 128 32 80Z", { fill: "none", stroke: "currentColor", "stroke-width": "1.25", opacity: "0.7" });
+    p("M80 60 100 80 80 100 60 80Z", { fill: "currentColor", opacity: "0.5" });
+    return svg;
   };
 })();

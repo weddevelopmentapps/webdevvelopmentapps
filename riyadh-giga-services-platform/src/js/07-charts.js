@@ -19,7 +19,7 @@
     return {
       color: Charts.palette(),
       textStyle: { fontFamily: "IBM Plex Sans Arabic", fontSize: 11, color: mut },
-      grid: { top: 28, right: 8, bottom: 28, left: 8, containLabel: true },
+      grid: { top: 32, right: 12, bottom: 36, left: 12, containLabel: true },
       animationDuration: RGP.REDUCED_MOTION ? 0 : 700,
       animationEasing: "cubicOut",
       tooltip: {
@@ -45,7 +45,7 @@
       yAxis: {
         type: "value",
         axisLine: { show: false }, axisTick: { show: false },
-        splitLine: { lineStyle: { color: "rgba(127,127,127,.12)", width: 1 } },
+        splitLine: { lineStyle: { color: "rgba(127,127,127,.12)", width: 1, type: [2, 6] } },
         axisLabel: { color: mut, fontSize: 10.5 }
       }
     };
@@ -75,11 +75,20 @@
       tooltip: Object.assign(Charts.base().tooltip, { trigger: "axis" }),
       legend: series.length > 1 ? Charts.base().legend : { show: false },
       series: series.map(function (s, i) {
+        var col = s.color || Charts.palette()[i];
         return {
           name: s.name, type: "bar", data: s.data,
           stack: opts.stack ? "total" : null,
-          barMaxWidth: 28,
-          itemStyle: { borderRadius: opts.stack && i < series.length - 1 ? [0, 0, 0, 0] : [6, 6, 0, 0], color: s.color }
+          barMaxWidth: 24,
+          emphasis: { focus: "series" },
+          animationDelay: RGP.REDUCED_MOTION ? 0 : function (di) { return di * 40; },
+          itemStyle: {
+            borderRadius: opts.stack && i < series.length - 1 ? [0, 0, 0, 0] : [7, 7, 0, 0],
+            color: opts.stack ? col : {
+              type: "linear", x: 0, y: 0, x2: 0, y2: 1,
+              colorStops: [{ offset: 0, color: col }, { offset: 1, color: Charts.hexA(col, 0.75) }]
+            }
+          }
         };
       })
     }));
@@ -100,7 +109,7 @@
           areaStyle: i === 0 ? {
             color: {
               type: "linear", x: 0, y: 0, x2: 0, y2: 1,
-              colorStops: [{ offset: 0, color: Charts.hexA(col, 0.16) }, { offset: 1, color: Charts.hexA(col, 0) }]
+              colorStops: [{ offset: 0, color: Charts.hexA(col, 0.22) }, { offset: 1, color: Charts.hexA(col, 0) }]
             }
           } : null
         };

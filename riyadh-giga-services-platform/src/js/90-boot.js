@@ -6,6 +6,7 @@
 (function () {
   function boot() {
     RGP.applyTheme();
+    if (RGP.prefs && RGP.prefs.apply) RGP.prefs.apply();   /* accent/density/type before first paint */
     RGP.i18n.init();
     RGP.store.init();
     RGP.auth.init();

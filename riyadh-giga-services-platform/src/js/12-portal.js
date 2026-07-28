@@ -225,12 +225,14 @@
         r.submittedAt ? h("span.t-sub.mut.num", null, "· " + RGP.fmtDate(r.submittedAt.slice(0, 10))) : null,
         UI.slaChip(r)));
 
-    var macroBar = h("div", null,
-      h("div.macro-steps", null, macroLabels.map(function (_, i) {
-        var cls = i < macro ? "done" : i === macro ? (bad ? "bad" : "current") : "";
-        return h("span.m-step" + (cls ? "." + cls : ""));
-      })),
-      h("div.macro-labels", null, macroLabels.map(function (l) { return h("span", null, td(l)); })));
+    var macroBar = RGP.journeyCanvas && RGP.journeyCanvas.rail
+      ? RGP.journeyCanvas.rail(r)
+      : h("div", null,
+          h("div.macro-steps", null, macroLabels.map(function (_, i) {
+            var cls = i < macro ? "done" : i === macro ? (bad ? "bad" : "current") : "";
+            return h("span.m-step" + (cls ? "." + cls : ""));
+          })),
+          h("div.macro-labels", null, macroLabels.map(function (l) { return h("span", null, td(l)); })));
 
     /* timeline */
     var tl = h("div.timeline", null, r.timeline.slice().reverse().map(function (e) {
@@ -523,6 +525,8 @@
 
   /* ---------------- journey explorer ---------------- */
   function journeys() {
+    /* the connected journey canvas replaces the flat step list (journey spec §0) */
+    if (RGP.journeyCanvas && RGP.journeyCanvas.screen) return RGP.journeyCanvas.screen();
     var u = RGP.auth.current();
     var J = RGP.store.state.journeys;
     var defaultByPersona = { operator: "operation", investor: "investor", giga_entity: "planning", developer: "planning" };

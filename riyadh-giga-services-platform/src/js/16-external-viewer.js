@@ -174,8 +174,12 @@
     var mapCard = RGP.map.render({ projects: S.projects, showLabels: true });
 
     band.classList.add("exec-band");
-    RGP.$$(".kpi", band).forEach(function (tile) { tile.classList.add("exec-tile"); });
-    var root = RGP.shell(h("div", null, head, band,
+    RGP.$$(".kpi", band).forEach(function (tile) {
+      tile.classList.add("exec-tile");
+      tile.appendChild(UI.saduMark("ink"));
+    });
+    var impactBand = RGP.impact && RGP.impact.band ? RGP.impact.band("executive") : null;
+    var root = RGP.shell(h("div", null, head, impactBand, band,
       h("div.grid.cols-21.mbs-2", null,
         h("div.chart-card.elev-1", null,
           h("div.ch-head", null, h("span.t-headline", null, t("gpo.trend"))), trendBox),

@@ -1,0 +1,212 @@
+/* ============================================================
+   Flagship landing — «الرياض السيادية ٢٫٠»
+   Cinematic hero, ceremonial stats slab, bleeding imagery,
+   section rhythm. Art-direction spec §1. RTL-first; both themes.
+   ============================================================ */
+
+.sec { padding-block: var(--sec-y) 0; position: relative; }
+.sec:last-of-type { padding-block-end: var(--sec-y); }
+
+/* ---------------- hero — full-bleed cinema ---------------- */
+.hero-v2 {
+  position: relative;
+  min-height: var(--hero-min);
+  display: flex; align-items: center;
+  overflow: clip;
+  background: var(--green-950, #062819);
+  color: #fff;
+  padding-block: calc(var(--topbar-h) + var(--sp-4)) calc(var(--notch-h) + 72px);
+}
+.hero-v2 .hero-media {
+  position: absolute; inset: -6% 0 0 0; height: 106%; width: 100%;
+  object-fit: cover; object-position: 50% 38%;
+  filter: saturate(.82) contrast(1.06) brightness(.94);
+  will-change: transform;
+}
+.hero-v2 .hero-grade { position: absolute; inset: 0; pointer-events: none; }
+.hero-v2 .hero-grade::before {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(135deg, #0B4F30 0%, #2E8A5F 100%);
+  mix-blend-mode: color; opacity: .38;
+}
+.hero-v2 .hero-grade::after {
+  content: ""; position: absolute; inset: 0;
+  background:
+    radial-gradient(120% 90% at 85% 8%, rgba(203,170,92,.16), transparent 55%),
+    linear-gradient(180deg, rgba(6,40,25,.58) 0%, rgba(6,40,25,.30) 42%,
+                    rgba(6,40,25,.55) 74%, #062819 100%);
+}
+.hero-v2 .hero-inner { position: relative; z-index: 2; width: 100%; }
+.hero-v2 .kicker::before {
+  content: ""; display: inline-block; width: 24px; height: 2px; border-radius: 2px;
+  background: var(--sand); margin-inline-end: 8px; vertical-align: middle;
+}
+.hero-v2 h1 {
+  font-family: var(--ff-display);
+  font-size: clamp(38px, 5.4vw, 64px);
+  line-height: 1.12; font-weight: 700;
+  max-width: 21ch; text-wrap: balance;
+}
+.hero-notch { position: absolute; inset-inline: 0; bottom: -1px; height: var(--notch-h); z-index: 3; }
+.hero-notch svg { width: 100%; height: 100%; display: block; }
+.hero-notch path { fill: var(--bg); }
+html[dir="ltr"] .hero-notch svg { transform: scaleX(-1); }
+
+/* ---------------- stats slab — ceremonial, overlaps the notch ---------------- */
+.stats-slab {
+  position: relative; z-index: 4;
+  max-width: min(1140px, calc(100% - 32px)); margin-inline: auto;
+  margin-block-start: calc(-1 * (var(--notch-h) + 40px));
+  border-radius: var(--r-xl);
+  background: linear-gradient(160deg, var(--green-800), var(--green-900, #0A3A24));
+  color: #fff; box-shadow: var(--shadow-3);
+  border: 1px solid rgba(255,255,255,.10);
+  padding: var(--sp-5) var(--sp-4);
+  overflow: clip;
+}
+.stats-slab .sadu-layer { opacity: .07; }
+.stats-slab::after {
+  content: ""; position: absolute; inset-inline: 0; top: 0; height: 3px;
+  background: linear-gradient(90deg, transparent, var(--sand) 30%, var(--sand) 70%, transparent);
+  opacity: .8;
+}
+.stats-slab .stat-grid {
+  position: relative; z-index: 1;
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp-3);
+  text-align: center;
+}
+.stats-slab .stat-big .v {
+  font-family: var(--ff-display); font-weight: 300;
+  font-size: clamp(36px, 3.8vw, 52px); line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+.stats-slab .stat-big .l { font-family: var(--ff-display); font-size: 12.5px; font-weight: 500; opacity: .85; margin-block-start: 6px; }
+.stats-slab .stat-big .u {
+  width: 0; height: 2px; background: var(--sand); border-radius: 2px;
+  margin: 10px auto 0;
+  transition: width 700ms var(--ease-out-expo) 300ms;
+}
+.stats-slab.io-in .stat-big .u { width: 40px; }
+@media (max-width: 900px) { .stats-slab .stat-grid { grid-template-columns: repeat(2, 1fr); row-gap: var(--sp-4); } }
+
+/* ---------------- impact band — bleeding sand-duotone photograph ---------------- */
+.impact-sec { overflow: visible; }
+.impact-wrap {
+  display: grid; grid-template-columns: 6fr 6fr;
+  align-items: center; gap: var(--sp-4);
+}
+.impact-fig {
+  position: relative;
+  margin-block: 0 -96px;
+  margin-inline-start: calc(-1 * clamp(16px, 4vw, 48px));
+  border-start-end-radius: var(--r-xl); border-end-end-radius: var(--r-xl);
+  overflow: clip; aspect-ratio: 16 / 10; z-index: 1;
+  -webkit-mask-image: linear-gradient(180deg, #000 78%, transparent 100%);
+  mask-image: linear-gradient(180deg, #000 78%, transparent 100%);
+}
+.impact-fig img {
+  width: 100%; height: 100%; object-fit: cover; object-position: 30% 60%;
+  filter: grayscale(1) contrast(1.08) brightness(1.02);
+  transform: scale(1.04);
+  transition: transform 900ms var(--ease-out-expo);
+}
+.impact-fig.io-in img { transform: none; }
+.impact-fig::before {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(150deg, #8A6F3F 0%, #E9DDBE 100%);
+  mix-blend-mode: color; opacity: .8;
+}
+.impact-fig::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(200deg, transparent 55%, rgba(9,61,38,.35) 100%);
+}
+[data-theme="dark"] .impact-fig::before { background: linear-gradient(150deg, #A98C50 0%, #3A3324 100%); opacity: .7; }
+.after-impact { position: relative; z-index: 2; padding-block-start: calc(var(--sec-y) + 32px); }
+@media (max-width: 768px) {
+  .impact-wrap { grid-template-columns: 1fr; }
+  .impact-fig {
+    order: -1;
+    margin-inline: -16px 0; margin-block-end: -48px;
+    aspect-ratio: 4 / 3;
+    border-radius: 0 var(--r-lg) var(--r-lg) 0;
+  }
+}
+
+/* ---------------- heritage bleed — portrait escaping the governance band ---------------- */
+.herit-wrap { display: grid; grid-template-columns: 7fr 5fr; gap: var(--sp-5); align-items: start; }
+.herit-fig {
+  position: relative;
+  margin-block-start: calc(-1 * var(--sec-y) - 24px);
+  border-radius: var(--r-xl);
+  overflow: clip; aspect-ratio: 3 / 4; z-index: 1;
+  box-shadow: var(--shadow-3);
+}
+.herit-fig img { width: 100%; height: 100%; object-fit: cover; }
+.herit-fig::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(200deg, transparent 60%, rgba(9,61,38,.38) 100%);
+}
+.herit-fig .cap {
+  position: absolute; inset-inline: 0; bottom: 0; z-index: 1;
+  padding: 14px 16px; color: #fff;
+  font-family: var(--ff-display); font-size: 12px; font-weight: 600;
+}
+@media (max-width: 900px) {
+  .herit-wrap { grid-template-columns: 1fr; }
+  .herit-fig { margin-block-start: 0; aspect-ratio: 16 / 10; max-height: 320px; }
+}
+
+/* ---------------- section backdrop + footer sadu ---------------- */
+.svc-sec { position: relative; }
+.svc-sec > .sadu-layer { opacity: .04; }
+[data-theme="dark"] .svc-sec > .sadu-layer { opacity: .05; }
+.pub-footer { position: relative; overflow: clip; }
+.pub-footer > .sadu-layer { opacity: .045; }
+
+/* sadu layer base (tone colors live in 37-experience.css) */
+.sadu-layer {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+}
+.sadu-mark {
+  position: absolute; width: 160px; height: 160px;
+  inset-inline-end: -28px; inset-block-end: -28px;
+  opacity: .05; pointer-events: none;
+}
+[data-theme="dark"] .sadu-mark { opacity: .06; }
+
+/* ---------------- reduced motion ---------------- */
+@media (prefers-reduced-motion: reduce) {
+  .stats-slab .stat-big .u { transition: none; }
+  .stats-slab.io-in .stat-big .u, .stats-slab .stat-big .u { width: 40px; }
+  .impact-fig img { transform: none; transition: none; }
+}
+
+/* ---------------- login panel photograph ---------------- */
+.login-brand .login-photo {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; opacity: .35; filter: saturate(.7) brightness(.8);
+}
+.login-brand .login-photo-scrim {
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(6,40,25,.78), rgba(6,40,25,.55) 50%, rgba(6,40,25,.88));
+}
+
+/* hero-v2 supersedes the legacy hero scrim (it carries its own grade) */
+.hero-v2::after { content: none; }
+.hero-v2 .hero-fallback { position: absolute; inset: 0; }
+.exec-tile { position: relative; overflow: clip; }
+.sadu-ink { color: #14201A; }
+[data-theme="dark"] .sadu-ink { color: #EDF0EC; }
+.sadu-white { color: #FFFFFF; }
+.sadu-sand { color: #B8963E; }
+[data-theme="dark"] .sadu-sand { color: #CBAA5C; }
+
+/* topbar search doubles as the command-palette trigger */
+.topbar-search input[readonly] { cursor: pointer; }
+.topbar-search .kbd {
+  position: absolute; inset-inline-end: 10px; top: 50%; transform: translateY(-50%);
+  pointer-events: none;
+}
+@media (max-width: 768px) { .topbar-search .kbd { display: none; } }

@@ -249,7 +249,7 @@ table.tbl { width: 100%; border-collapse: collapse; }
 .tbl thead th.sortable { cursor: pointer; user-select: none; }
 .tbl thead th.sortable:hover { color: var(--ink); }
 .tbl tbody td {
-  height: 48px; padding-inline: 14px;
+  height: var(--row-h); padding-inline: 14px;
   font-family: var(--ff-text); font-size: 13.5px;
   border-block-end: 1px solid var(--hair-2);
   white-space: nowrap; vertical-align: middle;
@@ -271,7 +271,7 @@ table.tbl { width: 100%; border-collapse: collapse; }
 .kpi {
   background: var(--surface); border-radius: var(--r-lg);
   padding: var(--sp-2) var(--sp-2) var(--sp-15);
-  min-height: 128px;
+  min-height: var(--kpi-min-h);
   display: flex; flex-direction: column; gap: 4px;
   cursor: pointer;
   transition: transform var(--dur-fast) var(--ease-standard), box-shadow var(--dur-fast) var(--ease-standard);

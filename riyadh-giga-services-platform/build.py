@@ -36,7 +36,12 @@ fonts   = read("vendor/fonts-embedded.css") + "\n" + read("vendor/fonts-light.cs
 echarts = read("vendor/echarts.min.js")
 
 logo = data_uri("assets/rrm-logo.webp")
-hero = data_uri("assets/hero-riyadh.jpg") if os.path.exists(os.path.join(HERE, "assets", "hero-riyadh.jpg")) else ""
+def opt_uri(p):
+    return data_uri(p) if os.path.exists(os.path.join(HERE, p)) else ""
+hero    = opt_uri("assets/hero-riyadh.webp") or opt_uri("assets/hero-riyadh.jpg")
+diriyah = opt_uri("assets/diriyah-heritage.webp")
+metro   = opt_uri("assets/metro-station.webp")
+night   = opt_uri("assets/riyadh-night.webp")
 
 data = json.dumps(json.load(open(os.path.join(HERE, "data.json"), encoding="utf-8")),
                   ensure_ascii=False, separators=(",", ":"))
@@ -64,7 +69,7 @@ html = f"""<!DOCTYPE html>
 </script>
 <script>
 window.SEED = {data};
-window.ASSETS = {{ logo: "{logo}", hero: "{hero}" }};
+window.ASSETS = {{ logo: "{logo}", hero: "{hero}", diriyah: "{diriyah}", metro: "{metro}", night: "{night}" }};
 </script>
 <script>
 {js}
@@ -96,7 +101,7 @@ artifact = f"""<title>منصة الخدمات البلدية للمشاريع ا
 </script>
 <script>
 window.SEED = {data};
-window.ASSETS = {{ logo: "{logo}", hero: "{hero}" }};
+window.ASSETS = {{ logo: "{logo}", hero: "{hero}", diriyah: "{diriyah}", metro: "{metro}", night: "{night}" }};
 </script>
 <script>
 {js}

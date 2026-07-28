@@ -64,6 +64,7 @@
     root.innerHTML = "";
     try {
       root.appendChild(m.route.view(m.params));
+      if (RGP.motion && RGP.motion.scan) RGP.motion.scan(root);
     } catch (err) {
       console.error("render failed", err);
       root.appendChild(RGP.h("div.content", null,

@@ -213,3 +213,5 @@ RGP.bus = (function () {
 })();
 
 RGP.REDUCED_MOTION = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+RGP.isMac = /Mac|iPhone|iPad/.test(navigator.platform || "");

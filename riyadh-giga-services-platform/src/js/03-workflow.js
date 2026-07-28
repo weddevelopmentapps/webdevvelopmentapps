@@ -324,6 +324,10 @@
           permitNo: permitNo, conditions: ctx.conditions || null, note: ctx.note || null,
           coSigned: !!ctx.coSign
         };
+        /* the demo's proof that impact is generated, not painted (impact spec §7.5) */
+        if (RGP.impact && RGP.impact.decisionToast) {
+          setTimeout(function () { try { RGP.impact.decisionToast(req); } catch (e) { /* noop */ } }, 400);
+        }
         if (feeBearing) {
           /* سداد invoice (simulated — live SADAD integration at the CRM phase) */
           req.decision.sadadInvoiceNo = "SADAD-" + new Date().getFullYear() + "-" + RGP.zeroPad(100000 + (RGP.hash32(req.id + permitNo) % 900000), 6);
