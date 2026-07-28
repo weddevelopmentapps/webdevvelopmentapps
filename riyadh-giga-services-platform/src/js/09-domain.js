@@ -170,7 +170,7 @@
         "aria-label": t("ntf.title"),
         onclick: function (e) { RGP.notifPopover(e.currentTarget); }
       }, UI.icon("bell", 20), unread ? h("span.dotbadge.num", null, String(Math.min(unread, 99))) : null),
-      h("button.iconbtn", { "aria-label": "language", title: t("common.language"), onclick: function () { RGP.i18n.toggle(); RGP.router.render(); } }, UI.icon("lang", 20)),
+      h("button.iconbtn", { "aria-label": "language", title: t("common.language"), onclick: function () { RGP.i18n.toggle(); } }, UI.icon("lang", 20)),
       h("button.iconbtn", {
         "aria-label": "theme",
         onclick: function () { RGP.toggleTheme(); }
@@ -201,7 +201,7 @@
           h("div", { style: { fontFamily: "var(--ff-display)", fontWeight: 700, fontSize: "13.5px" } }, t("brand.owner")),
           h("div.t-caption.mut", { style: { fontWeight: 500 } }, opts.context ? td(opts.context) : t("brand.name"))),
         h("span.grow"),
-        h("button.iconbtn", { "aria-label": "language", onclick: function () { RGP.i18n.toggle(); RGP.router.render(); } }, UI.icon("lang", 20)),
+        h("button.iconbtn", { "aria-label": "language", onclick: function () { RGP.i18n.toggle(); } }, UI.icon("lang", 20)),
         h("button.iconbtn", { "aria-label": "theme", onclick: function () { RGP.toggleTheme(); } },
           UI.icon(document.documentElement.getAttribute("data-theme") === "dark" ? "sun" : "moon", 19)),
         h("button.iconbtn", {

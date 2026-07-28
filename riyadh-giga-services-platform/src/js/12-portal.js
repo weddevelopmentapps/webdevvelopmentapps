@@ -713,7 +713,7 @@
       h("div.segmented", null,
         [["ar", "العربية"], ["en", "English"]].map(function (x) {
           return h("button" + (RGP.i18n.lang === x[0] ? ".active" : ""), {
-            onclick: function () { if (RGP.i18n.lang !== x[0]) { RGP.i18n.toggle(); RGP.router.render(); } }
+            onclick: function () { if (RGP.i18n.lang !== x[0]) { RGP.i18n.toggle(); } }
           }, x[1]);
         })));
 

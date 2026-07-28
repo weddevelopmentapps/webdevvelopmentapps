@@ -180,6 +180,8 @@
         UI.statePill(r.state),
         h("div.t-headline.mbs-2", null, svc ? td(svc.name) : ""),
         h("div.t-caption.mut", { style: { fontWeight: 500 } }, svc ? td(RGP.categoryLabel(svc.category)) + " · " + t("phase." + svc.phase) : ""),
+        r.referrals.length ? h("div.t-caption.mut.num.mbs-05", { style: { fontWeight: 600 } },
+          (RGP.i18n.lang === "ar" ? "مرجع التنسيق: " : "Coordination ref: ") + "GPO-" + r.id) : null,
         r.sla && r.sla.startAt ? h("div.flex.g2.mbs-2", null,
           UI.ring(Math.min(RGP.lifecycle.consumedPct(r), 100), 64, RGP.lifecycle.slaBand(r) === "paused" ? null : RGP.lifecycle.slaBand(r)),
           h("div", null,

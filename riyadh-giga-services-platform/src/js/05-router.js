@@ -79,4 +79,7 @@
   };
 
   window.addEventListener("hashchange", function () { Router.render(); });
+
+  /* a language change always re-renders — callers of i18n.toggle() need no extra step */
+  RGP.bus.on("lang:changed", function () { Router.render(); });
 })();

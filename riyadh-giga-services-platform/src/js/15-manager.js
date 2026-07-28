@@ -616,8 +616,8 @@
           h("div.t-headline.mbe-1", null, RGP.i18n.lang === "ar" ? "طلبات بلغت أو تجاوزت مددها المحددة" : "Requests at or beyond their allotted time"),
           h("div.table-scroll", null, h("table.p-table.tbl", { style: { width: "100%" } },
             h("thead", null, h("tr", null,
-              [{ ar: "الطلب", en: "Request" }, { ar: "الخدمة", en: "Service" }, { ar: "المشروع", en: "Project" },
-               { ar: "نسبة الاستهلاك", en: "Consumed" }, { ar: "التجاوز (أيام عمل)", en: "Overdue (wd)" }, { ar: "الأخصائي", en: "Specialist" }]
+              [{ ar: "الطلب", en: "Request" }, { ar: "التجاوز (أيام عمل)", en: "Overdue (wd)" }, { ar: "نسبة الاستهلاك", en: "Consumed" },
+               { ar: "الخدمة", en: "Service" }, { ar: "المشروع", en: "Project" }, { ar: "الأخصائي", en: "Specialist" }]
                 .map(function (c3) { return h("th", null, td(c3)); }))),
             h("tbody", null, overdueReqs.length ? overdueReqs.map(function (r2) {
               var svc2 = RGP.store.service(r2.serviceId);
@@ -625,10 +625,10 @@
               var over2 = Math.max(0, -RGP.lifecycle.remainingDays(r2));
               return h("tr", null,
                 h("td.num", null, r2.id),
+                h("td" + (over2 ? ".num" : ""), null, over2 ? String(over2) : (RGP.i18n.lang === "ar" ? "يستحق اليوم" : "Due today")),
+                h("td.num", null, RGP.lifecycle.consumedPct(r2) + "%"),
                 h("td", null, svc2 ? td(svc2.name) : "—"),
                 h("td", null, p2 ? td(p2.name) : "—"),
-                h("td.num", null, RGP.lifecycle.consumedPct(r2) + "%"),
-                h("td" + (over2 ? ".num" : ""), null, over2 ? String(over2) : (RGP.i18n.lang === "ar" ? "يستحق اليوم" : "Due today")),
                 h("td", null, r2.assigneeId ? td(RGP.store.userName(r2.assigneeId)) : "—"));
             }) : h("tr", null, h("td", { colspan: "6" }, RGP.i18n.lang === "ar" ? "لا توجد تجاوزات قائمة." : "No active breaches."))))),
           h("div.t-headline.mbs-3.mbe-1", null, RGP.i18n.lang === "ar" ? "تحديات مصعّدة" : "Escalated challenges"),

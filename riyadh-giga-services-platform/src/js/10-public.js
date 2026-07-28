@@ -338,7 +338,7 @@
         h("a", { href: "#/" }, RGP.i18n.lang === "ar" ? "الرئيسية" : "Home"),
         h("a", { href: "#services", onclick: function (e) { e.preventDefault(); document.getElementById("services").scrollIntoView({ behavior: "smooth" }); } }, t("landing.servicesTitle")),
         h("a", { href: "#rmap", onclick: function (e) { e.preventDefault(); var el2 = document.getElementById("rmap"); if (el2) el2.scrollIntoView({ behavior: "smooth" }); } }, RGP.i18n.lang === "ar" ? "خريطة المشاريع" : "Projects map")),
-      h("button.iconbtn", { style: { marginInlineStart: "auto" }, "aria-label": "language", onclick: function () { RGP.i18n.toggle(); RGP.router.render(); } }, UI.icon("lang", 20)),
+      h("button.iconbtn", { style: { marginInlineStart: "auto" }, "aria-label": "language", onclick: function () { RGP.i18n.toggle(); } }, UI.icon("lang", 20)),
       h("a.btn.primary.sm", { href: "#/login", style: { marginInlineStart: "8px" } }, t("common.signin")));
     nav.querySelector(".links").style.marginInlineStart = "auto";
 

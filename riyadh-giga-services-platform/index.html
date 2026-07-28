@@ -3160,6 +3160,9 @@ RGP.REDUCED_MOTION = matchMedia("(prefers-reduced-motion: reduce)").matches;
   };
 
   window.addEventListener("hashchange", function () { Router.render(); });
+
+  /* a language change always re-renders — callers of i18n.toggle() need no extra step */
+  RGP.bus.on("lang:changed", function () { Router.render(); });
 })();
 
 
@@ -4292,7 +4295,7 @@ RGP.REDUCED_MOTION = matchMedia("(prefers-reduced-motion: reduce)").matches;
         "aria-label": t("ntf.title"),
         onclick: function (e) { RGP.notifPopover(e.currentTarget); }
       }, UI.icon("bell", 20), unread ? h("span.dotbadge.num", null, String(Math.min(unread, 99))) : null),
-      h("button.iconbtn", { "aria-label": "language", title: t("common.language"), onclick: function () { RGP.i18n.toggle(); RGP.router.render(); } }, UI.icon("lang", 20)),
+      h("button.iconbtn", { "aria-label": "language", title: t("common.language"), onclick: function () { RGP.i18n.toggle(); } }, UI.icon("lang", 20)),
       h("button.iconbtn", {
         "aria-label": "theme",
         onclick: function () { RGP.toggleTheme(); }
@@ -4323,7 +4326,7 @@ RGP.REDUCED_MOTION = matchMedia("(prefers-reduced-motion: reduce)").matches;
           h("div", { style: { fontFamily: "var(--ff-display)", fontWeight: 700, fontSize: "13.5px" } }, t("brand.owner")),
           h("div.t-caption.mut", { style: { fontWeight: 500 } }, opts.context ? td(opts.context) : t("brand.name"))),
         h("span.grow"),
-        h("button.iconbtn", { "aria-label": "language", onclick: function () { RGP.i18n.toggle(); RGP.router.render(); } }, UI.icon("lang", 20)),
+        h("button.iconbtn", { "aria-label": "language", onclick: function () { RGP.i18n.toggle(); } }, UI.icon("lang", 20)),
         h("button.iconbtn", { "aria-label": "theme", onclick: function () { RGP.toggleTheme(); } },
           UI.icon(document.documentElement.getAttribute("data-theme") === "dark" ? "sun" : "moon", 19)),
         h("button.iconbtn", {
@@ -4993,7 +4996,7 @@ RGP.REDUCED_MOTION = matchMedia("(prefers-reduced-motion: reduce)").matches;
         h("a", { href: "#/" }, RGP.i18n.lang === "ar" ? "الرئيسية" : "Home"),
         h("a", { href: "#services", onclick: function (e) { e.preventDefault(); document.getElementById("services").scrollIntoView({ behavior: "smooth" }); } }, t("landing.servicesTitle")),
         h("a", { href: "#rmap", onclick: function (e) { e.preventDefault(); var el2 = document.getElementById("rmap"); if (el2) el2.scrollIntoView({ behavior: "smooth" }); } }, RGP.i18n.lang === "ar" ? "خريطة المشاريع" : "Projects map")),
-      h("button.iconbtn", { style: { marginInlineStart: "auto" }, "aria-label": "language", onclick: function () { RGP.i18n.toggle(); RGP.router.render(); } }, UI.icon("lang", 20)),
+      h("button.iconbtn", { style: { marginInlineStart: "auto" }, "aria-label": "language", onclick: function () { RGP.i18n.toggle(); } }, UI.icon("lang", 20)),
       h("a.btn.primary.sm", { href: "#/login", style: { marginInlineStart: "8px" } }, t("common.signin")));
     nav.querySelector(".links").style.marginInlineStart = "auto";
 
@@ -6046,7 +6049,7 @@ RGP.REDUCED_MOTION = matchMedia("(prefers-reduced-motion: reduce)").matches;
       h("div.segmented", null,
         [["ar", "العربية"], ["en", "English"]].map(function (x) {
           return h("button" + (RGP.i18n.lang === x[0] ? ".active" : ""), {
-            onclick: function () { if (RGP.i18n.lang !== x[0]) { RGP.i18n.toggle(); RGP.router.render(); } }
+            onclick: function () { if (RGP.i18n.lang !== x[0]) { RGP.i18n.toggle(); } }
           }, x[1]);
         })));
 
@@ -6753,6 +6756,8 @@ RGP.REDUCED_MOTION = matchMedia("(prefers-reduced-motion: reduce)").matches;
         UI.statePill(r.state),
         h("div.t-headline.mbs-2", null, svc ? td(svc.name) : ""),
         h("div.t-caption.mut", { style: { fontWeight: 500 } }, svc ? td(RGP.categoryLabel(svc.category)) + " · " + t("phase." + svc.phase) : ""),
+        r.referrals.length ? h("div.t-caption.mut.num.mbs-05", { style: { fontWeight: 600 } },
+          (RGP.i18n.lang === "ar" ? "مرجع التنسيق: " : "Coordination ref: ") + "GPO-" + r.id) : null,
         r.sla && r.sla.startAt ? h("div.flex.g2.mbs-2", null,
           UI.ring(Math.min(RGP.lifecycle.consumedPct(r), 100), 64, RGP.lifecycle.slaBand(r) === "paused" ? null : RGP.lifecycle.slaBand(r)),
           h("div", null,
@@ -7844,8 +7849,8 @@ RGP.REDUCED_MOTION = matchMedia("(prefers-reduced-motion: reduce)").matches;
           h("div.t-headline.mbe-1", null, RGP.i18n.lang === "ar" ? "طلبات بلغت أو تجاوزت مددها المحددة" : "Requests at or beyond their allotted time"),
           h("div.table-scroll", null, h("table.p-table.tbl", { style: { width: "100%" } },
             h("thead", null, h("tr", null,
-              [{ ar: "الطلب", en: "Request" }, { ar: "الخدمة", en: "Service" }, { ar: "المشروع", en: "Project" },
-               { ar: "نسبة الاستهلاك", en: "Consumed" }, { ar: "التجاوز (أيام عمل)", en: "Overdue (wd)" }, { ar: "الأخصائي", en: "Specialist" }]
+              [{ ar: "الطلب", en: "Request" }, { ar: "التجاوز (أيام عمل)", en: "Overdue (wd)" }, { ar: "نسبة الاستهلاك", en: "Consumed" },
+               { ar: "الخدمة", en: "Service" }, { ar: "المشروع", en: "Project" }, { ar: "الأخصائي", en: "Specialist" }]
                 .map(function (c3) { return h("th", null, td(c3)); }))),
             h("tbody", null, overdueReqs.length ? overdueReqs.map(function (r2) {
               var svc2 = RGP.store.service(r2.serviceId);
@@ -7853,10 +7858,10 @@ RGP.REDUCED_MOTION = matchMedia("(prefers-reduced-motion: reduce)").matches;
               var over2 = Math.max(0, -RGP.lifecycle.remainingDays(r2));
               return h("tr", null,
                 h("td.num", null, r2.id),
+                h("td" + (over2 ? ".num" : ""), null, over2 ? String(over2) : (RGP.i18n.lang === "ar" ? "يستحق اليوم" : "Due today")),
+                h("td.num", null, RGP.lifecycle.consumedPct(r2) + "%"),
                 h("td", null, svc2 ? td(svc2.name) : "—"),
                 h("td", null, p2 ? td(p2.name) : "—"),
-                h("td.num", null, RGP.lifecycle.consumedPct(r2) + "%"),
-                h("td" + (over2 ? ".num" : ""), null, over2 ? String(over2) : (RGP.i18n.lang === "ar" ? "يستحق اليوم" : "Due today")),
                 h("td", null, r2.assigneeId ? td(RGP.store.userName(r2.assigneeId)) : "—"));
             }) : h("tr", null, h("td", { colspan: "6" }, RGP.i18n.lang === "ar" ? "لا توجد تجاوزات قائمة." : "No active breaches."))))),
           h("div.t-headline.mbs-3.mbe-1", null, RGP.i18n.lang === "ar" ? "تحديات مصعّدة" : "Escalated challenges"),
