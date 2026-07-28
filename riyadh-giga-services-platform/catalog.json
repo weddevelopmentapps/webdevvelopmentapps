@@ -1,0 +1,1187 @@
+{
+  "meta": {
+    "platform": {"ar": "منصة الرياض الموحدة لتمكين المشاريع الكبرى", "en": "Riyadh Unified Platform for Giga Projects Enablement"},
+    "authority": {"ar": "أمانة منطقة الرياض", "en": "Riyadh Region Municipality"},
+    "version": "1.0.0",
+    "generatedAt": "2026-07-28"
+  },
+  "journeyPhases": [
+    {
+      "id": "before",
+      "name": {"ar": "قبل التطوير", "en": "Before Development"},
+      "description": {"ar": "مرحلة ما قبل التطوير: تأسيس المشروع في السجل الموحد، إصدار القرار المساحي، التقديم على طلب التخطيط، إعداد الدراسة التخطيطية (Concept Master Plan)، والحصول على قرار الاعتماد الأولي (Detailed Master Plan) واختيار مسار استكمال الاعتماد.", "en": "Pre-development phase: onboarding the project into the unified registry, issuing the survey decision, submitting the planning request, preparing the Concept Master Plan, obtaining the Detailed Master Plan initial approval decision and selecting the approval completion path."},
+      "stagesByPersona": {
+        "giga_entity": [
+          {"ar": "تسجيل المشروع في السجل الموحد للمشاريع الكبرى", "en": "Register the project in the unified giga-projects registry"},
+          {"ar": "إصدار قرار مساحي", "en": "Issue survey decision"},
+          {"ar": "التقديم على طلب التخطيط عبر المنصة", "en": "Submit the planning request via the platform"},
+          {"ar": "تقديم الدراسة التخطيطية (Concept Master Plan)", "en": "Submit the Concept Master Plan"},
+          {"ar": "تنسيق نطاق NPX مع الهيئة الملكية لمدينة الرياض", "en": "NPX scope coordination with the Royal Commission for Riyadh City"},
+          {"ar": "الموافقة على الفكرة التخطيطية وإصدار قرار الاعتماد الأولي (Detailed Master Plan)", "en": "Concept approval and issuance of the Detailed Master Plan initial approval decision"}
+        ],
+        "developer": [
+          {"ar": "إصدار قرار مساحي", "en": "Issue survey decision"},
+          {"ar": "التقديم على طلب التخطيط عبر المنصة", "en": "Submit the planning request via the platform"},
+          {"ar": "مراجعة الطلب والدراسات الأولية والحصول على المحددات", "en": "Request review, preliminary studies and obtaining the planning constraints"},
+          {"ar": "تقديم الدراسة التخطيطية (Concept Master Plan)", "en": "Submit the Concept Master Plan"},
+          {"ar": "إحالة المخطط للجنة التخطيط العمراني للمخططات ضمن نطاق NPX", "en": "Referral of the plan to the Urban Planning Committee for plans within the NPX scope"},
+          {"ar": "الموافقة على الفكرة التخطيطية وإصدار قرار الاعتماد الأولي (Detailed Master Plan)", "en": "Concept approval and issuance of the Detailed Master Plan initial approval decision"},
+          {"ar": "اختيار مسار استكمال الاعتماد", "en": "Select the approval completion path"}
+        ],
+        "investor": [
+          {"ar": "استكشاف الفرص الاستثمارية عبر منصة فرص", "en": "Explore investment opportunities via the Furas platform"},
+          {"ar": "التقديم على الفرصة والترسية والتعاقد", "en": "Bid on the opportunity, award and contracting"}
+        ],
+        "operator": [
+          {"ar": "استلام نطاق الأصول والتعرف على كراسة الشروط والمواصفات", "en": "Receive the asset scope and review the terms and specifications booklet"}
+        ]
+      }
+    },
+    {
+      "id": "during",
+      "name": {"ar": "أثناء التطوير", "en": "During Development"},
+      "description": {"ar": "مرحلة التنفيذ: المخططات التفصيلية، اعتماد تصاميم شبكات البنية التحتية مع الجهات الخدمية، رخص البناء وتصاريح التمكين الإنشائي (حفريات، إغلاق طرق، رافعات، سياج)، وصولاً إلى الاعتماد النهائي وشهادة الإتمام.", "en": "Execution phase: detailed plans, infrastructure network design approvals with service entities, building permits and construction enablement permits (excavation, road closures, cranes, hoarding), through to final approval and the Certificate of Completion."},
+      "stagesByPersona": {
+        "giga_entity": [
+          {"ar": "تقديم المخططات التفصيلية والدراسات التصميمية لشبكات البنية التحتية", "en": "Submit detailed plans and infrastructure network design studies"},
+          {"ar": "إصدار رخص البناء وتصاريح الأعمال المؤقتة والتمكين الإنشائي", "en": "Issue building permits and temporary works / construction enablement permits"},
+          {"ar": "متابعة التحديات وتنسيق الجهات عبر مكتب المشاريع الكبرى", "en": "Track challenges and coordinate entities via the Giga Projects Office"},
+          {"ar": "التسليم النهائي للبنية التحتية وشهادة الإتمام", "en": "Final infrastructure handover and Certificate of Completion"}
+        ],
+        "developer": [
+          {"ar": "تقديم المخططات التفصيلية ثم التدقيق والإحالة للجهات الخدمية", "en": "Submit detailed plans, then audit and referral to service entities"},
+          {"ar": "تقديم الدراسات التصميمية لشبكات البنية التحتية ودراستها واعتمادها", "en": "Submit infrastructure network design studies for review and approval"},
+          {"ar": "البدء بالتنفيذ الجزئي", "en": "Commence partial execution"},
+          {"ar": "التسليم النهائي للبنية التحتية", "en": "Final infrastructure handover"},
+          {"ar": "إشعار الهيئة العامة للعقار والسماح بالفرز والإفراغ الجزئي بنسبة لا تقل عن 25%", "en": "Notify the Real Estate General Authority and allow subdivision and partial conveyance of no less than 25%"},
+          {"ar": "اعتماد المخطط النهائي", "en": "Final plan approval"},
+          {"ar": "شهادة الإتمام (Certificate of Completion)", "en": "Certificate of Completion"}
+        ],
+        "investor": [
+          {"ar": "إصدار التراخيص المعنية حسب طبيعة الفرصة", "en": "Issue the relevant licenses per the nature of the opportunity"},
+          {"ar": "البدء بالأعمال الإنشائية", "en": "Commence construction works"}
+        ],
+        "operator": [
+          {"ar": "متابعة جاهزية الأصول واستكمال متطلبات التشغيل", "en": "Track asset readiness and complete operational requirements"}
+        ]
+      }
+    },
+    {
+      "id": "after",
+      "name": {"ar": "بعد التطوير", "en": "After Development"},
+      "description": {"ar": "مرحلة التشغيل: رخص النشاط والإشغال، التشغيل وفق كراسة الشروط والمواصفات والالتزام بخطة التشغيل والصيانة، الامتثال الدوري، ثم التجديد أو الإنهاء وتسليم الموقع لمكاتب مدينتي.", "en": "Operations phase: activity and occupancy licenses, operating per the terms and specifications booklet with commitment to the operation and maintenance plan, periodic compliance, then renewal or termination and site handover to Madinati offices."},
+      "stagesByPersona": {
+        "giga_entity": [
+          {"ar": "تشغيل الأصول ومتابعة الامتثال الدوري", "en": "Operate assets and track periodic compliance"},
+          {"ar": "تجديد الرخص واعتماد التسمية واللوحات للمراحل التشغيلية", "en": "Renew licenses and approve naming and signage for operational phases"}
+        ],
+        "developer": [
+          {"ar": "نقل الأصول لمديري الأصول وشركات التشغيل", "en": "Transfer assets to asset managers and operating companies"}
+        ],
+        "investor": [
+          {"ar": "تشغيل النشاط وفق كراسة الشروط والمواصفات مع الالتزام بخطة التشغيل والصيانة", "en": "Operate the activity per the terms and specifications booklet with commitment to the operation and maintenance plan"},
+          {"ar": "إعداد تقرير فني ومشاركته للأمانة ثم تجديد العقد", "en": "Prepare a technical report, share it with the Amanah, then renew the contract"},
+          {"ar": "أو إنهاء العقد وتسليم الموقع لمكاتب مدينتي", "en": "Or terminate the contract and hand over the site to Madinati offices"}
+        ],
+        "operator": [
+          {"ar": "إصدار رخصة نشاط تجاري وإشغال", "en": "Issue commercial activity and occupancy license"},
+          {"ar": "شهادات الامتثال الدورية وتجديد الرخص", "en": "Periodic compliance certificates and license renewals"},
+          {"ar": "تقرير فني للتجديد أو الإنهاء", "en": "Technical report for renewal or termination"},
+          {"ar": "تسليم الموقع لمكاتب مدينتي عند الإنهاء", "en": "Site handover to Madinati offices upon termination"}
+        ]
+      }
+    }
+  ],
+  "personas": [
+    {
+      "id": "giga_entity",
+      "name": {"ar": "ممثل مشروع كبير", "en": "Giga/Mega Project Representative"},
+      "description": {"ar": "الجهة المالكة أو المطورة الرئيسية لمشروع كبير ضمن مشاريع الرياض الكبرى، تتعامل مع المنصة بمسار أولوية وحوكمة مخصصة عبر مكتب المشاريع الكبرى.", "en": "The owning or master-developer entity of a Riyadh giga/mega project, served through a priority lane and dedicated governance via the Giga Projects Office."},
+      "journeys": ["before", "during", "after"]
+    },
+    {
+      "id": "developer",
+      "name": {"ar": "المطور العقاري", "en": "Real-Estate Developer"},
+      "description": {"ar": "مطور مشاريع تخطيط (أرض خام أو ضمن مخطط هيكلي) أو مشاريع بناء (أرض ضمن مخطط معتمد)، يتبع رحلة التخطيط الرسمية بخطواتها السبع ومسارات الاعتماد الثلاثة.", "en": "Developer of planning projects (raw land or within a structural master plan) or building projects (land within an approved plan), following the official 7-step planning journey and the three approval paths."},
+      "journeys": ["before", "during", "after"]
+    },
+    {
+      "id": "investor",
+      "name": {"ar": "المستثمر العقاري", "en": "Real-Estate Investor"},
+      "description": {"ar": "مستثمر يتعاقد على فرص بلدية عبر منصة فرص، ويمر بمرحلة التجهيز والتشغيل ثم مرحلة التجديد أو الإنهاء.", "en": "Investor contracting municipal opportunities via the Furas platform, passing through the setup-and-operation stage then the renewal-or-termination stage."},
+      "journeys": ["before", "during", "after"]
+    },
+    {
+      "id": "operator",
+      "name": {"ar": "مدير الأصول / شركة التشغيل", "en": "Asset Manager / Operations Company"},
+      "description": {"ar": "الجهة المسؤولة عن تشغيل الأصول وصيانتها بعد التطوير، بما يشمل رخص النشاط والإشغال والامتثال الدوري وتسليم المواقع.", "en": "The entity responsible for operating and maintaining assets after development, including activity and occupancy licenses, periodic compliance and site handovers."},
+      "journeys": ["after"]
+    },
+    {
+      "id": "engineering_office",
+      "name": {"ar": "المكتب الهندسي", "en": "Engineering Office"},
+      "description": {"ar": "مقدم طلبات مفوض عن المطور أو المستثمر في بعض الخدمات (رخص البناء، المخططات، الدراسات الفنية) وفق آلية التقديم المعتمدة.", "en": "Delegated submitter on behalf of the developer or investor for certain services (building permits, plans, technical studies) per the approved submission mechanism."},
+      "journeys": ["before", "during"]
+    }
+  ],
+  "services": [
+    {
+      "id": "survey-decision",
+      "name": {"ar": "إصدار قرار مساحي", "en": "Survey Decision Issuance"},
+      "category": "planning",
+      "phase": "before",
+      "personas": ["developer", "giga_entity", "engineering_office"],
+      "description": {"ar": "إصدار القرار المساحي للأرض الخام أو الأرض ضمن مخطط هيكلي، كخطوة أولى في رحلة مشاريع التخطيط قبل التقديم على طلب التخطيط.", "en": "Issue the survey decision for raw land or land within a structural master plan, as the first step of the planning-projects journey before the planning request."},
+      "prerequisites": [
+        {"ar": "صك ملكية إلكتروني ساري", "en": "Valid electronic title deed"},
+        {"ar": "تفويض المكتب الهندسي في حال التقديم بالإنابة", "en": "Engineering office delegation when submitting on behalf of the owner"}
+      ],
+      "requiredDocuments": [
+        {"name": {"ar": "صك الملكية", "en": "Title deed"}, "formats": ["pdf"]},
+        {"name": {"ar": "الرفع المساحي المعتمد", "en": "Certified survey lift"}, "formats": ["pdf", "dwg"]},
+        {"name": {"ar": "إحداثيات حدود الأرض", "en": "Land boundary coordinates"}, "formats": ["csv", "kml"]}
+      ],
+      "formFields": [
+        {"key": "deedNumber", "label": {"ar": "رقم الصك", "en": "Deed number"}, "type": "text", "required": true},
+        {"key": "parcelId", "label": {"ar": "رقم قطعة الأرض", "en": "Parcel ID"}, "type": "parcel-id", "required": true},
+        {"key": "location", "label": {"ar": "الموقع الجغرافي", "en": "Geographic location"}, "type": "map-point", "required": true},
+        {"key": "areaSqm", "label": {"ar": "المساحة (م²)", "en": "Area (sqm)"}, "type": "number", "required": true}
+      ],
+      "fees": {"model": "fixed", "note": {"ar": "رسوم إصدار القرار المساحي وفق لائحة الرسوم البلدية", "en": "Survey decision fee per the municipal fees schedule"}},
+      "slaDays": 10,
+      "supportingEntities": ["gd-survey"],
+      "gigaFastTrack": true,
+      "workflowHint": ["screening", "technical", "decision"]
+    },
+    {
+      "id": "planning-request",
+      "name": {"ar": "التقديم على طلب التخطيط", "en": "Planning Request Submission"},
+      "category": "planning",
+      "phase": "before",
+      "personas": ["developer", "giga_entity", "engineering_office"],
+      "description": {"ar": "التقديم على طلب التخطيط عبر المنصة، حيث تتم مراجعة الطلب والدراسات الأولية والحصول على المحددات التخطيطية.", "en": "Submit the planning request via the platform; the request and preliminary studies are reviewed and the planning constraints are issued."},
+      "prerequisites": [
+        {"ar": "قرار مساحي ساري", "en": "Valid survey decision"},
+        {"ar": "المشروع مسجل في السجل الموحد (للمشاريع الكبرى)", "en": "Project registered in the unified registry (for giga projects)"}
+      ],
+      "requiredDocuments": [
+        {"name": {"ar": "القرار المساحي", "en": "Survey decision"}, "formats": ["pdf"]},
+        {"name": {"ar": "الدراسات الأولية للموقع", "en": "Preliminary site studies"}, "formats": ["pdf"]}
+      ],
+      "formFields": [
+        {"key": "projectId", "label": {"ar": "المشروع", "en": "Project"}, "type": "select", "options": [], "required": true},
+        {"key": "surveyDecisionNo", "label": {"ar": "رقم القرار المساحي", "en": "Survey decision number"}, "type": "text", "required": true},
+        {"key": "landUse", "label": {"ar": "الاستخدام المقترح", "en": "Proposed land use"}, "type": "select", "options": [{"ar": "سكني", "en": "Residential"}, {"ar": "تجاري", "en": "Commercial"}, {"ar": "مختلط", "en": "Mixed-use"}, {"ar": "صناعي", "en": "Industrial"}], "required": true},
+        {"key": "notes", "label": {"ar": "وصف المشروع", "en": "Project description"}, "type": "textarea", "required": false}
+      ],
+      "fees": {"model": "none", "note": {"ar": "لا توجد رسوم على مرحلة مراجعة الطلب وإصدار المحددات", "en": "No fees for request review and constraints issuance"}},
+      "slaDays": 5,
+      "supportingEntities": ["gd-urban-planning"],
+      "gigaFastTrack": true,
+      "workflowHint": ["screening", "technical", "decision"]
+    },
+    {
+      "id": "concept-master-plan",
+      "name": {"ar": "تقديم الدراسة التخطيطية (Concept Master Plan)", "en": "Concept Master Plan Submission"},
+      "category": "planning",
+      "phase": "before",
+      "personas": ["developer", "giga_entity", "engineering_office"],
+      "description": {"ar": "تقديم الدراسة التخطيطية وفق المحددات الصادرة، مع إحالة المخطط للجنة التخطيط العمراني للمخططات الواقعة ضمن نطاق NPX.", "en": "Submit the Concept Master Plan per the issued constraints, with referral to the Urban Planning Committee for plans within the NPX scope."},
+      "prerequisites": [
+        {"ar": "الحصول على المحددات التخطيطية", "en": "Planning constraints obtained"},
+        {"ar": "إعداد الدراسة عبر مكتب هندسي مؤهل", "en": "Study prepared by a qualified engineering office"}
+      ],
+      "requiredDocuments": [
+        {"name": {"ar": "الدراسة التخطيطية (Concept Master Plan)", "en": "Concept Master Plan study"}, "formats": ["pdf", "dwg"]},
+        {"name": {"ar": "دراسة الاستخدامات والكثافات", "en": "Land-use and density study"}, "formats": ["pdf"]},
+        {"name": {"ar": "الدراسة المرورية الأولية", "en": "Preliminary traffic study"}, "formats": ["pdf"]}
+      ],
+      "formFields": [
+        {"key": "requestRef", "label": {"ar": "رقم طلب التخطيط", "en": "Planning request reference"}, "type": "text", "required": true},
+        {"key": "withinNpx", "label": {"ar": "ضمن نطاق NPX", "en": "Within NPX scope"}, "type": "select", "options": [{"ar": "نعم", "en": "Yes"}, {"ar": "لا", "en": "No"}], "required": true},
+        {"key": "consultant", "label": {"ar": "المكتب الهندسي المعد للدراسة", "en": "Preparing engineering office"}, "type": "text", "required": true}
+      ],
+      "fees": {"model": "none", "note": {"ar": "بدون رسوم", "en": "No fees"}},
+      "slaDays": 10,
+      "supportingEntities": ["gd-urban-planning", "rcrc"],
+      "gigaFastTrack": true,
+      "workflowHint": ["screening", "technical", "external", "decision"]
+    },
+    {
+      "id": "initial-approval-dmp",
+      "name": {"ar": "الموافقة على الفكرة التخطيطية وإصدار قرار الاعتماد الأولي (Detailed Master Plan)", "en": "Concept Approval and Initial Approval Decision (Detailed Master Plan)"},
+      "category": "planning",
+      "phase": "before",
+      "personas": ["developer", "giga_entity"],
+      "description": {"ar": "الموافقة على الفكرة التخطيطية وإصدار قرار الاعتماد الأولي بالتنسيق مع الهيئة الملكية لمدينة الرياض، ثم اختيار مسار استكمال الاعتماد من المسارات الثلاثة.", "en": "Approve the planning concept and issue the initial approval decision in coordination with the Royal Commission for Riyadh City, then select one of the three approval completion paths."},
+      "prerequisites": [
+        {"ar": "اجتياز مراجعة الدراسة التخطيطية (Concept Master Plan)", "en": "Concept Master Plan review passed"},
+        {"ar": "توصية لجنة التخطيط العمراني للمخططات ضمن نطاق NPX", "en": "Urban Planning Committee recommendation for plans within the NPX scope"}
+      ],
+      "requiredDocuments": [
+        {"name": {"ar": "المخطط العام المحدث (Detailed Master Plan)", "en": "Updated Detailed Master Plan"}, "formats": ["pdf", "dwg"]},
+        {"name": {"ar": "محضر معالجة الملاحظات", "en": "Comments resolution record"}, "formats": ["pdf"]}
+      ],
+      "formFields": [
+        {"key": "conceptRef", "label": {"ar": "رقم طلب الدراسة التخطيطية", "en": "Concept study reference"}, "type": "text", "required": true},
+        {"key": "approvalPath", "label": {"ar": "مسار استكمال الاعتماد", "en": "Approval completion path"}, "type": "select", "options": [{"ar": "الاعتماد الابتدائي والإفراغ التدريجي", "en": "Initial approval with gradual conveyance"}, {"ar": "الاعتماد الابتدائي والنهائي قبل التنفيذ", "en": "Initial and final approval before execution"}, {"ar": "الاعتماد الابتدائي والنهائي وبيع جميع القطع قبل التنفيذ", "en": "Initial and final approval with sale of all parcels before execution"}], "required": true}
+      ],
+      "fees": {"model": "none", "note": {"ar": "بدون رسوم", "en": "No fees"}},
+      "slaDays": 15,
+      "supportingEntities": ["gd-urban-planning", "rcrc"],
+      "gigaFastTrack": true,
+      "workflowHint": ["technical", "external", "decision"]
+    },
+    {
+      "id": "detailed-plans-submission",
+      "name": {"ar": "تقديم المخططات التفصيلية", "en": "Detailed Plans Submission"},
+      "category": "planning",
+      "phase": "during",
+      "personas": ["developer", "giga_entity", "engineering_office"],
+      "description": {"ar": "تقديم المخططات التفصيلية بعد قرار الاعتماد الأولي، ليتم تدقيقها وإحالتها للجهات الخدمية.", "en": "Submit the detailed plans after the initial approval decision, for audit and referral to service entities."},
+      "prerequisites": [
+        {"ar": "قرار الاعتماد الأولي (Detailed Master Plan) صادر", "en": "Initial approval decision (Detailed Master Plan) issued"}
+      ],
+      "requiredDocuments": [
+        {"name": {"ar": "المخططات التفصيلية", "en": "Detailed plans"}, "formats": ["pdf", "dwg"]},
+        {"name": {"ar": "جداول القطع والاستخدامات", "en": "Parcel and land-use schedules"}, "formats": ["xlsx", "pdf"]}
+      ],
+      "formFields": [
+        {"key": "dmpDecisionNo", "label": {"ar": "رقم قرار الاعتماد الأولي", "en": "Initial approval decision number"}, "type": "text", "required": true},
+        {"key": "parcelCount", "label": {"ar": "عدد القطع", "en": "Number of parcels"}, "type": "number", "required": true}
+      ],
+      "fees": {"model": "none", "note": {"ar": "بدون رسوم", "en": "No fees"}},
+      "slaDays": 2,
+      "supportingEntities": ["gd-urban-planning", "sec", "nwc", "telecom-operators"],
+      "gigaFastTrack": true,
+      "workflowHint": ["screening", "external"]
+    },
+    {
+      "id": "infra-design-studies",
+      "name": {"ar": "الدراسات التصميمية لشبكات البنية التحتية", "en": "Infrastructure Networks Design Studies"},
+      "category": "infrastructure",
+      "phase": "during",
+      "personas": ["developer", "giga_entity", "engineering_office"],
+      "description": {"ar": "تقديم الدراسات التصميمية لشبكات البنية التحتية ودراستها واعتمادها لدى الشركة السعودية للكهرباء وشركة المياه الوطنية وشركات الاتصالات.", "en": "Submit the infrastructure networks design studies for review and approval by Saudi Electricity Company, National Water Company and telecom operators."},
+      "prerequisites": [
+        {"ar": "تدقيق المخططات التفصيلية وإحالتها للجهات الخدمية", "en": "Detailed plans audited and referred to service entities"}
+      ],
+      "requiredDocuments": [
+        {"name": {"ar": "تصاميم شبكات الكهرباء", "en": "Electricity network designs"}, "formats": ["pdf", "dwg"]},
+        {"name": {"ar": "تصاميم شبكات المياه والصرف الصحي", "en": "Water and wastewater network designs"}, "formats": ["pdf", "dwg"]},
+        {"name": {"ar": "تصاميم شبكات الاتصالات", "en": "Telecom network designs"}, "formats": ["pdf", "dwg"]},
+        {"name": {"ar": "تصاميم الطرق وتصريف مياه الأمطار", "en": "Roads and stormwater drainage designs"}, "formats": ["pdf", "dwg"]}
+      ],
+      "formFields": [
+        {"key": "detailedPlanRef", "label": {"ar": "رقم طلب المخططات التفصيلية", "en": "Detailed plans reference"}, "type": "text", "required": true},
+        {"key": "networks", "label": {"ar": "الشبكات المشمولة", "en": "Covered networks"}, "type": "select", "options": [{"ar": "كهرباء", "en": "Electricity"}, {"ar": "مياه وصرف صحي", "en": "Water and wastewater"}, {"ar": "اتصالات", "en": "Telecom"}, {"ar": "طرق وتصريف", "en": "Roads and drainage"}], "required": true}
+      ],
+      "fees": {"model": "tariff", "note": {"ar": "وفق تعرفة الجهات الخدمية لكل شبكة", "en": "Per each service entity's network tariff"}},
+      "slaDays": 28,
+      "supportingEntities": ["sec", "nwc", "telecom-operators"],
+      "gigaFastTrack": true,
+      "workflowHint": ["screening", "external", "decision"]
+    },
+    {
+      "id": "infra-final-handover",
+      "name": {"ar": "التسليم النهائي للبنية التحتية", "en": "Final Infrastructure Handover"},
+      "category": "infrastructure",
+      "phase": "during",
+      "personas": ["developer", "giga_entity"],
+      "description": {"ar": "التسليم النهائي لأعمال البنية التحتية المنفذة بعد الفحص والاستلام من الجهات الخدمية والأمانة.", "en": "Final handover of executed infrastructure works after inspection and acceptance by service entities and the Amanah."},
+      "prerequisites": [
+        {"ar": "اكتمال تنفيذ شبكات البنية التحتية وفق التصاميم المعتمدة", "en": "Infrastructure networks executed per approved designs"},
+        {"ar": "محاضر الفحص من الجهات الخدمية", "en": "Inspection records from service entities"}
+      ],
+      "requiredDocuments": [
+        {"name": {"ar": "مخططات ما بعد التنفيذ (As-Built)", "en": "As-built drawings"}, "formats": ["pdf", "dwg"]},
+        {"name": {"ar": "محاضر الاستلام الابتدائي", "en": "Preliminary acceptance records"}, "formats": ["pdf"]}
+      ],
+      "formFields": [
+        {"key": "designApprovalRef", "label": {"ar": "رقم اعتماد التصاميم", "en": "Design approval reference"}, "type": "text", "required": true},
+        {"key": "handoverDate", "label": {"ar": "التاريخ المقترح للاستلام", "en": "Proposed handover date"}, "type": "date", "required": true}
+      ],
+      "fees": {"model": "none", "note": {"ar": "بدون رسوم", "en": "No fees"}},
+      "slaDays": 5,
+      "supportingEntities": ["construction-projects-agency", "sec", "nwc", "telecom-operators"],
+      "gigaFastTrack": true,
+      "workflowHint": ["technical", "external", "decision"]
+    },
+    {
+      "id": "partial-conveyance",
+      "name": {"ar": "إشعار الهيئة العامة للعقار والسماح بالفرز والإفراغ الجزئي", "en": "REGA Notification and Partial Subdivision/Conveyance Permission"},
+      "category": "planning",
+      "phase": "during",
+      "personas": ["developer", "giga_entity"],
+      "description": {"ar": "إشعار الهيئة العامة للعقار والسماح بالفرز والإفراغ الجزئي بنسبة لا تقل عن 25% ضمن مسار الاعتماد الابتدائي والإفراغ التدريجي.", "en": "Notify the Real Estate General Authority and permit subdivision and partial conveyance of no less than 25% under the gradual-conveyance approval path."},
+      "prerequisites": [
+        {"ar": "إنجاز نسبة تنفيذ لا تقل عن 25% من البنية التحتية للمرحلة", "en": "At least 25% of the stage infrastructure executed"},
+        {"ar": "مسار الاعتماد الابتدائي والإفراغ التدريجي مختار", "en": "Gradual-conveyance approval path selected"}
+      ],
+      "requiredDocuments": [
+        {"name": {"ar": "تقرير نسب الإنجاز المعتمد", "en": "Certified completion-ratio report"}, "formats": ["pdf"]},
+        {"name": {"ar": "كشف القطع المطلوب إفراغها", "en": "Schedule of parcels to be conveyed"}, "formats": ["xlsx", "pdf"]}
+      ],
+      "formFields": [
+        {"key": "stageNo", "label": {"ar": "رقم المرحلة", "en": "Stage number"}, "type": "text", "required": true},
+        {"key": "completionPct", "label": {"ar": "نسبة الإنجاز (%)", "en": "Completion percentage (%)"}, "type": "number", "required": true}
+      ],
+      "fees": {"model": "none", "note": {"ar": "بدون رسوم", "en": "No fees"}},
+      "slaDays": 1,
+      "supportingEntities": ["rega", "gd-urban-planning"],
+      "gigaFastTrack": true,
+      "workflowHint": ["screening", "external", "decision"]
+    },
+    {
+      "id": "final-plan-approval",
+      "name": {"ar": "اعتماد المخطط النهائي", "en": "Final Plan Approval"},
+      "category": "planning",
+      "phase": "during",
+      "personas": ["developer", "giga_entity"],
+      "description": {"ar": "اعتماد المخطط النهائي بعد استكمال متطلبات مسار الاعتماد المختار.", "en": "Approve the final plan after completing the requirements of the selected approval path."},
+      "prerequisites": [
+        {"ar": "التسليم النهائي للبنية التحتية أو التزام التنفيذ حسب المسار", "en": "Final infrastructure handover or execution commitment per the path"}
+      ],
+      "requiredDocuments": [
+        {"name": {"ar": "المخطط النهائي", "en": "Final plan"}, "formats": ["pdf", "dwg"]},
+        {"name": {"ar": "إثبات استيفاء متطلبات المسار", "en": "Proof of path requirements fulfillment"}, "formats": ["pdf"]}
+      ],
+      "formFields": [
+        {"key": "dmpDecisionNo", "label": {"ar": "رقم قرار الاعتماد الأولي", "en": "Initial approval decision number"}, "type": "text", "required": true}
+      ],
+      "fees": {"model": "fixed", "note": {"ar": "رسوم اعتماد المخطط وفق لائحة الرسوم البلدية", "en": "Plan approval fee per the municipal fees schedule"}},
+      "slaDays": 5,
+      "supportingEntities": ["gd-urban-planning"],
+      "gigaFastTrack": true,
+      "workflowHint": ["technical", "decision"]
+    },
+    {
+      "id": "certificate-of-completion",
+      "name": {"ar": "شهادة الإتمام (Certificate of Completion)", "en": "Certificate of Completion"},
+      "category": "planning",
+      "phase": "during",
+      "personas": ["developer", "giga_entity"],
+      "description": {"ar": "إصدار شهادة الإتمام كخطوة ختامية لمسار الاعتماد الابتدائي والإفراغ التدريجي.", "en": "Issue the Certificate of Completion as the closing step of the gradual-conveyance approval path."},
+      "prerequisites": [
+        {"ar": "اعتماد المخطط النهائي", "en": "Final plan approved"}
+      ],
+      "requiredDocuments": [
+        {"name": {"ar": "قرار اعتماد المخطط النهائي", "en": "Final plan approval decision"}, "formats": ["pdf"]},
+        {"name": {"ar": "محاضر التسليم النهائي للبنية التحتية", "en": "Final infrastructure handover records"}, "formats": ["pdf"]}
+      ],
+      "formFields": [
+        {"key": "finalPlanNo", "label": {"ar": "رقم المخطط المعتمد", "en": "Approved plan number"}, "type": "text", "required": true}
+      ],
+      "fees": {"model": "none", "note": {"ar": "بدون رسوم", "en": "No fees"}},
+      "slaDays": 5,
+      "supportingEntities": ["gd-urban-planning", "construction-projects-agency"],
+      "gigaFastTrack": true,
+      "workflowHint": ["technical", "decision"]
+    },
+    {
+      "id": "building-permit",
+      "name": {"ar": "إصدار رخصة بناء", "en": "Building Permit Issuance"},
+      "category": "building",
+      "phase": "during",
+      "personas": ["developer", "giga_entity", "investor", "engineering_office"],
+      "description": {"ar": "إصدار رخصة بناء لأرض ضمن مخطط معتمد عبر بوابة أمانة منطقة الرياض، مع مسار أولوية لطلبات المشاريع الكبرى.", "en": "Issue a building permit for land within an approved plan via the Riyadh Region Municipality portal, with a priority lane for giga-project requests."},
+      "prerequisites": [
+        {"ar": "تقرير دراسة التربة", "en": "Soil study report"},
+        {"ar": "التقرير المساحي", "en": "Survey report"},
+        {"ar": "التأمين ضد العيوب الخفية", "en": "Inherent defects insurance"},
+        {"ar": "مخططات الدفاع المدني", "en": "Civil Defense drawings"},
+        {"ar": "دراسة حركة مرورية حسب نوع المشروع", "en": "Traffic impact study per project type"}
+      ],
+      "requiredDocuments": [
+        {"name": {"ar": "المخططات المعمارية والإنشائية", "en": "Architectural and structural drawings"}, "formats": ["pdf", "dwg"]},
+        {"name": {"ar": "تقرير دراسة التربة", "en": "Soil study report"}, "formats": ["pdf"]},
+        {"name": {"ar": "وثيقة التأمين ضد العيوب الخفية", "en": "Inherent defects insurance policy"}, "formats": ["pdf"]},
+        {"name": {"ar": "مخططات السلامة المعتمدة من الدفاع المدني", "en": "Civil Defense approved safety drawings"}, "formats": ["pdf"]}
+      ],
+      "formFields": [
+        {"key": "parcelId", "label": {"ar": "رقم قطعة الأرض", "en": "Parcel ID"}, "type": "parcel-id", "required": true},
+        {"key": "projectCategory", "label": {"ar": "فئة المشروع", "en": "Project category"}, "type": "select", "options": [{"ar": "سكني", "en": "Residential"}, {"ar": "تجاري", "en": "Commercial"}, {"ar": "صناعي", "en": "Industrial"}, {"ar": "يتطلب موافقات خاصة", "en": "Requires special approvals"}], "required": true},
+        {"key": "floors", "label": {"ar": "عدد الأدوار", "en": "Number of floors"}, "type": "number", "required": true},
+        {"key": "builtUpArea", "label": {"ar": "مسطحات البناء (م²)", "en": "Built-up area (sqm)"}, "type": "number", "required": true},
+        {"key": "engineeringOffice", "label": {"ar": "المكتب الهندسي المشرف", "en": "Supervising engineering office"}, "type": "text", "required": true}
+      ],
+      "fees": {"model": "perSqm", "note": {"ar": "رسوم الرخصة تحتسب على مسطحات البناء وفق لائحة الرسوم البلدية", "en": "Permit fee computed on built-up area per the municipal fees schedule"}},
+      "slaDays": 7,
+      "supportingEntities": ["gd-building-permits", "civil-defense", "sub-municipalities"],
+      "gigaFastTrack": true,
+      "workflowHint": ["screening", "technical", "external", "decision"]
+    },
+    {
+      "id": "demolition-permit",
+      "name": {"ar": "رخصة هدم", "en": "Demolition Permit"},
+      "category": "building",
+      "phase": "during",
+      "personas": ["developer", "giga_entity", "engineering_office"],
+      "description": {"ar": "إصدار رخصة هدم للمباني القائمة ضمن نطاق المشروع مع اشتراطات السلامة وإدارة مخلفات الهدم.", "en": "Issue a demolition permit for existing structures within the project scope, with safety requirements and demolition-waste management."},
+      "prerequisites": [
+        {"ar": "إثبات الملكية أو تفويض المالك", "en": "Proof of ownership or owner delegation"},
+        {"ar": "فصل خدمات المرافق عن المبنى", "en": "Utility services disconnected from the building"}
+      ],
+      "requiredDocuments": [
+        {"name": {"ar": "خطة الهدم وإدارة المخلفات", "en": "Demolition and waste management plan"}, "formats": ["pdf"]},
+        {"name": {"ar": "إفادات فصل الخدمات", "en": "Utility disconnection confirmations"}, "formats": ["pdf"]}
+      ],
+      "formFields": [
+        {"key": "parcelId", "label": {"ar": "رقم قطعة الأرض", "en": "Parcel ID"}, "type": "parcel-id", "required": true},
+        {"key": "structureCount", "label": {"ar": "عدد المباني المطلوب هدمها", "en": "Number of structures to demolish"}, "type": "number", "required": true},
+        {"key": "method", "label": {"ar": "أسلوب الهدم", "en": "Demolition method"}, "type": "select", "options": [{"ar": "آلي", "en": "Mechanical"}, {"ar": "يدوي", "en": "Manual"}, {"ar": "مختلط", "en": "Mixed"}], "required": true}
+      ],
+      "fees": {"model": "fixed", "note": {"ar": "رسوم رخصة الهدم وفق لائحة الرسوم البلدية", "en": "Demolition permit fee per the municipal fees schedule"}},
+      "slaDays": 5,
+      "supportingEntities": ["gd-building-permits", "sub-municipalities", "civil-defense"],
+      "gigaFastTrack": true,
+      "workflowHint": ["screening", "technical", "decision"]
+    },
+    {
+      "id": "building-completion-occupancy",
+      "name": {"ar": "شهادة إتمام وإشغال البناء", "en": "Building Completion and Occupancy Certificate"},
+      "category": "building",
+      "phase": "during",
+      "personas": ["developer", "giga_entity", "investor", "engineering_office"],
+      "description": {"ar": "إصدار شهادة إتمام وإشغال البناء بعد التحقق من مطابقة التنفيذ للرخصة والمخططات المعتمدة، وهي متطلب لرخص التشغيل.", "en": "Issue the building completion and occupancy certificate after verifying execution conformity with the permit and approved drawings; a prerequisite for operation licenses."},
+      "prerequisites": [
+        {"ar": "رخصة بناء سارية", "en": "Valid building permit"},
+        {"ar": "تقرير المكتب الهندسي المشرف باكتمال التنفيذ", "en": "Supervising engineering office completion report"}
+      ],
+      "requiredDocuments": [
+        {"name": {"ar": "تقرير الإشراف الهندسي النهائي", "en": "Final engineering supervision report"}, "formats": ["pdf"]},
+        {"name": {"ar": "شهادة سلامة الدفاع المدني", "en": "Civil Defense safety certificate"}, "formats": ["pdf"]}
+      ],
+      "formFields": [
+        {"key": "buildingPermitNo", "label": {"ar": "رقم رخصة البناء", "en": "Building permit number"}, "type": "text", "required": true},
+        {"key": "completionDate", "label": {"ar": "تاريخ اكتمال التنفيذ", "en": "Execution completion date"}, "type": "date", "required": true}
+      ],
+      "fees": {"model": "fixed", "note": {"ar": "رسوم إصدار الشهادة وفق لائحة الرسوم البلدية", "en": "Certificate fee per the municipal fees schedule"}},
+      "slaDays": 5,
+      "supportingEntities": ["gd-building-permits", "civil-defense", "sub-municipalities"],
+      "gigaFastTrack": true,
+      "workflowHint": ["technical", "external", "decision"]
+    },
+    {
+      "id": "env-construction-permit",
+      "name": {"ar": "طلب تصريح بيئي للإنشاء", "en": "Environmental Construction Permit"},
+      "category": "environment",
+      "phase": "during",
+      "personas": ["developer", "giga_entity", "investor"],
+      "description": {"ar": "طلب التصريح البيئي لمرحلة الإنشاء من المركز الوطني للرقابة على الالتزام البيئي، بتنسيق المنصة للمشاريع الكبرى والمشاريع الصناعية.", "en": "Request the construction-phase environmental permit from the National Center for Environmental Compliance, coordinated by the platform for giga and industrial projects."},
+      "prerequisites": [
+        {"ar": "اعتماد المخططات (مخطط عام ومخطط سلامة) للمشاريع الصناعية", "en": "Plans approved (general layout and safety plan) for industrial projects"}
+      ],
+      "requiredDocuments": [
+        {"name": {"ar": "دراسة التقييم البيئي", "en": "Environmental assessment study"}, "formats": ["pdf"]},
+        {"name": {"ar": "خطة الإدارة البيئية لمرحلة الإنشاء", "en": "Construction-phase environmental management plan"}, "formats": ["pdf"]}
+      ],
+      "formFields": [
+        {"key": "projectId", "label": {"ar": "المشروع", "en": "Project"}, "type": "select", "options": [], "required": true},
+        {"key": "activityType", "label": {"ar": "نوع النشاط", "en": "Activity type"}, "type": "text", "required": true},
+        {"key": "envCategory", "label": {"ar": "الفئة البيئية", "en": "Environmental category"}, "type": "select", "options": [{"ar": "الفئة الأولى", "en": "Category 1"}, {"ar": "الفئة الثانية", "en": "Category 2"}, {"ar": "الفئة الثالثة", "en": "Category 3"}], "required": true}
+      ],
+      "fees": {"model": "tariff", "note": {"ar": "وفق تعرفة المركز الوطني للرقابة على الالتزام البيئي", "en": "Per the National Center for Environmental Compliance tariff"}},
+      "slaDays": 15,
+      "supportingEntities": ["ncec"],
+      "gigaFastTrack": true,
+      "workflowHint": ["screening", "external", "decision"]
+    },
+    {
+      "id": "env-operation-permit",
+      "name": {"ar": "طلب تصريح بيئي للتشغيل", "en": "Environmental Operation Permit"},
+      "category": "environment",
+      "phase": "after",
+      "personas": ["investor", "operator", "giga_entity"],
+      "description": {"ar": "طلب التصريح البيئي لمرحلة التشغيل من المركز الوطني للرقابة على الالتزام البيئي قبل بدء النشاط.", "en": "Request the operation-phase environmental permit from the National Center for Environmental Compliance before activity commencement."},
+      "prerequisites": [
+        {"ar": "تصريح بيئي للإنشاء ساري", "en": "Valid construction-phase environmental permit"},
+        {"ar": "اكتمال الأعمال الإنشائية", "en": "Construction works completed"}
+      ],
+      "requiredDocuments": [
+        {"name": {"ar": "خطة الإدارة البيئية التشغيلية", "en": "Operational environmental management plan"}, "formats": ["pdf"]},
+        {"name": {"ar": "تقارير قياسات الانبعاثات والضوضاء", "en": "Emissions and noise measurement reports"}, "formats": ["pdf"]}
+      ],
+      "formFields": [
+        {"key": "constructionPermitNo", "label": {"ar": "رقم التصريح البيئي للإنشاء", "en": "Construction environmental permit number"}, "type": "text", "required": true},
+        {"key": "operationStartDate", "label": {"ar": "تاريخ بدء التشغيل المتوقع", "en": "Expected operation start date"}, "type": "date", "required": true}
+      ],
+      "fees": {"model": "tariff", "note": {"ar": "وفق تعرفة المركز الوطني للرقابة على الالتزام البيئي", "en": "Per the National Center for Environmental Compliance tariff"}},
+      "slaDays": 15,
+      "supportingEntities": ["ncec"],
+      "gigaFastTrack": true,
+      "workflowHint": ["screening", "external", "decision"]
+    },
+    {
+      "id": "power-connection",
+      "name": {"ar": "طلب إيصال التيار الكهربائي", "en": "Electricity Connection Request"},
+      "category": "infrastructure",
+      "phase": "during",
+      "personas": ["developer", "giga_entity", "investor"],
+      "description": {"ar": "طلب إيصال التيار الكهربائي من الشركة السعودية للكهرباء، بشرط اكتمال 30-50% من البناء.", "en": "Request electricity connection from Saudi Electricity Company, conditional on 30-50% building completion."},
+      "prerequisites": [
+        {"ar": "اكتمال 30-50% من البناء", "en": "30-50% of construction completed"},
+        {"ar": "رخصة بناء سارية", "en": "Valid building permit"}
+      ],
+      "requiredDocuments": [
+        {"name": {"ar": "رخصة البناء", "en": "Building permit"}, "formats": ["pdf"]},
+        {"name": {"ar": "تقرير نسبة الإنجاز", "en": "Completion-ratio report"}, "formats": ["pdf"]},
+        {"name": {"ar": "مخطط الأحمال الكهربائية", "en": "Electrical load schedule"}, "formats": ["pdf", "dwg"]}
+      ],
+      "formFields": [
+        {"key": "buildingPermitNo", "label": {"ar": "رقم رخصة البناء", "en": "Building permit number"}, "type": "text", "required": true},
+        {"key": "requestedLoadKva", "label": {"ar": "الحمل المطلوب (ك.ف.أ)", "en": "Requested load (kVA)"}, "type": "number", "required": true},
+        {"key": "completionPct", "label": {"ar": "نسبة إنجاز البناء (%)", "en": "Construction completion (%)"}, "type": "number", "required": true}
+      ],
+      "fees": {"model": "tariff", "note": {"ar": "وفق تعرفة الشركة السعودية للكهرباء", "en": "Per Saudi Electricity Company tariff"}},
+      "slaDays": 20,
+      "supportingEntities": ["sec"],
+      "gigaFastTrack": true,
+      "workflowHint": ["screening", "external"]
+    },
+    {
+      "id": "operation-license",
+      "name": {"ar": "طلب رخصة للتشغيل", "en": "Operation License Request"},
+      "category": "operation",
+      "phase": "after",
+      "personas": ["investor", "operator", "giga_entity"],
+      "description": {"ar": "إصدار رخصة التشغيل بعد استيفاء شهادة إتمام وإشغال البناء ورخص التشغيل ذات العلاقة.", "en": "Issue the operation license after fulfilling the building completion and occupancy certificate and related operating licenses."},
+      "prerequisites": [
+        {"ar": "شهادة إتمام وإشغال البناء", "en": "Building completion and occupancy certificate"},
+        {"ar": "تصريح بيئي للتشغيل حيثما ينطبق", "en": "Operation-phase environmental permit where applicable"}
+      ],
+      "requiredDocuments": [
+        {"name": {"ar": "شهادة إتمام وإشغال البناء", "en": "Building completion and occupancy certificate"}, "formats": ["pdf"]},
+        {"name": {"ar": "شهادة سلامة الدفاع المدني", "en": "Civil Defense safety certificate"}, "formats": ["pdf"]},
+        {"name": {"ar": "السجل التجاري", "en": "Commercial registration"}, "formats": ["pdf"]}
+      ],
+      "formFields": [
+        {"key": "occupancyCertNo", "label": {"ar": "رقم شهادة الإتمام والإشغال", "en": "Completion/occupancy certificate number"}, "type": "text", "required": true},
+        {"key": "activity", "label": {"ar": "النشاط", "en": "Activity"}, "type": "text", "required": true},
+        {"key": "areaSqm", "label": {"ar": "مساحة الإشغال (م²)", "en": "Occupied area (sqm)"}, "type": "number", "required": true}
+      ],
+      "fees": {"model": "tariff", "note": {"ar": "وفق لائحة رسوم الرخص البلدية حسب النشاط والمساحة", "en": "Per the municipal licensing fees schedule by activity and area"}},
+      "slaDays": 5,
+      "supportingEntities": ["sub-municipalities", "civil-defense"],
+      "gigaFastTrack": true,
+      "workflowHint": ["screening", "technical", "decision"]
+    },
+    {
+      "id": "temporary-works-permit",
+      "name": {"ar": "تصريح أعمال مؤقتة", "en": "Temporary Works Permit"},
+      "category": "enablement",
+      "phase": "during",
+      "personas": ["giga_entity", "developer"],
+      "description": {"ar": "تصريح لإقامة منشآت وأعمال مؤقتة داخل نطاق المشروع (مكاتب موقع، مستودعات مؤقتة، خلاطات، ساحات تشوين).", "en": "Permit for temporary facilities and works within the project boundary (site offices, temporary warehouses, batching plants, laydown yards)."},
+      "prerequisites": [
+        {"ar": "رخصة بناء أو قرار اعتماد ساري للمشروع", "en": "Valid building permit or approval decision for the project"},
+        {"ar": "خطة سلامة للموقع", "en": "Site safety plan"}
+      ],
+      "requiredDocuments": [
+        {"name": {"ar": "مخطط توزيع الأعمال المؤقتة (Site Logistics Plan)", "en": "Temporary works layout (site logistics plan)"}, "formats": ["pdf", "dwg"]},
+        {"name": {"ar": "خطة السلامة والطوارئ", "en": "Safety and emergency plan"}, "formats": ["pdf"]}
+      ],
+      "formFields": [
+        {"key": "projectId", "label": {"ar": "المشروع", "en": "Project"}, "type": "select", "options": [], "required": true},
+        {"key": "worksType", "label": {"ar": "نوع الأعمال المؤقتة", "en": "Temporary works type"}, "type": "select", "options": [{"ar": "مكاتب موقع", "en": "Site offices"}, {"ar": "خلاطة خرسانة", "en": "Batching plant"}, {"ar": "ساحة تشوين", "en": "Laydown yard"}, {"ar": "مستودع مؤقت", "en": "Temporary warehouse"}], "required": true},
+        {"key": "durationMonths", "label": {"ar": "المدة (أشهر)", "en": "Duration (months)"}, "type": "number", "required": true},
+        {"key": "location", "label": {"ar": "الموقع", "en": "Location"}, "type": "map-point", "required": true}
+      ],
+      "fees": {"model": "fixed", "note": {"ar": "رسوم التصريح المؤقت وفق لائحة الرسوم البلدية", "en": "Temporary permit fee per the municipal fees schedule"}},
+      "slaDays": 5,
+      "supportingEntities": ["sub-municipalities", "civil-defense", "gpo"],
+      "gigaFastTrack": true,
+      "workflowHint": ["screening", "technical", "decision"]
+    },
+    {
+      "id": "road-closure-permit",
+      "name": {"ar": "تصريح إغلاق أو تحويل طرق", "en": "Road Closure or Diversion Permit"},
+      "category": "enablement",
+      "phase": "during",
+      "personas": ["giga_entity", "developer"],
+      "description": {"ar": "تصريح إغلاق كلي أو جزئي أو تحويل مسارات الطرق المتأثرة بأعمال المشروع، مع خطة إدارة مرورية معتمدة.", "en": "Permit for full/partial road closures or traffic diversions affected by project works, with an approved traffic management plan."},
+      "prerequisites": [
+        {"ar": "خطة إدارة مرورية معدة من استشاري مؤهل", "en": "Traffic management plan by a qualified consultant"},
+        {"ar": "تنسيق مسبق مع الإدارة العامة للمرور", "en": "Prior coordination with the General Traffic Department"}
+      ],
+      "requiredDocuments": [
+        {"name": {"ar": "خطة إدارة الحركة المرورية (TMP)", "en": "Traffic management plan (TMP)"}, "formats": ["pdf", "dwg"]},
+        {"name": {"ar": "مخطط التحويلات واللوحات الإرشادية", "en": "Diversion and signage layout"}, "formats": ["pdf", "dwg"]}
+      ],
+      "formFields": [
+        {"key": "roadName", "label": {"ar": "اسم الطريق", "en": "Road name"}, "type": "text", "required": true},
+        {"key": "closureType", "label": {"ar": "نوع الإغلاق", "en": "Closure type"}, "type": "select", "options": [{"ar": "كلي", "en": "Full"}, {"ar": "جزئي", "en": "Partial"}, {"ar": "تحويل مسار", "en": "Diversion"}], "required": true},
+        {"key": "startDate", "label": {"ar": "تاريخ البداية", "en": "Start date"}, "type": "date", "required": true},
+        {"key": "endDate", "label": {"ar": "تاريخ النهاية", "en": "End date"}, "type": "date", "required": true},
+        {"key": "segment", "label": {"ar": "الموقع على الخريطة", "en": "Location on map"}, "type": "map-point", "required": true}
+      ],
+      "fees": {"model": "fixed", "note": {"ar": "رسوم تصريح الإغلاق وفق لائحة الرسوم البلدية", "en": "Closure permit fee per the municipal fees schedule"}},
+      "slaDays": 7,
+      "supportingEntities": ["construction-projects-agency", "traffic-department", "sub-municipalities"],
+      "gigaFastTrack": true,
+      "workflowHint": ["screening", "technical", "external", "decision"]
+    },
+    {
+      "id": "excavation-permit",
+      "name": {"ar": "تصريح حفريات", "en": "Excavation Permit"},
+      "category": "enablement",
+      "phase": "during",
+      "personas": ["giga_entity", "developer", "engineering_office"],
+      "description": {"ar": "تصريح تنفيذ أعمال الحفريات في الطرق والأرصفة والمرافق العامة مع كشف مسارات الخدمات القائمة وضمانات إعادة الوضع.", "en": "Permit for excavation works in roads, sidewalks and public utilities, with existing-services detection and reinstatement guarantees."},
+      "prerequisites": [
+        {"ar": "كشف مسارات الخدمات القائمة من الجهات الخدمية", "en": "Existing utility routes disclosure from service entities"},
+        {"ar": "ضمان بنكي أو تأمين إعادة الوضع", "en": "Bank guarantee or reinstatement insurance"}
+      ],
+      "requiredDocuments": [
+        {"name": {"ar": "مخطط مسار الحفر", "en": "Excavation route drawing"}, "formats": ["pdf", "dwg"]},
+        {"name": {"ar": "موافقات الجهات الخدمية", "en": "Service entities approvals"}, "formats": ["pdf"]},
+        {"name": {"ar": "خطة السلامة المرورية", "en": "Traffic safety plan"}, "formats": ["pdf"]}
+      ],
+      "formFields": [
+        {"key": "routeLengthM", "label": {"ar": "طول المسار (م)", "en": "Route length (m)"}, "type": "number", "required": true},
+        {"key": "depthM", "label": {"ar": "عمق الحفر (م)", "en": "Excavation depth (m)"}, "type": "number", "required": true},
+        {"key": "purpose", "label": {"ar": "الغرض", "en": "Purpose"}, "type": "select", "options": [{"ar": "كهرباء", "en": "Electricity"}, {"ar": "مياه وصرف", "en": "Water and sewer"}, {"ar": "اتصالات", "en": "Telecom"}, {"ar": "تصريف مياه أمطار", "en": "Stormwater"}], "required": true},
+        {"key": "startDate", "label": {"ar": "تاريخ البدء", "en": "Start date"}, "type": "date", "required": true}
+      ],
+      "fees": {"model": "perSqm", "note": {"ar": "تحتسب الرسوم على مسطح الحفر وفق لائحة الرسوم البلدية مع ضمان إعادة الوضع", "en": "Fees computed on the excavation footprint per the municipal fees schedule, with a reinstatement guarantee"}},
+      "slaDays": 5,
+      "supportingEntities": ["sub-municipalities", "sec", "nwc", "telecom-operators", "traffic-department"],
+      "gigaFastTrack": true,
+      "workflowHint": ["screening", "external", "decision"]
+    },
+    {
+      "id": "utility-relocation",
+      "name": {"ar": "نقل وحماية خدمات المرافق", "en": "Utility Relocation and Protection"},
+      "category": "infrastructure",
+      "phase": "during",
+      "personas": ["giga_entity", "developer"],
+      "description": {"ar": "تنسيق نقل أو حماية خدمات المرافق المتعارضة مع أعمال المشروع (كهرباء، مياه، اتصالات) مع الجهات الخدمية عبر مكتب المشاريع الكبرى.", "en": "Coordinate relocation or protection of utility services conflicting with project works (electricity, water, telecom) with service entities via the Giga Projects Office."},
+      "prerequisites": [
+        {"ar": "تقرير التعارضات مع الخدمات القائمة", "en": "Clash report with existing services"},
+        {"ar": "تصاميم النقل أو الحماية المقترحة", "en": "Proposed relocation or protection designs"}
+      ],
+      "requiredDocuments": [
+        {"name": {"ar": "تقرير التعارضات (Clash Report)", "en": "Clash report"}, "formats": ["pdf"]},
+        {"name": {"ar": "تصاميم النقل والحماية", "en": "Relocation and protection designs"}, "formats": ["pdf", "dwg"]}
+      ],
+      "formFields": [
+        {"key": "utilityType", "label": {"ar": "نوع الخدمة", "en": "Utility type"}, "type": "select", "options": [{"ar": "كهرباء", "en": "Electricity"}, {"ar": "مياه", "en": "Water"}, {"ar": "صرف صحي", "en": "Wastewater"}, {"ar": "اتصالات", "en": "Telecom"}], "required": true},
+        {"key": "conflictLocation", "label": {"ar": "موقع التعارض", "en": "Conflict location"}, "type": "map-point", "required": true},
+        {"key": "proposedAction", "label": {"ar": "الإجراء المقترح", "en": "Proposed action"}, "type": "select", "options": [{"ar": "نقل", "en": "Relocation"}, {"ar": "حماية", "en": "Protection"}], "required": true}
+      ],
+      "fees": {"model": "tariff", "note": {"ar": "تكاليف النقل والحماية وفق تعرفة الجهة الخدمية المالكة للأصل", "en": "Relocation/protection costs per the asset-owning service entity tariff"}},
+      "slaDays": 20,
+      "supportingEntities": ["sec", "nwc", "telecom-operators", "construction-projects-agency", "gpo"],
+      "gigaFastTrack": true,
+      "workflowHint": ["screening", "technical", "external", "decision"]
+    },
+    {
+      "id": "tower-crane-permit",
+      "name": {"ar": "تصريح رافعات برجية", "en": "Tower Crane Permit"},
+      "category": "enablement",
+      "phase": "during",
+      "personas": ["giga_entity", "developer"],
+      "description": {"ar": "تصريح تركيب وتشغيل الرافعات البرجية داخل الموقع أو المتجاوزة لحدوده، مع شهادات الفحص وتأمين المسؤولية.", "en": "Permit to erect and operate tower cranes within or oversailing the site boundary, with inspection certificates and liability insurance."},
+      "prerequisites": [
+        {"ar": "رخصة بناء سارية", "en": "Valid building permit"},
+        {"ar": "شهادة فحص فني للرافعة من جهة معتمدة", "en": "Crane technical inspection certificate from an accredited body"}
+      ],
+      "requiredDocuments": [
+        {"name": {"ar": "شهادة الفحص الفني", "en": "Technical inspection certificate"}, "formats": ["pdf"]},
+        {"name": {"ar": "وثيقة تأمين المسؤولية تجاه الغير", "en": "Third-party liability insurance policy"}, "formats": ["pdf"]},
+        {"name": {"ar": "مخطط مواقع الرافعات ونصف قطر الدوران", "en": "Crane locations and slew radius drawing"}, "formats": ["pdf", "dwg"]}
+      ],
+      "formFields": [
+        {"key": "craneCount", "label": {"ar": "عدد الرافعات", "en": "Number of cranes"}, "type": "number", "required": true},
+        {"key": "maxHeightM", "label": {"ar": "أقصى ارتفاع (م)", "en": "Maximum height (m)"}, "type": "number", "required": true},
+        {"key": "oversailing", "label": {"ar": "تجاوز حدود الموقع", "en": "Oversails site boundary"}, "type": "select", "options": [{"ar": "نعم", "en": "Yes"}, {"ar": "لا", "en": "No"}], "required": true}
+      ],
+      "fees": {"model": "fixed", "note": {"ar": "رسوم التصريح لكل رافعة وفق لائحة الرسوم البلدية", "en": "Permit fee per crane per the municipal fees schedule"}},
+      "slaDays": 5,
+      "supportingEntities": ["sub-municipalities", "civil-defense", "gaca"],
+      "gigaFastTrack": true,
+      "workflowHint": ["screening", "technical", "decision"]
+    },
+    {
+      "id": "site-hoarding-permit",
+      "name": {"ar": "تصريح سياج وحواجز موقع", "en": "Site Hoarding and Barriers Permit"},
+      "category": "enablement",
+      "phase": "during",
+      "personas": ["giga_entity", "developer"],
+      "description": {"ar": "تصريح تركيب سياج الموقع والحواجز المؤقتة وفق دليل التصميم الحضري لأمانة منطقة الرياض بما يشمل المحتوى الإعلاني على السياج.", "en": "Permit for site hoarding and temporary barriers per the Riyadh Region Municipality urban design guidelines, including hoarding graphics."},
+      "prerequisites": [
+        {"ar": "رخصة بناء أو تصريح أعمال ساري", "en": "Valid building permit or works permit"}
+      ],
+      "requiredDocuments": [
+        {"name": {"ar": "مخطط مسار السياج وارتفاعاته", "en": "Hoarding alignment and heights drawing"}, "formats": ["pdf", "dwg"]},
+        {"name": {"ar": "تصاميم المحتوى البصري على السياج", "en": "Hoarding visual content designs"}, "formats": ["pdf"]}
+      ],
+      "formFields": [
+        {"key": "lengthM", "label": {"ar": "طول السياج (م)", "en": "Hoarding length (m)"}, "type": "number", "required": true},
+        {"key": "heightM", "label": {"ar": "الارتفاع (م)", "en": "Height (m)"}, "type": "number", "required": true},
+        {"key": "hasGraphics", "label": {"ar": "يتضمن محتوى إعلانياً", "en": "Includes advertising content"}, "type": "select", "options": [{"ar": "نعم", "en": "Yes"}, {"ar": "لا", "en": "No"}], "required": true}
+      ],
+      "fees": {"model": "perSqm", "note": {"ar": "تحتسب رسوم المحتوى الإعلاني على مسطح السياج وفق لائحة الرسوم", "en": "Advertising content fees computed on hoarding surface per the fees schedule"}},
+      "slaDays": 3,
+      "supportingEntities": ["sub-municipalities"],
+      "gigaFastTrack": true,
+      "workflowHint": ["screening", "decision"]
+    },
+    {
+      "id": "temporary-sales-center",
+      "name": {"ar": "تصريح مركز مبيعات مؤقت", "en": "Temporary Sales Center Permit"},
+      "category": "enablement",
+      "phase": "during",
+      "personas": ["giga_entity", "developer"],
+      "description": {"ar": "تصريح إنشاء وتشغيل مركز مبيعات مؤقت لتسويق وحدات المشروع قبل أو أثناء التنفيذ.", "en": "Permit to build and operate a temporary sales center marketing project units before or during execution."},
+      "prerequisites": [
+        {"ar": "قرار اعتماد أولي أو رخصة بناء للمشروع", "en": "Initial approval decision or building permit for the project"},
+        {"ar": "ترخيص البيع على الخارطة (وافي) حيثما ينطبق", "en": "Off-plan sales license (Wafi) where applicable"}
+      ],
+      "requiredDocuments": [
+        {"name": {"ar": "المخططات المعمارية لمركز المبيعات", "en": "Sales center architectural drawings"}, "formats": ["pdf", "dwg"]},
+        {"name": {"ar": "مخططات السلامة", "en": "Safety drawings"}, "formats": ["pdf"]}
+      ],
+      "formFields": [
+        {"key": "areaSqm", "label": {"ar": "المساحة (م²)", "en": "Area (sqm)"}, "type": "number", "required": true},
+        {"key": "durationMonths", "label": {"ar": "مدة التشغيل (أشهر)", "en": "Operation duration (months)"}, "type": "number", "required": true},
+        {"key": "location", "label": {"ar": "الموقع", "en": "Location"}, "type": "map-point", "required": true}
+      ],
+      "fees": {"model": "fixed", "note": {"ar": "رسوم التصريح المؤقت وفق لائحة الرسوم البلدية", "en": "Temporary permit fee per the municipal fees schedule"}},
+      "slaDays": 7,
+      "supportingEntities": ["sub-municipalities", "civil-defense"],
+      "gigaFastTrack": true,
+      "workflowHint": ["screening", "technical", "decision"]
+    },
+    {
+      "id": "events-permit",
+      "name": {"ar": "تصريح فعاليات", "en": "Events Permit"},
+      "category": "enablement",
+      "phase": "during",
+      "personas": ["giga_entity", "operator", "investor"],
+      "description": {"ar": "تصريح إقامة الفعاليات المؤقتة (تدشين، معارض، فعاليات موسمية) داخل نطاق المشروع أو المرافق العامة المرتبطة به.", "en": "Permit for temporary events (launches, exhibitions, seasonal activations) within the project scope or its associated public realm."},
+      "prerequisites": [
+        {"ar": "خطة سلامة وإدارة حشود معتمدة", "en": "Approved safety and crowd management plan"},
+        {"ar": "موافقة الجهة المالكة للموقع", "en": "Site owner approval"}
+      ],
+      "requiredDocuments": [
+        {"name": {"ar": "خطة الفعالية وإدارة الحشود", "en": "Event and crowd management plan"}, "formats": ["pdf"]},
+        {"name": {"ar": "مخطط الموقع والتجهيزات المؤقتة", "en": "Site and temporary installations layout"}, "formats": ["pdf", "dwg"]}
+      ],
+      "formFields": [
+        {"key": "eventName", "label": {"ar": "اسم الفعالية", "en": "Event name"}, "type": "text", "required": true},
+        {"key": "expectedAttendance", "label": {"ar": "الحضور المتوقع", "en": "Expected attendance"}, "type": "number", "required": true},
+        {"key": "startDate", "label": {"ar": "تاريخ البداية", "en": "Start date"}, "type": "date", "required": true},
+        {"key": "endDate", "label": {"ar": "تاريخ النهاية", "en": "End date"}, "type": "date", "required": true}
+      ],
+      "fees": {"model": "fixed", "note": {"ar": "رسوم تصريح الفعالية وفق لائحة الرسوم البلدية", "en": "Event permit fee per the municipal fees schedule"}},
+      "slaDays": 5,
+      "supportingEntities": ["sub-municipalities", "civil-defense", "traffic-department"],
+      "gigaFastTrack": true,
+      "workflowHint": ["screening", "external", "decision"]
+    },
+    {
+      "id": "naming-signage-approval",
+      "name": {"ar": "اعتماد التسمية واللوحات", "en": "Naming and Signage Approval"},
+      "category": "enablement",
+      "phase": "during",
+      "personas": ["giga_entity", "developer", "operator"],
+      "description": {"ar": "اعتماد تسمية المخططات والشوارع والمعالم داخل المشروع واعتماد اللوحات الخارجية وفق اشتراطات المشهد الحضري.", "en": "Approve plan, street and landmark naming within the project and exterior signage per urban-scene requirements."},
+      "prerequisites": [
+        {"ar": "مخطط معتمد أو رخصة سارية", "en": "Approved plan or valid license"}
+      ],
+      "requiredDocuments": [
+        {"name": {"ar": "قائمة التسميات المقترحة", "en": "Proposed names list"}, "formats": ["pdf", "xlsx"]},
+        {"name": {"ar": "تصاميم اللوحات وأبعادها", "en": "Signage designs and dimensions"}, "formats": ["pdf"]}
+      ],
+      "formFields": [
+        {"key": "scope", "label": {"ar": "نطاق الاعتماد", "en": "Approval scope"}, "type": "select", "options": [{"ar": "تسمية شوارع", "en": "Street naming"}, {"ar": "تسمية معالم", "en": "Landmark naming"}, {"ar": "لوحات خارجية", "en": "Exterior signage"}], "required": true},
+        {"key": "itemsCount", "label": {"ar": "عدد العناصر", "en": "Number of items"}, "type": "number", "required": true}
+      ],
+      "fees": {"model": "perSqm", "note": {"ar": "رسوم اللوحات تحتسب على المسطح الإعلاني وفق لائحة الرسوم", "en": "Signage fees computed on advertising surface per the fees schedule"}},
+      "slaDays": 10,
+      "supportingEntities": ["sub-municipalities", "gd-urban-planning"],
+      "gigaFastTrack": true,
+      "workflowHint": ["screening", "technical", "decision"]
+    },
+    {
+      "id": "labor-housing-permit",
+      "name": {"ar": "تصريح سكن عمالة مؤقت", "en": "Temporary Labor Housing Permit"},
+      "category": "enablement",
+      "phase": "during",
+      "personas": ["giga_entity", "developer"],
+      "description": {"ar": "تصريح إقامة سكن عمالة مؤقت داخل أو بجوار نطاق المشروع وفق اشتراطات سكن العمالة والسلامة والصحة العامة.", "en": "Permit for temporary labor housing within or adjacent to the project scope per labor-housing, safety and public-health requirements."},
+      "prerequisites": [
+        {"ar": "الالتزام باشتراطات سكن العمالة المعتمدة", "en": "Compliance with approved labor-housing requirements"},
+        {"ar": "خطة إدارة النقل اليومي للعمالة", "en": "Daily workforce transportation management plan"}
+      ],
+      "requiredDocuments": [
+        {"name": {"ar": "مخطط السكن والسعة الاستيعابية", "en": "Housing layout and capacity"}, "formats": ["pdf", "dwg"]},
+        {"name": {"ar": "خطة السلامة والصحة العامة", "en": "Safety and public health plan"}, "formats": ["pdf"]}
+      ],
+      "formFields": [
+        {"key": "capacity", "label": {"ar": "السعة (عامل)", "en": "Capacity (workers)"}, "type": "number", "required": true},
+        {"key": "durationMonths", "label": {"ar": "المدة (أشهر)", "en": "Duration (months)"}, "type": "number", "required": true},
+        {"key": "location", "label": {"ar": "الموقع", "en": "Location"}, "type": "map-point", "required": true}
+      ],
+      "fees": {"model": "fixed", "note": {"ar": "رسوم التصريح وفق لائحة الرسوم البلدية", "en": "Permit fee per the municipal fees schedule"}},
+      "slaDays": 7,
+      "supportingEntities": ["sub-municipalities", "civil-defense"],
+      "gigaFastTrack": true,
+      "workflowHint": ["screening", "technical", "decision"]
+    },
+    {
+      "id": "public-realm-occupation",
+      "name": {"ar": "إشغال أرصفة ومرافق عامة", "en": "Sidewalk and Public Facilities Occupation"},
+      "category": "enablement",
+      "phase": "during",
+      "personas": ["giga_entity", "developer", "operator", "investor"],
+      "description": {"ar": "تصريح إشغال مؤقت للأرصفة والمرافق العامة لأغراض الأعمال الإنشائية أو التشغيلية مقابل مالي.", "en": "Temporary occupation permit for sidewalks and public facilities for construction or operational purposes, against a financial consideration."},
+      "prerequisites": [
+        {"ar": "تصريح أعمال أو رخصة سارية", "en": "Valid works permit or license"},
+        {"ar": "خطة الحفاظ على حركة المشاة", "en": "Pedestrian movement preservation plan"}
+      ],
+      "requiredDocuments": [
+        {"name": {"ar": "مخطط نطاق الإشغال", "en": "Occupation extent drawing"}, "formats": ["pdf", "dwg"]}
+      ],
+      "formFields": [
+        {"key": "areaSqm", "label": {"ar": "مساحة الإشغال (م²)", "en": "Occupation area (sqm)"}, "type": "number", "required": true},
+        {"key": "durationMonths", "label": {"ar": "المدة (أشهر)", "en": "Duration (months)"}, "type": "number", "required": true},
+        {"key": "location", "label": {"ar": "الموقع", "en": "Location"}, "type": "map-point", "required": true}
+      ],
+      "fees": {"model": "perSqm", "note": {"ar": "مقابل مالي شهري على متر الإشغال وفق لائحة الرسوم البلدية", "en": "Monthly consideration per occupied sqm per the municipal fees schedule"}},
+      "slaDays": 3,
+      "supportingEntities": ["sub-municipalities"],
+      "gigaFastTrack": true,
+      "workflowHint": ["screening", "decision"]
+    },
+    {
+      "id": "npx-coordination",
+      "name": {"ar": "تنسيق نطاق NPX مع الهيئة الملكية لمدينة الرياض", "en": "NPX Scope Coordination with the Royal Commission for Riyadh City"},
+      "category": "enablement",
+      "phase": "before",
+      "personas": ["giga_entity", "developer"],
+      "description": {"ar": "تنسيق متطلبات المخططات الواقعة ضمن نطاق NPX مع الهيئة الملكية لمدينة الرياض عبر مكتب المشاريع الكبرى، بما يشمل الإحالات للجنة التخطيط العمراني ومتابعة المرئيات.", "en": "Coordinate requirements for plans within the NPX scope with the Royal Commission for Riyadh City via the Giga Projects Office, including Urban Planning Committee referrals and feedback tracking."},
+      "prerequisites": [
+        {"ar": "طلب تخطيط أو دراسة تخطيطية قائمة", "en": "Active planning request or concept study"}
+      ],
+      "requiredDocuments": [
+        {"name": {"ar": "ملف الدراسة التخطيطية", "en": "Concept study package"}, "formats": ["pdf", "dwg"]},
+        {"name": {"ar": "مذكرة نطاق التنسيق", "en": "Coordination scope memo"}, "formats": ["pdf"]}
+      ],
+      "formFields": [
+        {"key": "projectId", "label": {"ar": "المشروع", "en": "Project"}, "type": "select", "options": [], "required": true},
+        {"key": "coordinationTopic", "label": {"ar": "موضوع التنسيق", "en": "Coordination topic"}, "type": "textarea", "required": true}
+      ],
+      "fees": {"model": "none", "note": {"ar": "بدون رسوم", "en": "No fees"}},
+      "slaDays": 10,
+      "supportingEntities": ["rcrc", "gd-urban-planning", "gpo"],
+      "gigaFastTrack": true,
+      "workflowHint": ["screening", "external", "decision"]
+    },
+    {
+      "id": "dewatering-permit",
+      "name": {"ar": "تصريح تصريف مياه", "en": "Dewatering / Water Discharge Permit"},
+      "category": "environment",
+      "phase": "during",
+      "personas": ["giga_entity", "developer"],
+      "description": {"ar": "تصريح تصريف مياه نزح الحفريات أو المياه السطحية إلى شبكات التصريف المعتمدة مع اشتراطات جودة المياه.", "en": "Permit to discharge dewatering or surface water to approved drainage networks, with water-quality requirements."},
+      "prerequisites": [
+        {"ar": "تصريح حفريات ساري حيثما ينطبق", "en": "Valid excavation permit where applicable"},
+        {"ar": "تحليل جودة المياه من مختبر معتمد", "en": "Water-quality analysis from an accredited laboratory"}
+      ],
+      "requiredDocuments": [
+        {"name": {"ar": "خطة النزح والتصريف", "en": "Dewatering and discharge plan"}, "formats": ["pdf"]},
+        {"name": {"ar": "نتائج تحليل جودة المياه", "en": "Water-quality analysis results"}, "formats": ["pdf"]}
+      ],
+      "formFields": [
+        {"key": "dischargeRateM3d", "label": {"ar": "معدل التصريف (م³/يوم)", "en": "Discharge rate (m3/day)"}, "type": "number", "required": true},
+        {"key": "dischargePoint", "label": {"ar": "نقطة التصريف", "en": "Discharge point"}, "type": "map-point", "required": true},
+        {"key": "durationMonths", "label": {"ar": "المدة (أشهر)", "en": "Duration (months)"}, "type": "number", "required": true}
+      ],
+      "fees": {"model": "tariff", "note": {"ar": "وفق تعرفة شبكات التصريف والجهات ذات العلاقة", "en": "Per drainage-network and related entities tariffs"}},
+      "slaDays": 7,
+      "supportingEntities": ["construction-projects-agency", "nwc", "ncec"],
+      "gigaFastTrack": true,
+      "workflowHint": ["screening", "technical", "external", "decision"]
+    },
+    {
+      "id": "commercial-activity-license",
+      "name": {"ar": "رخصة نشاط تجاري وإشغال", "en": "Commercial Activity and Occupancy License"},
+      "category": "operation",
+      "phase": "after",
+      "personas": ["operator", "investor", "giga_entity"],
+      "description": {"ar": "إصدار رخصة النشاط التجاري وإشغال المنشأة للمرافق التشغيلية داخل المشاريع الكبرى بعد اكتمال التطوير.", "en": "Issue the commercial activity and occupancy license for operational facilities within giga projects after development completion."},
+      "prerequisites": [
+        {"ar": "شهادة إتمام وإشغال البناء", "en": "Building completion and occupancy certificate"},
+        {"ar": "سجل تجاري يتضمن النشاط", "en": "Commercial registration covering the activity"}
+      ],
+      "requiredDocuments": [
+        {"name": {"ar": "السجل التجاري", "en": "Commercial registration"}, "formats": ["pdf"]},
+        {"name": {"ar": "عقد الإيجار أو سند الملكية", "en": "Lease contract or ownership deed"}, "formats": ["pdf"]},
+        {"name": {"ar": "شهادة سلامة الدفاع المدني", "en": "Civil Defense safety certificate"}, "formats": ["pdf"]}
+      ],
+      "formFields": [
+        {"key": "activityCode", "label": {"ar": "رمز النشاط (ISIC)", "en": "Activity code (ISIC)"}, "type": "text", "required": true},
+        {"key": "shopName", "label": {"ar": "الاسم التجاري", "en": "Trade name"}, "type": "text", "required": true},
+        {"key": "areaSqm", "label": {"ar": "المساحة (م²)", "en": "Area (sqm)"}, "type": "number", "required": true}
+      ],
+      "fees": {"model": "tariff", "note": {"ar": "وفق لائحة رسوم الرخص البلدية حسب النشاط والمساحة", "en": "Per the municipal licensing fees schedule by activity and area"}},
+      "slaDays": 3,
+      "supportingEntities": ["sub-municipalities", "civil-defense"],
+      "gigaFastTrack": true,
+      "workflowHint": ["screening", "decision"]
+    },
+    {
+      "id": "license-renewal",
+      "name": {"ar": "تجديد الرخص", "en": "License Renewal"},
+      "category": "operation",
+      "phase": "after",
+      "personas": ["operator", "investor"],
+      "description": {"ar": "تجديد الرخص البلدية (نشاط تجاري، تشغيل، لوحات) قبل انتهاء سريانها مع التحقق من الامتثال.", "en": "Renew municipal licenses (commercial activity, operation, signage) before expiry with compliance verification."},
+      "prerequisites": [
+        {"ar": "رخصة قائمة قابلة للتجديد", "en": "Existing renewable license"},
+        {"ar": "سداد أي مستحقات مالية", "en": "Settlement of any outstanding dues"}
+      ],
+      "requiredDocuments": [
+        {"name": {"ar": "الرخصة الحالية", "en": "Current license"}, "formats": ["pdf"]},
+        {"name": {"ar": "شهادة سلامة سارية", "en": "Valid safety certificate"}, "formats": ["pdf"]}
+      ],
+      "formFields": [
+        {"key": "licenseNo", "label": {"ar": "رقم الرخصة", "en": "License number"}, "type": "text", "required": true},
+        {"key": "renewalYears", "label": {"ar": "مدة التجديد (سنوات)", "en": "Renewal period (years)"}, "type": "select", "options": [{"ar": "سنة", "en": "1 year"}, {"ar": "سنتان", "en": "2 years"}, {"ar": "ثلاث سنوات", "en": "3 years"}], "required": true}
+      ],
+      "fees": {"model": "tariff", "note": {"ar": "رسوم التجديد وفق لائحة رسوم الرخص البلدية", "en": "Renewal fees per the municipal licensing fees schedule"}},
+      "slaDays": 2,
+      "supportingEntities": ["sub-municipalities"],
+      "gigaFastTrack": false,
+      "workflowHint": ["screening", "decision"]
+    },
+    {
+      "id": "periodic-compliance-certificate",
+      "name": {"ar": "شهادة امتثال دورية", "en": "Periodic Compliance Certificate"},
+      "category": "operation",
+      "phase": "after",
+      "personas": ["operator", "investor", "giga_entity"],
+      "description": {"ar": "إصدار شهادة امتثال دورية للمرافق التشغيلية بعد جولات الفحص، للتحقق من الالتزام بخطة التشغيل والصيانة وكراسة الشروط والمواصفات.", "en": "Issue a periodic compliance certificate for operational facilities after inspection rounds, verifying commitment to the operation and maintenance plan and the terms and specifications booklet."},
+      "prerequisites": [
+        {"ar": "رخصة تشغيل أو نشاط سارية", "en": "Valid operation or activity license"},
+        {"ar": "خطة تشغيل وصيانة معتمدة", "en": "Approved operation and maintenance plan"}
+      ],
+      "requiredDocuments": [
+        {"name": {"ar": "تقارير الصيانة الدورية", "en": "Periodic maintenance reports"}, "formats": ["pdf"]},
+        {"name": {"ar": "سجلات السلامة والفحص", "en": "Safety and inspection logs"}, "formats": ["pdf", "xlsx"]}
+      ],
+      "formFields": [
+        {"key": "facilityId", "label": {"ar": "المرفق", "en": "Facility"}, "type": "text", "required": true},
+        {"key": "period", "label": {"ar": "الفترة", "en": "Period"}, "type": "select", "options": [{"ar": "ربع سنوية", "en": "Quarterly"}, {"ar": "نصف سنوية", "en": "Semi-annual"}, {"ar": "سنوية", "en": "Annual"}], "required": true}
+      ],
+      "fees": {"model": "none", "note": {"ar": "بدون رسوم", "en": "No fees"}},
+      "slaDays": 10,
+      "supportingEntities": ["sub-municipalities", "madinati-offices"],
+      "gigaFastTrack": false,
+      "workflowHint": ["screening", "technical", "decision"]
+    },
+    {
+      "id": "technical-report-renewal-termination",
+      "name": {"ar": "تقرير فني للتجديد أو الإنهاء", "en": "Technical Report for Renewal or Termination"},
+      "category": "investment",
+      "phase": "after",
+      "personas": ["investor", "operator"],
+      "description": {"ar": "إعداد تقرير فني عن حالة الموقع والأصول ومشاركته للأمانة تمهيداً لتجديد العقد أو إنهائه ضمن مرحلة التجديد أو الإنهاء في رحلة المستثمر.", "en": "Prepare a technical report on site and asset condition and share it with the Amanah ahead of contract renewal or termination, per the investor journey's renewal-or-termination stage."},
+      "prerequisites": [
+        {"ar": "عقد استثماري قائم عبر منصة فرص", "en": "Active investment contract via the Furas platform"}
+      ],
+      "requiredDocuments": [
+        {"name": {"ar": "التقرير الفني لحالة الأصول", "en": "Asset condition technical report"}, "formats": ["pdf"]},
+        {"name": {"ar": "سجل أعمال الصيانة خلال مدة العقد", "en": "Maintenance log over the contract term"}, "formats": ["pdf", "xlsx"]}
+      ],
+      "formFields": [
+        {"key": "contractNo", "label": {"ar": "رقم العقد", "en": "Contract number"}, "type": "text", "required": true},
+        {"key": "intent", "label": {"ar": "الرغبة", "en": "Intent"}, "type": "select", "options": [{"ar": "تجديد العقد", "en": "Renew the contract"}, {"ar": "إنهاء العقد", "en": "Terminate the contract"}], "required": true},
+        {"key": "notes", "label": {"ar": "ملخص الحالة الفنية", "en": "Technical condition summary"}, "type": "textarea", "required": true}
+      ],
+      "fees": {"model": "none", "note": {"ar": "بدون رسوم", "en": "No fees"}},
+      "slaDays": 10,
+      "supportingEntities": ["madinati-offices", "sub-municipalities"],
+      "gigaFastTrack": false,
+      "workflowHint": ["screening", "technical", "decision"]
+    },
+    {
+      "id": "site-handover-madinati",
+      "name": {"ar": "تسليم الموقع لمكاتب مدينتي", "en": "Site Handover to Madinati Offices"},
+      "category": "investment",
+      "phase": "after",
+      "personas": ["investor", "operator"],
+      "description": {"ar": "إنهاء العقد وتسليم الموقع لمكاتب مدينتي بعد المعاينة وإخلاء الطرف، كخطوة ختامية في رحلة المستثمر.", "en": "Terminate the contract and hand the site over to Madinati offices after inspection and clearance, as the closing step of the investor journey."},
+      "prerequisites": [
+        {"ar": "تقرير فني للإنهاء معتمد", "en": "Approved termination technical report"},
+        {"ar": "سداد جميع المستحقات المالية", "en": "All financial dues settled"}
+      ],
+      "requiredDocuments": [
+        {"name": {"ar": "محضر المعاينة المشتركة", "en": "Joint inspection record"}, "formats": ["pdf"]},
+        {"name": {"ar": "براءة ذمة مالية", "en": "Financial clearance"}, "formats": ["pdf"]}
+      ],
+      "formFields": [
+        {"key": "contractNo", "label": {"ar": "رقم العقد", "en": "Contract number"}, "type": "text", "required": true},
+        {"key": "handoverDate", "label": {"ar": "تاريخ التسليم المقترح", "en": "Proposed handover date"}, "type": "date", "required": true}
+      ],
+      "fees": {"model": "none", "note": {"ar": "بدون رسوم", "en": "No fees"}},
+      "slaDays": 5,
+      "supportingEntities": ["madinati-offices"],
+      "gigaFastTrack": false,
+      "workflowHint": ["screening", "technical", "decision"]
+    },
+    {
+      "id": "modon-building-permit",
+      "name": {"ar": "طلب رخصة بناء مُدن", "en": "MODON Building Permit Request"},
+      "category": "building",
+      "phase": "during",
+      "personas": ["investor", "developer", "engineering_office"],
+      "description": {"ar": "طلب رخصة بناء للمشاريع الصناعية داخل نطاق مُدن ضمن رحلة المشاريع الصناعية، بالتوازي مع اعتماد المخططات (مخطط عام ومخطط سلامة).", "en": "Building permit request for industrial projects within MODON boundaries per the industrial journey, alongside plans approval (general layout and safety plan)."},
+      "prerequisites": [
+        {"ar": "توقيع العقد مع مُدن", "en": "Contract signed with MODON"},
+        {"ar": "اعتماد المخططات (مخطط عام ومخطط سلامة)", "en": "Plans approved (general layout and safety plan)"}
+      ],
+      "requiredDocuments": [
+        {"name": {"ar": "عقد مُدن", "en": "MODON contract"}, "formats": ["pdf"]},
+        {"name": {"ar": "المخطط العام ومخطط السلامة المعتمدان", "en": "Approved general layout and safety plan"}, "formats": ["pdf", "dwg"]}
+      ],
+      "formFields": [
+        {"key": "modonContractNo", "label": {"ar": "رقم عقد مُدن", "en": "MODON contract number"}, "type": "text", "required": true},
+        {"key": "industrialActivity", "label": {"ar": "النشاط الصناعي", "en": "Industrial activity"}, "type": "text", "required": true},
+        {"key": "builtUpArea", "label": {"ar": "مسطحات البناء (م²)", "en": "Built-up area (sqm)"}, "type": "number", "required": true}
+      ],
+      "fees": {"model": "tariff", "note": {"ar": "وفق تعرفة مُدن ولائحة الرسوم البلدية", "en": "Per MODON tariff and the municipal fees schedule"}},
+      "slaDays": 10,
+      "supportingEntities": ["modon", "civil-defense", "gd-building-permits"],
+      "gigaFastTrack": false,
+      "workflowHint": ["screening", "external", "decision"]
+    },
+    {
+      "id": "giga-project-onboarding",
+      "name": {"ar": "تسجيل مشروع كبير في السجل الموحد", "en": "Giga Project Onboarding to the Unified Registry"},
+      "category": "enablement",
+      "phase": "before",
+      "personas": ["giga_entity"],
+      "description": {"ar": "تسجيل المشروع الكبير في السجل الموحد للمشاريع الكبرى (بيانات المشروع، الموقع الجغرافي، المرحلة، الخدمات المطلوبة، الحالة) وتفعيل مسار الأولوية وحوكمة مكتب المشاريع الكبرى.", "en": "Register the giga project in the unified registry (project data, geographic location, phase, required services, status) and activate the priority lane and Giga Projects Office governance."},
+      "prerequisites": [
+        {"ar": "خطاب تفويض ممثل المشروع", "en": "Project representative authorization letter"},
+        {"ar": "اعتماد إدراج المشروع من مدير مكتب المشاريع الكبرى", "en": "Project inclusion approved by the Giga Projects Office manager"}
+      ],
+      "requiredDocuments": [
+        {"name": {"ar": "ملف تعريف المشروع", "en": "Project profile"}, "formats": ["pdf"]},
+        {"name": {"ar": "الحدود الجغرافية للمشروع", "en": "Project geographic boundary"}, "formats": ["kml", "shp", "geojson"]}
+      ],
+      "formFields": [
+        {"key": "projectName", "label": {"ar": "اسم المشروع", "en": "Project name"}, "type": "text", "required": true},
+        {"key": "owner", "label": {"ar": "الجهة المالكة", "en": "Owning entity"}, "type": "text", "required": true},
+        {"key": "sector", "label": {"ar": "القطاع", "en": "Sector"}, "type": "select", "options": [{"ar": "ترفيه وسياحة", "en": "Entertainment and tourism"}, {"ar": "سكني", "en": "Residential"}, {"ar": "بنية تحتية ونقل", "en": "Infrastructure and transport"}, {"ar": "ثقافة وتراث", "en": "Culture and heritage"}, {"ar": "مختلط", "en": "Mixed-use"}], "required": true},
+        {"key": "boundary", "label": {"ar": "الموقع الجغرافي", "en": "Geographic location"}, "type": "map-point", "required": true},
+        {"key": "phase", "label": {"ar": "المرحلة", "en": "Phase"}, "type": "select", "options": [{"ar": "تخطيط", "en": "Planning"}, {"ar": "تطوير", "en": "Development"}, {"ar": "تشغيل", "en": "Operation"}], "required": true}
+      ],
+      "fees": {"model": "none", "note": {"ar": "بدون رسوم", "en": "No fees"}},
+      "slaDays": 3,
+      "supportingEntities": ["gpo"],
+      "gigaFastTrack": true,
+      "workflowHint": ["screening", "decision"]
+    },
+    {
+      "id": "challenge-escalation",
+      "name": {"ar": "تسجيل تحدٍ ومتابعة معالجته", "en": "Challenge Registration and Resolution Tracking"},
+      "category": "enablement",
+      "phase": "during",
+      "personas": ["giga_entity", "developer", "investor", "operator"],
+      "description": {"ar": "تسجيل وتصنيف تحديات المشاريع الكبرى، وتحديد الجهة المسؤولة، واقتراح الحلول ومتابعة الإغلاق وقياس مدة المعالجة وفق منهجية التشغيل.", "en": "Register and classify giga-project challenges, assign the responsible entity, propose solutions, track closure and measure resolution time per the operating methodology."},
+      "prerequisites": [
+        {"ar": "مشروع مسجل في السجل الموحد", "en": "Project registered in the unified registry"}
+      ],
+      "requiredDocuments": [
+        {"name": {"ar": "مذكرة وصف التحدي وأثره", "en": "Challenge description and impact memo"}, "formats": ["pdf", "docx"]}
+      ],
+      "formFields": [
+        {"key": "projectId", "label": {"ar": "المشروع", "en": "Project"}, "type": "select", "options": [], "required": true},
+        {"key": "category", "label": {"ar": "تصنيف التحدي", "en": "Challenge category"}, "type": "select", "options": [{"ar": "تنظيمي", "en": "Regulatory"}, {"ar": "تنسيق جهات", "en": "Inter-entity coordination"}, {"ar": "بنية تحتية", "en": "Infrastructure"}, {"ar": "تصاريح", "en": "Permits"}, {"ar": "رسوم ومقابل مالي", "en": "Fees and financial consideration"}, {"ar": "فني", "en": "Technical"}], "required": true},
+        {"key": "impact", "label": {"ar": "الأثر على المشروع", "en": "Impact on the project"}, "type": "textarea", "required": true},
+        {"key": "targetDate", "label": {"ar": "التاريخ المستهدف للحل", "en": "Target resolution date"}, "type": "date", "required": false}
+      ],
+      "fees": {"model": "none", "note": {"ar": "بدون رسوم", "en": "No fees"}},
+      "slaDays": 15,
+      "supportingEntities": ["gpo"],
+      "gigaFastTrack": true,
+      "workflowHint": ["screening", "technical", "external", "decision"]
+    }
+  ],
+  "entities": [
+    {"id": "gpo", "name": {"ar": "مكتب المشاريع الكبرى", "en": "Giga Projects Office"}, "type": "internal"},
+    {"id": "gd-urban-planning", "name": {"ar": "الإدارة العامة للتخطيط العمراني", "en": "General Directorate of Urban Planning"}, "type": "internal"},
+    {"id": "gd-building-permits", "name": {"ar": "الإدارة العامة لرخص البناء", "en": "General Directorate of Building Permits"}, "type": "internal"},
+    {"id": "gd-survey", "name": {"ar": "الإدارة العامة للمساحة", "en": "General Directorate of Survey"}, "type": "internal"},
+    {"id": "construction-projects-agency", "name": {"ar": "وكالة التعمير والمشاريع", "en": "Construction and Projects Agency"}, "type": "internal"},
+    {"id": "sub-municipalities", "name": {"ar": "البلديات الفرعية", "en": "Sub-Municipalities"}, "type": "internal"},
+    {"id": "madinati-offices", "name": {"ar": "مكاتب مدينتي", "en": "Madinati Offices"}, "type": "internal"},
+    {"id": "sec", "name": {"ar": "الشركة السعودية للكهرباء", "en": "Saudi Electricity Company"}, "type": "external"},
+    {"id": "nwc", "name": {"ar": "شركة المياه الوطنية", "en": "National Water Company"}, "type": "external"},
+    {"id": "telecom-operators", "name": {"ar": "شركات الاتصالات", "en": "Telecom Operators"}, "type": "external"},
+    {"id": "civil-defense", "name": {"ar": "الدفاع المدني", "en": "Civil Defense"}, "type": "external"},
+    {"id": "ncec", "name": {"ar": "المركز الوطني للرقابة على الالتزام البيئي", "en": "National Center for Environmental Compliance"}, "type": "external"},
+    {"id": "rcrc", "name": {"ar": "الهيئة الملكية لمدينة الرياض", "en": "Royal Commission for Riyadh City"}, "type": "external"},
+    {"id": "rega", "name": {"ar": "الهيئة العامة للعقار", "en": "Real Estate General Authority"}, "type": "external"},
+    {"id": "sfda", "name": {"ar": "الهيئة العامة للغذاء والدواء", "en": "Saudi Food and Drug Authority"}, "type": "external"},
+    {"id": "modon", "name": {"ar": "مُدن - الهيئة السعودية للمدن الصناعية ومناطق التقنية", "en": "MODON - Saudi Authority for Industrial Cities and Technology Zones"}, "type": "external"},
+    {"id": "ministry-of-energy", "name": {"ar": "وزارة الطاقة", "en": "Ministry of Energy"}, "type": "external"},
+    {"id": "gami", "name": {"ar": "الهيئة العامة للصناعات العسكرية", "en": "General Authority for Military Industries"}, "type": "external"},
+    {"id": "traffic-department", "name": {"ar": "الإدارة العامة للمرور", "en": "General Traffic Department"}, "type": "external"},
+    {"id": "gaca", "name": {"ar": "الهيئة العامة للطيران المدني", "en": "General Authority of Civil Aviation"}, "type": "external"}
+  ],
+  "gigaProjects": [
+    {"id": "diriyah", "name": {"ar": "بوابة الدرعية", "en": "Diriyah"}, "owner": {"ar": "شركة الدرعية", "en": "Diriyah Company"}, "developer": {"ar": "شركة الدرعية", "en": "Diriyah Company"}, "sector": {"ar": "ثقافة وتراث", "en": "Culture and heritage"}, "phase": "development", "status": {"ar": "تحت التنفيذ", "en": "Under construction"}, "lat": 24.7341, "lng": 46.5765, "areaKm2": 14.0, "description": {"ar": "تطوير الدرعية التاريخية وحي الطريف المسجل في اليونسكو كوجهة ثقافية وتراثية عالمية.", "en": "Development of historic Diriyah and the UNESCO-listed At-Turaif district into a global cultural and heritage destination."}, "monogram": "DG"},
+    {"id": "qiddiya", "name": {"ar": "القدية", "en": "Qiddiya"}, "owner": {"ar": "شركة القدية للاستثمار", "en": "Qiddiya Investment Company"}, "developer": {"ar": "شركة القدية للاستثمار", "en": "Qiddiya Investment Company"}, "sector": {"ar": "ترفيه وسياحة", "en": "Entertainment and tourism"}, "phase": "development", "status": {"ar": "تحت التنفيذ", "en": "Under construction"}, "lat": 24.6086, "lng": 46.0284, "areaKm2": 334.0, "description": {"ar": "مدينة الترفيه والرياضة والفنون جنوب غرب الرياض.", "en": "The entertainment, sports and arts city southwest of Riyadh."}, "monogram": "QD"},
+    {"id": "king-salman-park", "name": {"ar": "حديقة الملك سلمان", "en": "King Salman Park"}, "owner": {"ar": "مؤسسة حديقة الملك سلمان", "en": "King Salman Park Foundation"}, "developer": {"ar": "مؤسسة حديقة الملك سلمان", "en": "King Salman Park Foundation"}, "sector": {"ar": "بيئة وجودة حياة", "en": "Environment and quality of life"}, "phase": "development", "status": {"ar": "تحت التنفيذ", "en": "Under construction"}, "lat": 24.7100, "lng": 46.7020, "areaKm2": 16.6, "description": {"ar": "أكبر حديقة حضرية في العالم على أرض مطار الرياض القديم.", "en": "The world's largest urban park on the former Riyadh airport site."}, "monogram": "KP"},
+    {"id": "sports-boulevard", "name": {"ar": "المسار الرياضي", "en": "Sports Boulevard"}, "owner": {"ar": "مؤسسة المسار الرياضي", "en": "Sports Boulevard Foundation"}, "developer": {"ar": "مؤسسة المسار الرياضي", "en": "Sports Boulevard Foundation"}, "sector": {"ar": "بيئة وجودة حياة", "en": "Environment and quality of life"}, "phase": "development", "status": {"ar": "تحت التنفيذ", "en": "Under construction"}, "lat": 24.7595, "lng": 46.6396, "areaKm2": 3.5, "description": {"ar": "مسار رياضي وترفيهي بطول 135 كم يمتد من وادي حنيفة إلى وادي السلي.", "en": "A 135 km sports and leisure corridor from Wadi Hanifah to Wadi Al Sulai."}, "monogram": "SB"},
+    {"id": "new-murabba", "name": {"ar": "المربع الجديد", "en": "New Murabba"}, "owner": {"ar": "شركة المربع الجديد للتطوير", "en": "New Murabba Development Company"}, "developer": {"ar": "شركة المربع الجديد للتطوير", "en": "New Murabba Development Company"}, "sector": {"ar": "مختلط", "en": "Mixed-use"}, "phase": "development", "status": {"ar": "تحت التنفيذ", "en": "Under construction"}, "lat": 24.7710, "lng": 46.5990, "areaKm2": 19.0, "description": {"ar": "وسط مدينة حديث شمال غرب الرياض يضم المكعب (Mukaab) كمعلم رئيسي.", "en": "A modern downtown in northwest Riyadh anchored by the Mukaab landmark."}, "monogram": "NM"},
+    {"id": "roshn-sedra", "name": {"ar": "روشن - سدرة", "en": "ROSHN Sedra"}, "owner": {"ar": "مجموعة روشن", "en": "ROSHN Group"}, "developer": {"ar": "مجموعة روشن", "en": "ROSHN Group"}, "sector": {"ar": "سكني", "en": "Residential"}, "phase": "development", "status": {"ar": "تسليم مراحل وتنفيذ مراحل لاحقة", "en": "Phased handover with later phases under construction"}, "lat": 24.8690, "lng": 46.7010, "areaKm2": 20.0, "description": {"ar": "مجتمع سكني متكامل شمال الرياض ضمن محفظة روشن الوطنية.", "en": "An integrated residential community in north Riyadh within ROSHN's national portfolio."}, "monogram": "RS"},
+    {"id": "ksia", "name": {"ar": "مطار الملك سلمان الدولي", "en": "King Salman International Airport"}, "owner": {"ar": "شركة مطار الملك سلمان الدولي للتطوير", "en": "King Salman International Airport Development Company"}, "developer": {"ar": "شركة مطار الملك سلمان الدولي للتطوير", "en": "King Salman International Airport Development Company"}, "sector": {"ar": "بنية تحتية ونقل", "en": "Infrastructure and transport"}, "phase": "development", "status": {"ar": "تحت التنفيذ", "en": "Under construction"}, "lat": 24.9578, "lng": 46.6990, "areaKm2": 57.0, "description": {"ar": "توسعة مطار الرياض ليصبح من أكبر مطارات العالم بست مدارج.", "en": "Expansion of Riyadh's airport into one of the world's largest with six runways."}, "monogram": "KA"},
+    {"id": "expo-2030", "name": {"ar": "موقع إكسبو 2030 الرياض", "en": "Expo 2030 Riyadh Site"}, "owner": {"ar": "شركة إكسبو 2030 الرياض", "en": "Expo 2030 Riyadh Company"}, "developer": {"ar": "شركة إكسبو 2030 الرياض", "en": "Expo 2030 Riyadh Company"}, "sector": {"ar": "معارض وفعاليات دولية", "en": "International exhibitions and events"}, "phase": "development", "status": {"ar": "تحت التنفيذ", "en": "Under construction"}, "lat": 24.9350, "lng": 46.5510, "areaKm2": 6.0, "description": {"ar": "موقع معرض إكسبو الدولي 2030 شمال الرياض قرب مطار الملك سلمان الدولي.", "en": "The Expo 2030 world exposition site in north Riyadh near King Salman International Airport."}, "monogram": "EX"},
+    {"id": "misk-city", "name": {"ar": "مدينة مسك", "en": "Misk City"}, "owner": {"ar": "مؤسسة محمد بن سلمان (مسك)", "en": "Mohammed bin Salman Foundation (Misk)"}, "developer": {"ar": "مدينة مسك", "en": "Misk City"}, "sector": {"ar": "تعليم وابتكار", "en": "Education and innovation"}, "phase": "development", "status": {"ar": "تشغيل جزئي وتنفيذ مراحل", "en": "Partial operation with phases under construction"}, "lat": 24.7060, "lng": 46.5660, "areaKm2": 3.6, "description": {"ar": "أول مدينة غير ربحية في العالم مخصصة لتمكين الشباب والابتكار ضمن نطاق الدرعية.", "en": "The world's first non-profit city dedicated to youth empowerment and innovation within the Diriyah area."}, "monogram": "MC"},
+    {"id": "green-riyadh", "name": {"ar": "الرياض الخضراء", "en": "Green Riyadh"}, "owner": {"ar": "الهيئة الملكية لمدينة الرياض", "en": "Royal Commission for Riyadh City"}, "developer": {"ar": "برنامج الرياض الخضراء", "en": "Green Riyadh Program"}, "sector": {"ar": "بيئة وجودة حياة", "en": "Environment and quality of life"}, "phase": "development", "status": {"ar": "تنفيذ مستمر على مستوى المدينة", "en": "Ongoing citywide implementation"}, "lat": 24.7136, "lng": 46.6753, "areaKm2": 541.0, "description": {"ar": "برنامج تشجير الرياض بزراعة 7.5 مليون شجرة لرفع نصيب الفرد من المساحات الخضراء.", "en": "Riyadh's afforestation program planting 7.5 million trees to raise green space per capita."}, "monogram": "GR"}
+  ],
+  "challengeCategories": [
+    {"id": "regulatory", "name": {"ar": "تنظيمي", "en": "Regulatory"}},
+    {"id": "coordination", "name": {"ar": "تنسيق جهات", "en": "Inter-entity coordination"}},
+    {"id": "infrastructure", "name": {"ar": "بنية تحتية", "en": "Infrastructure"}},
+    {"id": "permits", "name": {"ar": "تصاريح", "en": "Permits"}},
+    {"id": "fees", "name": {"ar": "رسوم ومقابل مالي", "en": "Fees and financial consideration"}},
+    {"id": "technical", "name": {"ar": "فني", "en": "Technical"}}
+  ],
+  "slaPolicy": {
+    "workingDays": ["sun", "mon", "tue", "wed", "thu"],
+    "fastTrackMultiplier": 0.5,
+    "fastTrackRounding": "up",
+    "pauseOnReturnToCustomer": true,
+    "thresholds": {
+      "amberPct": 80,
+      "redPct": 100
+    },
+    "escalationLadder": [
+      {"level": 1, "atPctOfSla": 80, "state": "amber", "from": {"ar": "أخصائي بلدي", "en": "Municipal specialist"}, "to": {"ar": "رئيس القسم", "en": "Section head"}, "action": {"ar": "تنبيه استباقي ومتابعة يومية للطلب", "en": "Proactive alert and daily follow-up on the request"}},
+      {"level": 2, "atPctOfSla": 100, "state": "red", "from": {"ar": "رئيس القسم", "en": "Section head"}, "to": {"ar": "مدير مكتب المشاريع الكبرى", "en": "Giga Projects Office director"}, "action": {"ar": "تصعيد رسمي مع خطة معالجة خلال يومي عمل", "en": "Formal escalation with a remediation plan within two working days"}},
+      {"level": 3, "atPctOfSla": 120, "state": "red", "from": {"ar": "مدير مكتب المشاريع الكبرى", "en": "Giga Projects Office director"}, "to": {"ar": "مكتب الأمين", "en": "Mayor's office"}, "action": {"ar": "عرض الحالة ضمن تقرير التصعيدات الأسبوعي لمكتب الأمين", "en": "Case presented in the weekly escalations report to the Mayor's office"}}
+    ]
+  },
+  "satisfaction": {
+    "trigger": {"ar": "يُرسل استبيان الرضا تلقائياً عند إغلاق الطلب أو التحدي", "en": "The satisfaction survey is sent automatically upon request or challenge closure"},
+    "questions": [
+      {"id": "q-speed", "text": {"ar": "ما مدى رضاك عن سرعة إنجاز طلبك والالتزام بالمدة المعلنة؟", "en": "How satisfied are you with the processing speed and adherence to the announced duration?"}},
+      {"id": "q-clarity", "text": {"ar": "ما مدى وضوح المتطلبات والملاحظات التي وصلتك خلال معالجة الطلب؟", "en": "How clear were the requirements and remarks you received during processing?"}},
+      {"id": "q-coordination", "text": {"ar": "ما مدى رضاك عن تنسيق المنصة مع الجهات الداعمة وتمكين مشروعك؟", "en": "How satisfied are you with the platform's coordination with supporting entities and the enablement of your project?"}}
+    ],
+    "scale": [
+      {"value": 1, "label": {"ar": "غير راضٍ إطلاقاً", "en": "Very dissatisfied"}},
+      {"value": 2, "label": {"ar": "غير راضٍ", "en": "Dissatisfied"}},
+      {"value": 3, "label": {"ar": "محايد", "en": "Neutral"}},
+      {"value": 4, "label": {"ar": "راضٍ", "en": "Satisfied"}},
+      {"value": 5, "label": {"ar": "راضٍ جداً", "en": "Very satisfied"}}
+    ]
+  }
+}

@@ -1,0 +1,201 @@
+/* ============================================================
+   "Riyadh Sovereign" design tokens — ux-spec §2–§5 verbatim.
+   ============================================================ */
+:root {
+  /* ---- Green ramp (brand: RRM logo green #0E6A3F) ---- */
+  --green-50:  #F2F8F4;
+  --green-100: #E3F0E8;
+  --green-200: #C5E1D1;
+  --green-300: #97C8AC;
+  --green-400: #5FA983;
+  --green-500: #2E8A5F;
+  --green-600: #0E6A3F;
+  --green-700: #0C5A36;
+  --green-800: #0B4F30;
+  --green-900: #093D26;
+  --green-950: #062819;
+
+  /* ---- Warm neutral ramp (paper) ---- */
+  --neutral-0:   #FFFFFF;
+  --neutral-50:  #F8F7F4;
+  --neutral-100: #F1F0EC;
+  --neutral-200: #E6E4DE;
+  --neutral-300: #D3D1C9;
+  --neutral-400: #A9A89F;
+  --neutral-500: #7D7C73;
+  --neutral-600: #5D5D55;
+  --neutral-700: #45463F;
+  --neutral-800: #2E302B;
+  --neutral-900: #1D1F1B;
+  --neutral-950: #131512;
+
+  /* ---- Roles ---- */
+  --bg:        var(--neutral-50);
+  --surface:   var(--neutral-0);
+  --surface-2: #FCFBF9;
+  --ink:       #14201A;
+  --ink-2:     #3B4740;
+  --mut:       #6C7871;
+  --faint:     #96A19A;
+  --accent:       var(--green-600);
+  --accent-hover: #0C5A36;
+  --accent-press: #0B4F30;
+  --accent-soft:  #EDF5F0;
+  --accent-softer:#F4F9F6;
+  --on-accent: #FFFFFF;
+
+  /* ---- Sandstone (ceremonial only) ---- */
+  --sand:      #B8963E;
+  --sand-deep: #8A6F3F;
+  --sand-soft: #F6F0DF;
+  --sand-border: rgba(184,150,62,.35);
+
+  /* ---- Hairlines ---- */
+  --hair:   rgba(20,32,26,.10);
+  --hair-2: rgba(20,32,26,.055);
+  --hair-3: rgba(20,32,26,.16);
+
+  /* ---- Semantic ---- */
+  --ok:      #0E7A46;  --ok-bg:      #E9F4EE;  --ok-border:      rgba(14,122,70,.22);
+  --warn:    #9A6A15;  --warn-bg:    #FAF2E1;  --warn-border:    rgba(154,106,21,.24);
+  --danger:  #A63B2A;  --danger-bg:  #F9ECE8;  --danger-border:  rgba(166,59,42,.22);
+  --info:    #33628F;  --info-bg:    #EBF1F7;  --info-border:    rgba(51,98,143,.22);
+
+  /* ---- Glass ---- */
+  --glass-blur: 18px;
+  --glass-sat: 1.5;
+  --glass-tint:  rgba(252,251,249,.82);
+  --glass-tint-strong: rgba(252,251,249,.92);
+  --glass-hair:  rgba(20,32,26,.08);
+
+  /* ---- Shadows ---- */
+  --shadow-1: 0 1px 2px rgba(20,32,26,.04), 0 8px 24px rgba(20,32,26,.05);
+  --shadow-2: 0 2px 4px rgba(20,32,26,.05), 0 16px 40px rgba(20,32,26,.09);
+  --shadow-3: 0 4px 10px rgba(20,32,26,.07), 0 28px 64px rgba(20,32,26,.13);
+  --shadow-4: 0 8px 18px rgba(20,32,26,.09), 0 44px 96px rgba(20,32,26,.17);
+
+  --focus-ring: 0 0 0 3px rgba(14,106,63,.28);
+  --scrim: rgba(10,15,12,.44);
+
+  /* ---- Status palette: 12 request states ---- */
+  --st-draft-fg:#5D5D55;            --st-draft-bg:#F1F0EC;            --st-draft-bd:rgba(93,93,85,.22);
+  --st-submitted-fg:#3E5C82;        --st-submitted-bg:#EDF2F8;        --st-submitted-bd:rgba(62,92,130,.22);
+  --st-screening-fg:#2A6E69;        --st-screening-bg:#E9F4F3;        --st-screening-bd:rgba(42,110,105,.22);
+  --st-in_review-fg:#4A4E8F;        --st-in_review-bg:#EEEFF8;        --st-in_review-bd:rgba(74,78,143,.22);
+  --st-returned-fg:#9A6A15;         --st-returned-bg:#FAF2E1;         --st-returned-bd:rgba(154,106,21,.24);
+  --st-resubmitted-fg:#2E6E8A;      --st-resubmitted-bg:#EAF3F7;      --st-resubmitted-bd:rgba(46,110,138,.22);
+  --st-external_review-fg:#6E4E86;  --st-external_review-bg:#F3EFF8;  --st-external_review-bd:rgba(110,78,134,.22);
+  --st-decision_due-fg:#A05320;     --st-decision_due-bg:#FAEFE5;     --st-decision_due-bd:rgba(160,83,32,.24);
+  --st-approved-fg:#0E6A3F;         --st-approved-bg:#E9F4EE;         --st-approved-bd:rgba(14,106,63,.24);
+  --st-rejected-fg:#A63B2A;         --st-rejected-bg:#F9ECE8;         --st-rejected-bd:rgba(166,59,42,.22);
+  --st-cancelled-fg:#75726B;        --st-cancelled-bg:#F3F2EF;        --st-cancelled-bd:rgba(117,114,107,.28);
+  --st-closed-fg:#3E5548;           --st-closed-bg:#EDF2EF;           --st-closed-bd:rgba(62,85,72,.22);
+
+  /* ---- Chart palette ---- */
+  --ch-1: #0E6A3F;
+  --ch-2: #33628F;
+  --ch-3: #B8963E;
+  --ch-4: #4E8C8C;
+  --ch-5: #8A5A83;
+  --ch-6: #8D8B80;
+  --ch-grid: var(--hair-2);
+  --ch-axis: var(--mut);
+
+  /* ---- Map ---- */
+  --map-bg: #F4F3EE;
+  --map-district: #EDECE5;
+
+  /* ---- Type families ---- */
+  --ff-display: "IBM Plex Sans Arabic", -apple-system, "SF Pro Display", "Segoe UI", sans-serif;
+  --ff-text:    "Cairo", -apple-system, "SF Pro Text", "Segoe UI", sans-serif;
+  --ff-latin:   -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+
+  /* ---- Spacing (8pt + half-step) ---- */
+  --sp-05: 4px;  --sp-1: 8px;  --sp-15: 12px; --sp-2: 16px; --sp-3: 24px;
+  --sp-4: 32px;  --sp-5: 40px; --sp-6: 48px;  --sp-8: 64px; --sp-10: 80px; --sp-12: 96px;
+
+  /* ---- Containers & shell ---- */
+  --container-app: 1560px;
+  --container-content: 1140px;
+  --container-narrow: 720px;
+  --rail-expanded: 264px;
+  --rail-collapsed: 72px;
+  --topbar-h: 64px;
+  --bottomtab-h: 60px;
+
+  /* ---- Radii ---- */
+  --r-sm: 10px; --r-md: 14px; --r-lg: 20px; --r-xl: 28px; --r-full: 999px;
+
+  /* ---- Motion ---- */
+  --dur-fast:  150ms;
+  --dur-base:  240ms;
+  --dur-gentle:400ms;
+  --dur-hero:  700ms;
+  --ease-standard:  cubic-bezier(0.4, 0.0, 0.2, 1);
+  --ease-decelerate:cubic-bezier(0.0, 0.0, 0.2, 1);
+  --ease-accelerate:cubic-bezier(0.4, 0.0, 1, 1);
+  --ease-spring:    cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+/* ============ Dark theme — elevated dark, never #000 ============ */
+[data-theme="dark"] {
+  --bg:        #151814;
+  --surface:   #1C201C;
+  --surface-2: #232823;
+  --ink:       #EDF0EC;
+  --ink-2:     #C0C7C1;
+  --mut:       #8B948C;
+  --faint:     #626A63;
+  --accent:       #4FA97B;
+  --accent-hover: #63B98C;
+  --accent-press: #3F9169;
+  --accent-soft:  rgba(79,169,123,.14);
+  --accent-softer:rgba(79,169,123,.08);
+  --on-accent: #0B2015;
+
+  --sand:      #CBAA5C;
+  --sand-deep: #A98C50;
+  --sand-soft: rgba(203,170,92,.13);
+  --sand-border: rgba(203,170,92,.35);
+
+  --hair:   rgba(237,240,236,.10);
+  --hair-2: rgba(237,240,236,.055);
+  --hair-3: rgba(237,240,236,.17);
+
+  --ok:      #55B383;  --ok-bg:      rgba(85,179,131,.13);  --ok-border:      rgba(85,179,131,.30);
+  --warn:    #D3A64E;  --warn-bg:    rgba(211,166,78,.12);  --warn-border:    rgba(211,166,78,.30);
+  --danger:  #D97B67;  --danger-bg:  rgba(217,123,103,.12); --danger-border:  rgba(217,123,103,.30);
+  --info:    #7FA8CF;  --info-bg:    rgba(127,168,207,.12); --info-border:    rgba(127,168,207,.30);
+
+  --glass-blur: 18px;
+  --glass-sat: 1.4;
+  --glass-tint:  rgba(24,27,24,.78);
+  --glass-tint-strong: rgba(24,27,24,.90);
+  --glass-hair:  rgba(237,240,236,.09);
+
+  --shadow-1: 0 1px 2px rgba(0,0,0,.20), 0 8px 24px rgba(0,0,0,.28);
+  --shadow-2: 0 2px 4px rgba(0,0,0,.24), 0 16px 40px rgba(0,0,0,.38);
+  --shadow-3: 0 4px 10px rgba(0,0,0,.28), 0 28px 64px rgba(0,0,0,.46);
+  --shadow-4: 0 8px 18px rgba(0,0,0,.32), 0 44px 96px rgba(0,0,0,.55);
+
+  --focus-ring: 0 0 0 3px rgba(79,169,123,.35);
+  --scrim: rgba(0,0,0,.6);
+
+  --st-draft-bg:rgba(93,93,85,.14);            --st-draft-fg:#B9B8B0;
+  --st-submitted-bg:rgba(110,140,175,.14);     --st-submitted-fg:#9FBBDA;
+  --st-screening-bg:rgba(74,150,144,.14);      --st-screening-fg:#83C2BD;
+  --st-in_review-bg:rgba(120,124,190,.14);     --st-in_review-fg:#ADB0DF;
+  --st-returned-bg:rgba(211,166,78,.13);       --st-returned-fg:#D3A64E;
+  --st-resubmitted-bg:rgba(88,160,190,.14);    --st-resubmitted-fg:#8FC4DD;
+  --st-external_review-bg:rgba(160,124,190,.14);--st-external_review-fg:#C3A6DC;
+  --st-decision_due-bg:rgba(210,130,70,.14);   --st-decision_due-fg:#DFA477;
+  --st-approved-bg:rgba(79,169,123,.14);       --st-approved-fg:#4FA97B;
+  --st-rejected-bg:rgba(217,123,103,.13);      --st-rejected-fg:#D97B67;
+  --st-cancelled-bg:rgba(150,148,140,.12);     --st-cancelled-fg:#A6A49C;
+  --st-closed-bg:rgba(110,140,120,.14);        --st-closed-fg:#9DBCA9;
+
+  --ch-1:#4FA97B; --ch-2:#6E9CC7; --ch-3:#CBAA5C; --ch-4:#6FB0B0; --ch-5:#B085A9; --ch-6:#8B948C;
+
+  --map-bg: #1A1D1A;
+  --map-district: #212521;
+}

@@ -1,0 +1,66 @@
+/* ============================================================
+   Print — A4 permit/certificate & report sheets. ux-spec §6.20.
+   ============================================================ */
+.print-root { display: none; }
+
+@media print {
+  @page { size: A4; margin: 18mm; }
+
+  body { background: #fff !important; color: #14201A !important; font-size: 11pt; }
+  .app-root, .toast-root, #overlay-root { display: none !important; }
+  .print-root { display: block !important; }
+
+  .print-sheet { font-family: var(--ff-text); color: #14201A; }
+  .print-sheet * { box-shadow: none !important; }
+
+  .p-head {
+    display: flex; align-items: center; justify-content: space-between; gap: 8mm;
+    padding-block-end: 4mm;
+  }
+  .p-head .p-org { text-align: center; }
+  .p-head .p-org .o1 { font-family: var(--ff-display); font-weight: 700; font-size: 16pt; color: #0B4F30; }
+  .p-head .p-org .o2 { font-size: 9pt; color: #5D5D55; letter-spacing: .5px; }
+  .p-head .p-org .o3 { font-size: 9pt; color: #5D5D55; margin-top: 1mm; }
+  .p-head img { width: 22mm; height: auto; }
+  .p-rule { border: 0; border-top: 2px solid #0B4F30; margin: 0; }
+  .p-rule2 { border: 0; border-top: .5pt solid #C9CBC4; margin-top: 2mm; }
+
+  .p-title { text-align: center; margin-block: 8mm 6mm; }
+  .p-title .t { font-family: var(--ff-display); font-size: 17pt; font-weight: 700; color: #0B4F30; }
+  .p-title .no { font-family: var(--ff-display); font-size: 12pt; margin-top: 2mm; direction: ltr; }
+
+  .p-grid { display: grid; grid-template-columns: 1fr 1fr; border: .5pt solid #C9CBC4; }
+  .p-grid > div { padding: 3mm 4mm; border-bottom: .5pt solid #C9CBC4; }
+  .p-grid > div:nth-child(odd) { border-inline-end: .5pt solid #C9CBC4; }
+  .p-grid .pk { font-size: 8.5pt; color: #7D7C73; font-family: var(--ff-display); }
+  .p-grid .pv { font-size: 11pt; font-weight: 600; margin-top: 1mm; }
+
+  .p-conditions { margin-block: 6mm; }
+  .p-conditions h4 { font-family: var(--ff-display); font-size: 11pt; color: #0B4F30; margin-bottom: 2mm; }
+  .p-conditions ol { list-style: arabic-indic inside; font-size: 9.5pt; line-height: 1.9; }
+  html[lang="en"] .p-conditions ol { list-style: decimal inside; }
+
+  .p-verify {
+    display: flex; align-items: center; gap: 6mm;
+    border: .5pt solid #C9CBC4; border-radius: 3mm;
+    padding: 4mm; margin-block-start: 8mm;
+  }
+  .p-verify .v-code { font-family: var(--ff-display); font-size: 11pt; letter-spacing: 1px; direction: ltr; }
+  .p-verify .v-note { font-size: 8.5pt; color: #7D7C73; }
+  .p-verify svg { width: 20mm; height: 20mm; }
+
+  .p-sign { display: flex; justify-content: space-between; margin-block-start: 12mm; }
+  .p-sign .s-block { text-align: center; font-size: 9.5pt; }
+  .p-sign .s-line { width: 50mm; border-top: .5pt solid #14201A; margin-top: 14mm; padding-top: 2mm; }
+
+  .p-foot {
+    margin-block-start: 10mm; padding-block-start: 3mm;
+    border-top: .5pt solid #C9CBC4;
+    display: flex; justify-content: space-between;
+    font-size: 8pt; color: #7D7C73;
+  }
+
+  .p-table { width: 100%; border-collapse: collapse; margin-block: 4mm; }
+  .p-table th { background: #F1F0EC; font-family: var(--ff-display); font-size: 8.5pt; text-align: start; padding: 2.5mm 3mm; border: .5pt solid #C9CBC4; }
+  .p-table td { font-size: 9.5pt; padding: 2.5mm 3mm; border: .5pt solid #C9CBC4; }
+}
