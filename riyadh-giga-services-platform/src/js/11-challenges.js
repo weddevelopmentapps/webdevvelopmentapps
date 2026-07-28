@@ -159,12 +159,15 @@
     var S = RGP.store.state;
     var title = h("input.input", { placeholder: RGP.i18n.lang === "ar" ? "عنوان موجز للتحدي…" : "Short challenge title…" });
     var desc = h("textarea.input", { placeholder: RGP.i18n.lang === "ar" ? "الوصف والأثر على المشروع…" : "Description and project impact…" });
+    var eligible = S.projects.filter(function (p) {
+      return u.role !== "project_rep" || (u.projectIds || []).indexOf(p.id) >= 0;
+    });
+    /* a single-project representative gets their project preselected */
+    var defaultProjectId = presetProjectId || (u.role === "project_rep" && eligible.length === 1 ? eligible[0].id : null);
     var proj = h("select.input", null,
       h("option", { value: "" }, RGP.i18n.lang === "ar" ? "اختر المشروع…" : "Choose project…"),
-      S.projects.filter(function (p) {
-        return u.role !== "project_rep" || (u.projectIds || []).indexOf(p.id) >= 0;
-      }).map(function (p) {
-        return h("option", { value: p.id, selected: presetProjectId === p.id }, td(p.name));
+      eligible.map(function (p) {
+        return h("option", { value: p.id, selected: defaultProjectId === p.id }, td(p.name));
       }));
     var cat = h("select.input", null, (S.challengeCategories || []).map(function (c) {
       return h("option", { value: c.id }, td(c.name));

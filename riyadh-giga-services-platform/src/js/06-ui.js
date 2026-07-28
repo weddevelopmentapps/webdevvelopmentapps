@@ -95,6 +95,9 @@
   /* ---------------- toasts ---------------- */
   UI.toast = function (kind, title, body) {
     var root = RGP.$("#toast-root");
+    /* consecutive identical toasts collapse into one */
+    var sig = kind + "|" + JSON.stringify(title || "") + "|" + JSON.stringify(body || "");
+    if (root.firstChild && root.firstChild._toastSig === sig) return root.firstChild;
     while (root.children.length >= 3) root.removeChild(root.lastChild);
     var iconName = kind === "ok" ? "checkCircle" : kind === "danger" ? "xCircle" : kind === "warn" ? "alert" : "infoC";
     var el = h("div.toast." + (kind === "success" ? "ok" : kind), { role: "status" },
@@ -103,6 +106,7 @@
         h("div.t-title", null, td(title)),
         body ? h("div.t-body", null, td(body)) : null),
       h("button.iconbtn", { "aria-label": "close", onclick: function () { dismiss(); } }, UI.icon("x", 14)));
+    el._toastSig = sig;
     root.prepend(el);
     var t = null;
     function dismiss() {
@@ -110,9 +114,16 @@
       el.classList.add("leaving");
       setTimeout(function () { el.remove(); }, 160);
     }
-    if (kind !== "danger") t = setTimeout(dismiss, 5000);
+    t = setTimeout(dismiss, kind === "danger" ? 8000 : 5000);
     return el;
   };
+
+  /* an identity change invalidates every floating layer of the previous session */
+  RGP.bus.on("auth:changed", function () {
+    var tr = RGP.$("#toast-root"); if (tr) tr.innerHTML = "";
+    var or = RGP.$("#overlay-root"); if (or) or.innerHTML = "";
+    RGP.$$(".menu").forEach(function (m) { m.remove(); });
+  });
 
   /* ---------------- modal ---------------- */
   UI.modal = function (opts) {
@@ -214,7 +225,7 @@
       label = RGP.i18n.lang === "ar" ? "يستحق اليوم" : "Due today";
       if (band === "ok") band = "amber";
     } else if (band === "red" && remaining < 0) {
-      label = t("work.overdueBy") + " " + RGP.fmtWorkdays(Math.abs(remaining));
+      label = t("work.overdueBy") + " " + RGP.fmtWorkdays(Math.abs(remaining), { gen: true });
     } else if (band === "red") {
       label = t("sla.red");
     } else {

@@ -321,15 +321,16 @@
         var permitNo = RGP.store.nextPermitNo(req.serviceId);
         req.decision = {
           type: "approved", decidedAt: RGP.nowISO(), deciderId: u.id,
-          permitNo: permitNo, conditions: ctx.conditions || null, note: ctx.note || null
+          permitNo: permitNo, conditions: ctx.conditions || null, note: ctx.note || null,
+          coSigned: !!ctx.coSign
         };
         if (feeBearing) {
           /* سداد invoice (simulated — live SADAD integration at the CRM phase) */
           req.decision.sadadInvoiceNo = "SADAD-" + new Date().getFullYear() + "-" + RGP.zeroPad(100000 + (RGP.hash32(req.id + permitNo) % 900000), 6);
         }
         req.sla.breached = RGP.todayISO() > req.sla.dueAt;
-        WF.event(req, "decision", { fromState: from, toState: to, payload: { permitNo: permitNo } });
-        RGP.store.audit("request.approved", "request", req.id, { permitNo: permitNo });
+        WF.event(req, "decision", { fromState: from, toState: to, payload: { permitNo: permitNo, coSigned: req.decision.coSigned } });
+        RGP.store.audit("request.approved", "request", req.id, { permitNo: permitNo, coSigned: req.decision.coSigned });
         notifyOwner(req, "success", { ar: "تم اعتماد طلبكم — رقم الوثيقة " + permitNo, en: "Approved — document " + permitNo });
         notifyManagers(req, "success", { ar: "اعتماد طلب " + req.id, en: "Request " + req.id + " approved" });
         break;
@@ -345,11 +346,12 @@
         if (regMatch) ctx.regulationRef = td(regMatch.label);
         req.decision = {
           type: "rejected", decidedAt: RGP.nowISO(), deciderId: u.id,
-          reason: ctx.reason, regulationRef: ctx.regulationRef, note: ctx.note || null
+          reason: ctx.reason, regulationRef: ctx.regulationRef, note: ctx.note || null,
+          coSigned: !!ctx.coSign
         };
         req.sla.breached = RGP.todayISO() > req.sla.dueAt;
-        WF.event(req, "decision", { fromState: from, toState: to, payload: { reason: ctx.reason, regulationRef: ctx.regulationRef } });
-        RGP.store.audit("request.rejected", "request", req.id, { regulationRef: ctx.regulationRef });
+        WF.event(req, "decision", { fromState: from, toState: to, payload: { reason: ctx.reason, regulationRef: ctx.regulationRef, coSigned: req.decision.coSigned } });
+        RGP.store.audit("request.rejected", "request", req.id, { regulationRef: ctx.regulationRef, coSigned: req.decision.coSigned });
         notifyOwner(req, "danger", { ar: "نأسف، تم رفض طلبكم", en: "Your request was declined" });
         notifyManagers(req, "warning", { ar: "رفض طلب " + req.id, en: "Request " + req.id + " declined" });
         break;
@@ -464,20 +466,33 @@
         }
         if (band === "red" && req.sla.escalation !== "red") {
           req.sla.escalation = "red";
-          req.sla.breached = true;
+          /* «يستحق اليوم» (100% exactly) is escalated but not yet a breach */
+          var pastDue = WF.remainingDays(req) < 0;
+          req.sla.breached = pastDue;
           changed++;
           RGP.store.audit("request.escalated", "request", req.id);
           WF.event(req, "action", {
-            textAr: "تصعيد آلي: تجاوز الطلب مدته المحددة وأُشعر مدير مكتب المشاريع الكبرى",
-            textEn: "Automatic escalation: the request exceeded its allotted time; the GPO director was notified",
+            textAr: pastDue
+              ? "تصعيد آلي: تجاوز الطلب مدته المحددة وأُشعر مدير مكتب المشاريع الكبرى"
+              : "تصعيد آلي: بلغ الطلب مدته المحددة (يستحق اليوم) وأُشعر مدير مكتب المشاريع الكبرى",
+            textEn: pastDue
+              ? "Automatic escalation: the request exceeded its allotted time; the GPO director was notified"
+              : "Automatic escalation: the request reached its allotted time (due today); the GPO director was notified",
             payload: { escalated: true }
           });
           S.notify(S.managerIds().concat(req.assigneeId ? [req.assigneeId] : []), {
             kind: "danger",
-            title: { ar: "تجاوز مدة الإنجاز — تصعيد", en: "SLA breached — escalated" },
-            body: { ar: "الطلب " + req.id + " تجاوز المدة المستهدفة", en: "Request " + req.id + " exceeded its target" },
+            title: pastDue ? { ar: "تجاوز مدة الإنجاز — تصعيد", en: "SLA breached — escalated" }
+                           : { ar: "بلوغ مدة الإنجاز — تصعيد", en: "SLA due today — escalated" },
+            body: pastDue ? { ar: "الطلب " + req.id + " تجاوز المدة المستهدفة", en: "Request " + req.id + " exceeded its target" }
+                          : { ar: "الطلب " + req.id + " بلغ مدته المستهدفة اليوم", en: "Request " + req.id + " reached its target today" },
             link: "#/work/review/" + req.id
           });
+        }
+        /* a due-today escalation becomes a breach once the due date passes */
+        if (req.sla.escalation === "red" && !req.sla.breached && WF.remainingDays(req) < 0) {
+          req.sla.breached = true;
+          changed++;
         }
       }
       /* auto-close 5wd after decision */

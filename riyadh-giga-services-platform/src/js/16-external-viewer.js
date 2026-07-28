@@ -153,8 +153,8 @@
       if (red.length) out.push({
         icon: "alert", cls: "danger-fg",
         text: RGP.i18n.lang === "ar"
-          ? RGP.fmtNum(red.length, { dec: 0 }) + " طلبات تجاوزت مددها المحددة وجرى تصعيدها إلى مكتب المشاريع الكبرى."
-          : red.length + " requests breached their SLA and are escalated to the GPO."
+          ? RGP.fmtNum(red.length, { dec: 0 }) + " طلبات بلغت أو تجاوزت مددها المحددة وجرى تصعيدها إلى مكتب المشاريع الكبرى."
+          : red.length + " requests reached or exceeded their SLA and are escalated to the GPO."
       });
       if (esc.length) out.push({
         icon: "flag", cls: "warn-fg",

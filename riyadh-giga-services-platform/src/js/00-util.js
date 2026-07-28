@@ -175,13 +175,14 @@ RGP.arPlural = function (n, one, two, few, many) {
   return RGP.fmtNum(n, { dec: 0 }) + " " + many;
 };
 
-/* working-day counts with correct فصحى agreement */
+/* working-day counts with correct فصحى agreement.
+   opts.gen: genitive context (after بمقدار/منذ/خلال) — dual becomes «يومي عمل» */
 RGP.fmtWorkdays = function (n, opts) {
   var lang = RGP.i18n ? RGP.i18n.lang : "ar";
   n = Math.round(n * 10) / 10;
   if (lang === "en") return RGP.fmtNum(n, { dec: (n % 1 ? 1 : 0) }) + " working day" + (n === 1 ? "" : "s");
   if (n % 1) return RGP.fmtNum(n, { dec: 1 }) + " يوم عمل";
-  return RGP.arPlural(n, "يوم عمل واحد", "يوما عمل", "أيام عمل", "يوم عمل");
+  return RGP.arPlural(n, "يوم عمل واحد", (opts && opts.gen) ? "يومي عمل" : "يوما عمل", "أيام عمل", "يوم عمل");
 };
 
 /* relative time for timeline/notifications — correct Arabic plurals */

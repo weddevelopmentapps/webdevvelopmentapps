@@ -393,7 +393,12 @@ def form_fill(svc_id, extra=None):
         "consultantName": "مكتب العمران الهندسي",
         "contractorName": "شركة الإنشاءات الوطنية",
         "licenseNo": "LIC-2025-4471",
+        "requestRef": "TPL-2025-0441",
+        "consultant": "مكتب العمران الهندسي",
     }
+    # selects where the credible demo answer is the FIRST option (e.g. withinNpx=نعم,
+    # matching the NPX referral note rendered beside it)
+    SELECT_FIRST = {"withinNpx"}
     out = {}
     for f in SERVICES[svc_id].get("formFields", []):
         t, k = f.get("type"), f["key"]
@@ -404,7 +409,8 @@ def form_fill(svc_id, extra=None):
         elif t == "date":
             out[k] = iso(add_workdays(TODAY, 10 if "start" in k.lower() else 40))
         elif t == "select" and f.get("options"):
-            o = f["options"][1] if len(f["options"]) > 1 else f["options"][0]
+            opts_l = f["options"]
+            o = opts_l[0] if (k in SELECT_FIRST or len(opts_l) < 2) else opts_l[1]
             out[k] = o.get("v") if isinstance(o, dict) and "v" in o else (o["ar"] if isinstance(o, dict) and "ar" in o else str(o))
         elif t == "parcel-id":
             out[k] = "1010-" + str(2000 + hash(svc_id) % 7000)
@@ -710,7 +716,7 @@ CHALLENGES = [
     ch(17, "green-riyadh", None, "infrastructure", "medium", "in_progress",
        "تنسيق شبكات الري بالمياه المعالجة مع أعمال تطوير الطرق القائمة",
        "Coordinate treated-water irrigation networks with ongoing road works",
-       "nwc", 11, started_ago=9, opener="u-operator", target=20,
+       "nwc", 11, started_ago=9, opener="u-gpo-mgr", target=20,
        sol_ar="جدولة موحدة للحفريات ضمن تصريح إطاري مشترك",
        sol_en="A joint excavation schedule under a shared framework permit"),
 ]
@@ -751,6 +757,14 @@ NOTIFS = [
          title=AR("طلب جاهز لاتخاذ القرار", "Request ready for decision"),
          body=AR("RQ-2026-0188 — تصريح فعاليات (حديقة الملك سلمان)", "RQ-2026-0188 — events permit (King Salman Park)"),
          link="#/work/review/RQ-2026-0188"),
+    dict(id="ntf-9", userId="u-operator", at=ts(days_ago(1), 11), read=False, kind="info",
+         title=AR("طلبكم لدى الأمانة لاتخاذ القرار", "Your request is with the Municipality for decision"),
+         body=AR("RQ-2026-0188 — تصريح فعاليات (حديقة الملك سلمان)", "RQ-2026-0188 — events permit (King Salman Park)"),
+         link="#/portal/requests/RQ-2026-0188"),
+    dict(id="ntf-10", userId="u-operator", at=ts(days_ago(3), 14), read=False, kind="success",
+         title=AR("تم إغلاق التحدي المسجل من جهتكم", "Your logged challenge was resolved"),
+         body=AR("CH-2026-016 — توحيد نافذة الموافقات الأمنية لفعاليات الحديقة الموسمية", "CH-2026-016 — unified security-approvals window for seasonal park events"),
+         link="#/portal/challenges"),
 ]
 
 AUDIT = []

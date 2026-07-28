@@ -313,7 +313,7 @@
           h("div", null, h("h5", null, RGP.i18n.lang === "ar" ? "المنصة" : "Platform"),
             h("a", { href: "#/" }, RGP.i18n.lang === "ar" ? "الرئيسية" : "Home"),
             h("a", { href: "#services", onclick: function (e) { e.preventDefault(); document.getElementById("services").scrollIntoView(); } }, t("landing.servicesTitle")),
-            h("a", { href: "#/login" }, t("common.signin"))),
+            h("a", { href: "#/login" }, RGP.i18n.lang === "ar" ? "بوابة المستفيدين" : "Customer portal")),
           h("div", null, h("h5", null, RGP.i18n.lang === "ar" ? "الرحلات" : "Journeys"),
             h("a", { href: "#/login" }, t("phase.before")),
             h("a", { href: "#/login" }, t("phase.during")),

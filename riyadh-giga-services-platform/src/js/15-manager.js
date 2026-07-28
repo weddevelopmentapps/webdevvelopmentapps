@@ -545,7 +545,7 @@
       ["requests", t("rep.requests"), "docs"],
       ["challenges", t("rep.challenges"), "flag"],
       ["coordination", t("rep.coordination"), "globe"],
-      ["escalations", { ar: "تقرير التصعيدات الأسبوعي — مكتب الأمين", en: "Weekly escalations report — Mayor's office" }, "alert"]
+      ["escalations", td({ ar: "تقرير التصعيدات الأسبوعي — مكتب الأمين", en: "Weekly escalations report — Mayor's office" }), "alert"]
     ];
 
     function build() {
@@ -556,7 +556,7 @@
 
       var body;
       if (type === "projects") {
-        body = h("div", null,
+        body = h("div.table-scroll", null,
           h("table.p-table.tbl", { style: { width: "100%" } },
             h("thead", null, h("tr", null,
               [{ ar: "المشروع", en: "Project" }, { ar: "الجهة المالكة", en: "Owner" }, { ar: "المرحلة", en: "Phase" },
@@ -586,14 +586,14 @@
           if (r.decision && r.decision.type === "approved") byService[key].approved++;
           if (RGP.lifecycle.slaBand(r) === "red") byService[key].overdue++;
         });
-        body = h("table.p-table.tbl", { style: { width: "100%" } },
+        body = h("div.table-scroll", null, h("table.p-table.tbl", { style: { width: "100%" } },
           h("thead", null, h("tr", null, [{ ar: "الخدمة", en: "Service" }, { ar: "الطلبات", en: "Requests" }, { ar: "معتمد", en: "Approved" }, { ar: "متجاوز", en: "Overdue" }].map(function (c) { return h("th", null, td(c)); }))),
           h("tbody", null, Object.keys(byService).map(function (name) {
             var v = byService[name];
             return h("tr", null, h("td", null, name), h("td.num", null, String(v.total)), h("td.num", null, String(v.approved)), h("td.num", null, String(v.overdue)));
-          })));
+          }))));
       } else if (type === "challenges") {
-        body = h("table.p-table.tbl", { style: { width: "100%" } },
+        body = h("div.table-scroll", null, h("table.p-table.tbl", { style: { width: "100%" } },
           h("thead", null, h("tr", null, [{ ar: "التحدي", en: "Challenge" }, { ar: "المشروع", en: "Project" }, { ar: "الجهة المسؤولة", en: "Owner" }, { ar: "التصنيف", en: "Category" }, { ar: "العمر (أيام عمل)", en: "Age (wd)" }, { ar: "الحالة", en: "Status" }].map(function (c) { return h("th", null, td(c)); }))),
           h("tbody", null, S.challenges.map(function (c) {
             var p = c.projectId && RGP.store.project(c.projectId);
@@ -604,7 +604,7 @@
               h("td", null, td(RGP.challengeCatLabel(c.category))),
               h("td.num", null, String(RGP.challengeAge(c))),
               h("td", null, t("ch." + c.state)));
-          })));
+          }))));
       } else if (type === "escalations") {
         /* rmun-notes §4 level 3: cases at or beyond 120% of SLA + escalated challenges */
         var overdueReqs = S.requests.filter(function (r2) {
@@ -613,8 +613,8 @@
         });
         var escCh = S.challenges.filter(function (c2) { return c2.state === "escalated"; });
         body = h("div", null,
-          h("div.t-headline.mbe-1", null, RGP.i18n.lang === "ar" ? "طلبات متجاوزة للمدة المحددة" : "Requests beyond their allotted time"),
-          h("table.p-table.tbl", { style: { width: "100%" } },
+          h("div.t-headline.mbe-1", null, RGP.i18n.lang === "ar" ? "طلبات بلغت أو تجاوزت مددها المحددة" : "Requests at or beyond their allotted time"),
+          h("div.table-scroll", null, h("table.p-table.tbl", { style: { width: "100%" } },
             h("thead", null, h("tr", null,
               [{ ar: "الطلب", en: "Request" }, { ar: "الخدمة", en: "Service" }, { ar: "المشروع", en: "Project" },
                { ar: "نسبة الاستهلاك", en: "Consumed" }, { ar: "التجاوز (أيام عمل)", en: "Overdue (wd)" }, { ar: "الأخصائي", en: "Specialist" }]
@@ -622,16 +622,17 @@
             h("tbody", null, overdueReqs.length ? overdueReqs.map(function (r2) {
               var svc2 = RGP.store.service(r2.serviceId);
               var p2 = r2.projectId && RGP.store.project(r2.projectId);
+              var over2 = Math.max(0, -RGP.lifecycle.remainingDays(r2));
               return h("tr", null,
                 h("td.num", null, r2.id),
                 h("td", null, svc2 ? td(svc2.name) : "—"),
                 h("td", null, p2 ? td(p2.name) : "—"),
                 h("td.num", null, RGP.lifecycle.consumedPct(r2) + "%"),
-                h("td.num", null, String(Math.max(0, -RGP.lifecycle.remainingDays(r2)))),
+                h("td" + (over2 ? ".num" : ""), null, over2 ? String(over2) : (RGP.i18n.lang === "ar" ? "يستحق اليوم" : "Due today")),
                 h("td", null, r2.assigneeId ? td(RGP.store.userName(r2.assigneeId)) : "—"));
-            }) : h("tr", null, h("td", { colspan: "6" }, RGP.i18n.lang === "ar" ? "لا توجد تجاوزات قائمة." : "No active breaches.")))),
+            }) : h("tr", null, h("td", { colspan: "6" }, RGP.i18n.lang === "ar" ? "لا توجد تجاوزات قائمة." : "No active breaches."))))),
           h("div.t-headline.mbs-3.mbe-1", null, RGP.i18n.lang === "ar" ? "تحديات مصعّدة" : "Escalated challenges"),
-          h("table.p-table.tbl", { style: { width: "100%" } },
+          h("div.table-scroll", null, h("table.p-table.tbl", { style: { width: "100%" } },
             h("thead", null, h("tr", null,
               [{ ar: "التحدي", en: "Challenge" }, { ar: "المشروع", en: "Project" }, { ar: "الجهة المسؤولة", en: "Owner" }, { ar: "العمر (أيام عمل)", en: "Age (wd)" }]
                 .map(function (c3) { return h("th", null, td(c3)); }))),
@@ -642,7 +643,7 @@
                 h("td", null, p3 ? td(p3.name) : "—"),
                 h("td", null, c2.responsibleEntity ? td(RGP.entityName(c2.responsibleEntity)) : "—"),
                 h("td.num", null, String(RGP.challengeAge(c2))));
-            }) : h("tr", null, h("td", { colspan: "4" }, RGP.i18n.lang === "ar" ? "لا توجد تحديات مصعّدة." : "No escalated challenges.")))));
+            }) : h("tr", null, h("td", { colspan: "4" }, RGP.i18n.lang === "ar" ? "لا توجد تحديات مصعّدة." : "No escalated challenges."))))));
       } else {
         /* coordination: referrals per external entity */
         var agg = {};
@@ -656,7 +657,7 @@
             }
           });
         });
-        body = h("table.p-table.tbl", { style: { width: "100%" } },
+        body = h("div.table-scroll", null, h("table.p-table.tbl", { style: { width: "100%" } },
           h("thead", null, h("tr", null, [{ ar: "الجهة", en: "Entity" }, { ar: "الإحالات", en: "Referrals" }, { ar: "المجاب عنها", en: "Answered" }, { ar: "متوسط أيام الرد", en: "Avg response (wd)" }].map(function (c) { return h("th", null, td(c)); }))),
           h("tbody", null, Object.keys(agg).map(function (eid) {
             var v = agg[eid];
@@ -665,7 +666,7 @@
               h("td.num", null, String(v.sent)),
               h("td.num", null, String(v.answered)),
               h("td.num", null, v.answered ? RGP.fmtNum(v.days / v.answered, { dec: 1 }) : "—"));
-          })));
+          }))));
       }
 
       sheet.appendChild(h("div.report-sheet", null,

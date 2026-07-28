@@ -241,14 +241,40 @@
   };
 
   /* ---------------- notifications popover ---------------- */
+  /* full inbox — the popover's «عرض جميع الإشعارات» footer */
+  function showAllNotifications(user) {
+    var rows = RGP.store.state.notifications.filter(function (n) { return n.userId === user.id; });
+    UI.modal({
+      title: { ar: "جميع الإشعارات", en: "All notifications" },
+      body: rows.length ? h("div.ntf-list", { style: { maxHeight: "60vh", overflowY: "auto" } }, rows.map(function (n) {
+        var iconName = n.kind === "success" ? "checkCircle" : n.kind === "danger" ? "alert" : n.kind === "warning" ? "alert" : "infoC";
+        return h("div.ntf-row" + (n.read ? "" : ".unread"), {
+          onclick: function () {
+            n.read = true; RGP.store.save();
+            var or = RGP.$("#overlay-root"); if (or) or.innerHTML = "";
+            if (n.link) RGP.router.go(n.link); else RGP.router.render();
+          }
+        },
+          h("span.ntf-icon." + (n.kind || "info"), null, UI.icon(iconName, 16)),
+          h("div.grow", null,
+            h("div.t-footnote", { style: { fontWeight: 600 } }, td(n.title)),
+            n.body ? h("div.t-caption.mut.clamp2", { style: { fontWeight: 500 } }, td(n.body)) : null,
+            h("div.t-caption.mut.mbs-05", { style: { fontWeight: 500 } }, RGP.fmtAgo(n.at))));
+      })) : UI.empty("bell", { ar: "لا توجد إشعارات", en: "No notifications" }, null, null, true)
+    });
+  }
+
   RGP.notifPopover = function (anchor) {
     var user = RGP.auth.current();
     var existing = RGP.$(".menu"); if (existing) existing.remove();
     var filter = "all";
     var all = RGP.store.state.notifications.filter(function (n) { return n.userId === user.id; }).slice(0, 30);
+    function isReq(n) { return (n.link || "").indexOf("request") >= 0 || (n.link || "").indexOf("review") >= 0; }
+    function isCh(n) { return (n.link || "").indexOf("challenge") >= 0; }
     function applyFilter() {
-      if (filter === "req") return all.filter(function (n) { return (n.link || "").indexOf("request") >= 0 || (n.link || "").indexOf("review") >= 0; });
-      if (filter === "ch") return all.filter(function (n) { return (n.link || "").indexOf("challenge") >= 0; });
+      if (filter === "req") return all.filter(isReq);
+      if (filter === "ch") return all.filter(isCh);
+      if (filter === "sys") return all.filter(function (n) { return !isReq(n) && !isCh(n); });
       return all;
     }
     var list = applyFilter();
@@ -264,7 +290,7 @@
         }, t("ntf.markAll"))),
       h("div", { style: { padding: "0 14px 10px" } },
         h("div.segmented", { style: { height: "30px" } },
-          [["all", t("common.all")], ["req", { ar: "الطلبات", en: "Requests" }], ["ch", { ar: "التحديات", en: "Challenges" }]].map(function (x) {
+          [["all", t("common.all")], ["req", { ar: "الطلبات", en: "Requests" }], ["ch", { ar: "التحديات", en: "Challenges" }], ["sys", { ar: "النظام", en: "System" }]].map(function (x) {
             return h("button" + (filter === x[0] ? ".active" : ""), {
               onclick: function (e) {
                 e.stopPropagation();
@@ -290,7 +316,11 @@
             n.body ? h("div.t-caption.mut.clamp2", { style: { fontWeight: 500 } }, td(n.body)) : null,
             h("div.t-caption.mut.mbs-05", { style: { fontWeight: 500 } }, RGP.fmtAgo(n.at))));
       })) : UI.empty("bell", { ar: "لا توجد إشعارات جديدة", en: "No new notifications" },
-        null, null, true));
+        null, null, true),
+      h("div.hairline-t", { style: { padding: "8px 14px", textAlign: "center" } },
+        h("button.btn.tertiary.sm", {
+          onclick: function () { m.remove(); showAllNotifications(user); }
+        }, RGP.i18n.lang === "ar" ? "عرض جميع الإشعارات" : "View all notifications")));
 
     document.body.appendChild(m);
     var r = anchor.getBoundingClientRect();

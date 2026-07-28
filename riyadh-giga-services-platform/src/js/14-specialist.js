@@ -99,7 +99,7 @@
       [["inbox", { ar: "وارد جديد", en: "Inbox" }, c.inbox],
        ["mine", { ar: "قيد الدراسة", en: "In progress" }, c.mine],
        ["decisions", { ar: "قرارات مستحقة", en: "Decisions" }, c.decisions],
-       ["returned", { ar: "معاد للعميل", en: "Returned" }, c.returned],
+       ["returned", { ar: "مُعاد للاستكمال", en: "Returned" }, c.returned],
        ["done", { ar: "منتهية", en: "Done" }, null],
        ["all", t("common.all"), null]].map(function (x) {
         return h("button" + (tab === x[0] ? ".active" : ""), {
@@ -314,6 +314,8 @@
           r.note ? h("div.tl-quote.mbs-2", null, td(r.note)) : null,
           r.referrals.length ? h("div.mbs-3", null,
             h("div.t-headline.mbe-1", null, RGP.i18n.lang === "ar" ? "مرئيات الجهات الخارجية" : "External opinions"),
+            h("div.t-caption.mut.num.mbe-1", { style: { fontWeight: 600 } },
+              (RGP.i18n.lang === "ar" ? "مرجع التنسيق: " : "Coordination ref: ") + "GPO-" + r.id),
             r.referrals.map(function (ref) {
               return h("div.flex.g15.hairline-b", { style: { padding: "8px 0", alignItems: "flex-start" } },
                 h("span.pill." + (ref.answeredAt ? (ref.opinion === "reject_recommend" ? "dang" : "ok") : "info"), null,
@@ -385,8 +387,15 @@
         r.decision.type === "approved"
           ? h("div", null,
               h("div.t-sub", null, t("req.documentNo") + ": ", h("b.num", null, r.decision.permitNo)),
+              r.decision.sadadInvoiceNo ? h("div.t-sub.flex.g05", null,
+                (RGP.i18n.lang === "ar" ? "فاتورة سداد: " : "SADAD invoice: "), h("b.num", null, r.decision.sadadInvoiceNo), UI.simBadge()) : null,
+              r.decision.coSigned ? h("div.t-caption.mut", { style: { fontWeight: 500 } },
+                RGP.i18n.lang === "ar" ? "قرار بتوقيع مشترك (فصل الصلاحيات)" : "Co-signed decision (segregation of duties)") : null,
               h("button.btn.secondary.sm.mbs-1", { onclick: function () { RGP.print.permit(r); } }, UI.icon("print", 14), t("req.printPermit")))
-          : h("div.t-sub", null, r.decision.reason)) : null);
+          : h("div", null,
+              h("div.t-sub", null, r.decision.reason),
+              r.decision.coSigned ? h("div.t-caption.mut", { style: { fontWeight: 500 } },
+                RGP.i18n.lang === "ar" ? "قرار بتوقيع مشترك (فصل الصلاحيات)" : "Co-signed decision (segregation of duties)") : null)) : null);
 
     /* ---- decision modals ---- */
     var feeBearing = !!(svc && svc.fees && svc.fees.model !== "none");

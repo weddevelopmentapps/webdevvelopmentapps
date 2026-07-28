@@ -25,7 +25,9 @@
     var u = RGP.auth.current();
     var reqs = myRequests(u);
     var open = reqs.filter(function (r) { return RGP.lifecycle.OPEN_STATES.indexOf(r.state) >= 0; });
-    var needsAction = reqs.filter(function (r) { return ["returned", "draft"].indexOf(r.state) >= 0; });
+    var needsAction = reqs.filter(function (r) {
+      return r.state === "returned" || (r.state === "draft" && r.createdById === u.id);
+    });
     var approvedMonth = reqs.filter(function (r) {
       return r.decision && r.decision.type === "approved" &&
         RGP.daysBetween(r.decision.decidedAt.slice(0, 10), RGP.todayISO()) <= 30;
@@ -99,33 +101,39 @@
   }
 
   /* shared requests table */
-  function requestsTable(rows, compact) {
+  function requestsTable(rows, compact, emptyEl) {
+    var u = RGP.auth.current();
+    var cols = [
+      { key: "id", label: t("req.number"), render: function (r) {
+          var creator = RGP.store.user(r.createdById);
+          var viaDelegate = u && r.createdById !== u.id && creator && creator.delegatedBy === u.id;
+          return h("span.flex.g1", null, h("span.id-cell.num", null, r.id),
+            r.priority === "fast_track" ? h("span", { title: t("sla.fastTrack"), class: "flex" }, UI.icon("bolt", 13, "giga-ic")) : null,
+            viaDelegate ? h("span.pill.plain.sm", { title: td(creator.org) }, RGP.i18n.lang === "ar" ? "بالإنابة" : "Delegated") : null);
+        }, sortVal: function (r) { return r.id; } },
+      { key: "svc", label: t("req.service"), render: function (r) {
+          var svc = RGP.store.service(r.serviceId);
+          return h("span.ellipsis", { style: { maxWidth: compact ? "170px" : "220px", display: "inline-block" } }, svc ? td(svc.name) : "—");
+        }, sortVal: function (r) { var s = RGP.store.service(r.serviceId); return s ? td(s.name) : ""; } }
+    ];
+    if (!compact) cols.push({ key: "project", label: t("req.project"), render: function (r) {
+      var p = r.projectId && RGP.store.project(r.projectId);
+      return p ? td(p.name) : "—";
+    } });
+    cols.push(
+      { key: "date", label: t("common.date"), render: function (r) {
+          return h("span.num-date.t-footnote", null, RGP.fmtDate(r.submittedAt ? r.submittedAt.slice(0, 10) : r.createdAt.slice(0, 10)));
+        }, sortVal: function (r) { return r.submittedAt || r.createdAt; } },
+      { key: "sla", label: t("common.sla"), render: function (r) { return UI.slaChip(r) || h("span.mut", null, "—"); } },
+      { key: "state", label: t("common.status"), render: function (r) { return UI.statePill(r.state); },
+        sortVal: function (r) { return r.state; } });
     return UI.table({
       rows: rows,
       pageSize: compact ? 6 : 12,
       defaultSort: "date", defaultDir: -1,
-      cols: [
-        { key: "id", label: t("req.number"), render: function (r) {
-            return h("span.flex.g1", null, h("span.id-cell.num", null, r.id),
-              r.priority === "fast_track" ? h("span", { title: t("sla.fastTrack"), class: "flex" }, UI.icon("bolt", 13, "giga-ic")) : null);
-          }, sortVal: function (r) { return r.id; } },
-        { key: "svc", label: t("req.service"), render: function (r) {
-            var svc = RGP.store.service(r.serviceId);
-            return h("span.ellipsis", { style: { maxWidth: "220px", display: "inline-block" } }, svc ? td(svc.name) : "—");
-          }, sortVal: function (r) { var s = RGP.store.service(r.serviceId); return s ? td(s.name) : ""; } },
-        { key: "project", label: t("req.project"), render: function (r) {
-            var p = r.projectId && RGP.store.project(r.projectId);
-            return p ? td(p.name) : "—";
-          } },
-        { key: "date", label: t("common.date"), render: function (r) {
-            return h("span.num-date.t-footnote", null, RGP.fmtDate(r.submittedAt ? r.submittedAt.slice(0, 10) : r.createdAt.slice(0, 10)));
-          }, sortVal: function (r) { return r.submittedAt || r.createdAt; } },
-        { key: "sla", label: t("common.sla"), render: function (r) { return UI.slaChip(r) || h("span.mut", null, "—"); } },
-        { key: "state", label: t("common.status"), render: function (r) { return UI.statePill(r.state); },
-          sortVal: function (r) { return r.state; } }
-      ],
+      cols: cols,
       onRow: function (r) { RGP.router.go("#/portal/requests/" + r.id); },
-      empty: UI.empty("docs", { ar: "لا توجد طلبات بعد", en: "No requests yet" },
+      empty: emptyEl || UI.empty("docs", { ar: "لا توجد طلبات بعد", en: "No requests yet" },
         { ar: "يمكنك تقديم طلب خدمة جديد لمشروعك ومتابعة حالته من هذه الصفحة.", en: "You can submit a new service request for your project and track its status from this page." },
         h("a.btn.primary", { href: "#/wizard" }, t("portal.newRequest")))
     });
@@ -140,11 +148,22 @@
     var content = h("div");
     function refresh() {
       var rows = all;
-      if (filter === "action") rows = all.filter(function (r) { return ["returned", "draft"].indexOf(r.state) >= 0; });
+      /* a delegate's draft is the delegate's action, not the principal's */
+      if (filter === "action") rows = all.filter(function (r) {
+        return r.state === "returned" || (r.state === "draft" && r.createdById === u.id);
+      });
       if (filter === "open") rows = all.filter(function (r) { return RGP.lifecycle.OPEN_STATES.indexOf(r.state) >= 0; });
       if (filter === "done") rows = all.filter(function (r) { return RGP.lifecycle.TERMINAL_STATES.indexOf(r.state) >= 0; });
+      var empties = {
+        action: UI.empty("checkCircle", { ar: "لا توجد طلبات بانتظار إجراءك", en: "Nothing awaits your action" },
+          { ar: "سيصلك إشعار عند وجود أي إجراء مطلوب منك.", en: "You will be notified when any action is required." }, null, true),
+        open: UI.empty("docs", { ar: "لا توجد طلبات نشطة حاليًا", en: "No open requests" },
+          { ar: "الطلبات قيد الدراسة تظهر في هذه القائمة.", en: "Requests under review appear in this list." }, null, true),
+        done: UI.empty("checkCircle", { ar: "لا توجد طلبات منتهية بعد", en: "No completed requests yet" },
+          { ar: "تظهر هنا الطلبات المعتمدة والمرفوضة والمغلقة.", en: "Approved, declined and closed requests appear here." }, null, true)
+      };
       content.innerHTML = "";
-      content.appendChild(requestsTable(rows));
+      content.appendChild(requestsTable(rows, false, empties[filter] || null));
     }
 
     var seg = h("div.segmented", null,
@@ -326,6 +345,8 @@
       };
       side.appendChild(h("div.card.elev-1.card-pad-dense", null,
         h("div.t-footnote.mut.mbe-1", null, RGP.i18n.lang === "ar" ? "الجهات المعنية" : "Involved entities"),
+        r.referrals.length ? h("div.t-caption.mut.num.mbe-1", { style: { fontWeight: 600 } },
+          (RGP.i18n.lang === "ar" ? "مرجع التنسيق: " : "Coordination ref: ") + "GPO-" + r.id) : null,
         h("div.flex-col.g1", null, r.involvedEntities.map(function (eid) {
           var ref = r.referrals.filter(function (x) { return x.entityId === eid; })[0];
           if (!ref) return h("div.flex.g1", null, h("span.pill.plain.sm", null, td(RGP.entityName(eid))));
@@ -347,7 +368,7 @@
             h("span.t-caption.mut.num-date", { style: { fontWeight: 500 } }, RGP.fmtDate(ref.sentAt.slice(0, 10))),
             h("span.grow"),
             h("span.t-caption.warn-fg", { style: { fontWeight: 600 } },
-              (RGP.i18n.lang === "ar" ? "بانتظار الرد منذ " : "Awaiting reply for ") + RGP.fmtWorkdays(pendingDays)));
+              (RGP.i18n.lang === "ar" ? "بانتظار الرد منذ " : "Awaiting reply for ") + RGP.fmtWorkdays(pendingDays, { gen: true })));
         }))));
     }
 

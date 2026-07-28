@@ -110,7 +110,10 @@ select.input { appearance: none; cursor: pointer; }
   display: inline-flex; align-items: stretch;
   background: var(--neutral-100); border-radius: var(--r-sm); padding: 3px;
   height: 36px;
+  max-width: 100%; overflow-x: auto; overflow-y: hidden;
+  scrollbar-width: none;
 }
+.segmented::-webkit-scrollbar { display: none; }
 [data-theme="dark"] .segmented { background: var(--surface-2); }
 .segmented button {
   position: relative; z-index: 1;
@@ -118,6 +121,7 @@ select.input { appearance: none; cursor: pointer; }
   font-family: var(--ff-display); font-size: 12.5px; font-weight: 600; color: var(--mut);
   transition: color var(--dur-fast) var(--ease-standard);
   display: inline-flex; align-items: center; gap: 6px;
+  white-space: nowrap; flex: 0 0 auto;
 }
 .segmented button.active { color: var(--ink); background: var(--surface); box-shadow: var(--shadow-1); }
 .segmented .count { font-size: 10.5px; opacity: .75; }
