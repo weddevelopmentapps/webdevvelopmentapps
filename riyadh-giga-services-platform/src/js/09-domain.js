@@ -186,12 +186,45 @@
         }
       }, UI.avatar(user)));
 
-    var tabs = (NAVS[user.role] || []).filter(function (i) { return i.route; }).slice(0, 5);
-    var bottomtabs = h("nav.bottomtabs", null, tabs.map(function (item) {
-      var active = route.indexOf(item.route) === 0;
-      return h("button" + (active ? ".active" : ""), { onclick: function () { RGP.router.go(item.route); } },
-        UI.icon(item.icon, 22), td(item.label));
-    }));
+    /* bottom tabs: first four destinations + «المزيد» sheet covering the rest,
+       so every desktop rail destination stays reachable on the phone.
+       Exactly one tab is active — the longest route prefix wins. */
+    var navItems = (NAVS[user.role] || []).filter(function (i) { return i.route; });
+    var routePath = route.split("?")[0];
+    var best = "";
+    navItems.forEach(function (i) {
+      if ((routePath === i.route || routePath.indexOf(i.route + "/") === 0 || route.indexOf(i.route + "?") === 0) &&
+          i.route.length > best.length) best = i.route;
+    });
+    if (!best) navItems.forEach(function (i) {
+      if (routePath.indexOf(i.route) === 0 && i.route.length > best.length) best = i.route;
+    });
+    var tabItems = navItems.slice(0, navItems.length > 5 ? 4 : 5);
+    var moreItems = navItems.slice(tabItems.length);
+    function moreSheet() {
+      UI.modal({
+        title: { ar: "جميع الأقسام", en: "All sections" }, size: "sm",
+        body: h("div.flex-col.g1", null, moreItems.map(function (item) {
+          var badge = item.badge ? item.badge(user) : 0;
+          return h("button.sheet-item", {
+            onclick: function () {
+              var or = RGP.$("#overlay-root"); if (or) or.innerHTML = "";
+              RGP.router.go(item.route);
+            }
+          }, UI.icon(item.icon, 20), h("span.grow.t-footnote", { style: { fontWeight: 600 } }, td(item.label)),
+            badge ? h("span.nav-badge.num", null, String(badge)) : null);
+        }))
+      });
+    }
+    var bottomtabs = h("nav.bottomtabs", null,
+      tabItems.map(function (item) {
+        var active = item.route === best;
+        return h("button" + (active ? ".active" : ""), { onclick: function () { RGP.router.go(item.route); } },
+          UI.icon(item.icon, 22), td(item.label));
+      }),
+      moreItems.length ? h("button" + (moreItems.some(function (i) { return i.route === best; }) ? ".active" : ""),
+        { onclick: moreSheet },
+        UI.icon("grid", 22), RGP.i18n.lang === "ar" ? "المزيد" : "More") : null);
 
     /* chrome-minimal boardroom layout (ux-spec §7.12): no rail, identity strip only */
     if (opts.chromeMinimal) {
@@ -289,7 +322,7 @@
           }
         }, t("ntf.markAll"))),
       h("div", { style: { padding: "0 14px 10px" } },
-        h("div.segmented", { style: { height: "30px" } },
+        h("div.segmented", { style: { height: "34px" } },
           [["all", t("common.all")], ["req", { ar: "الطلبات", en: "Requests" }], ["ch", { ar: "التحديات", en: "Challenges" }], ["sys", { ar: "النظام", en: "System" }]].map(function (x) {
             return h("button" + (filter === x[0] ? ".active" : ""), {
               onclick: function (e) {
@@ -325,7 +358,9 @@
     document.body.appendChild(m);
     var r = anchor.getBoundingClientRect();
     m.style.top = (r.bottom + 8 + window.scrollY) + "px";
-    var left = RGP.clamp(RGP.i18n.lang === "ar" ? r.left - 40 : r.right - 400, 8, window.innerWidth - 408);
+    var pw = m.offsetWidth || 400;
+    var left = RGP.clamp(RGP.i18n.lang === "ar" ? r.left - 40 : r.right - pw,
+      8, Math.max(8, window.innerWidth - pw - 8));
     m.style.left = left + "px";
     setTimeout(function () {
       document.addEventListener("click", function onDoc(e) {

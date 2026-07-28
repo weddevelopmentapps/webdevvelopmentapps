@@ -79,3 +79,29 @@ size_kb = os.path.getsize(out) // 1024
 print("index.html written (%d KB) — fully self-contained (offline-ready)" % size_kb)
 if size_kb > 4600:
     print("WARNING: exceeds 4.5MB performance budget", file=sys.stderr)
+
+# Artifact variant: body-only content (the artifact host wraps it in its own
+# doctype/head/body skeleton), same assets, same behavior. dir/lang are applied
+# to documentElement at boot by RGP.i18n.applyDir().
+artifact = f"""<title>منصة الخدمات البلدية للمشاريع الكبرى</title>
+<style>
+{fonts}
+</style>
+<style>
+{css}
+</style>
+{markup}
+<script>
+{echarts}
+</script>
+<script>
+window.SEED = {data};
+window.ASSETS = {{ logo: "{logo}", hero: "{hero}" }};
+</script>
+<script>
+{js}
+</script>
+"""
+art_out = os.path.join(HERE, "artifact.html")
+open(art_out, "w", encoding="utf-8").write(artifact)
+print("artifact.html written (%d KB) — body-only variant for hosted publishing" % (os.path.getsize(art_out) // 1024))

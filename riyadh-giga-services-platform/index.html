@@ -631,8 +631,12 @@ html[lang="en"] .t-sub  { font-size: 13px; line-height: 1.5; }
   .rail { display: none; }
   .content { padding-inline: 16px; padding-block-end: calc(var(--bottomtab-h) + 40px); }
   .kpi-band, .kpi-band.six, .cols-2, .cols-3 { grid-template-columns: 1fr; }
-  .topbar-search input { width: 160px; }
-  .topbar-search input:focus { width: 200px; }
+  /* the page h1 carries the context on the phone; search flexes, actions stay tappable */
+  .topbar { gap: var(--sp-1); padding-inline: 12px; }
+  .topbar-context { display: none; }
+  .topbar-search { flex: 1 1 auto; min-width: 0; }
+  .topbar-search input, .topbar-search input:focus { width: 100%; }
+  .topbar .iconbtn { flex: 0 0 auto; width: 40px; height: 40px; }
   .t-title1 { font-size: 26px; }
 }
 
@@ -650,7 +654,8 @@ html[lang="en"] .t-sub  { font-size: 13px; line-height: 1.5; }
 @media (max-width: 768px) { .bottomtabs { display: flex; } }
 .bottomtabs button {
   flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
-  font-family: var(--ff-display); font-size: 10px; font-weight: 600; color: var(--mut);
+  font-family: var(--ff-display); font-size: 11px; font-weight: 600; color: var(--mut);
+  min-width: 0; white-space: nowrap;
 }
 .bottomtabs button.active { color: var(--accent); }
 .bottomtabs button.active::after { content: ""; width: 4px; height: 4px; border-radius: 4px; background: var(--accent); }
@@ -996,6 +1001,11 @@ table.tbl { width: 100%; border-collapse: collapse; }
   display: flex; flex-direction: column-reverse; gap: 10px;
   max-width: min(420px, calc(100vw - 48px));
 }
+@media (max-width: 768px) {
+  .toast-root { bottom: calc(var(--bottomtab-h) + env(safe-area-inset-bottom, 0px) + 12px); inset-inline-start: 12px; max-width: calc(100vw - 24px); }
+  .segmented { height: 40px; }
+  .pill.sm { font-size: 10.5px; }
+}
 .toast {
   position: relative;
   display: flex; align-items: flex-start; gap: 10px;
@@ -1052,6 +1062,16 @@ table.tbl { width: 100%; border-collapse: collapse; }
   padding: 6px;
   animation: rgp-modal-in var(--dur-fast) var(--ease-decelerate) both;
 }
+/* «المزيد» bottom-tab sheet rows */
+.sheet-item {
+  display: flex; align-items: center; gap: 12px;
+  min-height: 48px; width: 100%; text-align: start;
+  padding-inline: 12px; border-radius: var(--r-sm);
+  font-family: var(--ff-display); color: var(--ink);
+}
+.sheet-item:hover { background: var(--neutral-100); }
+[data-theme="dark"] .sheet-item:hover { background: var(--surface-2); }
+
 .menu .mi {
   display: flex; align-items: center; gap: 10px;
   width: 100%; min-height: 38px; padding-inline: 10px;
@@ -1076,7 +1096,7 @@ table.tbl { width: 100%; border-collapse: collapse; }
 .empty.compact { padding-block: 32px; }
 
 /* ---------------- notification center (§6.21) ---------------- */
-.ntf-pop { width: 400px; max-height: 560px; display: flex; flex-direction: column; }
+.ntf-pop { width: min(400px, calc(100vw - 16px)); max-height: min(560px, calc(100vh - 120px)); display: flex; flex-direction: column; }
 .ntf-list { overflow-y: auto; }
 .ntf-row {
   display: flex; gap: 12px; padding: 12px 16px;
@@ -1346,6 +1366,10 @@ html[dir="ltr"] .wiz-pane { animation-name: rgp-wiz-in-ltr; }
   transition: border-color var(--dur-fast), background var(--dur-fast);
 }
 .pick-card:hover { border-color: var(--hair-3); }
+@media (max-width: 768px) {
+  .pick-card { flex-wrap: wrap; }
+  .pick-card .grow { min-width: 55%; }
+}
 .pick-card.selected { border-color: var(--accent); background: var(--accent-softer); }
 .pick-card .pc-radio {
   width: 20px; height: 20px; border-radius: var(--r-full); flex: 0 0 auto;
@@ -1391,6 +1415,9 @@ html[dir="ltr"] .wiz-pane { animation-name: rgp-wiz-in-ltr; }
 @media (max-width: 900px) { .ws { grid-template-columns: 1fr; } }
 .ws-a, .ws-c { position: sticky; top: calc(var(--topbar-h) + 16px); }
 @media (max-width: 1280px) { .ws-c { position: static; } }
+/* stacked single-column workspace: a sticky summary would ride over the
+   documents and decision panes — everything flows statically on the phone */
+@media (max-width: 900px) { .ws-a { position: static; } }
 
 .queue-tabs { display: flex; gap: var(--sp-1); flex-wrap: wrap; }
 
@@ -3326,8 +3353,13 @@ RGP.REDUCED_MOTION = matchMedia("(prefers-reduced-motion: reduce)").matches;
     overlay.appendChild(modal);
     root.appendChild(overlay);
     document.addEventListener("keydown", onKey);
-    var focusable = RGP.$$("input, textarea, select, button", modal).filter(function (x) { return !x.closest(".modal-head"); });
-    if (focusable.length) focusable[0].focus();
+    /* autofocus only true form fields, and only on desktop — on the phone it
+       pops the keyboard over the modal, and focusing a result button lets the
+       same Enter keystroke activate it */
+    if (window.innerWidth > 768) {
+      var focusable = RGP.$$("input, textarea, select", modal).filter(function (x) { return !x.closest(".modal-head"); });
+      if (focusable.length) focusable[0].focus();
+    }
     return { close: close, el: modal };
   };
 
@@ -3968,7 +4000,14 @@ RGP.REDUCED_MOTION = matchMedia("(prefers-reduced-motion: reduce)").matches;
     var pop = null;
     function closePop() { if (pop) { pop.remove(); pop = null; } }
 
-    /* --- proximity clustering (§6.13): group markers closer than ~34 viewBox units --- */
+    /* Phone rendering: the viewBox shrinks to ~0.4x on a 390px screen, so
+       markers scale up, clustering widens (clusters-first navigation), and
+       every marker gets an invisible touch circle ≥ ~40px on screen. */
+    var phone = (window.innerWidth || 1200) <= 768;
+    var MK = phone ? 2.1 : 1;              /* marker scale in viewBox units */
+    var CLUSTER_DIST = phone ? 90 : 34;
+
+    /* --- proximity clustering (§6.13) --- */
     var pts = (opts.projects || []).map(function (prj) {
       return { prj: prj, x: px(prj.location.lng), y: py(prj.location.lat), cluster: -1 };
     });
@@ -3977,7 +4016,7 @@ RGP.REDUCED_MOTION = matchMedia("(prefers-reduced-motion: reduce)").matches;
       for (var ci = 0; ci < clusters.length; ci++) {
         var c = clusters[ci];
         var dx = c.x - pt.x, dy = c.y - pt.y;
-        if (Math.sqrt(dx * dx + dy * dy) < 34) { c.items.push(pt); pt.cluster = ci;
+        if (Math.sqrt(dx * dx + dy * dy) < CLUSTER_DIST) { c.items.push(pt); pt.cluster = ci;
           c.x = c.items.reduce(function (a, i2) { return a + i2.x; }, 0) / c.items.length;
           c.y = c.items.reduce(function (a, i2) { return a + i2.y; }, 0) / c.items.length;
           return; }
@@ -3986,18 +4025,27 @@ RGP.REDUCED_MOTION = matchMedia("(prefers-reduced-motion: reduce)").matches;
       pt.cluster = clusters.length - 1;
     });
 
+    function hitCircle(cx, cy) {
+      var hc = document.createElementNS(svgNS, "circle");
+      hc.setAttribute("cx", cx); hc.setAttribute("cy", cy);
+      hc.setAttribute("r", 22 * MK);
+      hc.setAttribute("fill", "transparent");
+      return hc;
+    }
+
     clusters.filter(function (c) { return c.items.length > 1; }).forEach(function (c) {
       var g = document.createElementNS(svgNS, "g");
       g.setAttribute("class", "rmap-marker");
+      g.appendChild(hitCircle(c.x, c.y));
       var circle = document.createElementNS(svgNS, "circle");
-      circle.setAttribute("cx", c.x); circle.setAttribute("cy", c.y); circle.setAttribute("r", 13);
+      circle.setAttribute("cx", c.x); circle.setAttribute("cy", c.y); circle.setAttribute("r", 13 * MK);
       circle.setAttribute("fill", "var(--accent)");
       circle.setAttribute("class", "core");
       g.appendChild(circle);
       var txt = document.createElementNS(svgNS, "text");
-      txt.setAttribute("x", c.x); txt.setAttribute("y", c.y + 3.5);
+      txt.setAttribute("x", c.x); txt.setAttribute("y", c.y + 3.5 * MK);
       txt.setAttribute("text-anchor", "middle");
-      txt.setAttribute("style", "font-family:var(--ff-display);font-size:11px;font-weight:700;fill:var(--on-accent);pointer-events:none");
+      txt.setAttribute("style", "font-family:var(--ff-display);font-size:" + (11 * MK) + "px;font-weight:700;fill:var(--on-accent);pointer-events:none");
       txt.textContent = String(c.items.length);
       g.appendChild(txt);
       g.addEventListener("click", function (e) {
@@ -4031,10 +4079,11 @@ RGP.REDUCED_MOTION = matchMedia("(prefers-reduced-motion: reduce)").matches;
       var g = document.createElementNS(svgNS, "g");
       g.setAttribute("class", "rmap-marker");
       var color = MAP.statusColor(prj.status);
+      g.appendChild(hitCircle(cx, cy));
 
       if ((opts.pulseIds || []).indexOf(prj.id) >= 0) {
         var pulse = document.createElementNS(svgNS, "circle");
-        pulse.setAttribute("cx", cx); pulse.setAttribute("cy", cy); pulse.setAttribute("r", 9);
+        pulse.setAttribute("cx", cx); pulse.setAttribute("cy", cy); pulse.setAttribute("r", 9 * MK);
         pulse.setAttribute("fill", "none");
         pulse.setAttribute("stroke", "var(--danger)");
         pulse.setAttribute("stroke-width", "2");
@@ -4043,7 +4092,7 @@ RGP.REDUCED_MOTION = matchMedia("(prefers-reduced-motion: reduce)").matches;
       }
       if (prj.isGiga) {
         var ringO = document.createElementNS(svgNS, "circle");
-        ringO.setAttribute("cx", cx); ringO.setAttribute("cy", cy); ringO.setAttribute("r", 10);
+        ringO.setAttribute("cx", cx); ringO.setAttribute("cy", cy); ringO.setAttribute("r", 10 * MK);
         ringO.setAttribute("fill", "none");
         ringO.setAttribute("stroke", "var(--sand)");
         ringO.setAttribute("stroke-width", "1.5");
@@ -4051,16 +4100,17 @@ RGP.REDUCED_MOTION = matchMedia("(prefers-reduced-motion: reduce)").matches;
       }
       var core = document.createElementNS(svgNS, "circle");
       core.setAttribute("cx", cx); core.setAttribute("cy", cy);
-      core.setAttribute("r", prj.isGiga ? 7 : 5);
+      core.setAttribute("r", (prj.isGiga ? 7 : 5) * MK);
       core.setAttribute("fill", color);
       core.setAttribute("class", "core");
       g.appendChild(core);
 
       if (opts.showLabels) {
         var lbl = document.createElementNS(svgNS, "text");
-        lbl.setAttribute("x", cx); lbl.setAttribute("y", cy - 14);
+        lbl.setAttribute("x", cx); lbl.setAttribute("y", cy - 14 * MK);
         lbl.setAttribute("text-anchor", "middle");
         lbl.setAttribute("class", "rmap-label");
+        if (phone) lbl.setAttribute("style", "font-size:" + (11 * MK) + "px");
         lbl.textContent = td(prj.name);
         g.appendChild(lbl);
       }
@@ -4311,12 +4361,45 @@ RGP.REDUCED_MOTION = matchMedia("(prefers-reduced-motion: reduce)").matches;
         }
       }, UI.avatar(user)));
 
-    var tabs = (NAVS[user.role] || []).filter(function (i) { return i.route; }).slice(0, 5);
-    var bottomtabs = h("nav.bottomtabs", null, tabs.map(function (item) {
-      var active = route.indexOf(item.route) === 0;
-      return h("button" + (active ? ".active" : ""), { onclick: function () { RGP.router.go(item.route); } },
-        UI.icon(item.icon, 22), td(item.label));
-    }));
+    /* bottom tabs: first four destinations + «المزيد» sheet covering the rest,
+       so every desktop rail destination stays reachable on the phone.
+       Exactly one tab is active — the longest route prefix wins. */
+    var navItems = (NAVS[user.role] || []).filter(function (i) { return i.route; });
+    var routePath = route.split("?")[0];
+    var best = "";
+    navItems.forEach(function (i) {
+      if ((routePath === i.route || routePath.indexOf(i.route + "/") === 0 || route.indexOf(i.route + "?") === 0) &&
+          i.route.length > best.length) best = i.route;
+    });
+    if (!best) navItems.forEach(function (i) {
+      if (routePath.indexOf(i.route) === 0 && i.route.length > best.length) best = i.route;
+    });
+    var tabItems = navItems.slice(0, navItems.length > 5 ? 4 : 5);
+    var moreItems = navItems.slice(tabItems.length);
+    function moreSheet() {
+      UI.modal({
+        title: { ar: "جميع الأقسام", en: "All sections" }, size: "sm",
+        body: h("div.flex-col.g1", null, moreItems.map(function (item) {
+          var badge = item.badge ? item.badge(user) : 0;
+          return h("button.sheet-item", {
+            onclick: function () {
+              var or = RGP.$("#overlay-root"); if (or) or.innerHTML = "";
+              RGP.router.go(item.route);
+            }
+          }, UI.icon(item.icon, 20), h("span.grow.t-footnote", { style: { fontWeight: 600 } }, td(item.label)),
+            badge ? h("span.nav-badge.num", null, String(badge)) : null);
+        }))
+      });
+    }
+    var bottomtabs = h("nav.bottomtabs", null,
+      tabItems.map(function (item) {
+        var active = item.route === best;
+        return h("button" + (active ? ".active" : ""), { onclick: function () { RGP.router.go(item.route); } },
+          UI.icon(item.icon, 22), td(item.label));
+      }),
+      moreItems.length ? h("button" + (moreItems.some(function (i) { return i.route === best; }) ? ".active" : ""),
+        { onclick: moreSheet },
+        UI.icon("grid", 22), RGP.i18n.lang === "ar" ? "المزيد" : "More") : null);
 
     /* chrome-minimal boardroom layout (ux-spec §7.12): no rail, identity strip only */
     if (opts.chromeMinimal) {
@@ -4414,7 +4497,7 @@ RGP.REDUCED_MOTION = matchMedia("(prefers-reduced-motion: reduce)").matches;
           }
         }, t("ntf.markAll"))),
       h("div", { style: { padding: "0 14px 10px" } },
-        h("div.segmented", { style: { height: "30px" } },
+        h("div.segmented", { style: { height: "34px" } },
           [["all", t("common.all")], ["req", { ar: "الطلبات", en: "Requests" }], ["ch", { ar: "التحديات", en: "Challenges" }], ["sys", { ar: "النظام", en: "System" }]].map(function (x) {
             return h("button" + (filter === x[0] ? ".active" : ""), {
               onclick: function (e) {
@@ -4450,7 +4533,9 @@ RGP.REDUCED_MOTION = matchMedia("(prefers-reduced-motion: reduce)").matches;
     document.body.appendChild(m);
     var r = anchor.getBoundingClientRect();
     m.style.top = (r.bottom + 8 + window.scrollY) + "px";
-    var left = RGP.clamp(RGP.i18n.lang === "ar" ? r.left - 40 : r.right - 400, 8, window.innerWidth - 408);
+    var pw = m.offsetWidth || 400;
+    var left = RGP.clamp(RGP.i18n.lang === "ar" ? r.left - 40 : r.right - pw,
+      8, Math.max(8, window.innerWidth - pw - 8));
     m.style.left = left + "px";
     setTimeout(function () {
       document.addEventListener("click", function onDoc(e) {
@@ -4775,7 +4860,7 @@ RGP.REDUCED_MOTION = matchMedia("(prefers-reduced-motion: reduce)").matches;
                 return h("li.flex.g1.t-sub", { style: { alignItems: "flex-start", padding: "4px 0" } },
                   h("span.mut", { style: { marginTop: "3px" } }, UI.icon("doc", 14)),
                   h("span", null, td(d.name),
-                    h("span.t-caption.mut.num", { style: { marginInlineStart: "6px" } }, (d.formats || []).join(" ").toUpperCase())));
+                    h("span.t-caption.mut.num", { style: { marginInline: "8px" } }, (d.formats || []).join(" · ").toUpperCase())));
               })))),
           h("div.well.card-pad-dense.mbs-3.flex.g2.wrap", null,
             h("span.t-footnote.mut", null, t("common.fees") + ": "),
@@ -6655,6 +6740,11 @@ RGP.REDUCED_MOTION = matchMedia("(prefers-reduced-motion: reduce)").matches;
                 h("span.id-cell.num", null, r.id),
                 r.priority === "fast_track" ? h("span", { class: "flex", title: t("sla.fastTrack"), style: { color: "var(--sand-deep)" } }, UI.icon("bolt", 14)) : null);
             }, sortVal: function (r) { return r.id; } },
+          /* triage priority: the clock and state ride beside the id so they
+             stay visible at the initial scroll position on narrow screens */
+          { key: "sla", label: t("work.slaLeft"), render: function (r) { return UI.slaChip(r) || "—"; },
+            sortVal: function (r) { return r.sla && r.sla.dueAt || "9999"; } },
+          { key: "state", label: t("common.status"), render: function (r) { return UI.statePill(r.state); } },
           { key: "svc", label: t("req.service"), render: function (r) {
               var s = RGP.store.service(r.serviceId);
               return h("span.ellipsis", { style: { maxWidth: "200px", display: "inline-block" } }, s ? td(s.name) : "—");
@@ -6669,9 +6759,6 @@ RGP.REDUCED_MOTION = matchMedia("(prefers-reduced-motion: reduce)").matches;
           { key: "sub", label: { ar: "الاستلام", en: "Received" }, render: function (r) {
               return h("span.num-date.t-footnote", null, r.submittedAt ? RGP.fmtDate(r.submittedAt.slice(0, 10)) : "—");
             }, sortVal: function (r) { return r.submittedAt || ""; } },
-          { key: "sla", label: t("work.slaLeft"), render: function (r) { return UI.slaChip(r) || "—"; },
-            sortVal: function (r) { return r.sla && r.sla.dueAt || "9999"; } },
-          { key: "state", label: t("common.status"), render: function (r) { return UI.statePill(r.state); } },
           { key: "assignee", label: t("req.assignee"), render: function (r) {
               var a = r.assigneeId && RGP.store.user(r.assigneeId);
               return a ? UI.avatar(a, "sm") : h("span.pill.plain.sm", null, t("work.unassigned"));
@@ -7988,7 +8075,8 @@ RGP.REDUCED_MOTION = matchMedia("(prefers-reduced-motion: reduce)").matches;
         { key: "edit", label: t("common.actions"), render: function (s) {
             return h("button.btn.tertiary.sm", { onclick: function (e) { e.stopPropagation(); editService(s); } }, t("common.edit"));
           } }
-      ]
+      ],
+      onRow: function (s) { editService(s); }
     });
 
     function editService(s) {
@@ -8099,13 +8187,18 @@ RGP.REDUCED_MOTION = matchMedia("(prefers-reduced-motion: reduce)").matches;
     function renderHolidays() {
       holidayList.innerHTML = "";
       S.settings.holidays.forEach(function (d, idx) {
-        holidayList.appendChild(h("span.pill.plain.num", null, d,
-          h("button.iconbtn", { style: { width: "18px", height: "18px" }, "aria-label": "remove",
+        holidayList.appendChild(h("span.pill.plain.num", { style: { height: "32px", paddingInline: "12px" } }, d,
+          h("button.iconbtn", { style: { width: "28px", height: "28px" }, "aria-label": "remove",
             onclick: function () {
-              S.settings.holidays.splice(idx, 1);
-              RGP.store.audit("settings.updated", "settings", "holidays");
-              RGP.store.save(); renderHolidays();
-            } }, UI.icon("x", 10))));
+              UI.confirm({ ar: "حذف يوم العطلة", en: "Remove holiday" },
+                { ar: "سيُحذف التاريخ " + d + " من أيام العطل المعتمدة، وتُحتسب المدد الزمنية بعدها دون استثنائه.", en: "Date " + d + " will be removed from official holidays; SLAs will no longer exclude it." },
+                { ar: "حذف", en: "Remove" }, "danger",
+                function () {
+                  S.settings.holidays.splice(idx, 1);
+                  RGP.store.audit("settings.updated", "settings", "holidays");
+                  RGP.store.save(); renderHolidays();
+                });
+            } }, UI.icon("x", 12))));
       });
     }
     renderHolidays();

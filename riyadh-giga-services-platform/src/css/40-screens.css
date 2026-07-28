@@ -170,6 +170,10 @@ html[dir="ltr"] .wiz-pane { animation-name: rgp-wiz-in-ltr; }
   transition: border-color var(--dur-fast), background var(--dur-fast);
 }
 .pick-card:hover { border-color: var(--hair-3); }
+@media (max-width: 768px) {
+  .pick-card { flex-wrap: wrap; }
+  .pick-card .grow { min-width: 55%; }
+}
 .pick-card.selected { border-color: var(--accent); background: var(--accent-softer); }
 .pick-card .pc-radio {
   width: 20px; height: 20px; border-radius: var(--r-full); flex: 0 0 auto;
@@ -215,6 +219,9 @@ html[dir="ltr"] .wiz-pane { animation-name: rgp-wiz-in-ltr; }
 @media (max-width: 900px) { .ws { grid-template-columns: 1fr; } }
 .ws-a, .ws-c { position: sticky; top: calc(var(--topbar-h) + 16px); }
 @media (max-width: 1280px) { .ws-c { position: static; } }
+/* stacked single-column workspace: a sticky summary would ride over the
+   documents and decision panes — everything flows statically on the phone */
+@media (max-width: 900px) { .ws-a { position: static; } }
 
 .queue-tabs { display: flex; gap: var(--sp-1); flex-wrap: wrap; }
 

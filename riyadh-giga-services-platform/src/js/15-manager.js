@@ -742,7 +742,8 @@
         { key: "edit", label: t("common.actions"), render: function (s) {
             return h("button.btn.tertiary.sm", { onclick: function (e) { e.stopPropagation(); editService(s); } }, t("common.edit"));
           } }
-      ]
+      ],
+      onRow: function (s) { editService(s); }
     });
 
     function editService(s) {
@@ -853,13 +854,18 @@
     function renderHolidays() {
       holidayList.innerHTML = "";
       S.settings.holidays.forEach(function (d, idx) {
-        holidayList.appendChild(h("span.pill.plain.num", null, d,
-          h("button.iconbtn", { style: { width: "18px", height: "18px" }, "aria-label": "remove",
+        holidayList.appendChild(h("span.pill.plain.num", { style: { height: "32px", paddingInline: "12px" } }, d,
+          h("button.iconbtn", { style: { width: "28px", height: "28px" }, "aria-label": "remove",
             onclick: function () {
-              S.settings.holidays.splice(idx, 1);
-              RGP.store.audit("settings.updated", "settings", "holidays");
-              RGP.store.save(); renderHolidays();
-            } }, UI.icon("x", 10))));
+              UI.confirm({ ar: "حذف يوم العطلة", en: "Remove holiday" },
+                { ar: "سيُحذف التاريخ " + d + " من أيام العطل المعتمدة، وتُحتسب المدد الزمنية بعدها دون استثنائه.", en: "Date " + d + " will be removed from official holidays; SLAs will no longer exclude it." },
+                { ar: "حذف", en: "Remove" }, "danger",
+                function () {
+                  S.settings.holidays.splice(idx, 1);
+                  RGP.store.audit("settings.updated", "settings", "holidays");
+                  RGP.store.save(); renderHolidays();
+                });
+            } }, UI.icon("x", 12))));
       });
     }
     renderHolidays();

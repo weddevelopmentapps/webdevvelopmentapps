@@ -66,6 +66,11 @@
                 h("span.id-cell.num", null, r.id),
                 r.priority === "fast_track" ? h("span", { class: "flex", title: t("sla.fastTrack"), style: { color: "var(--sand-deep)" } }, UI.icon("bolt", 14)) : null);
             }, sortVal: function (r) { return r.id; } },
+          /* triage priority: the clock and state ride beside the id so they
+             stay visible at the initial scroll position on narrow screens */
+          { key: "sla", label: t("work.slaLeft"), render: function (r) { return UI.slaChip(r) || "—"; },
+            sortVal: function (r) { return r.sla && r.sla.dueAt || "9999"; } },
+          { key: "state", label: t("common.status"), render: function (r) { return UI.statePill(r.state); } },
           { key: "svc", label: t("req.service"), render: function (r) {
               var s = RGP.store.service(r.serviceId);
               return h("span.ellipsis", { style: { maxWidth: "200px", display: "inline-block" } }, s ? td(s.name) : "—");
@@ -80,9 +85,6 @@
           { key: "sub", label: { ar: "الاستلام", en: "Received" }, render: function (r) {
               return h("span.num-date.t-footnote", null, r.submittedAt ? RGP.fmtDate(r.submittedAt.slice(0, 10)) : "—");
             }, sortVal: function (r) { return r.submittedAt || ""; } },
-          { key: "sla", label: t("work.slaLeft"), render: function (r) { return UI.slaChip(r) || "—"; },
-            sortVal: function (r) { return r.sla && r.sla.dueAt || "9999"; } },
-          { key: "state", label: t("common.status"), render: function (r) { return UI.statePill(r.state); } },
           { key: "assignee", label: t("req.assignee"), render: function (r) {
               var a = r.assigneeId && RGP.store.user(r.assigneeId);
               return a ? UI.avatar(a, "sm") : h("span.pill.plain.sm", null, t("work.unassigned"));

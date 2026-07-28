@@ -86,7 +86,14 @@
     var pop = null;
     function closePop() { if (pop) { pop.remove(); pop = null; } }
 
-    /* --- proximity clustering (§6.13): group markers closer than ~34 viewBox units --- */
+    /* Phone rendering: the viewBox shrinks to ~0.4x on a 390px screen, so
+       markers scale up, clustering widens (clusters-first navigation), and
+       every marker gets an invisible touch circle ≥ ~40px on screen. */
+    var phone = (window.innerWidth || 1200) <= 768;
+    var MK = phone ? 2.1 : 1;              /* marker scale in viewBox units */
+    var CLUSTER_DIST = phone ? 90 : 34;
+
+    /* --- proximity clustering (§6.13) --- */
     var pts = (opts.projects || []).map(function (prj) {
       return { prj: prj, x: px(prj.location.lng), y: py(prj.location.lat), cluster: -1 };
     });
@@ -95,7 +102,7 @@
       for (var ci = 0; ci < clusters.length; ci++) {
         var c = clusters[ci];
         var dx = c.x - pt.x, dy = c.y - pt.y;
-        if (Math.sqrt(dx * dx + dy * dy) < 34) { c.items.push(pt); pt.cluster = ci;
+        if (Math.sqrt(dx * dx + dy * dy) < CLUSTER_DIST) { c.items.push(pt); pt.cluster = ci;
           c.x = c.items.reduce(function (a, i2) { return a + i2.x; }, 0) / c.items.length;
           c.y = c.items.reduce(function (a, i2) { return a + i2.y; }, 0) / c.items.length;
           return; }
@@ -104,18 +111,27 @@
       pt.cluster = clusters.length - 1;
     });
 
+    function hitCircle(cx, cy) {
+      var hc = document.createElementNS(svgNS, "circle");
+      hc.setAttribute("cx", cx); hc.setAttribute("cy", cy);
+      hc.setAttribute("r", 22 * MK);
+      hc.setAttribute("fill", "transparent");
+      return hc;
+    }
+
     clusters.filter(function (c) { return c.items.length > 1; }).forEach(function (c) {
       var g = document.createElementNS(svgNS, "g");
       g.setAttribute("class", "rmap-marker");
+      g.appendChild(hitCircle(c.x, c.y));
       var circle = document.createElementNS(svgNS, "circle");
-      circle.setAttribute("cx", c.x); circle.setAttribute("cy", c.y); circle.setAttribute("r", 13);
+      circle.setAttribute("cx", c.x); circle.setAttribute("cy", c.y); circle.setAttribute("r", 13 * MK);
       circle.setAttribute("fill", "var(--accent)");
       circle.setAttribute("class", "core");
       g.appendChild(circle);
       var txt = document.createElementNS(svgNS, "text");
-      txt.setAttribute("x", c.x); txt.setAttribute("y", c.y + 3.5);
+      txt.setAttribute("x", c.x); txt.setAttribute("y", c.y + 3.5 * MK);
       txt.setAttribute("text-anchor", "middle");
-      txt.setAttribute("style", "font-family:var(--ff-display);font-size:11px;font-weight:700;fill:var(--on-accent);pointer-events:none");
+      txt.setAttribute("style", "font-family:var(--ff-display);font-size:" + (11 * MK) + "px;font-weight:700;fill:var(--on-accent);pointer-events:none");
       txt.textContent = String(c.items.length);
       g.appendChild(txt);
       g.addEventListener("click", function (e) {
@@ -149,10 +165,11 @@
       var g = document.createElementNS(svgNS, "g");
       g.setAttribute("class", "rmap-marker");
       var color = MAP.statusColor(prj.status);
+      g.appendChild(hitCircle(cx, cy));
 
       if ((opts.pulseIds || []).indexOf(prj.id) >= 0) {
         var pulse = document.createElementNS(svgNS, "circle");
-        pulse.setAttribute("cx", cx); pulse.setAttribute("cy", cy); pulse.setAttribute("r", 9);
+        pulse.setAttribute("cx", cx); pulse.setAttribute("cy", cy); pulse.setAttribute("r", 9 * MK);
         pulse.setAttribute("fill", "none");
         pulse.setAttribute("stroke", "var(--danger)");
         pulse.setAttribute("stroke-width", "2");
@@ -161,7 +178,7 @@
       }
       if (prj.isGiga) {
         var ringO = document.createElementNS(svgNS, "circle");
-        ringO.setAttribute("cx", cx); ringO.setAttribute("cy", cy); ringO.setAttribute("r", 10);
+        ringO.setAttribute("cx", cx); ringO.setAttribute("cy", cy); ringO.setAttribute("r", 10 * MK);
         ringO.setAttribute("fill", "none");
         ringO.setAttribute("stroke", "var(--sand)");
         ringO.setAttribute("stroke-width", "1.5");
@@ -169,16 +186,17 @@
       }
       var core = document.createElementNS(svgNS, "circle");
       core.setAttribute("cx", cx); core.setAttribute("cy", cy);
-      core.setAttribute("r", prj.isGiga ? 7 : 5);
+      core.setAttribute("r", (prj.isGiga ? 7 : 5) * MK);
       core.setAttribute("fill", color);
       core.setAttribute("class", "core");
       g.appendChild(core);
 
       if (opts.showLabels) {
         var lbl = document.createElementNS(svgNS, "text");
-        lbl.setAttribute("x", cx); lbl.setAttribute("y", cy - 14);
+        lbl.setAttribute("x", cx); lbl.setAttribute("y", cy - 14 * MK);
         lbl.setAttribute("text-anchor", "middle");
         lbl.setAttribute("class", "rmap-label");
+        if (phone) lbl.setAttribute("style", "font-size:" + (11 * MK) + "px");
         lbl.textContent = td(prj.name);
         g.appendChild(lbl);
       }

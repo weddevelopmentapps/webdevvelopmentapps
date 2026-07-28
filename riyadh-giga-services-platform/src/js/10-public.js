@@ -117,7 +117,7 @@
                 return h("li.flex.g1.t-sub", { style: { alignItems: "flex-start", padding: "4px 0" } },
                   h("span.mut", { style: { marginTop: "3px" } }, UI.icon("doc", 14)),
                   h("span", null, td(d.name),
-                    h("span.t-caption.mut.num", { style: { marginInlineStart: "6px" } }, (d.formats || []).join(" ").toUpperCase())));
+                    h("span.t-caption.mut.num", { style: { marginInline: "8px" } }, (d.formats || []).join(" · ").toUpperCase())));
               })))),
           h("div.well.card-pad-dense.mbs-3.flex.g2.wrap", null,
             h("span.t-footnote.mut", null, t("common.fees") + ": "),

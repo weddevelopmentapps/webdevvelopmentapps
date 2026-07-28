@@ -157,8 +157,13 @@
     overlay.appendChild(modal);
     root.appendChild(overlay);
     document.addEventListener("keydown", onKey);
-    var focusable = RGP.$$("input, textarea, select, button", modal).filter(function (x) { return !x.closest(".modal-head"); });
-    if (focusable.length) focusable[0].focus();
+    /* autofocus only true form fields, and only on desktop — on the phone it
+       pops the keyboard over the modal, and focusing a result button lets the
+       same Enter keystroke activate it */
+    if (window.innerWidth > 768) {
+      var focusable = RGP.$$("input, textarea, select", modal).filter(function (x) { return !x.closest(".modal-head"); });
+      if (focusable.length) focusable[0].focus();
+    }
     return { close: close, el: modal };
   };
 
