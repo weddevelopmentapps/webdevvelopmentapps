@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """Assemble the fully self-contained index.html for
-«منصة الرياض الموحدة لتمكين المشاريع الكبرى» — أمانة منطقة الرياض.
+«منصة الخدمات البلدية للمشاريع الكبرى» — أمانة منطقة الرياض.
 
 Zero external requests at runtime: embedded Arabic fonts, vendored ECharts,
 official RRM logo + hero imagery as data URIs, inline seed data + app code.
@@ -46,9 +46,9 @@ html = f"""<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="منصة الرياض الموحدة لتمكين المشاريع الكبرى — أمانة منطقة الرياض. البوابة الموحدة للخدمات البلدية للمشاريع الكبرى والمطورين ومديري الأصول.">
+<meta name="description" content="منصة الخدمات البلدية للمشاريع الكبرى — أمانة منطقة الرياض. البوابة الموحدة لتقديم الخدمات البلدية للمشاريع الكبرى في مدينة الرياض ومتابعتها.">
 <meta name="color-scheme" content="light dark">
-<title>منصة الرياض الموحدة لتمكين المشاريع الكبرى — أمانة منطقة الرياض</title>
+<title>منصة الخدمات البلدية للمشاريع الكبرى — أمانة منطقة الرياض</title>
 <link rel="icon" type="image/webp" href="{logo}">
 <style>
 {fonts}

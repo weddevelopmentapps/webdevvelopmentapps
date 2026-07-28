@@ -631,6 +631,9 @@
                 h("td", null, p2 ? td(p2.name) : "—"),
                 h("td", null, r2.assigneeId ? td(RGP.store.userName(r2.assigneeId)) : "—"));
             }) : h("tr", null, h("td", { colspan: "6" }, RGP.i18n.lang === "ar" ? "لا توجد تجاوزات قائمة." : "No active breaches."))))),
+          h("div.t-caption.mut.mbs-1", { style: { fontWeight: 500 } }, RGP.i18n.lang === "ar"
+            ? "يشمل الجدول جميع الطلبات القائمة التي بلغت 100% من مددها أو تجاوزتها، بما فيها الموقوفة مؤقتًا لدى ممثل المشروع؛ ويقتصر الملخص التنفيذي على ما جرى تصعيده منها."
+            : "This table covers all open requests at or beyond 100% of their allotted time, including those paused with the project representative; the executive summary counts only the escalated subset."),
           h("div.t-headline.mbs-3.mbe-1", null, RGP.i18n.lang === "ar" ? "تحديات مصعّدة" : "Escalated challenges"),
           h("div.table-scroll", null, h("table.p-table.tbl", { style: { width: "100%" } },
             h("thead", null, h("tr", null,

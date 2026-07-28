@@ -152,15 +152,21 @@
             : "No projects on your account — continue standalone, or register your project via the onboarding service."),
         h("h2.t-title3.mbe-1.mbs-2", null, t("wizard.choosePhase")),
         h("div.grid.cols-3", null, ["before", "during", "after"].map(function (ph) {
+          var nSvc = availableServices(ph).length;
+          var svcLabel = RGP.i18n.lang === "ar"
+            ? (nSvc === 0 ? "لا توجد خدمات متاحة لدوركم في هذه المرحلة"
+                          : RGP.arPlural(nSvc, "خدمة واحدة", "خدمتان", "خدمات", "خدمة"))
+            : (nSvc === 0 ? "No services for your role in this phase"
+                          : nSvc + (nSvc === 1 ? " service" : " services"));
           return h("button.pick-card" + (state.phase === ph ? ".selected" : ""), {
-            onclick: function () { state.phase = ph; state.serviceId = null; render(); }
+            disabled: nSvc === 0 ? true : null,
+            style: nSvc === 0 ? { opacity: ".55", cursor: "default" } : null,
+            onclick: nSvc === 0 ? null : function () { state.phase = ph; state.serviceId = null; render(); }
           },
             h("span.pc-radio"),
             h("div", null,
               h("div.t-headline", null, t("phase." + ph)),
-              h("div.t-caption.mut.num", { style: { fontWeight: 500 } },
-                availableServices(ph).length +
-                (RGP.i18n.lang === "ar" ? " خدمة" : " services"))));
+              h("div.t-caption.mut.num", { style: { fontWeight: 500 } }, svcLabel)));
         })));
     }
 

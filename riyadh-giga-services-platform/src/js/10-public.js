@@ -178,11 +178,18 @@
             h("p", null, td(descs[ph])));
         }))));
 
-    /* stats band */
+    /* stats band — the projects label agrees with its dynamic count (تمييز العدد) */
+    var projStatLabel = (function (n) {
+      if (RGP.i18n.lang !== "ar") return t("landing.statsProjects");
+      if (n === 1) return "مشروع كبير ممكّن";
+      if (n === 2) return "مشروعان كبيران ممكّنان";
+      if (n >= 3 && n <= 10) return "مشاريع كبرى ممكّنة";
+      return t("landing.statsProjects");
+    })(kpis.enabledProjects);
     var stats = h("section.stats-band", null,
       h("div.pub-section", null,
         h("div.grid", null,
-          statBig(kpis.enabledProjects, t("landing.statsProjects")),
+          statBig(kpis.enabledProjects, projStatLabel),
           statBig(S.services.length, t("landing.statsServices")),
           statBig(kpis.onTimePct, t("landing.statsOnTime"), "%"),
           statBig(kpis.avgProcessing, t("landing.statsAvg")))));

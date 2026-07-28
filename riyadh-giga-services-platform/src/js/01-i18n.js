@@ -10,8 +10,8 @@
 
   var DICT = {
     /* ---- brand ---- */
-    "brand.name":            { ar: "منصة الرياض الموحدة لتمكين المشاريع الكبرى", en: "Riyadh Unified Giga-Projects Platform" },
-    "brand.short":           { ar: "تمكين المشاريع الكبرى", en: "Giga-Projects Enablement" },
+    "brand.name":            { ar: "منصة الخدمات البلدية للمشاريع الكبرى", en: "Giga-Projects Municipal Services Platform" },
+    "brand.short":           { ar: "الخدمات البلدية للمشاريع الكبرى", en: "Giga Municipal Services" },
     "brand.owner":           { ar: "أمانة منطقة الرياض", en: "Riyadh Region Municipality" },
     "brand.tagline":         { ar: "البوابة الموحدة لتقديم الخدمات البلدية للمشاريع الكبرى في مدينة الرياض ومتابعتها.", en: "The unified gateway for submitting and tracking municipal services for giga projects in Riyadh." },
 

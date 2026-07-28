@@ -46,7 +46,7 @@
         h("div.p-org", null,
           h("div.o1", null, "أمانة منطقة الرياض"),
           h("div.o2", null, "RIYADH REGION MUNICIPALITY"),
-          h("div.o3", null, "منصة الرياض الموحدة لتمكين المشاريع الكبرى")),
+          h("div.o3", null, "منصة الخدمات البلدية للمشاريع الكبرى")),
         verifySvg(docCode, 22)),
       h("hr.p-rule"), h("hr.p-rule2"));
   }

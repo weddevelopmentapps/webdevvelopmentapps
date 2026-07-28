@@ -37,7 +37,7 @@
 
     var head = h("div.page-head", null,
       h("div.kicker", null, td(u.org)),
-      h("h1.t-title1", null, t("portal.welcome") + "، " + td(u.name).split("—")[0]),
+      h("h1.t-title1", null, t("portal.welcome") + (RGP.i18n.lang === "ar" ? "، " : ", ") + td(u.name).split("—")[0]),
       h("p.desc.t-sub", null,
         RGP.i18n.lang === "ar"
           ? "متابعة الطلبات والمشاريع وتقديم طلبات الخدمات البلدية وفق مدد إنجاز معتمدة."
