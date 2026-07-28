@@ -1,0 +1,208 @@
+/* ============================================================
+   Impact module — «وحدة الأثر». Sovereign hero band, qualifier
+   chips, secondary tiles, ledger, landing/executive bands.
+   Tokens only — zero hex literals. impact-spec §5, §7.
+   ============================================================ */
+
+/* ---------------- sovereign hero band ---------------- */
+.impact-hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--sp-3);
+  padding: var(--sp-4) var(--sp-3);
+  border-radius: var(--r-lg);
+  background: linear-gradient(135deg, var(--green-800), var(--green-950));
+  color: var(--neutral-0);
+  overflow: hidden;
+}
+[data-theme="dark"] .impact-hero {
+  background: var(--surface-2);
+  border-block-start: 2px solid var(--sand-border);
+  color: var(--ink);
+}
+
+.impact-hero .imp-hc { min-width: 0; }
+.impact-hero .ihc-value {
+  font-family: var(--ff-display);
+  font-weight: 300;
+  font-size: 40px;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--neutral-0);
+  font-variant-numeric: tabular-nums;
+}
+[data-theme="dark"] .impact-hero .ihc-value { color: var(--ink); }
+.impact-hero .ihc-value.gold,
+[data-theme="dark"] .impact-hero .ihc-value.gold { color: var(--sand); }
+.impact-hero .imp-hc.small .ihc-value { font-size: 28px; }
+
+.impact-hero .ihc-label {
+  font-family: var(--ff-display);
+  font-weight: 600;
+  font-size: 12.5px;
+  line-height: 1.5;
+  margin-block-start: 6px;
+  opacity: 0.88;
+}
+.impact-hero .ihc-sub {
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.5;
+  margin-block-start: 2px;
+  opacity: 0.62;
+}
+
+/* ---------------- qualifier chips («تقديري ▸ المنهجية» / «مُقاس») ---------------- */
+.qual-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  margin-block-start: 10px;
+  padding: 4px 12px;
+  border: 1px solid var(--sand-border);
+  border-radius: var(--r-full);
+  background: transparent;
+  color: inherit;
+  font-family: var(--ff-display);
+  font-weight: 600;
+  font-size: 11px;
+  cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease;
+}
+.qual-chip:hover { border-color: var(--sand); }
+.qual-chip.measured { border-style: dashed; opacity: 0.9; }
+.imp-tile .qual-chip { color: var(--sand-deep); }
+[data-theme="dark"] .imp-tile .qual-chip { color: var(--sand); }
+
+/* inline methodology text link — enlarged tap target without breaking line flow */
+.qual-link {
+  background: none;
+  border: none;
+  padding: 8px 4px;
+  margin: -8px -4px;
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.impact-band .qual-link { color: var(--accent); }
+
+/* ---------------- secondary tile row (M1 · M6 · M7 · M8) ---------------- */
+.impact-tiles {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--sp-15);
+}
+.imp-tile { cursor: default; }
+.imp-tile .imp-tile-sub { font-weight: 500; line-height: 1.55; margin-block-start: 4px; }
+.imp-tile .imp-tile-sub.accent { color: var(--accent); font-weight: 600; }
+
+/* 7/5 chart rows */
+.impact-cols-75 { grid-template-columns: 7fr 5fr; }
+.impact-cols-75 .chart-box { min-height: 240px; }
+
+/* ---------------- methodology footnote (visible inline) ---------------- */
+.impact-note {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3);
+  background: var(--sand-soft);
+  border: 1px solid var(--sand-border);
+  border-radius: var(--r-md);
+  color: var(--ink-2);
+}
+.impact-note .imp-note-icon { color: var(--sand-deep); flex: none; margin-block-start: 2px; }
+[data-theme="dark"] .impact-note .imp-note-icon { color: var(--sand); }
+.impact-note p { line-height: 1.9; font-weight: 500; margin: 0; }
+
+/* zero-state caption (never NaN / 0 ريال) */
+.impact-zero {
+  grid-column: 1 / -1;
+  font-weight: 500;
+  opacity: 0.75;
+}
+
+/* ---------------- executive compact variant (§5.2) ---------------- */
+.impact-hero.compact {
+  display: block;
+  padding: var(--sp-3);
+  margin-block-end: var(--sp-3);
+}
+.impact-hero.compact .imp-hgrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--sp-3);
+}
+.impact-hero.compact .ihc-value { font-size: 30px; }
+.impact-hero.compact .imp-hc.small .ihc-value { font-size: 24px; }
+.impact-hero.compact .imp-spark {
+  height: 120px;
+  margin-block-start: var(--sp-2);
+  direction: ltr;
+}
+.impact-hero.compact .ihc-note {
+  margin-block-start: var(--sp-1);
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+/* ---------------- landing band content (§5.3) ---------------- */
+.impact-band .imp-counters {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--sp-3);
+}
+.impact-band .imp-stat .v {
+  font-family: var(--ff-display);
+  font-weight: 300;
+  font-size: clamp(28px, 4vw, 42px);
+  line-height: 1.15;
+  color: var(--green-800);
+  font-variant-numeric: tabular-nums;
+}
+[data-theme="dark"] .impact-band .imp-stat .v { color: var(--accent); }
+.impact-band .imp-stat .v.gold,
+[data-theme="dark"] .impact-band .imp-stat .v.gold { color: var(--sand-deep); }
+.impact-band .imp-stat .l {
+  font-family: var(--ff-display);
+  font-weight: 500;
+  font-size: 12.5px;
+  color: var(--mut);
+  margin-block-start: 4px;
+}
+
+/* ---------------- phone hardening (§7.6) ---------------- */
+@media (max-width: 900px) {
+  .impact-hero,
+  .impact-hero.compact .imp-hgrid,
+  .impact-band .imp-counters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .impact-hero { gap: var(--sp-3) var(--sp-2); padding: var(--sp-3) var(--sp-2); }
+  .impact-hero .ihc-value { font-size: 32px; }
+  .impact-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .impact-cols-75 { grid-template-columns: 1fr; }
+}
+@media (max-width: 700px) {
+  .impact-hero { grid-template-columns: 1fr; }
+  .impact-hero.compact .imp-hgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .impact-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .qual-chip { min-height: 40px; }
+}
+
+/* ---------------- print: outlined card, no dark fill ---------------- */
+@media print {
+  .impact-hero,
+  [data-theme="dark"] .impact-hero {
+    background: none !important;
+    border: 1px solid var(--hair-3);
+    color: var(--ink);
+  }
+  .impact-hero .ihc-value,
+  [data-theme="dark"] .impact-hero .ihc-value { color: var(--ink); }
+  .impact-hero .ihc-value.gold { color: var(--sand-deep); }
+  .qual-chip { border-color: var(--hair-3); }
+}
