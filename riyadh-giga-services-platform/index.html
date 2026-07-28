@@ -2323,15 +2323,17 @@ body.pal-open .bottomtabs { display: none; }
 
 .impact-hero .imp-hc { min-width: 0; }
 .impact-hero .ihc-value {
+  white-space: nowrap;
   font-family: var(--ff-display);
   font-weight: 300;
-  font-size: 40px;
+  font-size: clamp(26px, 2.3vw, 36px);
   line-height: 1.15;
   letter-spacing: -0.01em;
   color: var(--neutral-0);
   font-variant-numeric: tabular-nums;
 }
-[data-theme="dark"] .impact-hero .ihc-value { color: var(--ink); }
+[data-theme="dark"] .impact-hero .ihc-value {
+  white-space: nowrap; color: var(--ink); }
 .impact-hero .ihc-value.gold,
 [data-theme="dark"] .impact-hero .ihc-value.gold { color: var(--sand); }
 .impact-hero .imp-hc.small .ihc-value { font-size: 28px; }
@@ -2481,7 +2483,8 @@ body.pal-open .bottomtabs { display: none; }
   .impact-hero.compact .imp-hgrid,
   .impact-band .imp-counters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .impact-hero { gap: var(--sp-3) var(--sp-2); padding: var(--sp-3) var(--sp-2); }
-  .impact-hero .ihc-value { font-size: 32px; }
+  .impact-hero .ihc-value {
+  white-space: nowrap; font-size: 32px; }
   .impact-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .impact-cols-75 { grid-template-columns: 1fr; }
 }
@@ -2501,7 +2504,8 @@ body.pal-open .bottomtabs { display: none; }
     color: var(--ink);
   }
   .impact-hero .ihc-value,
-  [data-theme="dark"] .impact-hero .ihc-value { color: var(--ink); }
+  [data-theme="dark"] .impact-hero .ihc-value {
+  white-space: nowrap; color: var(--ink); }
   .impact-hero .ihc-value.gold { color: var(--sand-deep); }
   .qual-chip { border-color: var(--hair-3); }
 }
@@ -2966,7 +2970,7 @@ html[dir="ltr"] .hero-notch svg { transform: scaleX(-1); }
 .herit-wrap { display: grid; grid-template-columns: 7fr 5fr; gap: var(--sp-5); align-items: start; }
 .herit-fig {
   position: relative;
-  margin-block-start: calc(-1 * var(--sec-y) - 24px);
+  margin-block-start: calc(-1 * var(--sec-y) + 40px);
   border-radius: var(--r-xl);
   overflow: clip; aspect-ratio: 3 / 4; z-index: 1;
   box-shadow: var(--shadow-3);
@@ -3040,6 +3044,24 @@ html[dir="ltr"] .hero-notch svg { transform: scaleX(-1); }
   pointer-events: none;
 }
 @media (max-width: 768px) { .topbar-search .kbd { display: none; } }
+
+/* QA fixes — flagship polish wave */
+/* the how-steps section breathes before the heritage portrait climbs in */
+.how-sec { padding-block-end: 56px; }
+/* glass nav must not let display-type read through */
+.pub-nav { background: var(--glass-tint-strong); }
+/* phone: brand block stays inside the 64px bar */
+@media (max-width: 560px) {
+  .pub-nav > div:nth-of-type(1) { min-width: 0; flex: 1 1 auto; }
+  .pub-nav > div:nth-of-type(1) > div:first-child {
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px;
+  }
+  .pub-nav > div:nth-of-type(1) .t-caption { display: none; }
+}
+/* prefs sheet close button reaches the touch floor */
+.prefs-sheet .iconbtn, .prefs-sheet .jc-panel-x { width: 44px; height: 44px; }
+/* choice-node fork stubs need label clearance */
+.jc-kind-choice .jc-label-block { margin-block-start: 36px; }
 
 
 /* ===== src/css/90-print.css ===== */
@@ -6622,12 +6644,15 @@ RGP.isMac = /Mac|iPhone|iPad/.test(navigator.platform || "");
     return c ? c.name : { ar: id, en: id };
   };
 
-  /* macro pipeline for the request tracking stepper (12 states → 5 phases) */
+  /* macro pipeline for the request tracking stepper (12 states → 5 phases).
+     approved/closed return 5 — all five stages read as complete; rejected/
+     cancelled stay at 4 so the danger ring lands on «القرار». */
   RGP.macroPhase = function (state) {
     if (state === "draft") return 0;
     if (["submitted", "screening"].indexOf(state) >= 0) return 1;
     if (["in_review", "returned", "resubmitted", "external_review"].indexOf(state) >= 0) return 2;
     if (state === "decision_due") return 3;
+    if (["approved", "closed"].indexOf(state) >= 0) return 5;
     return 4;
   };
 
@@ -7423,7 +7448,7 @@ RGP.isMac = /Mac|iPhone|iPad/.test(navigator.platform || "");
 
   /* hero counter block. opts: {value, label, sub, gold, dec, suffix, fmt, zero, small} */
   function heroCounter(opts) {
-    var v = h("div.ihc-value.num" + (opts.gold ? ".gold" : ""));
+    var v = h("div.ihc-value.num-date" + (opts.gold ? ".gold" : ""));
     if (opts.zero) v.textContent = "—";
     else Impact.counter(v, opts.value, { dec: opts.dec, suffix: opts.suffix, fmt: opts.fmt });
     return h("div.imp-hc" + (opts.small ? ".small" : ""), null,
@@ -7504,14 +7529,13 @@ RGP.isMac = /Mac|iPhone|iPad/.test(navigator.platform || "");
 
     /* landing band content (integrator wraps in <section class="pub-section impact-band" id="impact">) */
     function landingStat(opts) {
-      var v = h("div.v.num" + (opts.gold ? ".gold" : ""));
+      var v = h("div.v.num-date" + (opts.gold ? ".gold" : ""));
       if (opts.zero) v.textContent = "—";
       else Impact.counter(v, opts.value, { dec: opts.dec, suffix: opts.suffix, fmt: opts.fmt });
       return h("div.imp-stat", null, v, h("div.l", null, td(opts.label)));
     }
-    frag.appendChild(h("div.kicker", null, td(L.landingEyebrow)));
-    frag.appendChild(h("h2.t-title1", null, td(L.landingTitle)));
-    frag.appendChild(h("p.t-body.mut.mbs-1", { style: { maxWidth: "640px" } }, td(L.landingLede)));
+    /* heading is supplied by the landing section itself (10-public.js) —
+       duplicating it here stacked two kickers/titles (QA major) */
     frag.appendChild(h("div.imp-counters.mbs-4", null,
       landingStat({ zero: !has, value: I.savingsTotal, fmt: Impact.fmtSar, label: L.landingM3, gold: true }),
       landingStat({ zero: !has, value: I.acceleratedTotal, fmt: Impact.fmtSar, label: L.landingM4 }),
@@ -7587,16 +7611,18 @@ RGP.isMac = /Mac|iPhone|iPad/.test(navigator.platform || "");
           render: function (x) { return h("span.num", null, RGP.fmtNum(x.daysSaved, { dec: 0 })); },
           sortVal: function (x) { return x.daysSaved; } },
         { key: "sar", label: L.ledgerSar, end: true,
-          render: function (x) { return h("span.num", null, Impact.fmtSar(x.sarSaved)); },
+          render: function (x) { return h("span.num-date", null, Impact.fmtSar(x.sarSaved)); },
           sortVal: function (x) { return x.sarSaved; } }
       ],
       empty: RGP.ui.empty("chart", { ar: "لا سجلات أثر بعد", en: "No impact records yet" }, t("impact.zeroState"), null, true)
     });
-    var rowB = h("div.grid.impact-cols-75.mbs-2", null,
-      h("div.chart-card.elev-1", null,
+    /* ledger spans full width — inside the 5/12 column its metric columns
+       scrolled out of view in RTL (QA major) */
+    var rowB = h("div", null,
+      h("div.chart-card.elev-1.mbs-2", null,
         h("div.ch-head", null, h("span.t-headline", null, td(L.chartCumulative))),
         has ? areaBox : RGP.ui.empty("chart", { ar: "لا بيانات بعد", en: "No data yet" }, t("impact.zeroState"), null, true)),
-      h("div", null,
+      h("div.mbs-2", null,
         h("div.flex.between.mbe-1", null, h("span.t-headline", null, td(L.ledgerTitle))),
         ledger));
 
@@ -7912,7 +7938,7 @@ RGP.isMac = /Mac|iPhone|iPad/.test(navigator.platform || "");
             }))));
 
     /* impact band — bleeding sand-duotone photograph + live impact counters */
-    var impactBand = h("section.sec.impact-sec.pub-section#impact", null,
+    var impactBand = h("section.sec.impact-sec.impact-band.pub-section#impact", null,
       h("div.impact-wrap", null,
         h("figure.impact-fig", { "data-io": "" },
           h("img", { src: window.ASSETS.night || window.ASSETS.hero || "", alt: "" })),
@@ -8516,11 +8542,14 @@ RGP.isMac = /Mac|iPhone|iPad/.test(navigator.platform || "");
      ================================================================ */
   var gradSeq = 0;
 
-  function makeGradient(defs, id, clsA, clsB) {
+  function makeGradient(defs, id, clsA, clsB, hostW) {
+    /* userSpaceOnUse: objectBoundingBox collapses on horizontal segments
+       (zero-height bbox renders nothing — QA blocker) */
     var g = svgEl("linearGradient");
     g.setAttribute("id", id);
-    g.setAttribute("x1", isRTL() ? "1" : "0"); g.setAttribute("y1", "0");
-    g.setAttribute("x2", isRTL() ? "0" : "1"); g.setAttribute("y2", "0");
+    g.setAttribute("gradientUnits", "userSpaceOnUse");
+    g.setAttribute("x1", isRTL() ? String(hostW || 1000) : "0"); g.setAttribute("y1", "0");
+    g.setAttribute("x2", isRTL() ? "0" : String(hostW || 1000)); g.setAttribute("y2", "0");
     var s1 = svgEl("stop"); s1.setAttribute("offset", "0"); s1.setAttribute("class", clsA);
     var s2 = svgEl("stop"); s2.setAttribute("offset", "1"); s2.setAttribute("class", clsB);
     g.appendChild(s1); g.appendChild(s2);
@@ -8571,7 +8600,7 @@ RGP.isMac = /Mac|iPhone|iPad/.test(navigator.platform || "");
     var w = Math.max(1, host.offsetWidth);
     var defs = svgEl("defs");
     var gid = "jcGradDone-" + (++gradSeq);
-    makeGradient(defs, gid, "jc-g-done-a", "jc-g-done-b");
+    makeGradient(defs, gid, "jc-g-done-a", "jc-g-done-b", w);
     svg.appendChild(defs);
     var segs = [];
     for (var i = 0; i < centers.length - 1; i++) {
@@ -8720,7 +8749,7 @@ RGP.isMac = /Mac|iPhone|iPad/.test(navigator.platform || "");
       h("span.jc-label", null,
         status === "blocked" && flavor !== "danger" ? h("span.jc-alert-ic", null, UI.icon("alert", 14)) : null,
         td(s.title)),
-      s.slaDays ? h("span.jc-sub.t-caption.mut.num", null, RGP.fmtWorkdays(s.slaDays)) : null,
+      s.slaDays ? h("span.jc-sub.t-caption.mut.num-date", null, RGP.fmtWorkdays(s.slaDays)) : null,
       s.kind === "service" && prereqN > 0
         ? h("span.jc-dep", null, UI.icon("shield", 11), prereqLabel(prereqN)) : null));
 
@@ -8877,7 +8906,7 @@ RGP.isMac = /Mac|iPhone|iPad/.test(navigator.platform || "");
     tipEl = h("div.jc-tip", null,
       h("div.jc-tip-title", null, td(s.title)),
       h("div.t-caption.mut", { style: { fontWeight: 500 } }, td(s.actor)),
-      s.slaDays ? h("div.t-caption.mut.num", { style: { fontWeight: 500 } }, RGP.fmtWorkdays(s.slaDays)) : null);
+      s.slaDays ? h("div.t-caption.mut.num-date", { style: { fontWeight: 500 } }, RGP.fmtWorkdays(s.slaDays)) : null);
     document.body.appendChild(tipEl);
     var tw = tipEl.offsetWidth;
     var left = RGP.clamp(r.left + r.width / 2 - tw / 2, 8, window.innerWidth - tw - 8);
@@ -8945,6 +8974,13 @@ RGP.isMac = /Mac|iPhone|iPad/.test(navigator.platform || "");
   function openPanel(ctx, i, o) {
     o = o || {};
     var content = panelContent(ctx, i);
+
+    /* navigation wipes #overlay-root — a detached panel must not be reused
+       (QA blocker: dead panel after navigating away while open) */
+    if (panel && !panel.wrap.isConnected) {
+      document.removeEventListener("keydown", panel.onKey);
+      panel = null;
+    }
 
     if (panel) { /* reuse — swap content with cross-fade (§2.1) */
       panel.trigger = o.trigger || panel.trigger;
@@ -9040,8 +9076,8 @@ RGP.isMac = /Mac|iPhone|iPad/.test(navigator.platform || "");
       var fast = svc && svc.gigaFastTrack && ctx.personaType === "giga_entity";
       meta.appendChild(metaRow("clock", jt("jc.sla"),
         h("div", null,
-          h("div.num", null, RGP.fmtWorkdays(slaDays)),
-          fast ? h("div.jc-fast.num", null,
+          h("div.num-date", null, RGP.fmtWorkdays(slaDays)),
+          fast ? h("div.jc-fast.num-date", null,
             jt("jc.fastTrack") + " " + RGP.fmtWorkdays(Math.max(1, Math.ceil(slaDays * 0.5)))) : null)));
     }
     meta.appendChild(metaRow("user", jt("jc.actor"), td(s.actor)));
@@ -9125,7 +9161,7 @@ RGP.isMac = /Mac|iPhone|iPad/.test(navigator.platform || "");
       panelHead(ctx, i, td(s.title), status, ctx.flavor ? ctx.flavor[i] : null, null, null),
       h("div.jc-meta", null,
         metaRow("user", jt("jc.actor"), td(s.actor)),
-        s.slaDays ? metaRow("clock", jt("jc.sla"), h("span.num", null, RGP.fmtWorkdays(s.slaDays))) : null),
+        s.slaDays ? metaRow("clock", jt("jc.sla"), h("span.num-date", null, RGP.fmtWorkdays(s.slaDays))) : null),
       h("div.jc-step-note.t-caption.mut", { style: { fontWeight: 500 } }, jt("jc.waypointHint")),
       s.note ? h("div.t-caption.mut.mbs-1", { style: { fontWeight: 500 } }, td(s.note)) : null);
   }
@@ -9141,7 +9177,7 @@ RGP.isMac = /Mac|iPhone|iPad/.test(navigator.platform || "");
           h("div.t-headline", null, td(p.name)),
           p.description ? h("div.t-caption.mut.mbs-05", { style: { fontWeight: 500 } }, td(p.description)) : null,
           h("div.flex.g1.mbs-1", null,
-            h("span.pill.plain.sm.num", null, String(p.steps.length) + " " + jt("jc.steps")),
+            h("span.pill.plain.sm.num-date", null, String(p.steps.length) + " " + jt("jc.steps")),
             h("span.grow"),
             h("button.btn.secondary.sm", {
               onclick: function () {
@@ -9170,7 +9206,11 @@ RGP.isMac = /Mac|iPhone|iPad/.test(navigator.platform || "");
       };
       if (ctx.st) {
         var r2 = stepStatuses(p.steps, ctx.byService || {});
-        pctx.st = r2.st; pctx.flavor = r2.flavor; pctx.current = currentIndex(r2.st);
+        pctx.st = r2.st; pctx.flavor = r2.flavor;
+        /* only flag «أنت هنا» when the path actually has real progress —
+           otherwise two flags coexist with the main canvas (QA) */
+        var hasProgress = r2.st.some(function (x) { return x !== "upcoming"; });
+        pctx.current = hasProgress ? currentIndex(r2.st) : -1;
       }
       return buildCanvas(p.steps, pctx, { entrance: true });
     }
@@ -9203,7 +9243,7 @@ RGP.isMac = /Mac|iPhone|iPad/.test(navigator.platform || "");
         onclick: function () { if (ctx.pathId !== p.id) renderPath(p.id); }
       },
         h("span", null, td(p.name)),
-        h("span.pill.plain.sm.num", null, String(p.steps.length) + " " + jt("jc.steps"))));
+        h("span.pill.plain.sm.num-date", null, String(p.steps.length) + " " + jt("jc.steps"))));
     });
 
     ctx.selectPath = function (pid) { if (ctx.pathId !== pid) renderPath(pid); };

@@ -297,7 +297,7 @@
 
   /* hero counter block. opts: {value, label, sub, gold, dec, suffix, fmt, zero, small} */
   function heroCounter(opts) {
-    var v = h("div.ihc-value.num" + (opts.gold ? ".gold" : ""));
+    var v = h("div.ihc-value.num-date" + (opts.gold ? ".gold" : ""));
     if (opts.zero) v.textContent = "—";
     else Impact.counter(v, opts.value, { dec: opts.dec, suffix: opts.suffix, fmt: opts.fmt });
     return h("div.imp-hc" + (opts.small ? ".small" : ""), null,
@@ -378,14 +378,13 @@
 
     /* landing band content (integrator wraps in <section class="pub-section impact-band" id="impact">) */
     function landingStat(opts) {
-      var v = h("div.v.num" + (opts.gold ? ".gold" : ""));
+      var v = h("div.v.num-date" + (opts.gold ? ".gold" : ""));
       if (opts.zero) v.textContent = "—";
       else Impact.counter(v, opts.value, { dec: opts.dec, suffix: opts.suffix, fmt: opts.fmt });
       return h("div.imp-stat", null, v, h("div.l", null, td(opts.label)));
     }
-    frag.appendChild(h("div.kicker", null, td(L.landingEyebrow)));
-    frag.appendChild(h("h2.t-title1", null, td(L.landingTitle)));
-    frag.appendChild(h("p.t-body.mut.mbs-1", { style: { maxWidth: "640px" } }, td(L.landingLede)));
+    /* heading is supplied by the landing section itself (10-public.js) —
+       duplicating it here stacked two kickers/titles (QA major) */
     frag.appendChild(h("div.imp-counters.mbs-4", null,
       landingStat({ zero: !has, value: I.savingsTotal, fmt: Impact.fmtSar, label: L.landingM3, gold: true }),
       landingStat({ zero: !has, value: I.acceleratedTotal, fmt: Impact.fmtSar, label: L.landingM4 }),
@@ -461,16 +460,18 @@
           render: function (x) { return h("span.num", null, RGP.fmtNum(x.daysSaved, { dec: 0 })); },
           sortVal: function (x) { return x.daysSaved; } },
         { key: "sar", label: L.ledgerSar, end: true,
-          render: function (x) { return h("span.num", null, Impact.fmtSar(x.sarSaved)); },
+          render: function (x) { return h("span.num-date", null, Impact.fmtSar(x.sarSaved)); },
           sortVal: function (x) { return x.sarSaved; } }
       ],
       empty: RGP.ui.empty("chart", { ar: "لا سجلات أثر بعد", en: "No impact records yet" }, t("impact.zeroState"), null, true)
     });
-    var rowB = h("div.grid.impact-cols-75.mbs-2", null,
-      h("div.chart-card.elev-1", null,
+    /* ledger spans full width — inside the 5/12 column its metric columns
+       scrolled out of view in RTL (QA major) */
+    var rowB = h("div", null,
+      h("div.chart-card.elev-1.mbs-2", null,
         h("div.ch-head", null, h("span.t-headline", null, td(L.chartCumulative))),
         has ? areaBox : RGP.ui.empty("chart", { ar: "لا بيانات بعد", en: "No data yet" }, t("impact.zeroState"), null, true)),
-      h("div", null,
+      h("div.mbs-2", null,
         h("div.flex.between.mbe-1", null, h("span.t-headline", null, td(L.ledgerTitle))),
         ledger));
 

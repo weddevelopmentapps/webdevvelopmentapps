@@ -136,7 +136,7 @@ html[dir="ltr"] .hero-notch svg { transform: scaleX(-1); }
 .herit-wrap { display: grid; grid-template-columns: 7fr 5fr; gap: var(--sp-5); align-items: start; }
 .herit-fig {
   position: relative;
-  margin-block-start: calc(-1 * var(--sec-y) - 24px);
+  margin-block-start: calc(-1 * var(--sec-y) + 40px);
   border-radius: var(--r-xl);
   overflow: clip; aspect-ratio: 3 / 4; z-index: 1;
   box-shadow: var(--shadow-3);
@@ -210,3 +210,21 @@ html[dir="ltr"] .hero-notch svg { transform: scaleX(-1); }
   pointer-events: none;
 }
 @media (max-width: 768px) { .topbar-search .kbd { display: none; } }
+
+/* QA fixes — flagship polish wave */
+/* the how-steps section breathes before the heritage portrait climbs in */
+.how-sec { padding-block-end: 56px; }
+/* glass nav must not let display-type read through */
+.pub-nav { background: var(--glass-tint-strong); }
+/* phone: brand block stays inside the 64px bar */
+@media (max-width: 560px) {
+  .pub-nav > div:nth-of-type(1) { min-width: 0; flex: 1 1 auto; }
+  .pub-nav > div:nth-of-type(1) > div:first-child {
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px;
+  }
+  .pub-nav > div:nth-of-type(1) .t-caption { display: none; }
+}
+/* prefs sheet close button reaches the touch floor */
+.prefs-sheet .iconbtn, .prefs-sheet .jc-panel-x { width: 44px; height: 44px; }
+/* choice-node fork stubs need label clearance */
+.jc-kind-choice .jc-label-block { margin-block-start: 36px; }

@@ -268,7 +268,7 @@
             }))));
 
     /* impact band — bleeding sand-duotone photograph + live impact counters */
-    var impactBand = h("section.sec.impact-sec.pub-section#impact", null,
+    var impactBand = h("section.sec.impact-sec.impact-band.pub-section#impact", null,
       h("div.impact-wrap", null,
         h("figure.impact-fig", { "data-io": "" },
           h("img", { src: window.ASSETS.night || window.ASSETS.hero || "", alt: "" })),

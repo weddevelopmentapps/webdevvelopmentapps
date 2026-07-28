@@ -24,15 +24,17 @@
 
 .impact-hero .imp-hc { min-width: 0; }
 .impact-hero .ihc-value {
+  white-space: nowrap;
   font-family: var(--ff-display);
   font-weight: 300;
-  font-size: 40px;
+  font-size: clamp(26px, 2.3vw, 36px);
   line-height: 1.15;
   letter-spacing: -0.01em;
   color: var(--neutral-0);
   font-variant-numeric: tabular-nums;
 }
-[data-theme="dark"] .impact-hero .ihc-value { color: var(--ink); }
+[data-theme="dark"] .impact-hero .ihc-value {
+  white-space: nowrap; color: var(--ink); }
 .impact-hero .ihc-value.gold,
 [data-theme="dark"] .impact-hero .ihc-value.gold { color: var(--sand); }
 .impact-hero .imp-hc.small .ihc-value { font-size: 28px; }
@@ -182,7 +184,8 @@
   .impact-hero.compact .imp-hgrid,
   .impact-band .imp-counters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .impact-hero { gap: var(--sp-3) var(--sp-2); padding: var(--sp-3) var(--sp-2); }
-  .impact-hero .ihc-value { font-size: 32px; }
+  .impact-hero .ihc-value {
+  white-space: nowrap; font-size: 32px; }
   .impact-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .impact-cols-75 { grid-template-columns: 1fr; }
 }
@@ -202,7 +205,8 @@
     color: var(--ink);
   }
   .impact-hero .ihc-value,
-  [data-theme="dark"] .impact-hero .ihc-value { color: var(--ink); }
+  [data-theme="dark"] .impact-hero .ihc-value {
+  white-space: nowrap; color: var(--ink); }
   .impact-hero .ihc-value.gold { color: var(--sand-deep); }
   .qual-chip { border-color: var(--hair-3); }
 }

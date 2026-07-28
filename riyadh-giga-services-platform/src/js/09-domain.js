@@ -65,12 +65,15 @@
     return c ? c.name : { ar: id, en: id };
   };
 
-  /* macro pipeline for the request tracking stepper (12 states → 5 phases) */
+  /* macro pipeline for the request tracking stepper (12 states → 5 phases).
+     approved/closed return 5 — all five stages read as complete; rejected/
+     cancelled stay at 4 so the danger ring lands on «القرار». */
   RGP.macroPhase = function (state) {
     if (state === "draft") return 0;
     if (["submitted", "screening"].indexOf(state) >= 0) return 1;
     if (["in_review", "returned", "resubmitted", "external_review"].indexOf(state) >= 0) return 2;
     if (state === "decision_due") return 3;
+    if (["approved", "closed"].indexOf(state) >= 0) return 5;
     return 4;
   };
 

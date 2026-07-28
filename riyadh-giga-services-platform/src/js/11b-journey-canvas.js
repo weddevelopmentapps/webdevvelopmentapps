@@ -141,11 +141,14 @@
      ================================================================ */
   var gradSeq = 0;
 
-  function makeGradient(defs, id, clsA, clsB) {
+  function makeGradient(defs, id, clsA, clsB, hostW) {
+    /* userSpaceOnUse: objectBoundingBox collapses on horizontal segments
+       (zero-height bbox renders nothing — QA blocker) */
     var g = svgEl("linearGradient");
     g.setAttribute("id", id);
-    g.setAttribute("x1", isRTL() ? "1" : "0"); g.setAttribute("y1", "0");
-    g.setAttribute("x2", isRTL() ? "0" : "1"); g.setAttribute("y2", "0");
+    g.setAttribute("gradientUnits", "userSpaceOnUse");
+    g.setAttribute("x1", isRTL() ? String(hostW || 1000) : "0"); g.setAttribute("y1", "0");
+    g.setAttribute("x2", isRTL() ? "0" : String(hostW || 1000)); g.setAttribute("y2", "0");
     var s1 = svgEl("stop"); s1.setAttribute("offset", "0"); s1.setAttribute("class", clsA);
     var s2 = svgEl("stop"); s2.setAttribute("offset", "1"); s2.setAttribute("class", clsB);
     g.appendChild(s1); g.appendChild(s2);
@@ -196,7 +199,7 @@
     var w = Math.max(1, host.offsetWidth);
     var defs = svgEl("defs");
     var gid = "jcGradDone-" + (++gradSeq);
-    makeGradient(defs, gid, "jc-g-done-a", "jc-g-done-b");
+    makeGradient(defs, gid, "jc-g-done-a", "jc-g-done-b", w);
     svg.appendChild(defs);
     var segs = [];
     for (var i = 0; i < centers.length - 1; i++) {
@@ -345,7 +348,7 @@
       h("span.jc-label", null,
         status === "blocked" && flavor !== "danger" ? h("span.jc-alert-ic", null, UI.icon("alert", 14)) : null,
         td(s.title)),
-      s.slaDays ? h("span.jc-sub.t-caption.mut.num", null, RGP.fmtWorkdays(s.slaDays)) : null,
+      s.slaDays ? h("span.jc-sub.t-caption.mut.num-date", null, RGP.fmtWorkdays(s.slaDays)) : null,
       s.kind === "service" && prereqN > 0
         ? h("span.jc-dep", null, UI.icon("shield", 11), prereqLabel(prereqN)) : null));
 
@@ -502,7 +505,7 @@
     tipEl = h("div.jc-tip", null,
       h("div.jc-tip-title", null, td(s.title)),
       h("div.t-caption.mut", { style: { fontWeight: 500 } }, td(s.actor)),
-      s.slaDays ? h("div.t-caption.mut.num", { style: { fontWeight: 500 } }, RGP.fmtWorkdays(s.slaDays)) : null);
+      s.slaDays ? h("div.t-caption.mut.num-date", { style: { fontWeight: 500 } }, RGP.fmtWorkdays(s.slaDays)) : null);
     document.body.appendChild(tipEl);
     var tw = tipEl.offsetWidth;
     var left = RGP.clamp(r.left + r.width / 2 - tw / 2, 8, window.innerWidth - tw - 8);
@@ -570,6 +573,13 @@
   function openPanel(ctx, i, o) {
     o = o || {};
     var content = panelContent(ctx, i);
+
+    /* navigation wipes #overlay-root — a detached panel must not be reused
+       (QA blocker: dead panel after navigating away while open) */
+    if (panel && !panel.wrap.isConnected) {
+      document.removeEventListener("keydown", panel.onKey);
+      panel = null;
+    }
 
     if (panel) { /* reuse — swap content with cross-fade (§2.1) */
       panel.trigger = o.trigger || panel.trigger;
@@ -665,8 +675,8 @@
       var fast = svc && svc.gigaFastTrack && ctx.personaType === "giga_entity";
       meta.appendChild(metaRow("clock", jt("jc.sla"),
         h("div", null,
-          h("div.num", null, RGP.fmtWorkdays(slaDays)),
-          fast ? h("div.jc-fast.num", null,
+          h("div.num-date", null, RGP.fmtWorkdays(slaDays)),
+          fast ? h("div.jc-fast.num-date", null,
             jt("jc.fastTrack") + " " + RGP.fmtWorkdays(Math.max(1, Math.ceil(slaDays * 0.5)))) : null)));
     }
     meta.appendChild(metaRow("user", jt("jc.actor"), td(s.actor)));
@@ -750,7 +760,7 @@
       panelHead(ctx, i, td(s.title), status, ctx.flavor ? ctx.flavor[i] : null, null, null),
       h("div.jc-meta", null,
         metaRow("user", jt("jc.actor"), td(s.actor)),
-        s.slaDays ? metaRow("clock", jt("jc.sla"), h("span.num", null, RGP.fmtWorkdays(s.slaDays))) : null),
+        s.slaDays ? metaRow("clock", jt("jc.sla"), h("span.num-date", null, RGP.fmtWorkdays(s.slaDays))) : null),
       h("div.jc-step-note.t-caption.mut", { style: { fontWeight: 500 } }, jt("jc.waypointHint")),
       s.note ? h("div.t-caption.mut.mbs-1", { style: { fontWeight: 500 } }, td(s.note)) : null);
   }
@@ -766,7 +776,7 @@
           h("div.t-headline", null, td(p.name)),
           p.description ? h("div.t-caption.mut.mbs-05", { style: { fontWeight: 500 } }, td(p.description)) : null,
           h("div.flex.g1.mbs-1", null,
-            h("span.pill.plain.sm.num", null, String(p.steps.length) + " " + jt("jc.steps")),
+            h("span.pill.plain.sm.num-date", null, String(p.steps.length) + " " + jt("jc.steps")),
             h("span.grow"),
             h("button.btn.secondary.sm", {
               onclick: function () {
@@ -795,7 +805,11 @@
       };
       if (ctx.st) {
         var r2 = stepStatuses(p.steps, ctx.byService || {});
-        pctx.st = r2.st; pctx.flavor = r2.flavor; pctx.current = currentIndex(r2.st);
+        pctx.st = r2.st; pctx.flavor = r2.flavor;
+        /* only flag «أنت هنا» when the path actually has real progress —
+           otherwise two flags coexist with the main canvas (QA) */
+        var hasProgress = r2.st.some(function (x) { return x !== "upcoming"; });
+        pctx.current = hasProgress ? currentIndex(r2.st) : -1;
       }
       return buildCanvas(p.steps, pctx, { entrance: true });
     }
@@ -828,7 +842,7 @@
         onclick: function () { if (ctx.pathId !== p.id) renderPath(p.id); }
       },
         h("span", null, td(p.name)),
-        h("span.pill.plain.sm.num", null, String(p.steps.length) + " " + jt("jc.steps"))));
+        h("span.pill.plain.sm.num-date", null, String(p.steps.length) + " " + jt("jc.steps"))));
     });
 
     ctx.selectPath = function (pid) { if (ctx.pathId !== pid) renderPath(pid); };
