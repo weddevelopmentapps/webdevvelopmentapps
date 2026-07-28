@@ -350,12 +350,19 @@ ul, ol { list-style: none; }
 html[lang="en"] .t-body { font-size: 14px; line-height: 1.55; }
 html[lang="en"] .t-sub  { font-size: 13px; line-height: 1.5; }
 
-/* tabular numerals, LTR-isolated (ux-spec §3.2) */
+/* tabular numerals, LTR-isolated (ux-spec §3.2) — digits & codes ONLY */
 .num, [data-num] {
   font-family: var(--ff-display);
   font-variant-numeric: tabular-nums lining-nums;
   font-feature-settings: "tnum" 1, "lnum" 1;
   direction: ltr; unicode-bidi: isolate;
+}
+/* dates & mixed Arabic-numeral phrases: tabular digits, natural bidi order */
+.num-date {
+  font-family: var(--ff-display);
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings: "tnum" 1, "lnum" 1;
+  unicode-bidi: plaintext;
 }
 
 .mut   { color: var(--mut); }
@@ -586,7 +593,8 @@ html[lang="en"] .t-sub  { font-size: 13px; line-height: 1.5; }
 .avatar.sm { width: 24px; height: 24px; font-size: 9.5px; }
 
 /* ---------------- content ---------------- */
-.content { flex: 1 1 auto; width: 100%; max-width: var(--container-app); margin-inline: auto; padding: 0 28px 96px; }
+.content { flex: 1 1 auto; width: 100%; max-width: var(--container-app); margin-inline: auto; padding: 0 28px 96px; min-width: 0; }
+.content > * { min-width: 0; }
 .content.narrow { max-width: var(--container-content); }
 
 .page-head { padding-block: var(--sp-4) var(--sp-1); }
@@ -598,6 +606,8 @@ html[lang="en"] .t-sub  { font-size: 13px; line-height: 1.5; }
 
 /* ---------------- grids ---------------- */
 .grid { display: grid; gap: var(--sp-2); }
+.grid > * { min-width: 0; }
+.kpi-band > * { min-width: 0; }
 .cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
@@ -850,6 +860,10 @@ select.input { appearance: none; cursor: pointer; }
 .step.done .s-dot { background: var(--accent-soft); border-color: transparent; color: var(--accent); }
 .step .s-label { font-family: var(--ff-display); font-size: 12px; font-weight: 600; color: var(--mut); text-align: center; }
 .step.current .s-label { color: var(--ink); }
+@media (max-width: 768px) {
+  .step .s-label { display: none; }
+  .step.current .s-label { display: block; }
+}
 .step.done { cursor: pointer; }
 .step::before {
   content: ""; position: absolute; top: 13px; inset-inline-start: -50%; width: 100%;
@@ -1136,7 +1150,10 @@ html[dir="ltr"] .login-brand { border-start-end-radius: 0; border-start-start-ra
 [data-theme="dark"] .sla-chip.paused { background: var(--surface-2); }
 
 /* kanban (challenges board) */
-.kanban { display: grid; grid-template-columns: repeat(5, minmax(240px, 1fr)); gap: var(--sp-15); overflow-x: auto; align-items: start; }
+.kanban { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--sp-15); align-items: start; }
+@media (max-width: 1200px) {
+  .kanban { grid-template-columns: repeat(5, minmax(240px, 1fr)); overflow-x: auto; padding-block-end: var(--sp-2); }
+}
 .kb-col { background: var(--surface-2); border: 1px solid var(--hair-2); border-radius: var(--r-md); padding: var(--sp-15); min-height: 200px; }
 .kb-head { display: flex; align-items: center; gap: 8px; margin-block-end: var(--sp-15); }
 .kb-card {
@@ -1298,7 +1315,7 @@ html[dir="ltr"] .login-brand { border-start-end-radius: 0; border-start-start-ra
 .path-card.open { border-color: var(--accent); }
 
 /* ---------------- wizard (§7.4) ---------------- */
-.wizard-body { position: relative; overflow: hidden; }
+.wizard-body { position: relative; overflow: hidden; padding-block-end: var(--sp-2); }
 .wiz-pane { animation: rgp-wiz-in var(--dur-gentle) var(--ease-decelerate) both; }
 @keyframes rgp-wiz-in { from { opacity: 0; transform: translateX(-32px); } to { opacity: 1; transform: none; } }
 html[dir="ltr"] .wiz-pane { animation-name: rgp-wiz-in-ltr; }
@@ -1365,6 +1382,7 @@ html[dir="ltr"] .wiz-pane { animation-name: rgp-wiz-in-ltr; }
 
 /* ---------------- specialist workspace (§7.7) ---------------- */
 .ws { display: grid; grid-template-columns: 320px minmax(0,1fr) 360px; gap: var(--sp-2); align-items: start; }
+.ws > * { min-width: 0; }
 @media (max-width: 1280px) { .ws { grid-template-columns: 300px minmax(0,1fr); } .ws .ws-c { grid-column: 1 / -1; } }
 @media (max-width: 900px) { .ws { grid-template-columns: 1fr; } }
 .ws-a, .ws-c { position: sticky; top: calc(var(--topbar-h) + 16px); }
@@ -1496,8 +1514,7 @@ html[dir="ltr"] .wiz-pane { animation-name: rgp-wiz-in-ltr; }
 
   .p-conditions { margin-block: 6mm; }
   .p-conditions h4 { font-family: var(--ff-display); font-size: 11pt; color: #0B4F30; margin-bottom: 2mm; }
-  .p-conditions ol { list-style: arabic-indic inside; font-size: 9.5pt; line-height: 1.9; }
-  html[lang="en"] .p-conditions ol { list-style: decimal inside; }
+  .p-conditions ol { list-style: decimal inside; font-size: 9.5pt; line-height: 1.9; }
 
   .p-verify {
     display: flex; align-items: center; gap: 6mm;
@@ -1807,7 +1824,7 @@ RGP.REDUCED_MOTION = matchMedia("(prefers-reduced-motion: reduce)").matches;
     "brand.name":            { ar: "منصة الرياض الموحدة لتمكين المشاريع الكبرى", en: "Riyadh Unified Giga-Projects Platform" },
     "brand.short":           { ar: "تمكين المشاريع الكبرى", en: "Giga-Projects Enablement" },
     "brand.owner":           { ar: "أمانة منطقة الرياض", en: "Riyadh Region Municipality" },
-    "brand.tagline":         { ar: "بوابة واحدة، رحلة واضحة، قرار في موعده.", en: "One gateway. A clear journey. Decisions on time." },
+    "brand.tagline":         { ar: "البوابة الموحدة لتقديم الخدمات البلدية للمشاريع الكبرى في مدينة الرياض ومتابعتها.", en: "The unified gateway for submitting and tracking municipal services for giga projects in Riyadh." },
 
     /* ---- common ---- */
     "common.search":         { ar: "بحث", en: "Search" },
@@ -1881,7 +1898,7 @@ RGP.REDUCED_MOTION = matchMedia("(prefers-reduced-motion: reduce)").matches;
     "sla.ok":                 { ar: "ضمن المدة", en: "On track" },
     "sla.amber":              { ar: "اقتراب الموعد", en: "Approaching due" },
     "sla.red":                { ar: "متجاوز", en: "Overdue" },
-    "sla.paused":             { ar: "متوقف مؤقتًا — بانتظار العميل", en: "Paused — awaiting customer" },
+    "sla.paused":             { ar: "متوقف مؤقتًا بانتظار العميل", en: "Paused — awaiting customer" },
     "sla.remaining":          { ar: "المتبقي", en: "Remaining" },
     "sla.due":                { ar: "تاريخ الاستحقاق", en: "Due date" },
     "sla.elapsed":            { ar: "المنقضي", en: "Elapsed" },
@@ -1893,26 +1910,26 @@ RGP.REDUCED_MOTION = matchMedia("(prefers-reduced-motion: reduce)").matches;
     "phase.after":            { ar: "بعد التطوير", en: "After development" },
 
     /* ---- landing ---- */
-    "landing.heroTitle":      { ar: "مشاريع كبرى، بخدمات أكبر.", en: "Great projects deserve greater service." },
-    "landing.heroSub":        { ar: "المنصة الموحدة لأمانة منطقة الرياض لتقديم ومتابعة الخدمات البلدية للمشاريع الكبرى والمطورين والمستثمرين ومديري الأصول — بحوكمة واضحة وأولوية معتمدة.", en: "Riyadh Region Municipality's unified platform for giga projects, developers, investors and asset managers — clear governance, committed priority." },
-    "landing.cta":            { ar: "ابدأ طلبك", en: "Start a request" },
-    "landing.explore":        { ar: "استعرض الخدمات", en: "Explore services" },
-    "landing.journeyTitle":   { ar: "أين أنت في رحلة التطوير؟", en: "Where are you in the journey?" },
-    "landing.journeySub":     { ar: "اختر مرحلتك لعرض الخدمات المناسبة لها", en: "Choose your phase to see its services" },
+    "landing.heroTitle":      { ar: "منصة الخدمات البلدية للمشاريع الكبرى", en: "The Municipal Services Platform for Giga Projects" },
+    "landing.heroSub":        { ar: "المنصة الموحدة لأمانة منطقة الرياض لاستقبال طلبات الخدمات البلدية للمشاريع الكبرى والمطورين والمستثمرين ومديري الأصول، ومعالجتها ومتابعتها وفق مدد زمنية معتمدة.", en: "Riyadh Region Municipality's unified platform for receiving, processing and tracking municipal service requests for giga projects, developers, investors and asset managers within approved timelines." },
+    "landing.cta":            { ar: "تقديم طلب", en: "Submit a request" },
+    "landing.explore":        { ar: "استعراض الخدمات", en: "Browse services" },
+    "landing.journeyTitle":   { ar: "مراحل رحلة التطوير", en: "Development journey phases" },
+    "landing.journeySub":     { ar: "اختر مرحلة مشروعك لعرض الخدمات المتاحة فيها", en: "Select your project's phase to view its services" },
     "landing.servicesTitle":  { ar: "دليل الخدمات", en: "Service catalog" },
-    "landing.servicesSub":    { ar: "خدمة بلدية موثقة بمتطلباتها ومددها الزمنية", en: "Documented municipal services with requirements and timelines" },
-    "landing.howTitle":       { ar: "كيف تعمل المنصة؟", en: "How it works" },
-    "landing.how1":           { ar: "سجّل مشروعك واختر الخدمة", en: "Register your project and pick a service" },
-    "landing.how2":           { ar: "أكمل النموذج الذكي وأرفق المستندات", en: "Complete the smart form and attach documents" },
-    "landing.how3":           { ar: "تابع طلبك بمدد زمنية ملتزمة", en: "Track your request against committed SLAs" },
-    "landing.how4":           { ar: "استلم قرارك ووثيقتك الرسمية", en: "Receive your decision and official document" },
+    "landing.servicesSub":    { ar: "خدمات بلدية موثقة بمتطلباتها ومددها الزمنية", en: "Documented municipal services with requirements and timelines" },
+    "landing.howTitle":       { ar: "آلية تقديم الطلب ومعالجته", en: "How requests are submitted and processed" },
+    "landing.how1":           { ar: "تسجيل المشروع واختيار الخدمة", en: "Register the project and select a service" },
+    "landing.how2":           { ar: "تعبئة نموذج الطلب وإرفاق المستندات", en: "Complete the request form and attach the documents" },
+    "landing.how3":           { ar: "متابعة الطلب وفق المدد الزمنية المعتمدة", en: "Track the request against the approved timelines" },
+    "landing.how4":           { ar: "صدور القرار واستلام الوثيقة الرسمية", en: "Receive the decision and the official document" },
     "landing.statsProjects":  { ar: "مشروعًا كبيرًا ممكّنًا", en: "Giga projects enabled" },
     "landing.statsServices":  { ar: "خدمة بلدية موحدة", en: "Unified municipal services" },
     "landing.statsOnTime":    { ar: "الالتزام بالمواعيد", en: "On-time performance" },
     "landing.statsAvg":       { ar: "متوسط زمن المعالجة (يوم عمل)", en: "Avg processing (working days)" },
-    "landing.entitiesTitle":  { ar: "بتكامل مع الجهات ذات العلاقة", en: "Coordinated with partner entities" },
+    "landing.entitiesTitle":  { ar: "بالتكامل مع الجهات ذات العلاقة", en: "Coordinated with partner entities" },
     "landing.govTitle":       { ar: "حوكمة معتمدة من مكتب المشاريع الكبرى", en: "Governed by the Giga Projects Office" },
-    "landing.govSub":         { ar: "مسار موحد، مسؤوليات واضحة، وتصعيد منضبط حتى مكتب الأمين", en: "One route, clear accountability, disciplined escalation to the Mayor's office" },
+    "landing.govSub":         { ar: "مسار موحد للطلبات، ومسؤوليات محددة، وآلية تصعيد معتمدة تصل إلى مكتب الأمين", en: "A unified request route, defined responsibilities, and an approved escalation path up to the Mayor's office" },
 
     /* ---- login ---- */
     "login.title":            { ar: "تسجيل الدخول إلى المنصة", en: "Sign in to the platform" },
@@ -1936,7 +1953,7 @@ RGP.REDUCED_MOTION = matchMedia("(prefers-reduced-motion: reduce)").matches;
     "portal.needsAction":     { ar: "بانتظار إجراءك", en: "Needs your action" },
     "portal.journeyExplorer": { ar: "مستكشف الرحلة", en: "Journey explorer" },
     "portal.recentActivity":  { ar: "آخر المستجدات", en: "Recent activity" },
-    "portal.noRequests":      { ar: "لا توجد طلبات بعد. ابدأ أول طلب خدمة لمشروعك.", en: "No requests yet. Start your first service request." },
+    "portal.noRequests":      { ar: "لا توجد طلبات مسجلة حتى الآن. يمكنك تقديم طلب خدمة جديد لمشروعك.", en: "No requests registered yet. You can submit a new service request for your project." },
     "portal.viewCatalog":     { ar: "دليل الخدمات", en: "Service catalog" },
 
     /* ---- wizard ---- */
@@ -1956,14 +1973,14 @@ RGP.REDUCED_MOTION = matchMedia("(prefers-reduced-motion: reduce)").matches;
     "wizard.attached":        { ar: "مرفق", en: "Attached" },
     "wizard.missingDocs":     { ar: "أرفق جميع المستندات الإلزامية للمتابعة", en: "Attach all required documents to continue" },
     "wizard.reviewNote":      { ar: "راجع بيانات طلبك قبل التقديم. بعد التقديم يبدأ احتساب مدة الإنجاز.", en: "Review your request before submitting. The SLA clock starts on submission." },
-    "wizard.declaration":     { ar: "أقر بصحة البيانات والمستندات المقدمة وأتحمل مسؤولية دقتها نظامًا.", en: "I declare the submitted information and documents are accurate and accept regulatory responsibility." },
+    "wizard.declaration":     { ar: "أقر بأن جميع البيانات والمستندات المقدمة في هذا الطلب صحيحة، وأتحمل المسؤولية النظامية عن أي خطأ أو نقص فيها.", en: "I declare that all information and documents submitted in this request are accurate, and I bear regulatory responsibility for any error or omission." },
     "wizard.submit":          { ar: "تقديم الطلب", en: "Submit request" },
     "wizard.saveDraft":       { ar: "حفظ كمسودة", en: "Save as draft" },
     "wizard.submitted":       { ar: "تم تقديم طلبكم بنجاح", en: "Your request was submitted" },
     "wizard.submittedSub":    { ar: "رقم الطلب", en: "Request number" },
     "wizard.expectedBy":      { ar: "الإنجاز المتوقع بحلول", en: "Expected completion by" },
     "wizard.track":           { ar: "متابعة الطلب", en: "Track request" },
-    "wizard.fastTrackNote":   { ar: "هذا الطلب مؤهل لأولوية المشاريع الكبرى — مدة الإنجاز مخفضة", en: "Eligible for giga fast-track — reduced SLA applies" },
+    "wizard.fastTrackNote":   { ar: "هذا الطلب مؤهل لمسار أولوية المشاريع الكبرى، وتُطبق عليه مدة إنجاز مخفضة", en: "This request qualifies for the giga priority lane; a reduced service level applies" },
 
     /* ---- request detail ---- */
     "req.number":             { ar: "رقم الطلب", en: "Request no." },
@@ -1983,8 +2000,8 @@ RGP.REDUCED_MOTION = matchMedia("(prefers-reduced-motion: reduce)").matches;
     "req.printPermit":        { ar: "طباعة الوثيقة", en: "Print document" },
     "req.conditions":         { ar: "الاشتراطات", en: "Conditions" },
     "req.externalWith":       { ar: "لدى", en: "With" },
-    "req.rate":               { ar: "قيّم تجربتك", en: "Rate your experience" },
-    "req.rateThanks":         { ar: "شكرًا لتقييمكم — يسهم في تحسين الخدمة", en: "Thank you — your rating improves the service" },
+    "req.rate":               { ar: "تقييم الخدمة", en: "Rate the service" },
+    "req.rateThanks":         { ar: "تم تسجيل تقييمكم، وسيُستفاد منه في تحسين الخدمة.", en: "Your rating has been recorded and will inform service improvement." },
     "req.closeReq":           { ar: "إغلاق الطلب", en: "Close request" },
     "req.satisfaction":       { ar: "رضا المستفيد", en: "Customer satisfaction" },
 
@@ -1993,7 +2010,7 @@ RGP.REDUCED_MOTION = matchMedia("(prefers-reduced-motion: reduce)").matches;
     "work.myQueue":           { ar: "طلباتي المسندة", en: "My assignments" },
     "work.unassigned":        { ar: "غير مسندة", en: "Unassigned" },
     "work.priorityLane":      { ar: "مسار الأولوية", en: "Priority lane" },
-    "work.claim":             { ar: "إسناد إليّ وبدء الفرز", en: "Claim & start screening" },
+    "work.claim":             { ar: "إسناد الطلب إليّ وبدء الفرز", en: "Claim & start screening" },
     "work.startReview":       { ar: "بدء المراجعة الفنية", en: "Start technical review" },
     "work.sendExternal":      { ar: "إحالة لجهة خارجية", en: "Refer to external entity" },
     "work.markDecision":      { ar: "جاهز للقرار", en: "Ready for decision" },
@@ -2007,14 +2024,14 @@ RGP.REDUCED_MOTION = matchMedia("(prefers-reduced-motion: reduce)").matches;
     "work.addNote":           { ar: "إضافة ملاحظة", en: "Add note" },
     "work.reassign":          { ar: "إعادة إسناد", en: "Reassign" },
     "work.approveTitle":      { ar: "اعتماد الطلب وإصدار الوثيقة", en: "Approve & issue document" },
-    "work.approveNote":       { ar: "سيصدر رقم وثيقة رسمي ويُشعر العميل فورًا.", en: "An official document number is issued and the customer is notified." },
+    "work.approveNote":       { ar: "عند الاعتماد يصدر رقم وثيقة رسمي ويُشعر مقدم الطلب بذلك.", en: "On approval an official document number is issued and the applicant is notified." },
     "work.conditionsOpt":     { ar: "اشتراطات على الاعتماد (اختياري)", en: "Conditions on approval (optional)" },
     "work.returnTitle":       { ar: "إعادة الطلب للعميل", en: "Return to customer" },
-    "work.returnNote":        { ar: "حدد بدقة ما يجب استكماله — تتوقف مدة الإنجاز حتى إعادة التقديم.", en: "List exactly what to complete — the SLA clock pauses until resubmission." },
+    "work.returnNote":        { ar: "حدد البنود المطلوب استكمالها بدقة. تتوقف مدة الإنجاز حتى إعادة التقديم.", en: "List the items to be completed precisely. The SLA clock pauses until resubmission." },
     "work.returnItemPh":      { ar: "البند المطلوب استكماله…", en: "Item to complete…" },
     "work.addItem":           { ar: "إضافة بند", en: "Add item" },
     "work.rejectTitle":       { ar: "رفض الطلب", en: "Decline request" },
-    "work.rejectNote":        { ar: "الرفض قرار نهائي ويتطلب تسبيبًا وسندًا نظاميًا يُعرضان للعميل.", en: "Declining is final and requires a reason and regulatory reference shown to the customer." },
+    "work.rejectNote":        { ar: "قرار الرفض نهائي، ويشترط لإصداره بيان السبب والسند النظامي، ويُعرضان لمقدم الطلب.", en: "Declining is final and requires a stated reason and regulatory reference, both shown to the applicant." },
     "work.reasonPh":          { ar: "سبب الرفض…", en: "Reason…" },
     "work.regulationPh":      { ar: "مثال: المادة (12) من لائحة اشتراطات البناء", en: "e.g., Article 12, Building Code Regulations" },
     "work.externalTitle":     { ar: "إحالة لجهات خارجية", en: "Refer to external entities" },

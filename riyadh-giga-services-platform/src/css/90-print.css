@@ -37,8 +37,7 @@
 
   .p-conditions { margin-block: 6mm; }
   .p-conditions h4 { font-family: var(--ff-display); font-size: 11pt; color: #0B4F30; margin-bottom: 2mm; }
-  .p-conditions ol { list-style: arabic-indic inside; font-size: 9.5pt; line-height: 1.9; }
-  html[lang="en"] .p-conditions ol { list-style: decimal inside; }
+  .p-conditions ol { list-style: decimal inside; font-size: 9.5pt; line-height: 1.9; }
 
   .p-verify {
     display: flex; align-items: center; gap: 6mm;

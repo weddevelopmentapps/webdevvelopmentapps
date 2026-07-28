@@ -58,12 +58,19 @@ ul, ol { list-style: none; }
 html[lang="en"] .t-body { font-size: 14px; line-height: 1.55; }
 html[lang="en"] .t-sub  { font-size: 13px; line-height: 1.5; }
 
-/* tabular numerals, LTR-isolated (ux-spec §3.2) */
+/* tabular numerals, LTR-isolated (ux-spec §3.2) — digits & codes ONLY */
 .num, [data-num] {
   font-family: var(--ff-display);
   font-variant-numeric: tabular-nums lining-nums;
   font-feature-settings: "tnum" 1, "lnum" 1;
   direction: ltr; unicode-bidi: isolate;
+}
+/* dates & mixed Arabic-numeral phrases: tabular digits, natural bidi order */
+.num-date {
+  font-family: var(--ff-display);
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings: "tnum" 1, "lnum" 1;
+  unicode-bidi: plaintext;
 }
 
 .mut   { color: var(--mut); }

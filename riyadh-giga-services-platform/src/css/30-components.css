@@ -184,6 +184,10 @@ select.input { appearance: none; cursor: pointer; }
 .step.done .s-dot { background: var(--accent-soft); border-color: transparent; color: var(--accent); }
 .step .s-label { font-family: var(--ff-display); font-size: 12px; font-weight: 600; color: var(--mut); text-align: center; }
 .step.current .s-label { color: var(--ink); }
+@media (max-width: 768px) {
+  .step .s-label { display: none; }
+  .step.current .s-label { display: block; }
+}
 .step.done { cursor: pointer; }
 .step::before {
   content: ""; position: absolute; top: 13px; inset-inline-start: -50%; width: 100%;
@@ -470,7 +474,10 @@ html[dir="ltr"] .login-brand { border-start-end-radius: 0; border-start-start-ra
 [data-theme="dark"] .sla-chip.paused { background: var(--surface-2); }
 
 /* kanban (challenges board) */
-.kanban { display: grid; grid-template-columns: repeat(5, minmax(240px, 1fr)); gap: var(--sp-15); overflow-x: auto; align-items: start; }
+.kanban { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--sp-15); align-items: start; }
+@media (max-width: 1200px) {
+  .kanban { grid-template-columns: repeat(5, minmax(240px, 1fr)); overflow-x: auto; padding-block-end: var(--sp-2); }
+}
 .kb-col { background: var(--surface-2); border: 1px solid var(--hair-2); border-radius: var(--r-md); padding: var(--sp-15); min-height: 200px; }
 .kb-head { display: flex; align-items: center; gap: 8px; margin-block-end: var(--sp-15); }
 .kb-card {

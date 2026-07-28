@@ -131,7 +131,8 @@
 .avatar.sm { width: 24px; height: 24px; font-size: 9.5px; }
 
 /* ---------------- content ---------------- */
-.content { flex: 1 1 auto; width: 100%; max-width: var(--container-app); margin-inline: auto; padding: 0 28px 96px; }
+.content { flex: 1 1 auto; width: 100%; max-width: var(--container-app); margin-inline: auto; padding: 0 28px 96px; min-width: 0; }
+.content > * { min-width: 0; }
 .content.narrow { max-width: var(--container-content); }
 
 .page-head { padding-block: var(--sp-4) var(--sp-1); }
@@ -143,6 +144,8 @@
 
 /* ---------------- grids ---------------- */
 .grid { display: grid; gap: var(--sp-2); }
+.grid > * { min-width: 0; }
+.kpi-band > * { min-width: 0; }
 .cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }

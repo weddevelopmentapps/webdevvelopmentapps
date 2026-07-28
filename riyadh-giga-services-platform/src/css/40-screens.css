@@ -143,7 +143,7 @@
 .path-card.open { border-color: var(--accent); }
 
 /* ---------------- wizard (§7.4) ---------------- */
-.wizard-body { position: relative; overflow: hidden; }
+.wizard-body { position: relative; overflow: hidden; padding-block-end: var(--sp-2); }
 .wiz-pane { animation: rgp-wiz-in var(--dur-gentle) var(--ease-decelerate) both; }
 @keyframes rgp-wiz-in { from { opacity: 0; transform: translateX(-32px); } to { opacity: 1; transform: none; } }
 html[dir="ltr"] .wiz-pane { animation-name: rgp-wiz-in-ltr; }
@@ -210,6 +210,7 @@ html[dir="ltr"] .wiz-pane { animation-name: rgp-wiz-in-ltr; }
 
 /* ---------------- specialist workspace (§7.7) ---------------- */
 .ws { display: grid; grid-template-columns: 320px minmax(0,1fr) 360px; gap: var(--sp-2); align-items: start; }
+.ws > * { min-width: 0; }
 @media (max-width: 1280px) { .ws { grid-template-columns: 300px minmax(0,1fr); } .ws .ws-c { grid-column: 1 / -1; } }
 @media (max-width: 900px) { .ws { grid-template-columns: 1fr; } }
 .ws-a, .ws-c { position: sticky; top: calc(var(--topbar-h) + 16px); }
