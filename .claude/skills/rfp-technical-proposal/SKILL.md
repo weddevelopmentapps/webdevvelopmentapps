@@ -35,6 +35,18 @@ every project-specific word is newly derived from the input RFP.
    PDF must show only SakkalMajalla. A PDF rendered with a substitute font is NOT a
    deliverable: if the font cannot be installed, stop and ask the user for
    `majalla.ttf`/`majallab.ttf` instead of shipping a substituted export.
+0b. **References are grammar, not stencils.** The reference decks teach the design
+   language (palette, chrome, density, RTL mechanics, title voice) — they are NOT
+   a fixed slide inventory to clone-and-retext. Think first (what does THIS
+   client's story need?), then reuse a reference slide when one fits and INVENT a
+   new one in the same language when none does — bespoke maps, phase frameworks,
+   mapping matrices (see `references/point-of-view.md` story kit and
+   `references/approach.md` §0 phase doctrine). Two hard implications: the
+   approach is structured as consultant PHASES that absorb the RFP's tracks
+   (never track-by-track pagination), and the PoV may add slides the references
+   never had. Visual invention rules: diagrams/maps/timelines are hand-drawn
+   vector autoshapes in the palette; photography may come from Higgsfield but
+   must be photorealistic and geography-specific; never AI-looking layouts.
 1. **Understand, never transplant.** Scope, objectives, tracks, timeline, team,
    deliverables are all re-derived from THIS RFP. Boilerplate (letter skeleton, firm
    blurbs, frameworks, About Deloitte, T&C, legal) is reused verbatim by design.

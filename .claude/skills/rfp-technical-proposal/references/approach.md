@@ -7,14 +7,40 @@ Titles in this section are **white on the header band with NO green highlight**.
 Slide budget: 1 overview + 1 BoQ (+1 optional upsell) + 1 launch methodology + 3–4
 launch library + Σ per track ⌈activity_lines/20⌉ pages + 2 KT slides.
 
-## 0. The delivery-model choice (made once, used everywhere)
+## 0. The delivery model: think in PHASES, not in the RFP's track list
 
-- Retainer/parallel engagement → **مسارات** + `المسار الفرعي` (deck 1: 4 tracks / 9 months).
-- Sequential transformation → **مراحل** + `المرحلة الفرعية` (deck 2: 6 phases / 18 months).
-- Launch is always `0. الاطلاق` (house spelling, no hamza), with fixed sub-phases
-  `0.1 إطلاق المشروع` and `0.2 تحديد الطموح`.
-- Always include a knowledge-transfer stream (as phase N or inside a track).
-- Track names ≤6 words, noun phrases in the RFP's own vocabulary, numbered `1..N`.
+**Doctrine (client feedback, binding): never structure the approach as the RFP's
+scope items presented one-by-one.** An RFP that enumerates 9 tracks/مسارات is giving
+you the CONTRACT decomposition, not the DELIVERY logic. A consultant re-derives the
+delivery logic as a small set of phases — the classic arc is some variant of
+**Assess → Strategize/Design → Implement/Enable → Monitor & Sustain** (plus a
+mobilization phase 0 and continuous management bands). Design the phases first,
+then map every RFP track INTO them:
+
+- المرحلة صفر — الإطلاق والتعبئة (always; house spelling `الاطلاق` for the tab).
+- Assess-type phase (الفهم والتقييم): current state, needs, capabilities, gaps.
+- Strategize & Design (الاستراتيجية والتصميم): value propositions, catalogs, SLAs,
+  org changes, governance models — the thinking deliverables.
+- Implement & Enable (التنفيذ والتمكين): programs, roadmaps, PMO, platforms — the
+  build deliverables. May overlap Design; phases run in parallel, not as a relay.
+- Monitor & Sustain (قياس الأداء والاستدامة): continuous — periodic reporting,
+  change management, knowledge transfer. Can merge with Implement when thin.
+
+Rules of the mapping:
+- A phase page carries sub-phases numbered `n.1, n.2…` (`المرحلة الفرعية n.m`);
+  each sub-phase's activities are the RFP's مهام **verbatim** — compliance is
+  preserved at the activity level, not the pagination level.
+- One phase may span 2 pages (`(1/2)(2/2)`) when it holds 3+ RFP tracks; one RFP
+  track may deserve its own sub-phase page (e.g. a digital platform).
+- Every phase page's sidebar ends with `مسارات الكراسة المرتبطة: …` naming the RFP
+  tracks it covers — the compliance bridge the evaluator can check.
+- Add a phase↔track mapping slide in the overview (each phase column lists its RFP
+  tracks + their BoQ deliverables with delivery months) so full coverage of the
+  الكراسة is visible on one page.
+- The timeline/Gantt mirrors the SAME phase structure (see team-and-timeline.md).
+- Always include a knowledge-transfer stream (inside Monitor & Sustain).
+- Phase names ≤4 words; tab labels `{N}. {الاسم}`؛ sub-phase lines in the RFP's own
+  vocabulary.
 
 **The consistency chain (the quality signature):** ribbon tab names = overview column
 headers = breadcrumb titles = BoQ table track cells; BoQ deliverable strings =

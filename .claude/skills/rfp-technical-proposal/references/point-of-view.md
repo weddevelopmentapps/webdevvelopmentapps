@@ -263,3 +263,37 @@ green so-what phrase; ellipsis chains make consecutive slides one continuous
 sentence; dashed focus frames physically narrow the funnel; identical EMU geometry
 across sibling slides; the same words for work areas everywhere; and a single
 light-switch moment (dark → daylight) at the close.
+
+## The story kit — the PoV is an argument, not a slide inventory
+
+**Doctrine (client feedback, binding): the reference decks are grammar, not
+stencils.** Do not limit the PoV to the slides that happen to exist in the
+references. Build the section as a four-beat argument and INVENT whatever slide
+each beat needs, in the house design language:
+
+1. **نفهمكم** — we understand you: the client's mandate, position in the
+   ecosystem, and ambition (their own strategy language quoted back at them).
+2. **نفهم المنظومة** — we understand the landscape: the market/city/sector forces
+   and actors around them. This is where bespoke visuals earn their keep — e.g.
+   for a mega-projects mandate, a full-slide schematic map of the city with the
+   giga-projects located and named proves ecosystem intimacy better than any
+   bullet list.
+3. **نفهم تحديكم اليوم** — we understand today's challenge: the drivers/tensions
+   slides, sharpened to this RFP's pain.
+4. **نعرف الحل وقد فعلناه** — we know the answer and have done it: the pivot to
+   solution areas + the proof block (real cases, real assets, real experts).
+
+Slide-invention rules for new visuals (the anti-AI-slop contract):
+- Diagrams, maps, and timelines are HAND-DRAWN VECTOR autoshapes in the house
+  palette — never raster screenshots of generic diagrams. A dark full-bleed panel
+  with ring-road ellipses, thin road lines, glowing marker dots and white Sakkal
+  labels reads as consulting craft; label it `للتوضيح — المواقع تقريبية` and give
+  it a source line.
+- Photography (city, site, people-at-work) may be AI-generated (Higgsfield) but
+  must be photorealistic, dark enough for white text, and specific to the
+  geography — never obviously synthetic, never decorative clip-art.
+- Every invented slide still follows the house skeleton: assertion title, RTL
+  flow, palette colors only, dense-but-structured content, footer chrome.
+- Facts on invented slides stay qualitative unless sourced: name real projects
+  and real public milestones (إكسبو 2030، كأس العالم 2034) but do not invent
+  budgets, counts, or dates.

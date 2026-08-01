@@ -179,6 +179,29 @@ EVERY slide image fresh (subagent review recommended).
 - [ ] `validate.py out.pptx --original donor.pptx` clean.
 - [ ] Opens in LibreOffice; PDF export has the same slide count as `<p:sldIdLst>`.
 
+## 4b. Hazards learned the hard way (each one shipped a defect once)
+
+- **Index drift after structural ops.** Deleting/inserting slides shifts every
+  python-pptx index after the change point. NEVER re-run an index-addressed edit
+  script after a structural op — it will hit the wrong slides (a re-run once
+  retitled the timeline divider with a methodology breadcrumb). Re-resolve targets
+  by content/partname, or do all structural ops first and derive indices fresh.
+- **TOC numbers are computed, not adjusted.** After any add/delete, find each
+  section's divider by TITLE in the final deck and write those page numbers into
+  the TOC — arithmetic on "+N/−M shifts" gets it wrong.
+- **Duplicate footer stacking.** Donor slides may carry slide-local CaseCode /
+  Copyright / page-number textboxes IN ADDITION to the master's (deck-2 imports,
+  stacked duplicates like double Copyright boxes). Scan every slide for footer-band
+  text shapes (y > 7.0"): if the layout does NOT suppress master shapes and local
+  copies exist, delete the locals; also dedupe stacked same-name boxes. A doubled
+  footer renders as illegible jumbled text.
+- **LibreOffice centers `wrap="none"` textbox content**, defeating algn — use
+  wrap="square" whenever alignment inside the box matters.
+- **Full-deck visual sweep is mandatory before delivery**: render EVERY page and
+  review them all (fan out subagents); spot-checking has missed a blank TOC and
+  colliding footers. Brief reviewers on the accepted quirks (LO mirrors rtl
+  tables/ribbons; bullet glyphs substitute; inactive tabs are low-contrast).
+
 ## 5. Failure patterns to avoid (observed AI tells)
 
 - Even spacing forced onto uneven content (the reference decks center each numbered

@@ -194,3 +194,28 @@ standardize on Sakkal Majalla).
 - Names, photos, tags identical across all appearances; phase names on the Gantt
   byte-identical to the methodology chapter; durations identical everywhere.
 - Team size shown = team size priced.
+
+## Gantt spec v2 — phase swimlanes (client feedback, binding)
+
+The timeline must mirror the PHASE structure of the approach section — never a
+flat track-by-track bar list. Proven geometry (16:9, RTL):
+
+- Chart area x 0.30→10.42" (24 equal month columns, month 1 at the RIGHT); label
+  column x 10.50→13.14" (activity names right-aligned 9.5pt, black).
+- Month header at y≈1.62: numerals 1–24 (8pt, lang en, LTR) + «الشهر» at right.
+- Vertical gridlines every month (E6E6E6, hairline); heavier line every 6 months.
+- Rows: phase header rows (F2F2F2 band across chart+label, phase name bold 10.5pt
+  green 046A38 + الأشهر range) then that phase's activity rows. Row heights
+  ~0.25"/0.235" — 20 rows fits between y 1.94 and 6.72.
+- Bars: rounded rectangles h 0.12", one color per phase family (Assess 0D8390,
+  Design 007680, Implement 1A7749, Continuous 004F59). A hand-off inside one row
+  = two bars (design-color then implement-color) with NO overlapping month.
+- Milestones: 86BC25 diamonds 0.13" at the delivery month of every BoQ
+  deliverable; a monthly-deliverables row (e.g. 24 tracking reports) uses small
+  0.10" diamonds repeated per month instead of a bar.
+- Legend: single row of fixed slots from the right at BOT+0.04 (chip 0.30"+label
+  1.55" per item, diamond item last with wider label); the caption «الجدول
+  استرشادي ويُعتمد تفصيليًا خلال مرحلة الإطلاق» goes at bottom-left (LTR-aligned
+  left, italic 8pt) ABOVE the footer line — nothing may cross y 7.10.
+- Delivery months come from the BoQ; phases may overlap; continuous rows span to
+  month 24. Verify legend/footer clearance in a render before accepting.
