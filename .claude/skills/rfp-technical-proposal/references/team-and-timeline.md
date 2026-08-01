@@ -121,35 +121,69 @@ chart, expert pages, exec-summary strip, CV annex).
 ## 5. Team CV slides — ملحق: ملفات تعريف الفريق (archetype Q)
 
 One slide per team member, ordered by grade (شريك → المدير التنفيذي → مدير المشروع →
-استشاري أول → استشاري). Title: `{الاسم} | {الدور في المشروع}` on the standard header
-band.
+استشاري أول → استشاري). Title (28pt white on the standard band, LABEL not assertion,
+no green highlight): `{الاسم} | {الدور في المشروع}` — the role is the PROJECT role in
+the RFP's own vocabulary (شريك المشروع، مدير المشروع، محلل أعمال، مستشار تقني، مصمم
+انفوغرافيك…), not the firm rank.
 
-Frame (identical for every CV):
-- Right sidebar (`F2F2F2`, ~2.4" wide, full body height): circular photo ~1.9" top;
-  bold name; grade line; `مجالات الخبرة:` header + 4–8 short bullets;
-  `قطاعات الخبرة:` header + 2–4 bullets (القطاع العام، القطاع الخاص…).
-- Main area:
-  - `ملخص السيرة الذاتية` — section header with **black underline bar** → 1–2
-    paragraphs (career summary), then an education line (`تخرج {الاسم} من جامعة {X}
-    بدرجة {الماجستير في Y}، وبكالوريوس في {Z}`).
-  - `الخبرات السابقة` — section header with **green underline bar** → 6–10 bullets,
-    each `**{الجهة}:** {ما قاده}` — bold client lead-in + colon + achievement.
-    Confidential clients: `**{وصف القطاع} - سرية:**`.
+**Frame** (identical for every CV; visual restraint IS the design — no icons, charts,
+or decoration beyond two rules + photo + panel):
+- Main column ~82% / sidebar ~18%.
+- `ملخص السيرة الذاتية` header — **12pt bold** black — over a **4.5pt BLACK rule**
+  spanning the full content width (9.97"). (Some senior-consultant slides title it
+  `الملف الشخصي` — tolerated variant.)
+- Bio: 2–3 paragraphs, **12pt justified** (`algn="just"` — the one justified text in
+  the deck):
+  1. Position + firm + city + years focus (`{الاسم} شريك في مكتب مونيتور ديلويت في
+     الرياض واكتسب…`); anyone ≥manager gets the `أكثر من {N} عامًا` stat in sentence 1.
+  2. Pre-Deloitte career and/or marquee client names.
+  3. **Education is EMBEDDED in the bio** (no separate qualifications block):
+     `تخرج {الاسم} من جامعة {X} بدرجة {الماجستير في Y}، وبكالوريوس في {Z}` + honors,
+     languages (`ويتقن اللغتين العربية والإنجليزية`), certifications
+     (`حاز شهادة سكس سيغما لين (Six Sigma Lean)`).
+- `الخبرات السابقة` header — 12pt bold — over a **4.5pt GREEN `86BC25` rule** (black
+  rule for bio, green rule for experience: the CV's signature rhythm).
+- Experience bullets: **11pt**, Arial `•`, 0.19" hanging indent, 4–11 bullets
+  (typically 6–9), each `**{الجهة}:** {فعل + الإنجاز}`:
+  - Lead-in variants: `الجهة:` / `الجهة – المملكة العربية السعودية:` /
+    `{المشروع} – {البرنامج} – {الجهة}:` / dated `{الجهة} (أكتوبر 2024م – يونيو 2025م):`.
+  - Anonymization vocabulary: `سري`، `جهة حكومية سرّية`، `عميل من القطاع العام`،
+    `منظمة غير حكومية - سرية`; sensitive live work is scope-veiled
+    (`لفئة مستهدفة`، `في منطقة محددة`).
+  - **The verb ladder encodes seniority**: partners/directors قاد/قادت/ترأس؛ senior
+    consultants دعم/ساهم؛ consultants عمل على/طوّرت/أجرت — feminine forms for women.
+  - **Relevance-first ordering**: bullets for THIS client (or sister entities) go at
+    the TOP of every team CV, near-verbatim across the team.
+- Right sidebar (`F2F2F2`, 2.18" wide): circular photo **1.70"** (grayscale/muted) →
+  bold name → role line (must match the title role) → `مجالات الخبرة:` bold + 3–6
+  noun-phrase bullets → `قطاعات الخبرة:` bold + 2–4 bullets. Make the FIRST مجال and
+  FIRST قطاع match the RFP's domain.
 
 **Tailoring rules (the craft):**
-- Role titles are per-proposal — retitle to this RFP's vocabulary (the same person is
-  `المدير التنفيذي للمشروع` in one deck and `مدير المشروع` in another).
-- Re-order experience bullets so the most RFP-relevant engagements come first;
-  re-angle emphasis toward this RFP's domain; never invent engagements.
+- Retitle people per proposal — the same person is `المدير التنفيذي للمشروع` in one
+  deck and `مدير المشروع` in another; the retitle must land in ALL THREE places:
+  title, bio sentence 1, sidebar role.
+- Select 5–9 engagements scored by similarity to the new RFP; sort most-relevant
+  first; keep hard numbers wherever the library has them; never invent engagements.
 - Every RFP-required qualification (degree, years, certification) must be visibly
   satisfied on the slide of the person filling that role.
+- **Lint the clone defects** the references themselves contain: sidebar name/role not
+  updated after a swap, gender-agreement errors, stray old footers — name/role must
+  be consistent across title + bio + sidebar on every slide.
 
 ## 6. Expert profile slides — ملحق: ملفات تعريف الخبراء (archetype R)
 
-Same frame as §5. Title: `{الاسم} | خبير مختص في مجال {التخصص}`. Bio leads with
-seniority + years; bullets fewer (5–8), heavier on numbers (`أكثر من 150 مشروعًا`،
-`بقيمة 118 مليار دولار`), global/regional span. The appendix divider carries the
-`(غير شامل)` italic tag (it is a sample of the bench).
+Same frame as §5. Title: `{الاسم} | خبير مختص في مجال {التخصص}` (honorifics kept:
+`الدكتور {…}`). Bio leads with the seniority stat; bullets fewer (5–8), heavier on
+numbers (`أكثر من 150 مشروعًا`، `بقيمة 118 مليار دولار`، `وفورات ما بين 12 و35%`),
+global/regional span. Sidebar role line **italic** for external experts.
+**External-expert variant**: bullets are CAREER POSITIONS, not engagements —
+`{المنصب}، {جهة العمل}، {المدينة}، {الدولة}` — with optional level-2 sub-bullets.
+The experts divider carries the `(غير شامل)` 48pt italic tag (team divider never
+does). One expert per RFP evaluation theme — the expert list literally mirrors the
+RFP scoring criteria. Divider titles use Sakkal Majalla 88pt bold white (the
+references drift into Open Sans on appendix dividers — an artifact, not a rule;
+standardize on Sakkal Majalla).
 
 ## 7. Consistency contract
 
