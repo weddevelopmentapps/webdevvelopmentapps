@@ -21,6 +21,16 @@ every project-specific word is newly derived from the input RFP.
 
 ## Non-negotiables
 
+0. **Sakkal Majalla is THE typeface — no exceptions, no substitutions.** Every text
+   run the generator writes sets `latin` + `cs` + `sym` = "Sakkal Majalla" (the theme
+   provides no Arabic font; only run-level rPr carries it). This applies to Arabic
+   AND Latin/English content alike — framework names, emails, digits, stats, and any
+   EN-language deck all stay in Sakkal Majalla, exactly as the reference decks do.
+   Generic font guidance from other skills (e.g. the pptx skill's "safe fonts" list —
+   Arial, Calibri) does NOT apply to this deliverable; never silently fall back.
+   Install Sakkal Majalla in the build environment before rendering/QA (fonts are not
+   embedded in the .pptx); if it cannot be installed, warn the user that QA renders
+   will show a substitute while the file itself remains correct.
 1. **Understand, never transplant.** Scope, objectives, tracks, timeline, team,
    deliverables are all re-derived from THIS RFP. Boilerplate (letter skeleton, firm
    blurbs, frameworks, About Deloitte, T&C, legal) is reused verbatim by design.
@@ -98,9 +108,9 @@ The reference system is Arabic/RTL and these playbooks assume AR (default). If t
 RFP is English or demands a bilingual response: keep the identical skeleton, design
 system, and formulas but mirror the geometry LTR (left-aligned text, flows left→right,
 chevrons pointing right, month 1 leftmost), translate the canonical section names
-once and use them consistently, set body font to a Latin face consistent with the
-brand (Open Sans/Verdana per the reference Latin usage), and keep all framework names
-as-is. The corporate packs (About Deloitte, T&C, legal) must come from the library's
+once and use them consistently, keep **Sakkal Majalla as the typeface** (it renders
+Latin text cleanly and is the house face — see non-negotiable 0), and keep all
+framework names as-is. The corporate packs (About Deloitte, T&C, legal) must come from the library's
 EN versions if they exist — never machine-translate legal text; if no EN pack exists,
 flag it to the user.
 

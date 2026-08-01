@@ -74,8 +74,8 @@ will read as foreign to the house style.
 
 | Element | Font | Size | Weight/Color |
 |---|---|---|---|
-| Arabic — all text | **Sakkal Majalla** | see below | — |
-| Latin fragments (framework names, emails, URLs, EN logos) | Arial / Calibri / Open Sans | match surrounding | — |
+| ALL text — Arabic AND Latin | **Sakkal Majalla** — set `latin`+`cs`+`sym` = "Sakkal Majalla" on every run the generator writes | see below | The theme carries no Arabic font; only run-level rPr does. Never substitute |
+| Legacy exceptions (donor slides only) | Arial/Verdana on some chart micro-labels; Open Sans as divider Latin fallback | — | Tolerate when cloning donor slides untouched; never author NEW text in them |
 | Slide title — default (exec summary, PoV argument, approach, methodology, frameworks appendix) | Sakkal Majalla | **28pt** | **Stem regular-weight** white on band/photo (frameworks appendix bolds its titles); highlighted payload = separate **bold** run in `schemeClr accent4 + lumMod 60%/lumOff 40%` (schemeClr formula, never raw hex); black on white slides |
 | Slide title — 20pt chapters | Sakkal Majalla | **20pt** | Gantt + org chart + leadership + experts grids; credential-detail breadcrumbs; T&C and legal-document titles (About Deloitte ~21pt) |
 | Slide title — PoV funnel photo slides | Sakkal Majalla | 24–36pt | Varies by slide (32pt typical, 36pt hero variants) |
@@ -95,7 +95,7 @@ will read as foreign to the house style.
 
 Rules:
 - **Bold is the primary emphasis.** Italic appears in exactly three places: the divider-level `(غير شامل)` tag (48pt), the expertise tag under expert names on the الخبراء grids, and occasional table column-header labels — nowhere else. Underline for text appears only on credential block headers (`السياق:` / `المنهجية:` / `النتيجة:`) and CV section headers; elsewhere the "underline" is an accent bar drawn as a shape.
-- Latin terms stay in Latin inside Arabic sentences: `StrategyByDesign©`, `SWOT`, `PESTEL`, `CAGR`, `KPI`, emails, URLs. Keep them in a Latin font.
+- Latin terms stay in Latin **script** inside Arabic sentences: `StrategyByDesign©`, `SWOT`, `PESTEL`, `CAGR`, `KPI`, emails, URLs — as their own `lang="en-US"` runs, but still **typeface Sakkal Majalla** (the reference decks set latin+cs+sym = Sakkal Majalla on these runs too).
 - Numbers: use Western digits (1, 2, 3…) throughout — matching the reference decks.
 
 ## 4. The photo language

@@ -130,6 +130,11 @@ EVERY slide image fresh (subagent review recommended).
       identical frame positions across all instances).
 - [ ] Header band present on all content slides; heroes/dividers chrome-free.
 - [ ] Colors only from the palette; the green highlight only on load-bearing phrases.
+- [ ] **Font enforcement**: every run the generator authored carries
+      `typeface="Sakkal Majalla"` on latin+cs+sym — verify with
+      `grep -L 'Sakkal Majalla' unpacked/ppt/slides/slide*.xml` (only untouched donor
+      slides may differ) and spot-grep new slides for stray `Calibri`/`Arial`
+      typefaces in authored text.
 - [ ] Photos: correct city, dark enough for white text, no stretching/distortion.
 - [ ] Footer page numbers sequential; TOC numbers match reality.
 
