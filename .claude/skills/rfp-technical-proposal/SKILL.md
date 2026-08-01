@@ -28,9 +28,13 @@ every project-specific word is newly derived from the input RFP.
    EN-language deck all stay in Sakkal Majalla, exactly as the reference decks do.
    Generic font guidance from other skills (e.g. the pptx skill's "safe fonts" list —
    Arial, Calibri) does NOT apply to this deliverable; never silently fall back.
-   Install Sakkal Majalla in the build environment before rendering/QA (fonts are not
-   embedded in the .pptx); if it cannot be installed, warn the user that QA renders
-   will show a substitute while the file itself remains correct.
+   Install Sakkal Majalla in the build environment BEFORE any rendering/QA (fonts are
+   not embedded in the .pptx) and pass the hard font gate in
+   `references/build-and-qa.md` §4.0 — fc-match must resolve both weights, every
+   Arabic run in every part must carry the typeface, and `pdffonts` on the exported
+   PDF must show only SakkalMajalla. A PDF rendered with a substitute font is NOT a
+   deliverable: if the font cannot be installed, stop and ask the user for
+   `majalla.ttf`/`majallab.ttf` instead of shipping a substituted export.
 1. **Understand, never transplant.** Scope, objectives, tracks, timeline, team,
    deliverables are all re-derived from THIS RFP. Boilerplate (letter skeleton, firm
    blurbs, frameworks, About Deloitte, T&C, legal) is reused verbatim by design.

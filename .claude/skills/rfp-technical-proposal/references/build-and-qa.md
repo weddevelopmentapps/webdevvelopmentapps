@@ -64,7 +64,12 @@ and the off-canvas color-swatch board parked past the right edge.
 **Fonts are NOT embedded** and the theme's `<a:cs>` typeface is EMPTY — Sakkal
 Majalla exists only as run-level `rPr`. The pipeline must (a) have Sakkal Majalla
 installed for rendering/QA and (b) set `latin`+`cs`(+`sym`) = "Sakkal Majalla" on
-every run it writes (or fix the theme cs font as an improvement).
+every run it writes (or fix the theme cs font as an improvement). Both are enforced
+by the hard FONT GATE in §4.0 — it must pass before any render counts as QA and
+before any PDF ships. A working source for the genuine TTFs when the build
+environment lacks them: `raw.githubusercontent.com/chyyuu/msfonts/master/majalla.ttf`
+and `.../majallab.ttf` (Microsoft/Mamoun Sakkal 2008 originals; verify with `file` —
+"TrueType Font data, digitally signed"); install to `~/.fonts/` + `fc-cache -f`.
 
 **Native charts**: the GDP-scenario, district-bar, and population-scenario slides use
 REAL PowerPoint chart parts with editable embedded workbooks (white-styled series per
@@ -107,6 +112,28 @@ click into them). The Gantt and all diagrams are hand-drawn autoshapes.
 
 ## 4. QA checklist (run ALL of it; render → inspect → fix → re-render)
 
+### 4.0 FONT GATE — HARD, runs BEFORE any render (non-skippable)
+
+Visual QA on a font-substituted render passes silently: layout, colors, and RTL all
+look right while every glyph is wrong. This gate exists because that failure happened.
+
+1. **Before the first render**: `fc-match "Sakkal Majalla"` AND
+   `fc-match "Sakkal Majalla:bold"` must both resolve to a Sakkal Majalla file
+   (`majalla.ttf` / `majallab.ttf`). If either returns a substitute (DejaVu,
+   Liberation, Noto…), STOP — install the font first (`~/.fonts/` + `fc-cache -f`),
+   or ask the user to upload the two TTFs. Never run visual QA, and never export a
+   deliverable PDF, on a substituted render — a warning in chat does not count as
+   passing this gate.
+2. **Run-level audit of the .pptx** (not just authored runs): count Arabic-text runs
+   across `ppt/(slides|slideLayouts|slideMasters|notesSlides)/*.xml` whose `rPr` does
+   not carry `typeface="Sakkal Majalla"` — including runs with NO rPr at all (they
+   fall back to the theme font, and the theme `cs` typeface is empty). The count must
+   be **0**: donor fossils (`+mn-ea`, DIN Next, Open Sans, Calibri, bare runs) hide in
+   untouched donor slides and surface in the PDF.
+3. **After PDF export**: `pdffonts out.pdf` must list `SakkalMajalla` /
+   `SakkalMajalla-Bold` subsets as the text fonts. Any DejaVu/Liberation/Calibri line
+   means the export substituted — the PDF is NOT deliverable; fix and re-export.
+
 Render: `soffice.py --headless --convert-to pdf` → `pdftoppm -jpeg -r 150` → inspect
 EVERY slide image fresh (subagent review recommended).
 
@@ -130,11 +157,10 @@ EVERY slide image fresh (subagent review recommended).
       identical frame positions across all instances).
 - [ ] Header band present on all content slides; heroes/dividers chrome-free.
 - [ ] Colors only from the palette; the green highlight only on load-bearing phrases.
-- [ ] **Font enforcement**: every run the generator authored carries
-      `typeface="Sakkal Majalla"` on latin+cs+sym — verify with
-      `grep -L 'Sakkal Majalla' unpacked/ppt/slides/slide*.xml` (only untouched donor
-      slides may differ) and spot-grep new slides for stray `Calibri`/`Arial`
-      typefaces in authored text.
+- [ ] **Font enforcement**: the §4.0 FONT GATE passed in full — fc-match resolves
+      both weights, the run-level Arabic audit is 0 (ALL parts, donor slides
+      included, not just authored runs), and `pdffonts` on the exported PDF shows
+      only SakkalMajalla text fonts.
 - [ ] Photos: correct city, dark enough for white text, no stretching/distortion.
 - [ ] Footer page numbers sequential; TOC numbers match reality.
 
