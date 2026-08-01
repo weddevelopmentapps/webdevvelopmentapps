@@ -1,71 +1,106 @@
 # Section Playbook — ملحق: خبراتنا (Credentials)
 
-The largest appendix (~80 slides): a summary matrix series followed by one slide per
-credential, local then global. Credentials are SELECTED and ORDERED to answer this
-RFP's evaluation criteria — selection is the craft; rendering is mechanical.
+The largest appendix (~80–85 slides): divider → summary matrix series → one slide per
+credential (local then global). The credential library is a **frozen asset** — detail
+slides are copied whole between proposals (byte-identical across both reference
+decks); what changes per RFP is the selection, the matrix scope columns, and any new
+credentials added in the identical format. **No footers, page numbers, source lines,
+or copyright anywhere in this section** — the appendix runs clean. No `غير شامل`
+either (the list is positioned as an exhaustive record, not a sample).
 
-## 1. Selection & ordering (from `reference-library.md` scoring)
+Divider: `ملحق` + `خبراتنا المماثلة محلياً وعالمياً` (fixed boilerplate).
 
-- Shortlist by score: same client/sister entities → same sector local → other local →
-  global. Local heavily outnumbers global (~60:10 in the references).
-- The shortlist must cover every "similar experience" criterion the RFP's evaluation
-  section names — build a criteria → credential coverage map first and keep it in
-  `manifest.md`.
-- Divider: `ملحق` / `خبراتنا المماثلة محلياً وعالمياً`.
+## 1. Summary matrix series — `لدينا سجل حافل…` (archetype M)
 
-## 2. Summary matrix series (archetype M — dark table slides)
+**Title** (28pt white, wraps 2–3 lines, repeated with pagination on every page):
+`لدينا سجل حافل في تسليم المشاريع ذات المتطلبات المماثلة لـ{كلمات نطاق العمل من
+الكراسة حرفياً} ({i}/{N})` — the stem never changes; the scope clause is recomputed
+from each RFP.
 
-Title: `لدينا سجل حافل في تسليم المشاريع ذات المتطلبات المماثلة لـ{الخدمة كما سماها
-الRFP} ({i}/{n})` — one series enumerating EVERY credential that follows.
+**Canvas**: full-bleed KAFD night photo + full-slide black rectangle at **70% alpha**;
+all content white on top.
 
-- Full-bleed dark city photo; title white 28–32pt with no green highlight.
-- Table columns (RTL): `#` (sequence) / `المشروع` (project description, 1 line) /
-  `الجهة` (client entity) / `البلد` (country + small flag icon).
-- ~10 rows per slide; white 12–14pt text; dashed white row separators; no fills.
-- The sequence numbering continues across the series (1–10, 11–20…). Counts must equal
-  the number of detail slides that follow.
+**The capability-mapping table** (the evolved form — use it by default):
+- RTL table, 1 header + **10 body rows per page**, always.
+- Columns (right→left): `#` (0.34") | `البلد` (flag images 0.43×0.31", Saudi flag for
+  local rows, country flags/GCC emblem/globe glyph for global) | `الجهة` (~3") |
+  `المشروع` (~2.6") | then **5–6 scope columns 1.00" each**: requirement streams
+  quoted VERBATIM from the RFP's نطاق العمل + one sector-relevance column
+  (`القطاع البلدي` → rename to the RFP's sector).
+- Above the scope group: label `نطاق العمل` (12pt) + a **rightBrace shape rotated
+  270°, `86BC25`** bracing the columns.
+- Header row: 16pt bold white centered; bottom border **1pt solid `618894`**
+  (steel-blue hairline — the section's one off-palette color).
+- Body: `#` 12pt bold centered; `الجهة` 13pt bold; `المشروع` 12pt bold (compact
+  masdar phrase e.g. `تفعيل إدارة الأداء الإستراتيجي`); no cell fills (photo shows
+  through); row separators **0.75pt WHITE dashed**.
+- Checkmarks: **Wingdings ✓ (U+F0FC), 24pt, white**, centered.
+- **Check logic**: generous on capability columns (a credential earns a check if any
+  workstream touched the theme — the page should read "68 of our 74 projects did
+  operational planning"), strict on the sector column. Every row must earn ≥1 check
+  or be dropped. Auto-number rows 1…N (the references contain a manual numbering typo
+  — never hand-number).
 
-## 3. Credential detail slides (archetype L — one per project)
+**Ordering** (identical library order across proposals): client-family credentials
+FIRST (the RFP's issuing entity + siblings), then national entities clustered by
+theme, then giga-projects/ministry PMOs, then the rest — **local always before
+global**; global ordered Gulf → wider world. Not alphabetical, not chronological.
 
-Title breadcrumb: `خبراتنا | محلياً` (bold black, white slide, no header band) or
-`خبراتنا | عالمياً`. Client logo(s) top-left of the title zone.
+## 2. Credential detail slides (archetype L — one per project)
 
-**Tagline** (gray, under the title): `{قادت/دعمت/طوّرت/صممت} ديلويت {الإنجاز المحدد}
-لـ{الجهة}` — one line, verb-first past tense, names the deliverable and the client.
+**Geometry, identical to the EMU on every slide** (this uniformity is the
+consultant-made signature):
+- Left photo panel: 56.1% of width, full height, **no scrim** — photo theme-matched
+  to the project (client campus, sector imagery — an X-ray for a health credential, a
+  monument for a DC credential; never generic stock).
+- White header zone top-right: breadcrumb + headline + logos.
+- White content card (right 51%, from 19% to 98% of height, overlapping the photo by
+  ~1.06"), thin light border, with **two green `26890D` accent bars** (3.25" ×
+  0.076", single-corner-rounded): one flush with the card's TOP-LEFT corner, one at
+  the BOTTOM-RIGHT — diagonal opposites, the credential card's signature.
 
-Layout: left panel = full-height project-relevant photography (the client's asset,
-city, or sector — never generic stock); right panel = white content card with a thin
-green top-bar accent.
+**Header zone**:
+- Breadcrumb: `خبراتنا | محلياً` or `خبراتنا | عالمياً` — 20pt bold black. Never
+  paginated.
+- Roundel: 0.53" circular flag badge (Saudi flag local / country flag global / globe
+  glyph for confidential-international) + client logo (~0.64×0.43") to its left, in
+  native color.
+- Confidential variants: logo replaced by a thin-gray-bordered box reading `سري`;
+  giga-projects anonymized as `احدى المشاريع الكبرى`.
+- **Headline** (the real title): 16pt gray `53565A`, one sentence —
+  `{دعمت|عملت|قادت|قامت|شاركت} ديلويت {الإنجاز} لـ/مع {الجهة}`؛ ongoing projects use
+  present tense (`تعمل ديلويت على…`); brand alternates ديلويت / مونيتور ديلويت.
 
-Card blocks — always exactly these THREE, in this order, each header green bold
-underlined + colon:
-- `السياق:` — 2–4 sentences: what the client wanted / the situation and need
-  (`أرادت وزارة البلديات والإسكان متابعة رصد الجهود القائمة والعمل على التحسين
-  المستمر… وكان المطلوب تكوين مؤشرات الأداء…`).
-- `المنهجية:` — 4–7 verb-first bullets of what Deloitte actually did
-  (`تحليل الوضع الراهن وتحديد الفجوات الرئيسية والاجتماع مع أصحاب المصلحة`,
-  `تطوير خارطة طريق لتنفيذ الأعمال`, `تطوير مؤشرات الأداء وتطوير كافة معادلات
-  إحتساب المؤشرات…`).
-- `النتيجة:` — 1–3 sentences of outcomes, quantified when available (numbers first).
+**The three fixed card blocks** (100% consistent across all ~150 reference credential
+slides — zero variants; headers 16pt **bold + underline, `26890D`**, with colon; body
+16pt):
+1. `السياق:` — one paragraph, 2–5 lines: client ambition/problem + why Deloitte was
+   engaged (`تم تكليف ديلويت بـ…` / `أرادت {الجهة}…` / `كان العميل يسعى…` /
+   `طُلب من ديلويت أن…`).
+2. `المنهجية:` — 3–6 `•` bullets, each a **parallel masdar phrase, NO bold lead-ins,
+   NO colons inside bullets** (unlike bullets elsewhere in the deck):
+   `تحليل الوضع الراهن وتحديد الفجوات الرئيسية…`، `تطوير خارطة طريق لتنفيذ الأعمال`،
+   `تصميم النموذج التشغيلي`، `نقل المعرفة لفريق…`.
+3. `النتيجة:` — one paragraph: outcome + approval/impact
+   (`الحصول على موافقة مجلس الإدارة على نتائج الدراسة مما مهد الطريق لـ…`). Ongoing
+   projects use the fixed phrase `المشروع قيد التنفيذ حاليًا ويستهدف…`.
+- Sprinkle `N+` quantified claims (`تقييم 15+ دراسة حالة`, `أكثر من 32 جهة حكومية`,
+  `ما يزيد عن 450 من أصحاب المصلحة`) — a few per 10 slides.
+- NO meta line (duration/sector/dates) — identity is carried by logo + roundel +
+  breadcrumb; credentials are evergreen.
 
-Rules:
-- Real projects only, from the library. Confidential clients: `{وصف القطاع} - سرية`.
-- Local slides use Saudi client logos (+ Saudi flag roundel); global slides carry the
-  country flag / event logo and name the country or event in the tagline
-  (`…في كاس العالم 2022`).
-- Order within the section = the summary-matrix order = relevance order.
-- Frame geometry identical across all ~70 credential slides; only content and photo
-  change.
+**Detail-slide ordering**: follows matrix row order with same-client clustering
+overrides (the issuing client's own credentials pulled up into the lead cluster).
+Global slides always last.
 
-## 4. Adapting a library credential to this RFP (not copy-paste)
+## 3. Selection & adaptation for a new RFP
 
-Keep the facts frozen (client, scope, outcomes — never embellish). Re-angle the
-*emphasis*: lead the المنهجية bullets with the activities that mirror this RFP's scope;
-if the library slide's tagline highlights a different aspect of the same project,
-rewrite the tagline toward the relevant aspect. Update nothing else.
-
-## 5. PoV cross-links
-
-The PoV proof block quotes this appendix in aggregate (`15+ مشروع على مستوى المدينة`,
-`8 عروض تنفيذية`, `15+ قصة نجاح`). Those counts must be derivable from this section's
-contents — count them after final selection.
+1. **Shortlist**: take ALL local credentials (the house style shows breadth, 60+) +
+   10–14 global. Thin sectors → add NEW credentials in the identical 3-block format
+   (as the references did with 4 economic-development ones) — real projects only,
+   from the firm's record; never embellish facts.
+2. **Never rewrite existing library slides** — copy them whole. Only the matrix
+   (title clause, scope columns, checks, added rows) and new credentials are authored.
+3. **PoV cross-links**: the PoV proof block quotes this appendix in aggregate
+   (`15+ مشروع`, `8 عروض تنفيذية`) — those counts must be derivable from this
+   section; count after final selection.

@@ -76,8 +76,10 @@ partner name + title. Footer present (page 2).
   alpha; white contour-wave line art sweeping top-right; Deloitte triangle/chevron
   pattern tiles at ~18% alpha along the left edge.
 - Title: **88pt bold white** Sakkal Majalla, right-aligned, in a box 11.5" wide, top at
-  1.83", bottom-anchored (baseline lands upper-middle). Never shrink below 88pt; 2-line
-  wrap is fine.
+  1.83", bottom-anchored (baseline lands upper-middle). 88pt is a slide-level override
+  (the layout default is 36pt) — apply it on every divider. Never shrink below 88pt;
+  2-line wrap is fine. Arabic glyphs = Sakkal Majalla; Open Sans appears in the
+  references only as the Latin fallback face on divider runs.
 - Main-section divider = single title, text verbatim from the TOC entry
   (first-person-plural voice: وجهة نظرنا، النهج الذي سنتّبعه، الجدول الزمني الذي نقترحه…).
 - **Appendix divider = two lines**: line 1 `ملحق` (title placeholder, 88pt), line 2 the

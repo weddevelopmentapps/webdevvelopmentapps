@@ -73,7 +73,14 @@ title formulas, and what is fixed vs recomputed:
 | 7 | ملحق: أطر العمل / نبذة عن ديلويت / الشروط والأحكام / المستندات القانونية | `references/appendices.md` |
 
 Design constraints for every slide: `references/design-system.md`. Slide-type recipes:
-`references/slide-archetypes.md`.
+`references/slide-archetypes.md`. The full title-by-title storylines of both reference
+decks (the gold standard for "titles carry the story"): `references/reference-storylines.md`.
+
+**When a spec question isn't answered by a playbook**, consult
+`references/forensics/01…11_*.md` — the raw XML-level forensic analyses of both
+reference decks (EMU coordinates, exact fills, run-level typography, verbatim Arabic
+boilerplate, deck-vs-deck diffs, and the corrections log in `11_gaps_filled.md`).
+The playbooks distill these; the forensics are the source of truth.
 
 ### Step 4 — Build the .pptx
 Follow `references/build-and-qa.md` §1–3 (clone-don't-draw, RTL mechanics, assembly

@@ -31,8 +31,8 @@ One tab per track, laid RTL (track 0 at far right):
   (width ∝ label length), ~0.105" gaps. Overflow solution for many phases: a
   second full-width chevron band row (deck 2's phase 6).
 - **ACTIVE tab fill = the header-band gradient itself** (`056946` 85% @18% → `88AEF1`
-  60% @100%, 45°). **INACTIVE = solid `F2F2F2` with text left white** → ghosted,
-  barely legible on purpose.
+  60% @100%, linear ang=8100000/135°). **INACTIVE = solid `F2F2F2` with text left
+  white** → ghosted, barely legible on purpose.
 - Overview slide: ALL tabs active. Methodology slides: exactly one active ("you are
   here"). The active tab must always agree with the breadcrumb title.
 

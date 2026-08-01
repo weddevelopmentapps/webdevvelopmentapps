@@ -12,7 +12,7 @@ will read as foreign to the house style.
 | Slide size | 13.333 in × 7.5 in (12,192,000 × 6,858,000 EMU), 16:9 widescreen |
 | Direction | **RTL**. Text frames carry `rtl="1"`, paragraphs right-aligned (`algn="r"`). Reading order right → left; diagrams, process flows, Gantt month columns, and numbered sequences all run right → left |
 | Content margins | 0.50–0.55 in left/right; title block at y = 0.36–0.38 in |
-| Header band (content slides) | Full-width rectangle 13.33 × **1.55 in** at (0,0): city-skyline photo with gradient overlay — `056946` at 85% alpha (position 18%) → `88AEF1` at 60% alpha (position 100%). Title sits inside this band |
+| Header band (content slides) | Full-width composite 13.33 × **1.55 in** at (0,0), living on the LAYOUT: skyline photo (`image8.jpeg` asset) + gradient overlay rectangle — `056946` at 85% alpha (pos 18%) → `88AEF1` at 60% alpha (pos 100%), **linear ang=8100000 (135°), scaled** — + white contour-wave art (`image9.png`) bleeding past both edges. Title sits inside this band, anchor=ctr |
 | Title placeholder | (0.50, 0.38), 12.33 × 0.95 in, right-aligned, RTL |
 | Body zone | y ≈ 1.7 in → 6.9 in (below band, above footer) |
 | Footer line | y = 7.13 in: page number at x=0.50 (10pt); project name "العرض الفني: {اسم المشروع}" at x=1.05, width 7.04 in (10pt); copyright right-aligned at x=6.98, width 5.86 in (9pt) |

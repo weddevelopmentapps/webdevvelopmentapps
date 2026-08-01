@@ -27,17 +27,70 @@ Only when no donor exists: build from scratch per `design-system.md` +
 13.333×7.5, no `#` in hex, RTL text boxes need `rtl: true` + `align: "right"`,
 `lang` on runs, bold-only emphasis).
 
+## 1b. Template infrastructure facts (from XML forensics of the reference decks)
+
+**Masters & layouts.** The reference files carry FIVE slide masters and 60 layouts —
+clone accretion from years of proposal copying (deck 1 even contains a master with
+deck 2's footer frozen inside it). **A rebuild collapses to ONE master + ~14
+layouts**: cover (Title Slide - White), letter (Letter Layout), TOC, divider
+(Divider - Deloitte white), hero (3_Title & subtitle master1), general content
+(3_Title & subtitle — the L5/L26 twins merged), frameworks chassis (2_MD Proposal
+Content Slide), methodology (1_MD Proposal Content Slide), 3-card drivers
+(11_Title & subtitle), funnel photo-bg (6_Title & subtitle), credential detail
+(4_Title & subtitle: 20pt one-line title + 18pt gray `53565A` headline placeholder),
+About (Title Only + 1_Title & subtitle), certificates (2_/5_Title & subtitle), T&C
+(Text and chart), disclaimer.
+
+**Footers are MASTER-level literal shapes** (not placeholders): page number
+(`slidenum` field) at (0.50", 7.13"), CaseCode project line at (1.05", 7.13") 10.5→9pt
+(`العرض الفني: {الجهة} | {المشروع}`), Copyright right-aligned at (6.98", 7.13") 9pt.
+Per-proposal footer changes are **master edits**. Suppression mechanics: cover +
+letter layouts set `showMasterSp="0"` (the letter then REDRAWS its own identical trio
+locally — that's why it's "page 2"); dividers keep master shapes on but their
+full-bleed art covers them. Don't "fix" either mechanism.
+
+**Content-slide source line** is a layout placeholder (8pt) at y≈6.63", just above the
+footer — put `المصدر: …` there, not in a free textbox.
+
+**Fixed media assets** (reuse byte-identical for pixel fidelity): `image8.jpeg`
+header-band skyline; `image9.png` white contour-wave; `image13.jpeg` KAFD night hero
+(cover/exec-summary/credentials matrix); divider art photos + pattern tiles; the
+Monitor Deloitte wordmark is a **vector EMF**; icons are **real SVGs** (`svgBlip` with
+PNG fallback — keep SVG+PNG pairs when inserting new icons). Omit on rebuild: hidden
+think-cell OLE stubs, the hidden FFFF00 tag rectangle, two 158750-EMU debris squares,
+and the off-canvas color-swatch board parked past the right edge.
+
+**Fonts are NOT embedded** and the theme's `<a:cs>` typeface is EMPTY — Sakkal
+Majalla exists only as run-level `rPr`. The pipeline must (a) have Sakkal Majalla
+installed for rendering/QA and (b) set `latin`+`cs`(+`sym`) = "Sakkal Majalla" on
+every run it writes (or fix the theme cs font as an improvement).
+
+**Native charts**: the GDP-scenario, district-bar, and population-scenario slides use
+REAL PowerPoint chart parts with editable embedded workbooks (white-styled series per
+the house grammar) — generate line/bar data slides as native charts (evaluators can
+click into them). The Gantt and all diagrams are hand-drawn autoshapes.
+
+**Speaker notes**: the references carry none — don't add any.
+
 ## 2. RTL mechanics (critical — the #1 corruption source)
 
-- Every Arabic paragraph: `<a:pPr algn="r" rtl="1">`; every run keeps
-  `latin`+`cs`+`sym` = Sakkal Majalla.
-- Mixed Arabic/Latin runs (framework names, emails, `N+` stats): keep the Latin fragment
-  in its own run; do not reorder characters manually — the bidi algorithm handles order.
-- Tables: column order is visually mirrored in RTL. In the XML, gridCol order stays
-  logical; verify visually in the render that months/steps flow right→left.
-- Numbered sequences (tracks 0→4, months 1→9, process steps) must READ right→left in the
-  render. If a donor diagram is being repurposed, keep its shape order — it is already
-  RTL-correct.
+- **RTL is opt-in per paragraph, never global**: presentation and master defaults are
+  LTR (`algn="l" rtl="0"`); EVERY Arabic paragraph sets `<a:pPr algn="r" rtl="1">`.
+  Latin paragraphs (letterhead, emails, EN education lines) stay LTR — mixed slides
+  legitimately carry both.
+- Every Arabic run keeps `latin`+`cs`+`sym` = Sakkal Majalla; digits and Latin names
+  are separate `lang="en-US"` runs inside RTL paragraphs. Do not reorder characters
+  manually — the bidi algorithm handles order.
+- Hand-built tables need `<a:tblPr rtl="1">` — then the FIRST `gridCol` renders at
+  the far RIGHT (author columns in logical order). The reference TOC table lacks it
+  (a think-cell artifact) — set it in rebuilds.
+- `flipH="1"` mirrors chevrons/homePlate arrows so points lead LEFT = RTL flow.
+  Column sequences, tab ribbons, numbered circles, and the Gantt time axis all run
+  right→left.
+- Rendering caveat: LibreOffice mirrors some RTL tables/ribbons vs real PowerPoint —
+  when a render looks flipped, verify against the XML before "fixing".
+- Arabic-Indic digits (١٢٣) appear ONLY in the final disclaimer's legal prose;
+  Western digits everywhere else.
 
 ## 3. Assembly order (do content in this order)
 
