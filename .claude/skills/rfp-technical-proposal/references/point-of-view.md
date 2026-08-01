@@ -314,11 +314,26 @@ Requirements:
   the RFP's economics live (e.g. slides profiling each giga-project's municipal
   service needs, demand projections on services, what "partner of choice" means
   operationally).
-- **Design to top-notch consulting-grid quality.** New slides are composed on
-  the house grid (title band, RTL flow, palette, Sakkal Majalla) but may use
-  new layouts: profile cards, small-multiple maps, stat bands, timeline ladders.
-  Use the strongest design tooling available for slide generation (design-grade
-  layout thinking, not clip-art); photography via Higgsfield where it helps.
+- **Design to top-notch consulting-grid quality — by cloning chrome, never by
+  drawing freehand.** This is the hardest-won rule in the playbook: a new slide
+  drawn from scratch out of bare autoshapes and textboxes on a blank canvas
+  ALWAYS reads as a wireframe — naked boxes, floating text, dead space — no
+  matter how carefully the palette and fonts are applied. It will be rejected
+  on sight. The only reliable path to reference-grade craft is:
+  1. **Survey the archetype pool.** Render (or reuse renders of) every page of
+     the reference decks and shortlist the most beautiful, densest existing
+     layouts matching what the new slide needs — card grids, stat-led pages,
+     timeline/roadmap pages, comparison pages. Fan out review agents if the
+     pool is large; keep only pages a design partner would call beautiful.
+  2. **Clone the winning chrome.** Strip-copy the chosen slide (its full XML —
+     backgrounds, bands, photos, icons, rules, column geometry) into the build
+     and change ONLY the text and data, exactly as the main deck is built from
+     its donor. Photography may be swapped via Higgsfield when the story needs
+     different imagery; geometry is never re-derived.
+  3. **Judge before the user sees it.** Every new slide passes a visual judge
+     panel comparing it against real reference pages — "is this
+     indistinguishable in craft from the native pages?" Iterate until yes.
+     Showing the user an unjudged new layout is a delivery failure.
   The bar: a partner would present any of these slides without apology.
 - Budget: creative mode may add 4–10 PoV slides beyond the reference count;
   update TOC, dividers, and cross-references accordingly.
