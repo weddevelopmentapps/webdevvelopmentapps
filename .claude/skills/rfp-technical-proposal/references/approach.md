@@ -68,21 +68,35 @@ One tab per track, laid RTL (track 0 at far right):
 - Overview slide: ALL tabs active. Methodology slides: exactly one active ("you are
   here"). The active tab must always agree with the breadcrumb title.
 
-## 2. Approach overview slide (archetype J)
+## 2. Approach overview slides (archetype J) — NEVER bare lists
 
-Title (exact template): `سيتم تنفيذ المشروع عبر {N} {مسارات|مراحل} رئيسية وخلال مدة
-زمنية تقدر بـ{X} {أشهر|شهرًا}` — passive future, count + duration from the RFP.
+**Doctrine (client feedback, binding): an overview column is a miniature methodology,
+not a table of contents.** A column that lists sub-phases as bare one-line items with
+empty space beneath reads as unfinished. The mandatory column anatomy, top to bottom:
 
-Body: N+1 columns under the ribbon (headers = the ribbon tabs, all active). Per column:
-- Sub-track headings `X.Y {الاسم}` — 12pt **bold teal accent5 `0D8390`**, no bullet.
-- 1–8 activity bullets per sub-track — 12pt black, Arial `•`, 0.19" hanging indent,
-  verb-first masdar (رصد وتحليل / تطوير / إعداد / صياغة / عقد / توثيق…), near-verbatim
-  liftovers of the RFP scope items in the client's own vocabulary.
-- Launch column is fixed boilerplate:
-  `0.1 إطلاق المشروع` → `عقد اجتماع الإطلاق الأولي وتحديد أصحاب المصلحة الرئيسيين،
-  وإعداد ميثاق المشروع`؛ `0.2 تحديد الطموح` → `إجراء ورشة عمل مع أصحاب المصلحة
-  الرئيسيين في المشروع للموائمة على طموحات وأهداف المشروع`.
-- Quality bar: columns balanced ±2 lines; zero orphan words; dense but gridded.
+1. Phase chip (the ribbon tab, active) — `المرحلة {الترتيب}` + name, 2 lines.
+2. Months line — `الأشهر X–Y` (or `مستمرة طوال المشروع`), ~11pt bold gray `53565A`.
+3. For EVERY sub-phase: heading `n.m {الاسم}` — ~10.5pt **bold teal `0D8390`**,
+   no bullet — followed by **1–3 scope bullets** (~10pt black, Arial `•`, hanging
+   indent) that compress that sub-phase's RFP activities into its essence
+   (near-verbatim vocabulary, verb-first masdar).
+4. Payoff line — the phase's contractual deliverable(s) + month, ~10pt **bold green
+   `046A38`** (e.g. `تقرير تقييم الوضع الراهن — الشهر 3`, `5 مخرجات تعاقدية —
+   الأشهر 5–14`).
+
+Title (exact template): `سيتم تنفيذ المشروع عبر {N} {مسارات|مراحل}...` or the
+assertion form `سنقود المشروع عبر أربع مراحل متكاملة تغطي مسارات العمل التسعة خلال
+{X} شهرًا`.
+
+A SECOND overview slide carries the phase↔RFP-track mapping with the same density
+rule — per track, a three-line block: track name (bold black bullet) → one scope
+line (~9.5pt gray) → deliverable + month (bold teal). Continuous-management bands
+(light `F2F2F2` flipH pentagons, full width) sit beneath the columns on both slides.
+
+Launch column boilerplate: `0.1 إطلاق المشروع` → team/charter/stakeholder bullets؛
+`0.2 تحديد الطموح` → ورشة الموائمة على الأهداف ومعايير النجاح.
+Quality bar: columns filled to ~90% of their height (ragged bottoms are human, dead
+half-columns are not); zero orphan words; every sub-phase visible with scope.
 
 ## 3. BoQ deliverables table
 
