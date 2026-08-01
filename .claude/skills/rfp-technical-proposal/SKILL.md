@@ -99,7 +99,12 @@ every project-specific word is newly derived from the input RFP.
 - Locate the reference folder; index it per `references/reference-library.md` §2.
   If no reference folder exists, ask the user for it (or for permission to build from
   archetype recipes alone).
-- Identify the template donor deck (most recent complete past proposal).
+- Identify the BASE donor deck (most recent complete past proposal) — it supplies the
+  global chrome (masters, dividers, footers, TOC mechanics). Section-level layouts are
+  NOT restricted to it: per `references/reference-library.md` §3.0, every section's
+  layout is chosen best-of-breed across ALL decks in the library, judged visually, then
+  normalized to the base donor's chrome. Re-run the library inventory (text + visual
+  index, content-hash cached) on every RFP so newly added assets are always seen.
 - Load the `pptx` skill for all reading/writing of .pptx files.
 
 ### Step 1 — Deconstruct the RFP → Proposal Plan

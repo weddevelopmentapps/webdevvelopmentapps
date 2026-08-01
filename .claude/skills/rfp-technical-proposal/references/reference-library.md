@@ -27,10 +27,28 @@ maps each section), extract per-slide text (`markitdown`), and record slide numb
 category. Past decks contain *all* categories — a full library exists inside any one
 complete proposal.
 
-## 2. Inventory pass (do once per run, cache the index)
+**The library is meant to GROW.** File every delivered proposal back into `_templates/`
+when a build completes, and the user may drop new credentials, CVs, frameworks, or photos
+into their folders at any time. The inventory pass below runs on EVERY RFP and picks up
+whatever is new — the more the library grows, the better every subsequent proposal gets.
+
+## 2. Inventory pass (run on EVERY RFP; cache by content, not by session)
+
+Re-scan the whole library at the start of every proposal run. Keep a cached index
+directory (`index/`) inside the library keyed by file content hash: unchanged files reuse
+their cached entries instantly, new or modified files get indexed fresh. Never rely on a
+stale index from a previous run — new assets the user dropped in must be seen.
+
+The index has TWO layers, and both are mandatory:
+- **Text layer** — per-slide extracted text, for classification and RFP-fit matching.
+- **Visual layer** — every deck rendered once to per-page images (`soffice` → `pdftoppm`,
+  cached by the same hash). Slide selection is a DESIGN decision as much as a content
+  decision, and design can only be judged by looking. This is what enables the
+  best-of-breed sweep in §3.0 and the archetype chrome survey in creative mode.
 
 For every .pptx in the library:
-1. `markitdown file.pptx > index/file.md` and split per slide.
+1. `markitdown file.pptx > index/file.md` and split per slide; render pages to
+   `index/img/<hash>/` if not already cached.
 2. Classify each slide by its title signature:
    - `خبراتنا | محلياً` / `خبراتنا | عالمياً` → credential
    - `{name} | {role}` with السيرة الذاتية blocks → CV
@@ -43,6 +61,32 @@ For every .pptx in the library:
    named projects. For each framework: family, topic keywords.
 
 ## 3. Retrieval & selection logic
+
+### 3.0 Best-of-breed slide selection — sweep the WHOLE library, per section
+
+The donor is not a single deck. Two-level rule:
+
+- **Base donor** (one deck): the most recent complete past proposal supplies the global
+  chrome — masters, theme, footers, dividers, TOC mechanics — so the assembled deck has
+  one consistent skeleton.
+- **Section layouts** (any deck): for EVERY section of the new deck, sweep the candidate
+  slides of that section across ALL decks in the library and pick the strongest, not
+  merely the base donor's version. Use the text index to shortlist candidates, then judge
+  the shortlist VISUALLY (fan out review agents over the cached page renders when the
+  pool is large — same mechanics as the creative-mode archetype survey). Score each
+  candidate on:
+  1. **Fit** — does this layout carry THIS RFP's story for this section (right number of
+     tracks/phases/pillars, right density for the content volume)?
+  2. **Design quality** — density, layered craft, grid discipline; only layouts a design
+     partner would call beautiful. A newer deck's redesigned section beats an older
+     deck's tired one; an older deck's brilliant framework page beats a newer mediocre one.
+  3. **Recency & client-signal** — newer wins ties; slides originally built for the same
+     client or sister entities win over generic ones.
+  Clone the winner's chrome, rewrite its text per the section playbook.
+- **Consistency pass afterwards**: slides sourced from different decks must be normalized
+  to the base donor's palette, typography scale, footer, and divider language before QA —
+  a mixed-donor deck must read as ONE deck. Record every slide's source deck in
+  `manifest.md`.
 
 ### Credentials (see `credentials.md` for rendering)
 Score each credential 0–5 against the RFP:
