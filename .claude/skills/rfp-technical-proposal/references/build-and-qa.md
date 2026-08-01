@@ -121,6 +121,20 @@ click into them). The Gantt and all diagrams are hand-drawn autoshapes.
    exec-summary/PoV-pivot/approach/Gantt/BoQ table, deliverable names identical to BoQ.
 5. QA pass (below).
 
+## 3b. The two-tier review gate (Manager + Partner — no delivery without both)
+
+Run AFTER the build is content-complete and BEFORE final export:
+1. **Manager pass** — fan out reviewers over every rendered page with the §4
+   checklist plus: dead/white space (a half-empty content area is a defect),
+   ragged alignment, orphan lines, inconsistent sizes between sibling slides,
+   and text errors (typos, fused words, wrong client/project names).
+2. **Partner pass** — a separate agent reads the deck end-to-end as the client:
+   storyline persuasiveness, slide-level "so what", simplistic or templated
+   sections, missed opportunities to demonstrate understanding. Partner findings
+   can demand new slides or rewrites — treat them as scope, not polish.
+3. Fix everything; re-render changed pages; re-run the failed reviewer on them.
+Deliver only when both passes return zero blockers.
+
 ## 4. QA checklist (run ALL of it; render → inspect → fix → re-render)
 
 ### 4.0 FONT GATE — HARD, runs BEFORE any render (non-skippable)

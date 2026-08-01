@@ -297,3 +297,28 @@ Slide-invention rules for new visuals (the anti-AI-slop contract):
 - Facts on invented slides stay qualitative unless sourced: name real projects
   and real public milestones (إكسبو 2030، كأس العالم 2034) but do not invent
   budgets, counts, or dates.
+
+
+## Creative deep-dive mode (user-selected; ask first — see SKILL.md 0a)
+
+When the user chooses the creative PoV, the reference storyline is only a floor.
+Requirements:
+- **Research before writing.** Use web research to ground the story in the
+  client's real ecosystem: the actual mega/giga projects, their announced scopes
+  and timelines, the national strategies they serve, published statistics —
+  every fact carried onto a slide gets a source line. No invented numbers.
+- **Judge the storyline.** Draft the argument first (what must this client
+  believe by the last PoV slide?), list candidate beats, and cut anything that
+  does not move the argument. The reference beats (نفهمكم/نفهم المنظومة/نفهم
+  التحدي/نعرف الحل) are a starting skeleton, not the ceiling — go deeper where
+  the RFP's economics live (e.g. slides profiling each giga-project's municipal
+  service needs, demand projections on services, what "partner of choice" means
+  operationally).
+- **Design to top-notch consulting-grid quality.** New slides are composed on
+  the house grid (title band, RTL flow, palette, Sakkal Majalla) but may use
+  new layouts: profile cards, small-multiple maps, stat bands, timeline ladders.
+  Use the strongest design tooling available for slide generation (design-grade
+  layout thinking, not clip-art); photography via Higgsfield where it helps.
+  The bar: a partner would present any of these slides without apology.
+- Budget: creative mode may add 4–10 PoV slides beyond the reference count;
+  update TOC, dividers, and cross-references accordingly.

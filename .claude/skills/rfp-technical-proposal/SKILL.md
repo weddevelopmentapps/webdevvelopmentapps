@@ -35,6 +35,31 @@ every project-specific word is newly derived from the input RFP.
    PDF must show only SakkalMajalla. A PDF rendered with a substitute font is NOT a
    deliverable: if the font cannot be installed, stop and ask the user for
    `majalla.ttf`/`majallab.ttf` instead of shipping a substituted export.
+0a. **Ask the PoV-mode question before planning.** Before writing the Proposal
+   Plan, ASK the user (one question, two options): (1) **Reference-style PoV** —
+   the proven storyline of the reference decks, re-derived for this RFP; or
+   (2) **Creative deep-dive PoV** — a newly judged storyline built for THIS
+   client: research the client's ecosystem online (projects, strategies, public
+   figures with sources), add bespoke slides the story needs (e.g. per-mega-
+   project needs profiles, demand-on-services analyses), and design them to
+   top-notch consulting-grid quality. Never assume; the user decides per
+   proposal. In creative mode, judge the storyline explicitly — "is this the
+   best possible story for this client?" — and iterate until the answer is yes.
+
+0c. **Mandatory Manager + Partner review before ANY delivery.** A proposal that
+   has not passed BOTH reviews does not leave the building:
+   - **Manager review** (detail lens): a subagent pass over EVERY rendered page
+     checking text errors, alignment, dead/white space, overflow and clipping,
+     font compliance, consistency-chain breaks, and layout balance — the
+     checklist in `references/build-and-qa.md` §4. Every finding is fixed and
+     the affected pages re-reviewed.
+   - **Partner review** (judgment lens): a second, independent subagent pass
+     that reads the deck as the client would — does the storyline persuade? does
+     every slide earn its place? is anything simplistic, templated, or thin for
+     the fee being asked? would a partner sign this? Its verdicts drive content
+     changes, not just cosmetics.
+   Only after both passes come back clean is the PDF exported and delivered.
+
 0b. **References are grammar, not stencils.** The reference decks teach the design
    language (palette, chrome, density, RTL mechanics, title voice) — they are NOT
    a fixed slide inventory to clone-and-retext. Think first (what does THIS
