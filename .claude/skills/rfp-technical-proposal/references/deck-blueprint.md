@@ -16,15 +16,18 @@ scale their depth instead. Canonical Arabic section names are fixed vocabulary.
 | 7 | Proposed timeline | الجدول الزمني الذي نقترحه | 63–64 / 66–67 | divider + Gantt |
 | 8 | Proposed team | فريق العمل الذي نقترحه | 65–70 / 68–74 | divider + org + leadership + experts |
 | 9 | Appendix marker | ملحق | one divider before EACH appendix | Divider |
-| 10 | Team profiles | ملحق: ملفات تعريف الفريق | 73–80 / 77–87 | 1 CV per slide |
-| 11 | Expert profiles | ملحق: ملفات تعريف الخبراء | 82–92 / 88–104 | 1 profile per slide |
-| 12 | Our credentials | ملحق: خبراتنا | 94–172 / 105–189 | summary matrix + 1 credential per slide |
-| 13 | Frameworks | ملحق: أطر العمل والمنهجيات | 174–233 / 190–250 | framework library |
-| 14 | About Deloitte | ملحق: نبذة عن ديلويت | 235–245 / 251–262 | fixed pack |
-| 15 | Terms & conditions | ملحق: الشروط والأحكام | 247–258 / 263–275 | fixed pack |
-| 16 | Legal documents | ملحق: المستندات القانونية | 260–269 / 276–286 | certificate scans + final disclaimer |
+| 10 | Team profiles | ملحق: ملفات تعريف الفريق | 73–80 / 77–85 | 1 CV per slide |
+| 11 | Expert profiles | ملحق: ملفات تعريف الخبراء | 82–92 / 87–102 | 1 profile per slide |
+| 12 | Our credentials | ملحق: خبراتنا | 94–172 / 104–187 | summary matrix + 1 credential per slide |
+| 13 | Frameworks | ملحق: أطر العمل والمنهجيات | 174–233 / 189–248 | framework library |
+| 14 | About Deloitte | ملحق: نبذة عن ديلويت | 235–245 / 250–260 | fixed pack |
+| 15 | Terms & conditions | ملحق: الشروط والأحكام | 247–258 / 262–273 | fixed pack |
+| 16 | Legal documents | ملحق: المستندات القانونية | 260–269 / 275–286 | certificate scans + final disclaimer (always slide N) |
 
-The TOC lists exactly these names with their start pages, appendices prefixed `ملحق: `.
+The TOC lists exactly these names with their start pages, appendices prefixed
+`ملحق: `. (TOC page numbers point at each section's divider — sometimes divider+1 in
+the references; be consistent and point at section starts. The content ranges above
+are the actual content slides, not the TOC figures.)
 
 ## 1. Cover (slide 1)
 
@@ -46,12 +49,13 @@ The TOC lists exactly these names with their start pages, appendices prefixed `�
 
 ## 2. Cover letter (slide 2) — see writing-style.md §6 for the full formula
 
-Three-zone layout: letterhead top-right (address block 8pt gray), Monitor Deloitte
-wordmark top-left, contacts sidebar far-left (~2.2 in wide: `جهات الاتصال` header, two
-partner entries — circular photo 0.8 in, bold name, شريك, entity, blue email, `جوال:`).
-Main body ~9.5 in wide, 11–12pt, right-aligned: addressee → greeting → bold subject →
-thanks ¶ → bridge ¶ → 4–6 bold-lead advantage bullets → commitment ¶ → sign-off →
-partner name + title. Footer present (page 2).
+Three-zone layout: letterhead top-LEFT at (0,0) (company line 10pt bold + address
+block 10pt), Monitor Deloitte wordmark large top-RIGHT, contacts sidebar on the RIGHT
+rail (x≈10.1–12.8": `جهات الاتصال` header, two partner entries — circular photo
+1.06", bold name, شريك, entity, hyperlink email, `جوال:`). Main body ~9.4" wide at
+left/center, 12pt, right-aligned RTL: addressee → greeting → bold subject → thanks ¶ →
+bridge ¶ → 4–6 teal-lead advantage bullets → commitment ¶ → sign-off → partner name +
+title. Footer present (page 2 — the letter layout redraws the footer trio locally).
 
 ## 3. Table of contents (slide 3)
 

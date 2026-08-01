@@ -92,6 +92,18 @@ inspect fresh, fix, re-render. Grep for donor-client residue. Validate the file.
 Deliver the .pptx plus `manifest.md` (slide-by-slide provenance) and flag any gaps
 (missing credentials/CVs/logos) for the user.
 
+## Language
+
+The reference system is Arabic/RTL and these playbooks assume AR (default). If the
+RFP is English or demands a bilingual response: keep the identical skeleton, design
+system, and formulas but mirror the geometry LTR (left-aligned text, flows left→right,
+chevrons pointing right, month 1 leftmost), translate the canonical section names
+once and use them consistently, set body font to a Latin face consistent with the
+brand (Open Sans/Verdana per the reference Latin usage), and keep all framework names
+as-is. The corporate packs (About Deloitte, T&C, legal) must come from the library's
+EN versions if they exist — never machine-translate legal text; if no EN pack exists,
+flag it to the user.
+
 ## Interaction contract
 
 - The user may say only: "generate a technical proposal based on the attached RFP".

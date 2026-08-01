@@ -38,7 +38,7 @@ Answer in writing:
 2. **What context makes this urgent now?** Vision/strategy programs, growth numbers,
    institutional changes. Feeds the PoV context funnel.
 3. **What 3 enablers or challenges frame the need?** Compress the scope into exactly **3**
-   (the house pattern is 3 — never 2, rarely 4) client-side gaps:
+   (the house pattern is ALWAYS 3 drivers; only the work areas vary 3–5) client-side gaps:
    - If the project is *opportunity-driven* (strategy, studies, growth) → frame as
      **ممكنات (enablers)**: "ولمواكبة التطور، تحتاج الجهة إلى 3 ممكنات رئيسية".
    - If the project is *problem-driven* (quality, performance, operations) → frame as
@@ -51,7 +51,7 @@ Answer in writing:
    Vision 2030 linkages, transformation programs. At least 1–2 PoV slides must show we
    know *their* strategy documents, org structure, and ecosystem.
 6. **Which Deloitte-style methodologies fit?** Map each work area to framework families
-   (see `appendices.md` §frameworks): strategy design, policy cycle, TOM, performance
+   (see `appendices.md` §1): strategy design, policy cycle, TOM, performance
    management, PMO, change/knowledge transfer, scenario planning…
 7. **Key messages** — write the 4–6 win themes that the letter bullets, exec summary, and
    PoV proof slides will all repeat (deep local knowledge; leadership-support track record;

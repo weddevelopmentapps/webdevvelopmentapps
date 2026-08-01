@@ -33,7 +33,8 @@ will read as foreign to the house style.
 ### Teals & blues
 | Hex | Role |
 |---|---|
-| `0D8390` | Teal — icon circles on dark photo cards, Gantt phase bands, expert-card fills, framework stage 2 |
+| `0D8390` | Teal — icon circles on dark photo cards, methodology sub-track headers, framework process machinery, escalation header |
+| `007680` → `004F59` | Team/timeline chapter teal — Gantt phase bands (solid `007680`), org-chart expert boxes and expert number ribbons (gradient) |
 | `007CB0` | Blue — framework stage 1, hyperlink-adjacent accents |
 | `62B5E5` / `00B0F0` | Light blue accents in charts/diagrams |
 | `0F2837` | Near-black navy — framework stage 3 / dark diagram fills |
@@ -45,7 +46,9 @@ will read as foreign to the house style.
 | `FFFFFF` | Text on dark photo/green; white cards |
 | `53565A` | Dark gray (dk2) — secondary text, letterhead |
 | `575757` / `313131` | Body gray text |
-| `D0D0CE` | Light gray (lt2) — big ghost numerals (1 2 3 4), inactive states, "اخرين ++" boxes |
+| `D0D0CE` | Light gray (lt2) — big ghost numerals (1 2 3 4), inactive states |
+| `BFBFBF` | "اخرين ++" overflow boxes (bg1 @ lumMod 75%); mid-gray separators |
+| `9C9C9B` | Org-chart consultant boxes (D0D0CE @ lumMod 75%) |
 | `BFBFBF` / `A6A6A6` | Mid grays — dashed separators, muted labels |
 | `F2F2F2` / `EEEEEE` | Light gray panel fills (CV sidebar, deliverables sidebar) |
 
@@ -73,7 +76,9 @@ will read as foreign to the house style.
 |---|---|---|---|
 | Arabic — all text | **Sakkal Majalla** | see below | — |
 | Latin fragments (framework names, emails, URLs, EN logos) | Arial / Calibri / Open Sans | match surrounding | — |
-| Slide title (content slides) | Sakkal Majalla | **28pt** | Bold; white on header band; black on white slides; highlighted phrase = `schemeClr accent4 + lumMod 60%/lumOff 40%` bold (renders bright green — use the schemeClr formula, not raw hex) |
+| Slide title — default (exec summary, PoV argument, approach, methodology, frameworks appendix) | Sakkal Majalla | **28pt** | **Stem regular-weight** white on band/photo (frameworks appendix bolds its titles); highlighted payload = separate **bold** run in `schemeClr accent4 + lumMod 60%/lumOff 40%` (schemeClr formula, never raw hex); black on white slides |
+| Slide title — 20pt chapters | Sakkal Majalla | **20pt** | Gantt + org chart + leadership + experts grids; credential-detail breadcrumbs; T&C and legal-document titles (About Deloitte ~21pt) |
+| Slide title — PoV funnel photo slides | Sakkal Majalla | 24–36pt | Varies by slide (32pt typical, 36pt hero variants) |
 | Section divider title | Sakkal Majalla | **88pt** | Bold white (both lines of appendix dividers too; `(غير شامل)` sample-tag = 48pt italic white) |
 | Cover: client name | Sakkal Majalla | 40pt | Bold, `schemeClr accent3 + lumMod 60%/lumOff 40%` (bright green) |
 | Cover: project title | Sakkal Majalla | 32pt | Bold white |
@@ -123,7 +128,7 @@ Rules:
 - Header row: bold, either on `0D8390`/green band (Gantt phase rows, matrix headers) or plain bold black with a solid underline.
 - Data rows: white/transparent with dashed separators (on photo) or hairline gray borders (on white); zebra tints `F2F8E5`/`E5F0F9` when categorization matters.
 - Country flags as small rectangular icons inside credential tables.
-- Checkmarks: Wingdings 2 "P" (✓) in green for capability/criteria matrices.
+- Checkmarks: the credentials capability matrix uses **Wingdings U+F0FC, 24pt, WHITE** on the dark photo; green ✓ circle badges (Wingdings 2) belong only to the PoV proof-ladder logo walls.
 
 ## 8. Charts
 
@@ -149,7 +154,7 @@ Rules:
 | Cross-reference ribbon | `تجدون المزيد من المشاريع في ملحق "خبراتنا"` / `تفاصيل في الشريحة التالية` — forward-references between sections, appendix names in «» |
 | Tab bar | Rotated double-bracket shapes, one per work area, ~11pt white; inactive = charcoal fill, active = teal fill bold text; runs across the PoV methodology+proof chapters, active tab advancing right→left |
 | Focus frame | `تركيز الشرائح التالية` green tag + dashed-green rounded frame around the diagram element the next slides zoom into |
-| Checkmarks | Wingdings 2 ✓ glyphs in green circle badges |
+| Checkmarks | Credentials matrix: Wingdings U+F0FC 24pt white; PoV proof walls: Wingdings 2 ✓ in green circle badges |
 
 ## 10. What makes it look human-made (anti-AI-slide rules)
 

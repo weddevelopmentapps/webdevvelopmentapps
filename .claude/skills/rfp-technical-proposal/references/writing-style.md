@@ -29,8 +29,9 @@ argument (titles = the storyline).
 **Rules:**
 - Titles may run to two lines (28pt). Never truncate to a label ("النهج" alone is wrong).
 - **Green highlighting**: inside dark-slide titles, the load-bearing phrase (project name,
-  the key claim) is bold `86BC25`; the rest is white. On white slides titles are plain
-  black (breadcrumb/labelled titles take no highlight).
+  the key claim) is a separate bold run in `schemeClr accent4 + lumMod 60%/lumOff 40%`
+  ("accent4, Lighter 40%" — never a raw hex); the title stem stays regular-weight white.
+  On white slides titles are plain black (breadcrumb/labelled titles take no highlight).
 - **Narrative connectors**: consecutive titles begin with و / ولذلك / ومن هذا المنطلق /
   كما / واخيراً to chain the argument across slides.
 - **Continuation pairs**: split one sentence across two consecutive slides with `...` —

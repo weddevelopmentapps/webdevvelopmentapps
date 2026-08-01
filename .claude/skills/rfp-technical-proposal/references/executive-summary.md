@@ -77,6 +77,9 @@ every paragraph is one grammatical sentence; zero Latin words.
   words, verb-noun opener: إعداد/تمكين/ضمان/تحليل/تطوير). 8pt space before AND after.
   - Workstream flavor: `مسار الإطلاق` then `مسار العمل الأول: {الاسم}` (ordinal WORDS).
   - Phase flavor: `المرحلة 0: الاطلاق` … `المرحلة 6: نقل المعرفة` (ordinal DIGITS).
+  - Track/phase 0's description is FIXED boilerplate — reuse verbatim:
+    `المواءمة على معايير النجاح للمشروع، وإجراء ورشة عمل انطلاق المشروع مع الفريق
+    للموائمة على أهداف المشروع`.
   - Font 16pt for ≤5 items, step down to 14pt for 6–7 — **capacity is absorbed by
     shrinking body text, never the title/headers/circles**.
   - Track names MUST match the approach chapter word-for-word.

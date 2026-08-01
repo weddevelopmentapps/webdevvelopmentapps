@@ -37,7 +37,8 @@ layouts**: cover (Title Slide - White), letter (Letter Layout), TOC, divider
 (3_Title & subtitle — the L5/L26 twins merged), frameworks chassis (2_MD Proposal
 Content Slide), methodology (1_MD Proposal Content Slide), 3-card drivers
 (11_Title & subtitle), funnel photo-bg (6_Title & subtitle), credential detail
-(4_Title & subtitle: 20pt one-line title + 18pt gray `53565A` headline placeholder),
+(4_Title & subtitle: 20pt one-line title + gray `53565A` headline placeholder whose
+layout default is 18pt — slides override the headline run to 16pt; run overrides win),
 About (Title Only + 1_Title & subtitle), certificates (2_/5_Title & subtitle), T&C
 (Text and chart), disclaimer.
 

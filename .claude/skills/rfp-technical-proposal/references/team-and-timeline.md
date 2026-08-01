@@ -1,8 +1,10 @@
 # Section Playbook — الجدول الزمني + فريق العمل + الملفات التعريفية
 
 Fixed chapter order: **Gantt → team-structure org chart → leadership cards → experts
-(N pages)** — then the CV appendices. The chapter owns a private sub-palette layered
-over the theme — reproduce these EXACT hex values (not derivable from the theme):
+(N pages)** — then the CV appendices. **All four chapter archetypes use 20pt regular
+white titles** (not the 28pt default — this chapter runs a size down). The chapter
+owns a private sub-palette layered over the theme — reproduce these EXACT hex values
+(not derivable from the theme):
 teal `007680`→`004F59` gradients, Gantt diamonds `1A7749` (dark) / `86BC25` (bright),
 launch band gray `75787B`, knowledge-transfer olive `435E13`. Nothing in this chapter
 uses tables, SmartArt, or chart objects — 100% positioned autoshapes + text boxes +

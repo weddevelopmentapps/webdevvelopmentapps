@@ -126,11 +126,12 @@ Title: `ولمواكبة التطور والتنمية في المدينة، ت�
 {القطاع}` (problem valence — remedial/operational RFPs). Same skeleton, opposite
 valence — choose by RFP mood. Digit always a numeral (`3`, not `ثلاثة`).
 
-3 photo cards (3.03 × 3.99", ~0.09" gutters, driver 1 = RIGHTMOST): topical photo +
-dark scrim; teal `0D8390` filled icon circle (0.96") inside a **broken white ring**
-(1.17", arc with a gap — signature style); card title bold white 20–24pt (4–7-word
-noun phrase); green `86BC25` underline rule (~2.3" wide); one 16pt white sentence =
-current dynamic + `ما يفرض/يتطلب…` need clause. Icons semantically match each driver.
+3 photo cards (4.03" × 5.30" at y=1.27", x = 0.545"/4.70"/8.85", 0.126" gutters,
+driver 1 = RIGHTMOST): topical photo + dark scrim; teal `0D8390` filled icon circle
+(1.28") inside a **broken white ring** (1.56", arc with a gap — signature style);
+card title bold white 20–24pt (4–7-word noun phrase); green `86BC25` underline rule
+(~3.03" wide); one 16pt white sentence = current dynamic + `ما يفرض/يتطلب…` need
+clause. Icons semantically match each driver.
 
 ### 2.2 Statement + evidence pairs (×3)
 
@@ -177,12 +178,17 @@ recomputed per RFP). Dark background. Anatomy:
 
 ### 2.4 The tab bar (navigation device, every slide from pivot+1 to proof end)
 
-A top strip of N rotated double-bracket shapes = the N area names, ordered right→left,
-~11pt white. Inactive tabs = dark charcoal fill, low-contrast text; **active tab =
-teal fill (`0D8390`/`004F59`) bold white text**. The active tab moves strictly left as
-the deck advances — a progress bar made of words. In the proof chapter the same device
-is reused with the differentiator names from the synthesis slide as tab labels. Tabs
-live on each slide body, not the layout.
+A top strip of N tabs = the N area names, ordered right→left. Construction: rotated
+**double-bracket (`bracketPair`) shapes**, one per area, laid edge-to-edge across the
+usable width directly under the title zone (equal widths = usable width / N, same
+height ~0.3–0.4", same y for the whole series); label ~11pt Sakkal Majalla white,
+centered, wrapping to 2 lines for long area names. Inactive tabs = dark charcoal
+fill, low-contrast text; **active tab = teal fill (`0D8390`/`004F59`) bold white
+text**. The active tab moves strictly left as the deck advances — a progress bar made
+of words. In the proof chapter the same device is reused with the differentiator
+names from the synthesis slide as tab labels. Tabs live on each slide body, not the
+layout — clone the group from slide to slide, toggling only the active fill; keep the
+geometry EMU-identical across the whole run.
 
 ### 2.5 Methodology previews (~6–12 slides, tab-tracked)
 
