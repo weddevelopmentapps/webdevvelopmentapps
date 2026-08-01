@@ -42,10 +42,16 @@ Rules of the mapping:
 - Phase names ≤4 words; tab labels `{N}. {الاسم}`؛ sub-phase lines in the RFP's own
   vocabulary.
 
-**The consistency chain (the quality signature):** ribbon tab names = overview column
-headers = breadcrumb titles = BoQ table track cells; BoQ deliverable strings =
-methodology sidebar bullets. Break this chain and the deck stops looking
-consultant-made.
+**The consistency chain (the quality signature):** the phase model is ONE story told
+everywhere — the executive summary's delivery-model slide, the hero's scope prose,
+the PoV pivot's solution areas, the approach overview, the ribbon tabs, the
+breadcrumb titles, and the Gantt swimlanes ALL use the same phase names in the same
+order. Additionally: ribbon tab names = overview column headers = breadcrumb titles;
+BoQ deliverable strings = methodology sidebar bullets = mapping-slide chips. After
+any restructuring of the approach, grep the whole bespoke range (cover→timeline)
+for the OLD structure's vocabulary (e.g. «مسار العمل») — the executive summary is
+the easiest slide to forget and the first one the client reads. Break this chain
+and the deck stops looking consultant-made.
 
 ## 1. The navigation ribbon (on EVERY approach slide except the 2 KT slides)
 
