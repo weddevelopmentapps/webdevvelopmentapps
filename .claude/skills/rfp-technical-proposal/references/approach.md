@@ -77,9 +77,16 @@ empty space beneath reads as unfinished. The mandatory column anatomy, top to bo
 1. Phase chip (the ribbon tab, active) — `المرحلة {الترتيب}` + name, 2 lines.
 2. Months line — `الأشهر X–Y` (or `مستمرة طوال المشروع`), ~11pt bold gray `53565A`.
 3. For EVERY sub-phase: heading `n.m {الاسم}` — ~10.5pt **bold teal `0D8390`**,
-   no bullet — followed by **1–3 scope bullets** (~10pt black, Arial `•`, hanging
-   indent) that compress that sub-phase's RFP activities into its essence
-   (near-verbatim vocabulary, verb-first masdar).
+   no bullet — followed by **1–3 scope bullets** (~9.5pt black, Arial `•`, hanging
+   indent). Each bullet is a FULL, descriptive verb-first masdar clause lifted from
+   the RFP scope — «إجراء مقابلات وورش عمل مع المشاريع الكبرى لفهم احتياجاتها
+   التشغيلية وأولوياتها»، «حصر وتصنيف مقدمي الخدمات داخل المنطقة وخارجها» — NEVER a
+   noun fragment («مسارات تطوير ومعايير تأهيل» is wrong; «تصنيف الموردين حسب النضج
+   وتصميم مسارات التطوير ومعايير التأهيل والحوافز» is right). Together the bullets
+   must be INCLUSIVE of everything the sub-phase's detailed methodology page does:
+   the overview is the detailed approach compressed, not a different list. Write
+   them by summarizing the detailed page's activity lines, then verify nothing
+   material on the detailed page is unrepresented.
 4. Payoff line — the phase's contractual deliverable(s) + month, ~10pt **bold green
    `046A38`** (e.g. `تقرير تقييم الوضع الراهن — الشهر 3`, `5 مخرجات تعاقدية —
    الأشهر 5–14`).
