@@ -213,3 +213,21 @@ EVERY slide image fresh (subagent review recommended).
 - Emphasis inflation: bolding whole sentences. Bold is for lead-ins and payloads only.
 - Inventing a new divider/section when unsure — always map content into the canonical
   16 sections.
+
+## 4c. Two more LibreOffice-render hazards (found in the final sweep)
+
+- **Negative letter-spacing breaks Arabic shaping.** Runs carrying `spc="-30"`
+  (or any nonzero tracking) render in LibreOffice with words torn apart at
+  ligature joints («الم عقدة» instead of «المعقدة») even though the text is one
+  intact run. PowerPoint shapes them fine, the PDF does not. Set `spc="0"` on
+  every Arabic run that carries tracking.
+- **Floating icons over rtl tables land in the wrong column in the PDF.**
+  LibreOffice mirrors rtl-table columns relative to PowerPoint, but floating
+  pictures (country flags, badges) keep their absolute x — so in the PDF they
+  stamp over a text column instead of their own. Fix without touching the
+  deliverable .pptx: save an EXPORT VARIANT copy where those pictures are moved
+  to the mirrored column's x-range, export the PDF from the variant, and ship
+  the original .pptx (correct in PowerPoint) alongside the variant-rendered PDF.
+- Font-size overflow in donor tables/cards is fixed with `<a:normAutofit
+  fontScale=".." lnSpcReduction=".."/>` on the bodyPr (text boxes) or a direct
+  ~8% run-size scale (table cells — tables have no autofit).
