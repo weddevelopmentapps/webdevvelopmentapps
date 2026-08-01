@@ -45,6 +45,12 @@ every project-specific word is newly derived from the input RFP.
    top-notch consulting-grid quality. Never assume; the user decides per
    proposal. In creative mode, judge the storyline explicitly — "is this the
    best possible story for this client?" — and iterate until the answer is yes.
+   **Default to reference-style** when the user hesitates, declines, or says
+   "go simple" — and once they choose it, proceed without re-pitching creative.
+   **Sneak-peek gate:** if creative IS chosen, build exactly ONE sample hero
+   slide first and get explicit design-language approval on it before building
+   any further creative slides. Never fan out a full creative build on an
+   unapproved design language.
 
 0c. **Mandatory Manager + Partner review before ANY delivery.** A proposal that
    has not passed BOTH reviews does not leave the building:

@@ -303,6 +303,13 @@ Slide-invention rules for new visuals (the anti-AI-slop contract):
 
 When the user chooses the creative PoV, the reference storyline is only a floor.
 Requirements:
+- **Sneak-peek gate first.** Before building anything at scale, produce ONE
+  sample hero slide (the strongest beat of the proposed storyline — e.g. a
+  full-bleed real-photography stat hero) and show it to the user for explicit
+  design-language approval. Only after approval do the remaining creative
+  slides get built, all in the approved language. If the user rejects it or
+  reverts to "go simple", switch to reference-style immediately and without
+  argument.
 - **Research before writing.** Use web research to ground the story in the
   client's real ecosystem: the actual mega/giga projects, their announced scopes
   and timelines, the national strategies they serve, published statistics —
