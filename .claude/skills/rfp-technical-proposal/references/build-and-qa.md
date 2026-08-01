@@ -90,6 +90,17 @@ click into them). The Gantt and all diagrams are hand-drawn autoshapes.
 - Hand-built tables need `<a:tblPr rtl="1">` — then the FIRST `gridCol` renders at
   the far RIGHT (author columns in logical order). The reference TOC table lacks it
   (a think-cell artifact) — set it in rebuilds.
+- **The donor's think-cell TOC table does NOT render in LibreOffice**: the whole
+  table is drawn offset to the right by its own frame width, so only a sliver of the
+  first column survives at the canvas edge and the section titles vanish from the
+  exported PDF. No XML tweak fixes it (rtl flag, column swap, style/extLst stripping
+  all fail). When the deliverable includes a PDF, REBUILD the TOC as plain shapes at
+  the table's geometry: per row, a number textbox (col-1 region, `algn="l"`), a title
+  textbox (col-2 region, `algn="r" rtl="1"`), and a 1pt `bg2` rule spanning the row —
+  and delete the 0-size think-cell OLE stub. Textboxes must use `wrap="square"`
+  (default): LibreOffice horizontally CENTERS the shrunk content of `wrap="none"`
+  boxes, defeating paragraph alignment. Strip `<p:style>` from the rule shapes or
+  they inherit a theme drop-shadow. ALWAYS render and visually inspect the TOC page.
 - `flipH="1"` mirrors chevrons/homePlate arrows so points lead LEFT = RTL flow.
   Column sequences, tab ribbons, numbered circles, and the Gantt time axis all run
   right→left.
