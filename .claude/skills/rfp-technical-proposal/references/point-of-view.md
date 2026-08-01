@@ -113,54 +113,147 @@ into. This device physically executes the funnel (client chip on the stakeholder
 
 ---
 
-## Movement 2 — The argument arc (needs → areas → methods → proof → one team)
+## Movement 2 — The argument arc (drivers → areas → methods → proof → one team)
 
-Slide count ~20–27. The beats:
+A fixed 5-movement rhetorical machine (~20–27 slides). Every movement-opening title
+begins with a connective (`ولمواكبة…`, `ولتحقيق الممكنات…`, `واخيراً، سنعمل…`) — the
+section reads as ONE running sentence.
 
-1. **The needs frame**: `ولمواكبة التطور والتنمية في المدينة، تحتاج {الجهة} إلى 3
-   ممكنات رئيسية` (opportunity-framing) or `3 تحديات تشغيلية تواجه {القطاع}`
-   (problem-framing). 3-card rail, all cards lit (archetype E in
-   `slide-archetypes.md`). Exactly 3; MECE; each provable and each foreshadowing scoped
-   work.
-2. **Per-need statement + evidence** (×3): statement slide (spotlight rail — active
-   card lit, siblings dimmed; title `الممكن الأول: {…}` / `التحدي الثاني: {…}`)
-   followed by an evidence slide whose title often continues the thought with `...`
-   (`تشهد مدينة الرياض تحول متسارع تقوده ...`, `حجم منظومة قطاع وسط الرياض ...`),
-   carrying researched data that proves the need.
-3. **The pivot**: `ولتحقيق الممكنات، ينبغي أن تعمل {الجهة} على {N} مجالات رئيسية` —
-   the N work areas (numbered) mapping 1:1 onto approach tracks. The hinge of the whole
-   proposal; the needs→areas→tracks chain must be traceable by an evaluator.
-4. **Methodology previews** (~6–12 slides): per work area, 1–3 slides teasing the
-   Deloitte method that delivers it (policy cycle, analytics, TOM elements, KPI
-   dashboards, scenario planning, knowledge transfer…), pulled from the frameworks
-   library but *contextualized*: titles assert what the method does FOR THIS PROJECT;
-   include one worked example (`مثال عن دراسة عقارية في المملكة…`); tag mockups
-   `للتوضيح`.
-5. **The proof block** (~4–7 slides):
-   - Synthesis: `فهمنا العميق لتطلعات {الجهة} بالإضافة إلى خبرتنا الفريدة… سيمكّناننا
-     من تلبية الاحتياجات`.
-   - Quantified familiarity: `عملنا على أكثر من 8 عروض تنفيذية للقيادة العليا…`،
-     `كما عملنا على 15+ مشروع على مستوى المدينة` — project walls tagged `غير شامل`.
-   - Named success stories: `لدى ديلويت 15+ قصة نجاح في {الخدمة} مع جهات محلية` + 2–3
-     mini-credential slides with client logos.
-   - Alliance slide when partners are bid: `يتمتع التحالف المقترح برؤية وقدرات شاملة…`.
-   - Expert-insight slide: `ستتمكن {الجهة} من الاستفادة من المعارف والمرئيات الموجودة
-     لدى مجموعة من الخبراء المختصين الرائدين في قطاعاتهم`.
-6. **One-team closing** (always the section's last slide): `واخيراً، سنعمل كفريق واحد
-   مع {الجهة} لتحقيق الاهداف والأثر المرجو من المشروع` — panoramic city photo, 4
-   numbered value statements with giant `D0D0CE` ghost numerals.
+### 2.1 The drivers frame (always exactly 3)
+
+Title: `ولمواكبة التطور والتنمية في المدينة، تحتاج {الجهة} إلى 3 ممكنات رئيسية`
+(opportunity valence — aspirational/strategic RFPs) or `3 تحديات تشغيلية تواجه
+{القطاع}` (problem valence — remedial/operational RFPs). Same skeleton, opposite
+valence — choose by RFP mood. Digit always a numeral (`3`, not `ثلاثة`).
+
+3 photo cards (3.03 × 3.99", ~0.09" gutters, driver 1 = RIGHTMOST): topical photo +
+dark scrim; teal `0D8390` filled icon circle (0.96") inside a **broken white ring**
+(1.17", arc with a gap — signature style); card title bold white 20–24pt (4–7-word
+noun phrase); green `86BC25` underline rule (~2.3" wide); one 16pt white sentence =
+current dynamic + `ما يفرض/يتطلب…` need clause. Icons semantically match each driver.
+
+### 2.2 Statement + evidence pairs (×3)
+
+**Statement slide** = the drivers slide CLONED with a spotlight: title becomes
+`الممكن الأول: {عنوان البطاقة حرفياً}` (ordinal + colon + verbatim card title — never
+paraphrase); the two non-focus cards get a ~75%-alpha black overlay, staying faintly
+legible. Spotlight order right→middle→left. **Zero new content is written for
+statement slides — that is the trick.**
+
+**Evidence slide** (the `...` continuation pair): ~58% white DATA half + ~42% dark
+IMPLICATION half.
+- Right (white) title ends open: `تشهد مدينة الرياض تحول متسارع تقوده ...`
+- Left (dark) kicker starts with dots + a rotating connective: `... مما يتطلب تعزيز
+  قدرات التخطيط واتخاذ القرار المبكر` (مما يتطلب / بما يتطلب / ما يفرض الحاجة لـ).
+  FACT… → …THEREFORE-CAPABILITY — the kicker is always the requirement Deloitte will
+  later sell.
+- White half: 2–4 verifiable facts — big-numeral stats (Arial/Verdana bold 44–60pt,
+  `22+`, `27%`, `~23`), logo walls, real org-chart screenshots in bordered frames,
+  tinted takeaway boxes (`EFF3E8` fill, dark green text). Stats are GREEN when the
+  number is an achievement, **ORANGE `ED8B00` when it signals pain/scale**; red
+  `C00000` only for negative accents, sparingly.
+- Dark half: 3–4 rows separated by thin white hairlines — bare white line-art icon +
+  one bold 28pt sentence with one 2–4-word phrase in bright green (accent4 lum60/40):
+  `قرارات طويلة المدى`, `اتخاذ قرارات سريعة ومرنة`… **These green capability phrases
+  must foreshadow the scope items** — they get clustered into the work areas next.
+- White double-bracket chevrons sit on the panel boundary pointing data → implication.
+- Source line; `غير شامل` pill when lists are illustrative.
+
+### 2.3 The pivot (drivers → N work areas)
+
+Title: `ولتحقيق الممكنات، ينبغي أن تعمل {الجهة} على {N} مجالات رئيسية` (N = 3–5,
+recomputed per RFP). Dark background. Anatomy:
+- Top: 2–3 deep-teal (`004F59`) banner boxes carrying one run-on meta-sentence split
+  across them with `...` and sequencing words (`أوّلًا، يجب … ...` / `... بعد ذلك،
+  يجب … ..` / `…ويجب …`) — encoding the execution order of the areas.
+- N columns right→left: **ghost numeral 44pt `D0D0CE`** → area name bold white 18pt →
+  teal circle icon badge (broken ring) → white card with 16pt body (what Deloitte will
+  DO, gerund phrasing) → thin green `86BC25` strip at the card base.
+- Mapping rule: areas do NOT map 1:1 to drivers — areas 1..N-1 answer the drivers,
+  the **last area is always institutional/continuity** (التمكين المؤسسي / إدارة الأداء
+  المستمرة); the first is the core analytical foundation.
+- **The area names are now IMMUTABLE strings**: they become the tab-bar labels and the
+  approach tracks — identical characters everywhere they recur.
+
+### 2.4 The tab bar (navigation device, every slide from pivot+1 to proof end)
+
+A top strip of N rotated double-bracket shapes = the N area names, ordered right→left,
+~11pt white. Inactive tabs = dark charcoal fill, low-contrast text; **active tab =
+teal fill (`0D8390`/`004F59`) bold white text**. The active tab moves strictly left as
+the deck advances — a progress bar made of words. In the proof chapter the same device
+is reused with the differentiator names from the synthesis slide as tab labels. Tabs
+live on each slide body, not the layout.
+
+### 2.5 Methodology previews (~6–12 slides, tab-tracked)
+
+Per work area select 1–4 house frameworks (chosen 1:1 against areas: policy cycle /
+scenario planning / risk for a studies retainer; TOM house / BPMN / RASCI / EVM /
+dashboards for an ops-performance job). Common DNA: dark background, tab bar, white
+assertion title, `للتوضيح` when illustrative, source line, REAL diagrams drawn with
+shapes (never screenshots of text). Key sub-patterns:
+- **Framework sequence rhythm**: what it is → what each step does → what questions it
+  answers (policy cycle shown 3× at 3 zoom levels; third title starts with `و…`).
+- Ghost numerals up to 138pt behind stage labels; diamond teal nodes numbered 1–7.
+- Latin framework names in parentheses inside Arabic titles: `(RASCI)`,
+  `(Target Operating Model Framework)`, `Deloitte Enterprise Value Map™ (EVM)`.
+- Example series use the ONLY non-assertion title style — breadcrumb + counter:
+  `أطر العمل والمنهجيات | مثال على تصميم لوحة معلومات (1/3)`; the series shrinks
+  naturally (4 items, 4 items, 2 items) — never pad to fill.
+- Credential-artifact and workshop-photo slides (real deck covers, real Saudi workshop
+  photos) embedded mid-methodology as credibility devices.
+
+### 2.6 The proof ladder (most-specific → broadest, ~4–7 slides)
+
+1. **Synthesis/differentiators**: `فهمنا العميق لتطلعات {الجهة} بالإضافة إلى خبرتنا
+   الفريدة الشاملة وخبراتنا السابقة سيمكّناننا من تلبية متطلباتكم` — 4 frosted-glass
+   cards (semi-transparent white, green line-art icon, green bold heading, green base
+   bar). The 4 headings become the proof-chapter tab labels.
+2. **This-client artifact gallery**: `عملنا على أكثر من 8 عروض تنفيذية للقيادة
+   العليا…` — 2×4 grid of REAL deck-cover screenshots with dark-green header bars +
+   white numeral badges; bottom bar `++ مستندات اخرى`.
+3. **This-client project medallions**: `وتتمتّع ديلويت بقصص نجاح مع {الجهة} من خلال
+   عدد من الشراكات الاستراتيجية` — 2×4 circular photo medallions with caption bars +
+   white `قيد التنفيذ` status pills (10pt bold italic) on active projects. (This slide
+   was VERBATIM identical across both reference decks — a lift-and-drop asset.)
+4. **Domain claim wall**: `كما عملنا على 15+ مشروع…` / `لدى ديلويت 15+ قصة نجاح في
+   {الخدمة} مع جهات محلية` — logo tiles + green ✓ circle badges (Wingdings 2) + 30–45
+   word engagement one-liners; side ribbon `تجدون المزيد من المشاريع في ملحق
+   "خبراتنا"` (cross-reference convention).
+5. **Enumerated-artifact flex** (when the domain has an enumerable set): the 24-KPI
+   pattern — giant counts + full numbered chip list + real report screenshots.
+6. **Alliance ring** (consortium bids): partner rows (logo + green team name +
+   capability line) linked by a dotted spine to a segmented ring around a central
+   photo.
+7. **Expert wall**: `+200 خبراء مختصين` giant green stat + 10 B/W headshot cards with
+   teal corner-bracket accents, names bold green, domains gray; `قائمة غير شاملة` tag.
+
+### 2.7 One-team closing (always last)
+
+`واخيراً، سنعمل كفريق واحد مع {الجهة} لتحقيق الاهداف والأثر المرجو من المشروع` (impact
+phrase may be bold dark-green `046A38`). **The only bright-daylight slide in the
+section** — panoramic warm skyline fills the lower ~60%; the light change itself
+signals arrival. 4 columns right→left: ghost numeral 60pt `D0D0CE` + 20pt statement.
+Impact k = the promised end-state of work area k (`تحقيق/تمكين/بناء/الارتقاء… على
+المدى الطويل`); item 3-or-4 is ALWAYS institutional capability building. No icons, no
+cards — deliberately air-filled.
 
 ## Authoring order
 
 1. Write the **title sequence first** — all ~35 titles as a continuous essay
-   (و/ولذلك/كما connectors; `...` chains). Fix the argument BEFORE building slides.
-2. Slot each title into an archetype; mark which need `تركيز الشرائح التالية` frames.
-3. Research every data beat (number + source per slide).
-4. Build; verify needs→areas→tracks mapping against the approach chapter.
+   (و/مما/بعد ذلك connectors; `...` chains). Fix the argument BEFORE building slides.
+2. Derive the 3 drivers from the RFP (alignment tension / integration-standardization
+   gap / output-quality pressure are the archetypal municipal trio); pick valence.
+3. Author evidence slides; harvest their green capability phrases; cluster into N
+   areas (last = institutional); freeze the area strings.
+4. Select frameworks per area; build the tab bar; assemble the proof ladder from the
+   library (reuse verbatim where the client overlaps).
+5. Verify: areas = tab labels = approach track names, character-identical.
 
 ## What makes this section human-grade
 
-Real GIS maps and real document screenshots as evidence; counts in titles reconcile
-with counts drawn on the slide; one assertion per slide with a single green so-what
-phrase; ellipsis chains make consecutive slides one continuous sentence; dashed focus
-frames physically narrow the funnel; dense 10–13pt diagram labels on a strict grid.
+Real GIS maps, real document screenshots, real deck covers as evidence; counts in
+titles reconcile with counts drawn on slides; one assertion per slide with a single
+green so-what phrase; ellipsis chains make consecutive slides one continuous
+sentence; dashed focus frames physically narrow the funnel; identical EMU geometry
+across sibling slides; the same words for work areas everywhere; and a single
+light-switch moment (dark → daylight) at the close.

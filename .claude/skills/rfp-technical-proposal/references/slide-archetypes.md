@@ -45,32 +45,45 @@ Variants:
 Content of A sets up (value chain, stat, benefit map); B pays off (stakeholders,
 concentration, backbone role). Use 1–3 pairs per PoV, never elsewhere.
 
-## E. Enabler/challenge card rail (the 3-card statement slide)
+## E. Driver card rail (the 3-card enabler/challenge machine)
 
-(D1-19→25, D2-23→29) The PoV's argument core:
-1. **Intro slide**: title `ولمواكبة التطور والتنمية، تحتاج {الجهة} إلى 3 ممكنات رئيسية`
-   or `3 تحديات تشغيلية تواجه {القطاع}` + the 3 cards, all equal prominence.
-2. **Per-enabler statement slide** (title `الممكن الأول: {الاسم}` / `التحدي الثاني: {الاسم}`):
-   same 3 cards, but the ACTIVE card is fully lit and the other two are dimmed/ghosted —
-   a spotlight rail. 
-3. **Per-enabler evidence slide** immediately after, title continues the thought
-   (often with `...`), carrying data proving that enabler/challenge.
+(D1-19→25, D2-23→29) The PoV's argument core — full spec in `point-of-view.md` §2.1–2.2:
+1. **Drivers slide**: title `ولمواكبة…، تحتاج {الجهة} إلى 3 ممكنات رئيسية` or
+   `3 تحديات تشغيلية تواجه {القطاع}` + 3 cards, all lit.
+2. **Statement slide ×3**: the SAME slide cloned; title prepends
+   `الممكن الأول: {عنوان البطاقة حرفياً}`; non-focus cards get ~75%-alpha black
+   overlays (still faintly legible). No new content is authored.
+3. **Evidence slide ×3**: `...` continuation pair — ~58% white data half (stats/logos/
+   org screenshots) + ~42% dark implication half (3–4 icon rows, one green capability
+   phrase each). See `point-of-view.md` §2.2.
 
-Card anatomy (each ~3.9" wide × 5.0" tall, 3 across with equal gutters):
-- Dark topical photo background (traffic/blueprint/analytics screens…), heavy overlay.
-- Teal `0D8390` filled circle icon (~0.95") with white thin-line glyph, white ring
-  offset, centered at card top, overlapping the edge.
-- Card title: bold white 18–20pt, 2–3 lines, centered, with a **green underline bar**
-  (86BC25-family, ~1.5–2" wide) below it.
-- Body: white 12–14pt paragraph (2–5 sentences) explaining the need.
+Card anatomy (exact: 3.03" × 3.99", y=0.95", x = 0.41"/4.70"/8.85" — driver 1
+rightmost, ~0.09" gutters):
+- Topical photo fill + dark gradient scrim (alpha ~74–98%).
+- Teal `0D8390` filled icon circle 0.96" inside a **broken white ring** 1.17" (arc
+  with a gap — signature), centered at card top.
+- Card title: bold white 20–24pt noun phrase (4–7 words), then a **green `86BC25`
+  underline rule ~2.27" wide**.
+- Body: one white 16pt sentence (20–30 words): current dynamic + `ما يفرض/يتطلب…`.
 - Source line + standard footer on the slide.
 
-## F. Pivot slide (needs → work areas)
+## F. Pivot slide (drivers → work areas)
 
-(D1-26, D2-30) Title `ولتحقيق الممكنات، ينبغي أن تعمل {الجهة} على 4 مجالات رئيسية` /
-`ينبغي أن يعمل {القطاع} على 3 مجالات رئيسية لمعالجة التحديات وتحقيق النجاح التشغيلي`.
-Lays out the N areas (numbered cards/columns) that later map 1:1 onto approach tracks.
-This is the hinge of the whole argument — the mapping enabler→area→track must be exact.
+(D1-26, D2-30) Title `ولتحقيق الممكنات، ينبغي أن تعمل {الجهة} على {N} مجالات رئيسية`.
+Dark bg; top = 2–3 deep-teal `004F59` banner boxes carrying one run-on sentence split
+with `...` + sequencing words (أولاً/بعد ذلك/و); N columns right→left: ghost numeral
+44pt `D0D0CE` → bold white area name 18pt → teal icon circle (broken ring) → white
+card 16pt body → green base strip. Last area always institutional/continuity. Area
+strings become tab labels + approach tracks — immutable. Full spec:
+`point-of-view.md` §2.3–2.4 (including the tab-bar navigation device that follows).
+
+## F2. Proof-ladder slides
+
+(D1-36→42, D2-43→46) Seven sub-archetypes, most-specific → broadest: frosted-glass
+differentiator cards; real deck-cover gallery with `++ مستندات اخرى` bar; circular
+project medallions with `قيد التنفيذ` pills; ✓-badged logo wall with one-liners +
+`تجدون المزيد…` ribbon; enumerated-artifact flex (24-KPI pattern); alliance ring;
+`+200 خبراء` expert wall. Full specs: `point-of-view.md` §2.6.
 
 ## G. Big-stat dark slide
 

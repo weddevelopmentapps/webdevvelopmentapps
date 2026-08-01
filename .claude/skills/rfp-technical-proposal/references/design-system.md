@@ -55,9 +55,17 @@ will read as foreign to the house style.
 | `F2F8E5` / `EFF3E8` | Pale green tint — highlight cells, alternating table rows |
 | `E5F0F9` / `E5F7FD` | Pale blue tint — secondary highlight cells |
 
+### Warm accents (rare, semantic)
+| Hex | Role |
+|---|---|
+| `ED8B00` | Deloitte orange — big stats ONLY when the number signals pain/scale (e.g. an overloaded org: `22+ إدارة`), never achievements |
+| `C00000` | Red — negative accents, at most 1–2 per slide, matrices/heat only |
+
 ### Color discipline
-- One dominant color family per slide (green). Teal is the standard secondary for icons/bands. Blue appears only in multi-stage frameworks and charts.
-- Never introduce colors outside this palette. Never use warm colors (red/orange) except sparingly for risk/heat indicators inside matrices.
+- One dominant color family per slide (green). Teal (`0D8390`/`004F59`) is the standard secondary for structural fills: icon circles, banner boxes, tab bars, matrix cells, Gantt bands. Blue appears only in multi-stage frameworks and charts.
+- Green semantics: `86BC25` = underline rules, icons, ✓ badges, headline emphasis on dark; `046A38` = header bars and emphasis on light backgrounds; `D0D0CE` = ghost numerals.
+- Achievement numbers green; pain/scale numbers orange `ED8B00`; nothing else warm.
+- Never introduce colors outside this palette.
 
 ## 3. Typography
 
@@ -135,7 +143,13 @@ Rules:
 | Pagination | `(1/3)` appended to repeated-title series — **in the title itself** |
 | Breadcrumb titles | `منهجية المشروع التفصيلية | المسار الأول – {الاسم} (1/3)` and `خبراتنا | محلياً` — the `|` separator is the standard |
 | Continuation titles | Slide A ends `...` and slide B starts `...` to span one sentence across two consecutive slides (e.g. `يسكن منطقة الرياض حوالي 8.6 مليون نسمة ...` → `... 81% منهم يتركزون في مدينة الرياض`) |
-| Logo cards | White rounded-corner cards (~2.9 × 1.1 in) top corners of cover: client logo top-right area, Monitor Deloitte top-left (mirrored placements acceptable; follow reference) |
+| Logo cards | `F2F2F2` rounded-corner cards 3.52 × 1.28 in, top corners of cover: client logo top-left, Monitor Deloitte top-right |
+| Status pill | `قيد التنفيذ` — white pill, black bold-italic 10pt, on in-progress project medallions |
+| "And more" bar | `++ مستندات اخرى` / `++ خدمات أخرى يقدمها القطاع بشكل مستمر` — full-width bar closing enumerations |
+| Cross-reference ribbon | `تجدون المزيد من المشاريع في ملحق "خبراتنا"` / `تفاصيل في الشريحة التالية` — forward-references between sections, appendix names in «» |
+| Tab bar | Rotated double-bracket shapes, one per work area, ~11pt white; inactive = charcoal fill, active = teal fill bold text; runs across the PoV methodology+proof chapters, active tab advancing right→left |
+| Focus frame | `تركيز الشرائح التالية` green tag + dashed-green rounded frame around the diagram element the next slides zoom into |
+| Checkmarks | Wingdings 2 ✓ glyphs in green circle badges |
 
 ## 10. What makes it look human-made (anti-AI-slide rules)
 
