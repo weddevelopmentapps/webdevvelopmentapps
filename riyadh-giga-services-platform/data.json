@@ -1,7 +1,7 @@
 {
  "settings": {
   "schemaVersion": 1,
-  "seedVersion": 2,
+  "seedVersion": 3,
   "lang": "ar",
   "theme": "light",
   "holidays": [
@@ -5745,8 +5745,8 @@
    "role": "platform_manager",
    "personaType": null,
    "name": {
-    "ar": "م. عبدالعزيز بن ناصر الحمدان",
-    "en": "Eng. Abdulaziz bin Nasser Alhamdan"
+    "ar": "م. عبدالعزيز",
+    "en": "Eng. Abdulaziz"
    },
    "title": {
     "ar": "مدير مكتب المشاريع الكبرى",
@@ -5769,8 +5769,8 @@
    "role": "amanah_specialist",
    "personaType": null,
    "name": {
-    "ar": "سارة القحطاني",
-    "en": "Sarah Alqahtani"
+    "ar": "سارة",
+    "en": "Sarah"
    },
    "title": {
     "ar": "أخصائي بلدي — التخطيط العمراني",
@@ -5793,8 +5793,8 @@
    "role": "amanah_specialist",
    "personaType": null,
    "name": {
-    "ar": "م. خالد العتيبي",
-    "en": "Eng. Khalid Alotaibi"
+    "ar": "م. خالد",
+    "en": "Eng. Khalid"
    },
    "title": {
     "ar": "أخصائي بلدي — رخص البناء",
@@ -5817,8 +5817,8 @@
    "role": "project_rep",
    "personaType": "giga_entity",
    "name": {
-    "ar": "م. ريم العنقري",
-    "en": "Eng. Reem Alanqari"
+    "ar": "م. ريم",
+    "en": "Eng. Reem"
    },
    "title": {
     "ar": "ممثل مشروع كبير — الدرعية",
@@ -5843,8 +5843,8 @@
    "role": "project_rep",
    "personaType": "giga_entity",
    "name": {
-    "ar": "م. سلطان الشمري",
-    "en": "Eng. Sultan Alshammari"
+    "ar": "م. سلطان",
+    "en": "Eng. Sultan"
    },
    "title": {
     "ar": "مدير التصاريح — المربع الجديد",
@@ -5869,8 +5869,8 @@
    "role": "project_rep",
    "personaType": "developer",
    "name": {
-    "ar": "م. بدر الراشد",
-    "en": "Eng. Bader Alrashed"
+    "ar": "م. بدر",
+    "en": "Eng. Bader"
    },
    "title": {
     "ar": "مدير التراخيص — مجموعة روشن",
@@ -5895,8 +5895,8 @@
    "role": "project_rep",
    "personaType": "investor",
    "name": {
-    "ar": "أحمد بن سليمان الجريسي",
-    "en": "Ahmed bin Sulaiman Aljeraisy"
+    "ar": "أحمد",
+    "en": "Ahmed"
    },
    "title": {
     "ar": "مستثمر عقاري — شركة رافد للاستثمار",
@@ -5919,8 +5919,8 @@
    "role": "project_rep",
    "personaType": "operator",
    "name": {
-    "ar": "م. هند المطيري",
-    "en": "Eng. Hind Almutairi"
+    "ar": "م. هند",
+    "en": "Eng. Hind"
    },
    "title": {
     "ar": "مدير الأصول — تحالف إدارة المرافق",
@@ -5978,8 +5978,8 @@
    "role": "external_entity",
    "personaType": null,
    "name": {
-    "ar": "م. ماجد الدوسري",
-    "en": "Eng. Majed Aldosari"
+    "ar": "م. ماجد",
+    "en": "Eng. Majed"
    },
    "title": {
     "ar": "ممثل الشركة السعودية للكهرباء",
@@ -6003,8 +6003,8 @@
    "role": "external_entity",
    "personaType": null,
    "name": {
-    "ar": "م. عبير الحقباني",
-    "en": "Eng. Abeer Alhogbani"
+    "ar": "م. عبير",
+    "en": "Eng. Abeer"
    },
    "title": {
     "ar": "ممثل شركة المياه الوطنية",
@@ -6029,8 +6029,8 @@
    "personaType": "giga_entity",
    "showInLogin": false,
    "name": {
-    "ar": "م. ناصر الغامدي",
-    "en": "Eng. Nasser Alghamdi"
+    "ar": "م. ناصر",
+    "en": "Eng. Nasser"
    },
    "title": {
     "ar": "مدير التصاريح — القدية",
@@ -6055,8 +6055,8 @@
    "personaType": "giga_entity",
    "showInLogin": false,
    "name": {
-    "ar": "م. طلال الحربي",
-    "en": "Eng. Talal Alharbi"
+    "ar": "م. طلال",
+    "en": "Eng. Talal"
    },
    "title": {
     "ar": "مدير التصاريح — المسار الرياضي",
@@ -6081,8 +6081,8 @@
    "personaType": "giga_entity",
    "showInLogin": false,
    "name": {
-    "ar": "م. يوسف باداود",
-    "en": "Eng. Yousef Badawood"
+    "ar": "م. يوسف",
+    "en": "Eng. Yousef"
    },
    "title": {
     "ar": "مدير التصاريح — مطار الملك سلمان الدولي",
@@ -6107,8 +6107,8 @@
    "personaType": "giga_entity",
    "showInLogin": false,
    "name": {
-    "ar": "م. عبدالرحمن السويلم",
-    "en": "Eng. Abdulrahman Alsuwailem"
+    "ar": "م. عبدالرحمن",
+    "en": "Eng. Abdulrahman"
    },
    "title": {
     "ar": "مدير التصاريح — إكسبو 2030 الرياض",
@@ -6133,8 +6133,8 @@
    "personaType": "operator",
    "showInLogin": false,
    "name": {
-    "ar": "م. نوف الدخيل",
-    "en": "Eng. Nouf Aldakheel"
+    "ar": "م. نوف",
+    "en": "Eng. Nouf"
    },
    "title": {
     "ar": "مدير التشغيل — مدينة مسك",
@@ -6158,8 +6158,8 @@
    "role": "amanah_specialist",
    "personaType": null,
    "name": {
-    "ar": "م. نورة الشهري",
-    "en": "Eng. Noura Alshehri"
+    "ar": "م. نورة",
+    "en": "Eng. Noura"
    },
    "title": {
     "ar": "منسقة الإدارة العامة للتخطيط العمراني",
@@ -6182,8 +6182,8 @@
    "role": "viewer",
    "personaType": null,
    "name": {
-    "ar": "د. فهد السديري",
-    "en": "Dr. Fahad Alsudairi"
+    "ar": "د. فهد",
+    "en": "Dr. Fahad"
    },
    "title": {
     "ar": "مستشار — مكتب الأمين (مستخدم مشاهد)",
@@ -6653,8 +6653,8 @@
    "personaSnapshot": {
     "userId": "u-giga-nm",
     "name": {
-     "ar": "م. سلطان الشمري",
-     "en": "Eng. Sultan Alshammari"
+     "ar": "م. سلطان",
+     "en": "Eng. Sultan"
     },
     "personaType": "giga_entity",
     "org": {
@@ -6764,8 +6764,8 @@
    "personaSnapshot": {
     "userId": "u-op-misk",
     "name": {
-     "ar": "م. نوف الدخيل",
-     "en": "Eng. Nouf Aldakheel"
+     "ar": "م. نوف",
+     "en": "Eng. Nouf"
     },
     "personaType": "operator",
     "org": {
@@ -6861,8 +6861,8 @@
    "personaSnapshot": {
     "userId": "u-giga-sb",
     "name": {
-     "ar": "م. طلال الحربي",
-     "en": "Eng. Talal Alharbi"
+     "ar": "م. طلال",
+     "en": "Eng. Talal"
     },
     "personaType": "giga_entity",
     "org": {
@@ -6979,8 +6979,8 @@
    "personaSnapshot": {
     "userId": "u-giga-qid",
     "name": {
-     "ar": "م. ناصر الغامدي",
-     "en": "Eng. Nasser Alghamdi"
+     "ar": "م. ناصر",
+     "en": "Eng. Nasser"
     },
     "personaType": "giga_entity",
     "org": {
@@ -7189,8 +7189,8 @@
    "personaSnapshot": {
     "userId": "u-op-misk",
     "name": {
-     "ar": "م. نوف الدخيل",
-     "en": "Eng. Nouf Aldakheel"
+     "ar": "م. نوف",
+     "en": "Eng. Nouf"
     },
     "personaType": "operator",
     "org": {
@@ -7306,8 +7306,8 @@
    "personaSnapshot": {
     "userId": "u-operator",
     "name": {
-     "ar": "م. هند المطيري",
-     "en": "Eng. Hind Almutairi"
+     "ar": "م. هند",
+     "en": "Eng. Hind"
     },
     "personaType": "operator",
     "org": {
@@ -7436,8 +7436,8 @@
    "personaSnapshot": {
     "userId": "u-giga-ksia",
     "name": {
-     "ar": "م. يوسف باداود",
-     "en": "Eng. Yousef Badawood"
+     "ar": "م. يوسف",
+     "en": "Eng. Yousef"
     },
     "personaType": "giga_entity",
     "org": {
@@ -7535,8 +7535,8 @@
    "personaSnapshot": {
     "userId": "u-giga-expo",
     "name": {
-     "ar": "م. عبدالرحمن السويلم",
-     "en": "Eng. Abdulrahman Alsuwailem"
+     "ar": "م. عبدالرحمن",
+     "en": "Eng. Abdulrahman"
     },
     "personaType": "giga_entity",
     "org": {
@@ -7642,8 +7642,8 @@
    "personaSnapshot": {
     "userId": "u-giga-qid",
     "name": {
-     "ar": "م. ناصر الغامدي",
-     "en": "Eng. Nasser Alghamdi"
+     "ar": "م. ناصر",
+     "en": "Eng. Nasser"
     },
     "personaType": "giga_entity",
     "org": {
@@ -7758,8 +7758,8 @@
    "personaSnapshot": {
     "userId": "u-giga-nm",
     "name": {
-     "ar": "م. سلطان الشمري",
-     "en": "Eng. Sultan Alshammari"
+     "ar": "م. سلطان",
+     "en": "Eng. Sultan"
     },
     "personaType": "giga_entity",
     "org": {
@@ -7905,8 +7905,8 @@
    "personaSnapshot": {
     "userId": "u-giga-dgda",
     "name": {
-     "ar": "م. ريم العنقري",
-     "en": "Eng. Reem Alanqari"
+     "ar": "م. ريم",
+     "en": "Eng. Reem"
     },
     "personaType": "giga_entity",
     "org": {
@@ -8036,8 +8036,8 @@
    "personaSnapshot": {
     "userId": "u-giga-nm",
     "name": {
-     "ar": "م. سلطان الشمري",
-     "en": "Eng. Sultan Alshammari"
+     "ar": "م. سلطان",
+     "en": "Eng. Sultan"
     },
     "personaType": "giga_entity",
     "org": {
@@ -8134,8 +8134,8 @@
    "personaSnapshot": {
     "userId": "u-giga-qid",
     "name": {
-     "ar": "م. ناصر الغامدي",
-     "en": "Eng. Nasser Alghamdi"
+     "ar": "م. ناصر",
+     "en": "Eng. Nasser"
     },
     "personaType": "giga_entity",
     "org": {
@@ -8258,8 +8258,8 @@
    "personaSnapshot": {
     "userId": "u-giga-ksia",
     "name": {
-     "ar": "م. يوسف باداود",
-     "en": "Eng. Yousef Badawood"
+     "ar": "م. يوسف",
+     "en": "Eng. Yousef"
     },
     "personaType": "giga_entity",
     "org": {
@@ -8420,8 +8420,8 @@
    "personaSnapshot": {
     "userId": "u-investor",
     "name": {
-     "ar": "أحمد بن سليمان الجريسي",
-     "en": "Ahmed bin Sulaiman Aljeraisy"
+     "ar": "أحمد",
+     "en": "Ahmed"
     },
     "personaType": "investor",
     "org": {
@@ -8539,8 +8539,8 @@
    "personaSnapshot": {
     "userId": "u-giga-nm",
     "name": {
-     "ar": "م. سلطان الشمري",
-     "en": "Eng. Sultan Alshammari"
+     "ar": "م. سلطان",
+     "en": "Eng. Sultan"
     },
     "personaType": "giga_entity",
     "org": {
@@ -8709,8 +8709,8 @@
    "personaSnapshot": {
     "userId": "u-giga-sb",
     "name": {
-     "ar": "م. طلال الحربي",
-     "en": "Eng. Talal Alharbi"
+     "ar": "م. طلال",
+     "en": "Eng. Talal"
     },
     "personaType": "giga_entity",
     "org": {
@@ -8840,8 +8840,8 @@
    "personaSnapshot": {
     "userId": "u-giga-dgda",
     "name": {
-     "ar": "م. ريم العنقري",
-     "en": "Eng. Reem Alanqari"
+     "ar": "م. ريم",
+     "en": "Eng. Reem"
     },
     "personaType": "giga_entity",
     "org": {
@@ -9033,8 +9033,8 @@
    "personaSnapshot": {
     "userId": "u-giga-dgda",
     "name": {
-     "ar": "م. ريم العنقري",
-     "en": "Eng. Reem Alanqari"
+     "ar": "م. ريم",
+     "en": "Eng. Reem"
     },
     "personaType": "giga_entity",
     "org": {
@@ -9179,8 +9179,8 @@
    "personaSnapshot": {
     "userId": "u-dev-roshn",
     "name": {
-     "ar": "م. بدر الراشد",
-     "en": "Eng. Bader Alrashed"
+     "ar": "م. بدر",
+     "en": "Eng. Bader"
     },
     "personaType": "developer",
     "org": {
@@ -9483,8 +9483,8 @@
    "personaSnapshot": {
     "userId": "u-giga-sb",
     "name": {
-     "ar": "م. طلال الحربي",
-     "en": "Eng. Talal Alharbi"
+     "ar": "م. طلال",
+     "en": "Eng. Talal"
     },
     "personaType": "giga_entity",
     "org": {
@@ -9631,8 +9631,8 @@
    "personaSnapshot": {
     "userId": "u-op-misk",
     "name": {
-     "ar": "م. نوف الدخيل",
-     "en": "Eng. Nouf Aldakheel"
+     "ar": "م. نوف",
+     "en": "Eng. Nouf"
     },
     "personaType": "operator",
     "org": {
@@ -9756,8 +9756,8 @@
    "personaSnapshot": {
     "userId": "u-operator",
     "name": {
-     "ar": "م. هند المطيري",
-     "en": "Eng. Hind Almutairi"
+     "ar": "م. هند",
+     "en": "Eng. Hind"
     },
     "personaType": "operator",
     "org": {
@@ -9900,8 +9900,8 @@
    "personaSnapshot": {
     "userId": "u-dev-roshn",
     "name": {
-     "ar": "م. بدر الراشد",
-     "en": "Eng. Bader Alrashed"
+     "ar": "م. بدر",
+     "en": "Eng. Bader"
     },
     "personaType": "developer",
     "org": {
@@ -10030,8 +10030,8 @@
    "personaSnapshot": {
     "userId": "u-giga-nm",
     "name": {
-     "ar": "م. سلطان الشمري",
-     "en": "Eng. Sultan Alshammari"
+     "ar": "م. سلطان",
+     "en": "Eng. Sultan"
     },
     "personaType": "giga_entity",
     "org": {
@@ -10174,8 +10174,8 @@
    "personaSnapshot": {
     "userId": "u-giga-expo",
     "name": {
-     "ar": "م. عبدالرحمن السويلم",
-     "en": "Eng. Abdulrahman Alsuwailem"
+     "ar": "م. عبدالرحمن",
+     "en": "Eng. Abdulrahman"
     },
     "personaType": "giga_entity",
     "org": {
@@ -10304,8 +10304,8 @@
    "personaSnapshot": {
     "userId": "u-dev-roshn",
     "name": {
-     "ar": "م. بدر الراشد",
-     "en": "Eng. Bader Alrashed"
+     "ar": "م. بدر",
+     "en": "Eng. Bader"
     },
     "personaType": "developer",
     "org": {
