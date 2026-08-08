@@ -16,8 +16,10 @@
     font-family: "IBM Plex Sans Arabic", "Segoe UI", sans-serif;
     font-size: 10pt; line-height: 1.8; color: var(--ink);
   }
-  @page { size: A4; margin: 0; }
-  .page { page-break-after: always; padding: 20mm 18mm 18mm; position: relative; }
+  @page { size: A4; margin: 16mm 0 14mm; }
+  @page coverpg { size: A4; margin: 0; }
+  .cover { page: coverpg; }
+  .page { page-break-after: always; padding: 0 18mm; position: relative; }
   .page:last-child { page-break-after: auto; }
   .en { direction: ltr; unicode-bidi: isolate; }
 
@@ -52,6 +54,10 @@
   ul, ol { margin: 0 0 3mm 0; padding-inline-start: 6mm; }
   li { margin-bottom: 1.4mm; }
   .avoid-break { page-break-inside: avoid; }
+  tr { page-break-inside: avoid; }
+  thead { display: table-header-group; }
+  h2.sec, h3 { page-break-after: avoid; }
+  figure, .note, .kpi-grid, .phase-row { page-break-inside: avoid; }
 
   /* ---------- tables ---------- */
   table { width: 100%; border-collapse: collapse; margin: 2mm 0 4mm; font-size: 8.8pt; }
