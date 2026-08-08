@@ -8465,8 +8465,7 @@ RGP.isMac = /Mac|iPhone|iPad/.test(navigator.platform || "");
         h("div", null, h("h5", null, RGP.i18n.lang === "ar" ? "نظرة عامة" : "Overview"),
           h("a", { href: "#/" }, RGP.i18n.lang === "ar" ? "الرئيسية" : "Home"),
           h("a", { href: "#services", onclick: function (e) { e.preventDefault(); document.getElementById("services").scrollIntoView(); } }, t("landing.servicesTitle")),
-          h("a", { href: "#rmap", onclick: function (e) { e.preventDefault(); var el2 = document.getElementById("rmap"); if (el2) el2.scrollIntoView(); } }, RGP.i18n.lang === "ar" ? "خريطة المشاريع" : "Projects map"),
-          h("a", { href: "#impact", onclick: function (e) { e.preventDefault(); var el2 = document.getElementById("impact"); if (el2) el2.scrollIntoView(); } }, RGP.i18n.lang === "ar" ? "أثر المنصة" : "Platform impact")),
+          h("a", { href: RGP.auth.current() ? "#/portal/journeys" : "#/login" }, RGP.i18n.lang === "ar" ? "رحلات المطور والمستثمر" : "Journeys")),
         h("div", null, h("h5", null, RGP.i18n.lang === "ar" ? "البوابات" : "Portals"),
           h("a", { href: "#/login" }, RGP.i18n.lang === "ar" ? "بوابة المستفيدين" : "Customer portal"),
           h("a", { href: "#/login" }, RGP.i18n.lang === "ar" ? "لوحة موظفي الأمانة" : "Staff workspace"),
@@ -8496,10 +8495,10 @@ RGP.isMac = /Mac|iPhone|iPad/.test(navigator.platform || "");
         }
       }, RGP.i18n.lang === "ar" ? "فهمت" : "Got it")); } catch (e) { demoNote = null; }
 
+    /* lean home page: hero → services catalog → journeys → footer */
     return h("div.page-in.gov-page", null,
       utilbar, hero,
-      services, impactBand, strip, journeysStrip, publicMap,
-      stats, how, methodology, portals, guides,
+      services, journeysStrip,
       footer, demoNote);
   }
 
