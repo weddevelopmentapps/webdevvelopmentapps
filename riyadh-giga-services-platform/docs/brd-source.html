@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>BRD — Giga-Projects Municipal Services Platform</title>
+<link rel="stylesheet" href="file:///home/user/webdevvelopmentapps/riyadh-giga-services-platform/vendor/fonts-embedded.css">
+<link rel="stylesheet" href="file:///home/user/webdevvelopmentapps/riyadh-giga-services-platform/vendor/fonts-light.css">
+<style>
+  :root {
+    --deep: #0F3B2B; --emerald: #17714B; --soft: #E8F2ED; --softer: #F3F8F6;
+    --ink: #00170F; --mut: #5A6B62; --border: #D9DFDC; --sand: #B8963E;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body {
+    font-family: "IBM Plex Sans Arabic", "Segoe UI", sans-serif;
+    font-size: 10pt; line-height: 1.62; color: var(--ink);
+  }
+  @page { size: A4; margin: 0; }
+  .page { page-break-after: always; padding: 20mm 18mm 18mm; position: relative; }
+  .page:last-child { page-break-after: auto; }
+  .ar { direction: rtl; unicode-bidi: isolate; }
+
+  /* ---------- cover ---------- */
+  .cover {
+    height: 297mm; padding: 0; color: #fff;
+    background: linear-gradient(140deg, #1F8159 0%, #156345 48%, #0D4C34 100%);
+    display: flex; flex-direction: column;
+  }
+  .cover .geo { position: absolute; inset: 0; overflow: hidden; }
+  .cover-head { position: relative; display: flex; align-items: center; gap: 12px; padding: 16mm 18mm 0; }
+  .cover-head img { width: 52px; height: 52px; border-radius: 50%; background: #fff; padding: 2px; }
+  .cover-head .b1 { font-weight: 700; font-size: 13pt; }
+  .cover-head .b2 { font-size: 6.5pt; letter-spacing: 2.2px; opacity: .85; }
+  .cover-mid { position: relative; margin: auto 18mm; }
+  .cover-mid .doctype { font-size: 10pt; letter-spacing: 3px; font-weight: 600; color: #CFE6DA; margin-bottom: 8mm; }
+  .cover-mid h1 { font-size: 27pt; line-height: 1.28; font-weight: 700; max-width: 150mm; }
+  .cover-mid .ar-title { font-size: 15pt; font-weight: 600; margin-top: 6mm; color: #DCEEE4; }
+  .cover-mid .sub { margin-top: 8mm; font-size: 10.5pt; color: rgba(255,255,255,.85); max-width: 140mm; }
+  .cover-foot { position: relative; padding: 0 18mm 14mm; display: flex; gap: 10mm; font-size: 8.5pt; color: rgba(255,255,255,.85); }
+  .cover-foot div b { display: block; color: #fff; font-size: 9.5pt; }
+  .cover-band { position: relative; background: rgba(6,30,20,.35); padding: 6mm 18mm; font-size: 8.5pt; color: rgba(255,255,255,.9); }
+
+  /* ---------- typography ---------- */
+  h2.sec {
+    font-size: 15pt; font-weight: 700; color: var(--emerald);
+    border-bottom: 2.5px solid var(--emerald); padding-bottom: 2mm; margin: 0 0 5mm;
+  }
+  h2.sec .num { color: var(--sand); margin-right: 3mm; }
+  h3 { font-size: 11pt; font-weight: 700; color: var(--deep); margin: 5mm 0 2mm; }
+  p { margin: 0 0 3mm; text-align: justify; }
+  ul, ol { margin: 0 0 3mm 5mm; }
+  li { margin-bottom: 1.2mm; }
+  b.arb { font-weight: 600; }
+  .avoid-break { page-break-inside: avoid; }
+
+  /* ---------- tables ---------- */
+  table { width: 100%; border-collapse: collapse; margin: 2mm 0 4mm; font-size: 8.6pt; }
+  th {
+    background: var(--deep); color: #fff; text-align: left;
+    padding: 2.2mm 2.6mm; font-weight: 600; font-size: 8.4pt;
+  }
+  td { border: 0.5pt solid var(--border); padding: 2mm 2.6mm; vertical-align: top; }
+  tr:nth-child(even) td { background: var(--softer); }
+  td.id { font-weight: 700; color: var(--emerald); white-space: nowrap; width: 16mm; }
+  td.pr { white-space: nowrap; width: 14mm; }
+  .must { color: #8A2A1F; font-weight: 700; } .should { color: #7A5C13; font-weight: 700; } .could { color: #3D5A4C; font-weight: 700; }
+
+  /* ---------- callouts / chips ---------- */
+  .note {
+    background: var(--soft); border-left: 3px solid var(--emerald);
+    padding: 3mm 4mm; margin: 3mm 0 4mm; font-size: 9pt;
+  }
+  .warn { background: #FBF4E4; border-left-color: var(--sand); }
+  .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3mm; margin: 3mm 0 4mm; }
+  .kpi-box { border: 0.6pt solid var(--border); border-top: 2.5px solid var(--emerald); padding: 3mm; }
+  .kpi-box .v { font-size: 15pt; font-weight: 700; color: var(--emerald); }
+  .kpi-box .l { font-size: 8pt; color: var(--mut); }
+  .toc td { border: none; border-bottom: 0.4pt dotted var(--border); padding: 1.6mm 1mm; font-size: 9.5pt; background: #fff !important; }
+  .toc .n { color: var(--sand); font-weight: 700; width: 10mm; }
+  .toc .pg { text-align: right; color: var(--mut); width: 12mm; }
+  figure { margin: 3mm 0 4mm; page-break-inside: avoid; }
+  figure img { width: 100%; border: 0.6pt solid var(--border); border-radius: 2mm; }
+  figcaption { font-size: 8pt; color: var(--mut); margin-top: 1.5mm; }
+  .phase-row { display: flex; gap: 3mm; margin: 3mm 0; }
+  .phase { flex: 1; border: 0.6pt solid var(--border); border-top: 2.5px solid var(--emerald); padding: 3mm; font-size: 8.4pt; }
+  .phase h4 { font-size: 9.5pt; color: var(--deep); margin-bottom: 1.5mm; }
+  .phase .tag { display: inline-block; background: var(--soft); color: var(--emerald); font-size: 7.4pt; font-weight: 700; border-radius: 8px; padding: 0.5mm 2.4mm; margin-bottom: 1.5mm; }
+</style>
+</head>
+<body>
+
+<!-- ==================== COVER ==================== -->
+<section class="page cover">
+  <div class="geo">
+    <svg width="100%" height="100%" viewBox="0 0 800 1130" preserveAspectRatio="xMidYMid slice">
+      <g fill="#ffffff">
+        <polygon points="90,0 260,0 120,1130 -50,1130" opacity="0.05"/>
+        <polygon points="300,0 400,0 260,1130 160,1130" opacity="0.03"/>
+        <polygon points="600,0 800,0 800,420" opacity="0.045"/>
+        <polygon points="520,1130 800,1130 800,860" opacity="0.04"/>
+      </g>
+    </svg>
+  </div>
+  <div class="cover-head">
+    <img src="file:///home/user/webdevvelopmentapps/riyadh-giga-services-platform/assets/rrm-logo.webp" alt="">
+    <div>
+      <div class="b1 ar">أمانة منطقة الرياض</div>
+      <div class="b2">RIYADH REGION MUNICIPALITY</div>
+    </div>
+  </div>
+  <div class="cover-mid">
+    <div class="doctype">BUSINESS REQUIREMENTS DOCUMENT</div>
+    <h1>Giga-Projects Municipal Services Platform</h1>
+    <div class="ar-title ar">منصة الخدمات البلدية للمشاريع الكبرى</div>
+    <div class="sub">Business requirements for the unified municipal-services gateway serving Riyadh's giga projects, and its integration into the official Riyadh Region Municipality portal — alriyadh.gov.sa.</div>
+  </div>
+  <div class="cover-foot">
+    <div><b>Version</b> 1.0 (Draft for review)</div>
+    <div><b>Date</b> 8 August 2026</div>
+    <div><b>Classification</b> Internal — Restricted</div>
+    <div><b>Reference</b> RRM-GPO-BRD-2026-001</div>
+  </div>
+  <div class="cover-band">Prepared on behalf of the Giga Projects Office (GPO) — <span class="ar">مكتب المشاريع الكبرى</span>. This document accompanies a working demonstration prototype; all figures and named records in the prototype are fictional demonstration data.</div>
+</section>
+
+<!-- ==================== DOC CONTROL + TOC ==================== -->
+<section class="page">
+  <h2 class="sec"><span class="num">§</span>Document Control</h2>
+  <table>
+    <tr><th style="width:28mm">Item</th><th>Detail</th></tr>
+    <tr><td>Document title</td><td>Business Requirements Document — Giga-Projects Municipal Services Platform (<span class="ar">منصة الخدمات البلدية للمشاريع الكبرى</span>)</td></tr>
+    <tr><td>Reference</td><td>RRM-GPO-BRD-2026-001 · Version 1.0 (Draft) · 8 August 2026</td></tr>
+    <tr><td>Business owner</td><td>Giga Projects Office (GPO), Riyadh Region Municipality</td></tr>
+    <tr><td>Related assets</td><td>Working prototype (bilingual, fully interactive); portal design reference: alriyadh.gov.sa</td></tr>
+    <tr><td>Status</td><td>Draft for stakeholder review — pending approval by GPO, Digital Transformation Agency of the Amanah, and Portal Governance Committee</td></tr>
+  </table>
+
+  <h3>Revision history</h3>
+  <table>
+    <tr><th style="width:16mm">Version</th><th style="width:26mm">Date</th><th>Description</th></tr>
+    <tr><td>0.9</td><td>28 July 2026</td><td>Initial draft from prototype build (platform scope, roles, service catalog, SLA model, impact model)</td></tr>
+    <tr><td>1.0</td><td>8 August 2026</td><td>Added portal-integration requirements (alriyadh.gov.sa), unified visual identity, phasing and acceptance criteria</td></tr>
+  </table>
+
+  <h3>Approvals (pending)</h3>
+  <table>
+    <tr><th>Role</th><th>Name</th><th style="width:24mm">Signature</th><th style="width:22mm">Date</th></tr>
+    <tr><td>Director, Giga Projects Office</td><td>—</td><td></td><td></td></tr>
+    <tr><td>Head of Digital Transformation</td><td>—</td><td></td><td></td></tr>
+    <tr><td>Portal Governance (alriyadh.gov.sa)</td><td>—</td><td></td><td></td></tr>
+  </table>
+
+  <h2 class="sec" style="margin-top:8mm"><span class="num">§</span>Contents</h2>
+  <table class="toc">
+    <tr><td class="n">1</td><td>Executive summary</td><td class="pg">3</td></tr>
+    <tr><td class="n">2</td><td>Background and strategic context</td><td class="pg">3</td></tr>
+    <tr><td class="n">3</td><td>Business objectives and success measures</td><td class="pg">4</td></tr>
+    <tr><td class="n">4</td><td>Scope</td><td class="pg">4</td></tr>
+    <tr><td class="n">5</td><td>Stakeholders and user roles</td><td class="pg">5</td></tr>
+    <tr><td class="n">6</td><td>Current state and problem statement</td><td class="pg">5</td></tr>
+    <tr><td class="n">7</td><td>Proposed solution overview</td><td class="pg">6</td></tr>
+    <tr><td class="n">8</td><td>Business requirements catalog</td><td class="pg">7</td></tr>
+    <tr><td class="n">9</td><td>Integration with alriyadh.gov.sa</td><td class="pg">9</td></tr>
+    <tr><td class="n">10</td><td>Non-functional requirements</td><td class="pg">11</td></tr>
+    <tr><td class="n">11</td><td>Data, reporting and the impact model</td><td class="pg">11</td></tr>
+    <tr><td class="n">12</td><td>Assumptions, constraints and dependencies</td><td class="pg">12</td></tr>
+    <tr><td class="n">13</td><td>Risks and mitigations</td><td class="pg">12</td></tr>
+    <tr><td class="n">14</td><td>Implementation roadmap</td><td class="pg">13</td></tr>
+    <tr><td class="n">15</td><td>Acceptance criteria</td><td class="pg">13</td></tr>
+    <tr><td class="n">16</td><td>Appendix — prototype screens and glossary</td><td class="pg">14</td></tr>
+  </table>
+</section>
+
+<!-- ==================== 1 + 2 ==================== -->
+<section class="page">
+  <h2 class="sec"><span class="num">1</span>Executive Summary</h2>
+  <p>Riyadh is delivering one of the largest coordinated urban-development programs in the world. Giga projects such as Diriyah, Qiddiya, New Murabba, King Salman International Airport and Expo 2030 Riyadh depend on hundreds of municipal decisions — survey decisions, plan approvals, building permits, infrastructure handovers, environmental clearances and operating licenses — whose timeliness directly gates construction schedules measured in billions of riyals.</p>
+  <p>The <b>Giga-Projects Municipal Services Platform</b> (<span class="ar">منصة الخدمات البلدية للمشاريع الكبرى</span>) is a single, bilingual gateway through which giga-project entities, developers, engineering offices, investors and operators submit, track and receive every municipal service relevant to a large project — against published service-level agreements (SLAs), with structured escalation, an auditable decision trail, and live measurement of economic impact.</p>
+  <p>A fully interactive prototype has been built and styled as a native section of the official municipality portal, <b>alriyadh.gov.sa</b>. This BRD records the business requirements embodied by that prototype and specifies the requirements for integrating the platform into the official portal: placement inside <span class="ar">الخدمات الإلكترونية</span>, unified sign-on (Nafath and portal accounts), the shared design system, unified notifications, the 940 contact channel, hosting, analytics, and compliance obligations.</p>
+  <div class="kpi-grid avoid-break">
+    <div class="kpi-box"><div class="v">38</div><div class="l">Documented municipal services with published SLAs (2–28 working days)</div></div>
+    <div class="kpi-box"><div class="v">5</div><div class="l">Official end-to-end journeys — planning, building, investor, operation, industrial</div></div>
+    <div class="kpi-box"><div class="v">−67%</div><div class="l">Targeted reduction in average service time vs. pre-platform baselines</div></div>
+  </div>
+
+  <h2 class="sec"><span class="num">2</span>Background and Strategic Context</h2>
+  <p><b>Vision 2030 and the Riyadh agenda.</b> National strategy positions Riyadh among the world's ten largest city economies, with population targets approaching 15&nbsp;million and a giga-project investment pipeline spanning culture, sport, aviation, housing and urban regeneration. Municipal enablement — permits, plans, inspections, licenses — is on the critical path of that pipeline.</p>
+  <p><b>The Giga Projects Office.</b> The Amanah has established a dedicated Giga Projects Office (<span class="ar">مكتب المشاريع الكبرى</span>) as the single municipal counterpart for large projects: one registry of projects, one prioritized lane for their requests, one escalation route for cross-agency blockages (<span class="ar">التحديات</span>), and one accountable scoreboard of timeliness and impact.</p>
+  <p><b>The digital gap.</b> Today these interactions are dispersed across general-purpose channels that were not designed for the scale, urgency or multi-entity coordination that giga projects require. There is no unified view of a project's municipal pipeline, no published giga-specific SLAs, and no measurement of the economic cost of delay.</p>
+  <p><b>Why integrate with alriyadh.gov.sa.</b> The official portal is the Amanah's front door: it carries the trusted brand, the unified design system, national sign-on, the 940 channel, the myCity app ecosystem and portal governance. Launching the platform as a portal section — rather than a stand-alone site — inherits that trust and infrastructure from day one, and keeps a single citizen- and business-facing digital estate.</p>
+</section>
+
+<!-- ==================== 3 + 4 ==================== -->
+<section class="page">
+  <h2 class="sec"><span class="num">3</span>Business Objectives and Success Measures</h2>
+  <table>
+    <tr><th style="width:8mm">#</th><th>Objective</th><th>Success measure (target)</th></tr>
+    <tr><td>O1</td><td>Cut municipal service time for giga projects</td><td>Average processing ≤ 8 working days (baseline ≈ 25); catalog-level reduction ≥ 60%</td></tr>
+    <tr><td>O2</td><td>Deliver decisions within published SLAs</td><td>SLA compliance ≥ 90%; first response ≤ 2 working days</td></tr>
+    <tr><td>O3</td><td>Resolve cross-agency blockages fast</td><td>Challenge closure rate ≥ 85% within SLA (15 working days)</td></tr>
+    <tr><td>O4</td><td>Full digital, paperless intake and decisioning</td><td>100% of requests digital end-to-end; zero paper documents</td></tr>
+    <tr><td>O5</td><td>Customer trust and satisfaction</td><td>Satisfaction ≥ 4.2 / 5 measured per closed request</td></tr>
+    <tr><td>O6</td><td>Make impact visible and accountable</td><td>Delay-cost model published with methodology; impact dashboard live for GPO and leadership</td></tr>
+    <tr><td>O7</td><td>One front door via the official portal</td><td>Platform discoverable and accessible from alriyadh.gov.sa with unified sign-on</td></tr>
+  </table>
+
+  <h2 class="sec"><span class="num">4</span>Scope</h2>
+  <h3>4.1 In scope</h3>
+  <ul>
+    <li><b>Public section</b> (inside the portal): platform landing with the services catalog (<span class="ar">دليل الخدمات</span>) and the interactive developer/investor journeys (<span class="ar">رحلات المطور والمستثمر العقاري</span>).</li>
+    <li><b>Customer portal</b>: guided request wizard, my-requests tracking, journey canvas with live progress, resubmission, challenges, notifications, satisfaction rating, profile and delegation.</li>
+    <li><b>Staff workspace</b>: triage queue, three-pane review workspace, document verification, external referrals, decisions with conditions/co-sign, SLA clocks and escalation.</li>
+    <li><b>Management</b>: GPO dashboard, projects registry, KPIs, reports, service-catalog administration, audit log, settings (holidays, SLA policy), impact dashboard (<span class="ar">أثر المنصة</span>).</li>
+    <li><b>Executive view</b>: boardroom summary with impact headline figures and weekly highlights.</li>
+    <li><b>Portal integration</b>: identity, design system, hosting, notifications, 940/chat, myCity, open data, analytics (Section 9).</li>
+  </ul>
+  <h3>4.2 Out of scope (this phase)</h3>
+  <ul>
+    <li>Fee payment execution (SADAD integration) — fees are displayed; collection remains on existing rails until Phase 2.</li>
+    <li>Automated GIS parcel validation and field-inspection scheduling (Phase 2 with Amanah GIS).</li>
+    <li>Direct system-to-system integrations with external entities (water, power, environment authorities) beyond the referral workflow — Phase 2 via the Government Service Bus.</li>
+    <li>Non-giga (general public) municipal services — these remain in the portal's existing e-services.</li>
+  </ul>
+  <div class="note warn"><b>Prototype status.</b> The current build demonstrates the full experience with fictional data on a client-side data store by design. Its data layer is a swappable repository interface so that Phase 1 replaces storage with Amanah CRM/REST services without UI change.</div>
+</section>
+
+<!-- ==================== 5 + 6 ==================== -->
+<section class="page">
+  <h2 class="sec"><span class="num">5</span>Stakeholders and User Roles</h2>
+  <table>
+    <tr><th style="width:34mm">Role</th><th>Description</th><th style="width:44mm">Key capabilities</th></tr>
+    <tr><td>Project representative (<span class="ar">ممثل مشروع</span>)</td><td>Authorized user of a registered project. Personas: giga-entity representative, real-estate developer, engineering office (delegate), investor, operator.</td><td>Submit/track requests, journeys, challenges, ratings, delegation scope</td></tr>
+    <tr><td>Amanah specialist (<span class="ar">أخصائي دراسة</span>)</td><td>Reviews assigned requests within SLA; verifies documents; refers externally; prepares decisions.</td><td>Queue, review workspace, returns, referrals, decision drafts</td></tr>
+    <tr><td>Platform manager / GPO (<span class="ar">مدير المنصة</span>)</td><td>Section head at the Giga Projects Office; owns catalog, SLAs, escalations and reporting; co-signs sensitive decisions.</td><td>Dashboards, registry, KPIs, impact, catalog & settings, audit</td></tr>
+    <tr><td>External entity reviewer (<span class="ar">جهة خارجية</span>)</td><td>Receives scoped referrals (e.g., utilities, environment) and returns opinions within referral SLA.</td><td>Referral inbox, respond with opinion/conditions</td></tr>
+    <tr><td>Executive viewer (<span class="ar">مطالع تنفيذي</span>)</td><td>Leadership; consumes summaries only.</td><td>Executive summary, impact headline, print brief</td></tr>
+  </table>
+  <p><b>Other stakeholders:</b> Portal Governance Committee (alriyadh.gov.sa), Digital Transformation Agency of the Amanah, giga-project owner companies, external government entities, Digital Government Authority (standards), National Cybersecurity Authority (controls).</p>
+
+  <h2 class="sec"><span class="num">6</span>Current State and Problem Statement</h2>
+  <table>
+    <tr><th>Pain point</th><th>Business consequence</th></tr>
+    <tr><td>No single lane for giga-project requests; they queue with general workload</td><td>Critical-path permits wait behind routine transactions; schedule slip on multi-billion-riyal programs</td></tr>
+    <tr><td>SLAs not published per service; no live clocks or escalation bands</td><td>No accountability for timeliness; disputes about elapsed time; surprises instead of early warning</td></tr>
+    <tr><td>Cross-agency blockages have no owner or workflow</td><td>Utility relocations and clearances stall for months; no record of cause or resolution</td></tr>
+    <tr><td>Document requirements discovered iteratively</td><td>High return/resubmission rates; wasted review cycles</td></tr>
+    <tr><td>No project-level view of the municipal pipeline</td><td>Neither the entity nor the GPO can see everything blocking a project at once</td></tr>
+    <tr><td>Delay cost invisible</td><td>Investment case for process improvement cannot be made; wins go unmeasured</td></tr>
+  </table>
+</section>
+
+<!-- ==================== 7 ==================== -->
+<section class="page">
+  <h2 class="sec"><span class="num">7</span>Proposed Solution Overview</h2>
+  <p>One platform, five experiences, one data spine:</p>
+  <table>
+    <tr><th style="width:40mm">Module</th><th>What it does</th></tr>
+    <tr><td>Services catalog (<span class="ar">دليل الخدمات</span>)</td><td>38 documented services across the project lifecycle — pre-development (planning, survey decisions, master plans), during delivery (building/demolition permits, infrastructure design and handover, environmental construction permits, enablement permits such as cranes, hoarding, road closures, dewatering, utility relocation), and post-completion (operating licenses, activity licensing, periodic compliance, renewals). Each service publishes purpose, prerequisites, required documents with accepted formats, fees model, supporting entities and SLA in working days.</td></tr>
+    <tr><td>Journeys (<span class="ar">رحلات المطور والمستثمر</span>)</td><td>Five official journeys rendered as an interactive canvas of connected stages (serpentine on desktop, spine on mobile): planning (7 steps and three plan-approval paths), building (5), investor (6), operation &amp; asset management (7), industrial (5). Signed-in customers see their project's live position («<span class="ar">أنت هنا</span>»), completed and blocked stages, and can start any service from its stage.</td></tr>
+    <tr><td>Request wizard</td><td>Guided, validating intake: project and phase selection, dynamic service forms, document upload with format checks, review and declaration, drafts, and a tracking number on submission.</td></tr>
+    <tr><td>Lifecycle engine</td><td>Twelve request states from draft to closure with role-guarded transitions; SLA clocks on a Sunday–Thursday calendar with official holidays; the clock pauses while a request is returned to the customer; escalation bands (green/amber/red) with automatic GPO escalation at breach; fast-track lane halving SLAs for giga entities; co-sign rule for fee-bearing or fast-track decisions; permit numbering on approval.</td></tr>
+    <tr><td>Review workspace</td><td>Three-pane specialist screen: request summary and SLA clock; document verification checklist; decision pane with approve/return/reject/refer, conditions, regulation references and templates.</td></tr>
+    <tr><td>Challenges (<span class="ar">التحديات</span>)</td><td>Structured intake of cross-agency blockages tied to a project and optionally a request; categories, owner assignment, SLA, escalation to GPO coordination, resolution record.</td></tr>
+    <tr><td>Impact (<span class="ar">أثر المنصة</span>)</td><td>Delay-cost model computed live from decided requests: working days saved vs. pre-platform baselines, estimated savings (SAR), investment value accelerated, estimated GDP contribution, jobs supported — with a per-request impact ledger, methodology disclosure, and honest estimated/measured labeling (Section 11).</td></tr>
+    <tr><td>Reporting &amp; audit</td><td>KPI engine (processing time, SLA compliance, first response, on-time rate, challenge closure, satisfaction), weekly trends, printable executive brief, and a full audit log of administrative and decision actions.</td></tr>
+    <tr><td>Experience layer</td><td>Arabic-first RTL with full English mirror; the portal's design system (Section 9); accessibility and mobile hardening; command palette; theme/accent/density personalization.</td></tr>
+  </table>
+</section>
+
+<!-- ==================== 8 ==================== -->
+<section class="page">
+  <h2 class="sec"><span class="num">8</span>Business Requirements Catalog</h2>
+  <p>Priorities follow MoSCoW: <span class="must">M</span> must have · <span class="should">S</span> should have · <span class="could">C</span> could have. All requirements below are demonstrated in the prototype unless marked otherwise.</p>
+  <h3>8.1 Public section and catalog</h3>
+  <table>
+    <tr><th style="width:14mm">ID</th><th>Requirement</th><th style="width:10mm">Pri</th></tr>
+    <tr><td class="id">BR-001</td><td>The public landing shall present the services catalog with phase filter tabs (all / pre-development / during delivery / post-completion), free-text search, and a service detail view showing prerequisites, required documents and formats, fees note, supporting entities and SLA.</td><td class="pr must">M</td></tr>
+    <tr><td class="id">BR-002</td><td>The public landing shall present the five official journeys as a connected, read-only visualization; selecting a journey routes to sign-in and then the full interactive canvas.</td><td class="pr must">M</td></tr>
+    <tr><td class="id">BR-003</td><td>Every public page shall be available in Arabic (default, RTL) and English with equivalent content.</td><td class="pr must">M</td></tr>
+  </table>
+  <h3>8.2 Customer portal</h3>
+  <table>
+    <tr><th style="width:14mm">ID</th><th>Requirement</th><th style="width:10mm">Pri</th></tr>
+    <tr><td class="id">BR-010</td><td>A signed-in project representative shall submit any catalog service through a guided wizard with per-service dynamic forms, document upload validated against declared formats, a review step and a legal declaration; incomplete submissions shall be blocked with actionable errors.</td><td class="pr must">M</td></tr>
+    <tr><td class="id">BR-011</td><td>Drafts shall be savable and resumable; a submitted request shall receive a unique tracking number and appear in "My requests" with state, SLA countdown and macro-progress rail.</td><td class="pr must">M</td></tr>
+    <tr><td class="id">BR-012</td><td>The journey canvas shall map the customer's actual requests onto journey stages (completed / in progress / action required / upcoming), flag the current stage, and offer stage-level actions (start request, continue draft, view request/decision).</td><td class="pr must">M</td></tr>
+    <tr><td class="id">BR-013</td><td>When a request is returned, the customer shall see the reasons and missing items, amend and resubmit; the SLA clock shall be visibly paused during customer action.</td><td class="pr must">M</td></tr>
+    <tr><td class="id">BR-014</td><td>Customers shall log challenges (<span class="ar">تحدٍّ</span>) tied to a project/request with category and description, and track their resolution.</td><td class="pr must">M</td></tr>
+    <tr><td class="id">BR-015</td><td>On closure, the customer shall be invited to rate satisfaction (1–5) with optional comment; ratings feed KPI-5.</td><td class="pr should">S</td></tr>
+    <tr><td class="id">BR-016</td><td>Engineering offices shall act under an explicit, visible delegation scope limited to authorized services.</td><td class="pr should">S</td></tr>
+  </table>
+  <h3>8.3 Staff and decisions</h3>
+  <table>
+    <tr><th style="width:14mm">ID</th><th>Requirement</th><th style="width:10mm">Pri</th></tr>
+    <tr><td class="id">BR-020</td><td>Specialists shall work from a prioritized queue (inbox / mine / decisions due / returned) ordered by SLA urgency, with fast-track requests visually distinguished.</td><td class="pr must">M</td></tr>
+    <tr><td class="id">BR-021</td><td>The review workspace shall present summary, documents and decision panes together; every document shall be individually verifiable (accept / flag) before decision.</td><td class="pr must">M</td></tr>
+    <tr><td class="id">BR-022</td><td>Available decisions shall be state- and role-guarded: return with reasons, refer externally with scope and due date, approve with optional conditions, reject with regulation reference. Fee-bearing or fast-track approvals by a specialist shall require GPO co-sign.</td><td class="pr must">M</td></tr>
+    <tr><td class="id">BR-023</td><td>External referrals shall create a scoped work item for the external entity with its own SLA; the parent request shall show referral status and returned opinions.</td><td class="pr must">M</td></tr>
+    <tr><td class="id">BR-024</td><td>Approvals shall issue a numbered permit/decision document; all decisions shall be recorded in the audit log with actor, timestamp and payload.</td><td class="pr must">M</td></tr>
+    <tr><td class="id">BR-025</td><td>SLA breaches shall auto-escalate to the GPO dashboard; every breach shall carry cause visibility (elapsed vs. paused days).</td><td class="pr must">M</td></tr>
+  </table>
+  <h3>8.4 Management, catalog and settings</h3>
+  <table>
+    <tr><th style="width:14mm">ID</th><th>Requirement</th><th style="width:10mm">Pri</th></tr>
+    <tr><td class="id">BR-030</td><td>The GPO shall maintain the projects registry (register, enable, hold, archive) with sector, phase, location and giga designation.</td><td class="pr must">M</td></tr>
+    <tr><td class="id">BR-031</td><td>The GPO shall administer the service catalog: SLA days and fast-track eligibility editable with an audit trail; changes apply to new requests only.</td><td class="pr must">M</td></tr>
+    <tr><td class="id">BR-032</td><td>Dashboards shall show live KPIs with period comparison, weekly submission/decision trends, breakdowns by service and sector, and drill-through to underlying requests.</td><td class="pr must">M</td></tr>
+    <tr><td class="id">BR-033</td><td>Settings shall govern the working calendar (weekend, official holidays) used by every SLA computation.</td><td class="pr must">M</td></tr>
+    <tr><td class="id">BR-034</td><td>A printable executive brief shall summarize KPIs, impact headline and escalations for leadership.</td><td class="pr should">S</td></tr>
+  </table>
+</section>
+
+<!-- ==================== 9 ==================== -->
+<section class="page">
+  <h2 class="sec"><span class="num">9</span>Integration with alriyadh.gov.sa</h2>
+  <p>The platform launches as a native section of the official portal. The prototype already implements the portal's visual identity end-to-end (measured from the live site: palette, header anatomy, typography scale, component geometry). The requirements below complete the operational integration.</p>
+  <h3>9.1 Placement and navigation</h3>
+  <table>
+    <tr><th style="width:14mm">ID</th><th>Requirement</th><th style="width:10mm">Pri</th></tr>
+    <tr><td class="id">IR-001</td><td>The platform shall be reachable from the portal's <span class="ar">الخدمات الإلكترونية</span> menu and services hub as "<span class="ar">خدمات المشاريع الكبرى</span>", with a featured entry on the e-services landing.</td><td class="pr must">M</td></tr>
+    <tr><td class="id">IR-002</td><td>Canonical hosting shall be under the portal domain — path <b>alriyadh.gov.sa/giga-services</b> (or subdomain giga.alriyadh.gov.sa) behind the portal's edge (TLS, WAF, CDN); no third-party domain shall be user-visible.</td><td class="pr must">M</td></tr>
+    <tr><td class="id">IR-003</td><td>Each catalog service shall be listed in the portal's service directory with a deep link that opens the platform wizard pre-selected on that service (e.g. …/giga-services#/wizard?service=building-permit).</td><td class="pr must">M</td></tr>
+    <tr><td class="id">IR-004</td><td>The platform shall render the portal's global chrome: top utility bar, header/mega-menu, breadcrumbs (<span class="ar">الرئيسية ← الخدمات الإلكترونية ← خدمات المشاريع الكبرى</span>), and the portal footer — sourced from the portal design system package, not duplicated.</td><td class="pr must">M</td></tr>
+  </table>
+  <h3>9.2 Identity and access</h3>
+  <table>
+    <tr><th style="width:14mm">ID</th><th>Requirement</th><th style="width:10mm">Pri</th></tr>
+    <tr><td class="id">IR-010</td><td>Customer sign-in shall use the National Single Sign-On (Nafath — <span class="ar">النفاذ الوطني الموحد</span>) and existing portal accounts; a company representative shall bind to a registered project via GPO-approved authorization.</td><td class="pr must">M</td></tr>
+    <tr><td class="id">IR-011</td><td>Staff access shall federate with the Amanah identity provider used for <span class="ar">بريد الموظفين</span> (SSO, MFA); platform roles map to IAM groups (specialist, GPO manager, external reviewer, executive).</td><td class="pr must">M</td></tr>
+    <tr><td class="id">IR-012</td><td>External entity reviewers shall access through the government interconnection channel or scoped federated accounts, limited to their referrals.</td><td class="pr must">M</td></tr>
+    <tr><td class="id">IR-013</td><td>Session, consent and privacy notices shall follow portal policy (<span class="ar">سياسة الخصوصية</span>) and PDPL requirements.</td><td class="pr must">M</td></tr>
+  </table>
+  <h3>9.3 Channels and services around the platform</h3>
+  <table>
+    <tr><th style="width:14mm">ID</th><th>Requirement</th><th style="width:10mm">Pri</th></tr>
+    <tr><td class="id">IR-020</td><td>Notifications (submission, state change, return, decision, escalation) shall be delivered through the portal's unified notification gateway — SMS, email and portal inbox — in the customer's language.</td><td class="pr must">M</td></tr>
+    <tr><td class="id">IR-021</td><td>The 940 contact center and the portal's <span class="ar">تحدث معنا</span> chat shall be able to look up a request by tracking number and log a challenge on the customer's behalf.</td><td class="pr must">M</td></tr>
+    <tr><td class="id">IR-022</td><td>The myCity app (<span class="ar">تطبيق مدينتي</span>) shall deep-link into request tracking; push notifications mirror the unified gateway.</td><td class="pr should">S</td></tr>
+    <tr><td class="id">IR-023</td><td>Anonymized, aggregated platform indicators (volumes, SLA compliance, impact headline) shall be published to the portal's open-data section (<span class="ar">البيانات المفتوحة</span>) on a monthly cycle.</td><td class="pr should">S</td></tr>
+    <tr><td class="id">IR-024</td><td>Usage analytics shall flow into the portal's unified analytics; the platform contributes to <span class="ar">إحصائيات البوابة</span>.</td><td class="pr should">S</td></tr>
+    <tr><td class="id">IR-025</td><td>Public copy (service descriptions, journey texts) shall be governed through the portal content workflow, bilingual, with GPO as content owner.</td><td class="pr must">M</td></tr>
+  </table>
+  <h3>9.4 Platform-to-core integrations (Phase 1–2)</h3>
+  <table>
+    <tr><th style="width:14mm">ID</th><th>Requirement</th><th style="width:10mm">Pri</th></tr>
+    <tr><td class="id">IR-030</td><td>The prototype's repository layer shall be replaced by Amanah CRM/case-management REST services behind the same interface (requests, projects, documents, decisions, notifications) — the UI contract is already adapter-based.</td><td class="pr must">M</td></tr>
+    <tr><td class="id">IR-031</td><td>Document storage shall move to the Amanah ECM with virus scanning, retention policy and evidential integrity.</td><td class="pr must">M</td></tr>
+    <tr><td class="id">IR-032</td><td>External-entity referrals shall ride the Government Service Bus where counterpart integrations exist; the manual referral workflow remains the fallback.</td><td class="pr should">S</td></tr>
+    <tr><td class="id">IR-033</td><td>Fee-bearing services shall integrate SADAD billing at decision time (Phase 2); until then fee notes display and collection stays on current rails.</td><td class="pr should">S</td></tr>
+    <tr><td class="id">IR-034</td><td>The projects map shall consume Amanah GIS layers for project boundaries (Phase 2), replacing the stylized map.</td><td class="pr could">C</td></tr>
+  </table>
+</section>
+
+<!-- ==================== 10 + 11 ==================== -->
+<section class="page">
+  <h2 class="sec"><span class="num">10</span>Non-Functional Requirements</h2>
+  <table>
+    <tr><th style="width:14mm">ID</th><th style="width:26mm">Category</th><th>Requirement</th></tr>
+    <tr><td class="id">NFR-01</td><td>Language</td><td>Arabic-first RTL with full English mirror; every label, notification and document bilingual; Hijri/Gregorian dates as per portal convention.</td></tr>
+    <tr><td class="id">NFR-02</td><td>Accessibility</td><td>WCAG 2.1 AA: keyboard-complete flows, visible focus, reduced-motion support, contrast-checked palette, screen-reader landmarks (prototype implements these patterns).</td></tr>
+    <tr><td class="id">NFR-03</td><td>Performance</td><td>First meaningful render ≤ 3 s on standard broadband; interactions ≤ 200 ms; production build code-split (the single-file bundle is a prototype packaging choice).</td></tr>
+    <tr><td class="id">NFR-04</td><td>Responsiveness</td><td>Full function from 390 px phones to desktop; touch targets ≥ 40 px; no horizontal panning.</td></tr>
+    <tr><td class="id">NFR-05</td><td>Availability</td><td>99.9% monthly for customer-facing functions; maintenance windows per portal policy.</td></tr>
+    <tr><td class="id">NFR-06</td><td>Security</td><td>NCA Essential Cybersecurity Controls; OWASP ASVS L2; full audit trail; least-privilege roles; data hosted in-Kingdom (PDPL).</td></tr>
+    <tr><td class="id">NFR-07</td><td>Auditability</td><td>Every state change and administrative action attributable (who/when/what) and retained per records policy.</td></tr>
+    <tr><td class="id">NFR-08</td><td>Browsers</td><td>Evergreen Chrome/Edge/Safari/Firefox, latest two versions; iOS and Android WebView via myCity.</td></tr>
+  </table>
+
+  <h2 class="sec"><span class="num">11</span>Data, Reporting and the Impact Model</h2>
+  <p>The platform measures itself. Six operational KPIs are computed live (average processing time, SLA compliance, first-response time, on-time rate incl. open requests, challenge closure, satisfaction), and an <b>economic impact model</b> converts time saved into money terms using a delay-cost methodology:</p>
+  <ul>
+    <li>Every service carries a documented pre-platform baseline duration; every project carries an indicative investment value and a daily delay-cost factor; every service carries a critical-path weight.</li>
+    <li>For each approved request: <i>days saved = baseline − actual net working days</i>; <i>savings = days saved × project value × daily factor × critical-path weight</i>; accelerated value and GDP/jobs contributions derive from standard economic coefficients.</li>
+    <li>Every figure is labeled <b>estimated</b> (modeled) or <b>measured</b> (directly observed); the methodology is published in full inside the product, and a per-request impact ledger makes headline numbers auditable.</li>
+  </ul>
+  <div class="note">In production, baselines, project values and coefficients shall be replaced with officially approved figures, and the model reviewed by the Amanah's economics function before external publication (see R-05).</div>
+</section>
+
+<!-- ==================== 12 + 13 ==================== -->
+<section class="page">
+  <h2 class="sec"><span class="num">12</span>Assumptions, Constraints and Dependencies</h2>
+  <table>
+    <tr><th style="width:14mm">ID</th><th>Statement</th></tr>
+    <tr><td class="id">A-01</td><td>The GPO operating model (single counterpart, prioritized lane, published SLAs) is approved policy before go-live.</td></tr>
+    <tr><td class="id">A-02</td><td>Giga entities will nominate authorized representatives and accept digital-only submission.</td></tr>
+    <tr><td class="id">A-03</td><td>Portal governance grants the platform a section under <span class="ar">الخدمات الإلكترونية</span> and access to the design-system package.</td></tr>
+    <tr><td class="id">C-01</td><td>All production data resides in-Kingdom; no external CDNs or trackers beyond portal-approved tooling.</td></tr>
+    <tr><td class="id">C-02</td><td>SLA definitions are bounded by regulation; the platform publishes and measures them but does not override regulatory time limits.</td></tr>
+    <tr><td class="id">D-01</td><td>Nafath/SSO onboarding, Amanah IdP federation, unified notification gateway, CRM/ECM environments, GSB connectivity — owned by the Digital Transformation Agency.</td></tr>
+    <tr><td class="id">D-02</td><td>940 and chat scripts updated to recognize the platform's tracking numbers.</td></tr>
+  </table>
+
+  <h2 class="sec"><span class="num">13</span>Risks and Mitigations</h2>
+  <table>
+    <tr><th style="width:14mm">ID</th><th>Risk</th><th style="width:18mm">Impact</th><th>Mitigation</th></tr>
+    <tr><td class="id">R-01</td><td>SLA commitments published before operational readiness</td><td>High</td><td>Soft-launch with two pilot entities; publish SLAs per service wave after two green weeks</td></tr>
+    <tr><td class="id">R-02</td><td>External entities do not act within referral SLAs</td><td>High</td><td>Escalation to GPO coordination committee is built-in; referral performance is reported by entity</td></tr>
+    <tr><td class="id">R-03</td><td>Integration timeline (SSO/CRM/ECM) slips</td><td>Medium</td><td>Adapter architecture allows portal-hosted pilot with interim identity while integrations land</td></tr>
+    <tr><td class="id">R-04</td><td>Duplicate channels confuse customers during transition</td><td>Medium</td><td>Single-front-door policy: portal directory deep-links only to the platform for giga services; legacy channels redirect</td></tr>
+    <tr><td class="id">R-05</td><td>Impact figures quoted externally without context</td><td>Medium</td><td>Estimated/measured labeling, published methodology, economics-function sign-off before any external use</td></tr>
+    <tr><td class="id">R-06</td><td>Content drift between portal directory and platform catalog</td><td>Low</td><td>Catalog is the single source; directory entries generated from it (IR-003, IR-025)</td></tr>
+  </table>
+</section>
+
+<!-- ==================== 14 + 15 ==================== -->
+<section class="page">
+  <h2 class="sec"><span class="num">14</span>Implementation Roadmap</h2>
+  <div class="phase-row avoid-break">
+    <div class="phase"><span class="tag">Complete</span><h4>Phase 0 — Prototype</h4>Full interactive demonstration: 38 services, 5 journeys, lifecycle engine, workspaces, dashboards, impact model, portal visual identity, bilingual, mobile-hardened.</div>
+    <div class="phase"><span class="tag">~ 3 months</span><h4>Phase 1 — Portal launch (MVP)</h4>Hosting under alriyadh.gov.sa; Nafath + staff SSO; CRM/ECM adapters replace demo store; unified notifications; 940/chat lookup; content governance; pilot with two giga entities and a 12-service wave.</div>
+    <div class="phase"><span class="tag">~ 6 months</span><h4>Phase 2 — Core integrations</h4>Full 38-service catalog live; SADAD fees; GSB referrals to first external entities; GIS layers; myCity deep links; open-data feed; onboarding of all registered giga projects.</div>
+    <div class="phase"><span class="tag">Ongoing</span><h4>Phase 3 — Scale &amp; optimize</h4>Additional entities and services; SLA tightening from measured performance; predictive workload; assisted drafting for specialists; annual impact report.</div>
+  </div>
+
+  <h2 class="sec"><span class="num">15</span>Acceptance Criteria (Phase 1 gate)</h2>
+  <table>
+    <tr><th style="width:14mm">ID</th><th>Criterion</th></tr>
+    <tr><td class="id">AC-01</td><td>A pilot-entity representative signs in via Nafath from alriyadh.gov.sa, submits a building-permit request end-to-end digitally, and receives the tracking number by SMS/email/portal inbox.</td></tr>
+    <tr><td class="id">AC-02</td><td>A specialist processes the request in the workspace within SLA; the customer sees each state change with a live SLA clock; a return pauses the clock until resubmission.</td></tr>
+    <tr><td class="id">AC-03</td><td>A fee-bearing or fast-track approval requires and records GPO co-sign, and issues a numbered decision document stored in ECM.</td></tr>
+    <tr><td class="id">AC-04</td><td>An SLA breach escalates automatically and appears on the GPO dashboard with cause visibility; a challenge logged via 940 appears in the challenges module.</td></tr>
+    <tr><td class="id">AC-05</td><td>The section renders inside the portal chrome, passes WCAG 2.1 AA checks on key flows, and functions fully in Arabic and English from a 390 px phone to desktop.</td></tr>
+    <tr><td class="id">AC-06</td><td>KPI and impact dashboards compute from live pilot data; every headline figure traces to its per-request ledger entries.</td></tr>
+  </table>
+</section>
+
+<!-- ==================== 16 APPENDIX ==================== -->
+<section class="page">
+  <h2 class="sec"><span class="num">16</span>Appendix A — Prototype Screens</h2>
+  <figure>
+    <img src="file:///tmp/claude-0/-home-user-webdevvelopmentapps/c4766c91-c14d-5cbc-8359-72299def30ee/scratchpad/shots/gov-ar-top.png" alt="">
+    <figcaption>A.1 — Public section rendered in the alriyadh.gov.sa design language: utility bar, portal header with «الخدمات الإلكترونية» active, services catalog with phase tabs.</figcaption>
+  </figure>
+  <figure>
+    <img src="file:///tmp/claude-0/-home-user-webdevvelopmentapps/c4766c91-c14d-5cbc-8359-72299def30ee/scratchpad/shots/f-canvas.png" alt="">
+    <figcaption>A.2 — Journey canvas: the planning journey with live per-stage status mapped from the customer's project, current position («أنت هنا»), and the three plan-approval paths.</figcaption>
+  </figure>
+</section>
+
+<section class="page">
+  <h2 class="sec"><span class="num">16</span>Appendix A — Prototype Screens (continued)</h2>
+  <figure>
+    <img src="file:///tmp/claude-0/-home-user-webdevvelopmentapps/c4766c91-c14d-5cbc-8359-72299def30ee/scratchpad/shots/f-impact-dash.png" alt="">
+    <figcaption>A.3 — Impact dashboard «أثر المنصة»: delay-cost headline figures, estimated/measured labeling, sector breakdown and the per-request impact ledger.</figcaption>
+  </figure>
+
+  <h3>Appendix B — Glossary</h3>
+  <table>
+    <tr><th style="width:42mm">Term</th><th>Definition</th></tr>
+    <tr><td>Amanah (<span class="ar">الأمانة</span>)</td><td>Riyadh Region Municipality — <span class="ar">أمانة منطقة الرياض</span>.</td></tr>
+    <tr><td>GPO (<span class="ar">مكتب المشاريع الكبرى</span>)</td><td>Giga Projects Office; single municipal counterpart for giga projects.</td></tr>
+    <tr><td>SLA</td><td>Service-level agreement — published duration in working days (Sun–Thu, excluding official holidays).</td></tr>
+    <tr><td>Fast track (<span class="ar">مسار الأولوية</span>)</td><td>Priority lane for giga-entity requests on eligible services; SLA halved; decisions co-signed.</td></tr>
+    <tr><td>Challenge (<span class="ar">تحدٍّ</span>)</td><td>A structured cross-agency blockage record owned to resolution by the GPO.</td></tr>
+    <tr><td>Nafath (<span class="ar">النفاذ الوطني الموحد</span>)</td><td>National single sign-on service.</td></tr>
+    <tr><td>GSB</td><td>Government Service Bus — the national interconnection channel for entity-to-entity integration.</td></tr>
+    <tr><td>PDPL</td><td>Personal Data Protection Law of Saudi Arabia.</td></tr>
+    <tr><td>Delay-cost model</td><td>Valuation of each saved working day as a fraction of affected project value, weighted by the service's critical-path share.</td></tr>
+  </table>
+
+  <div class="note warn" style="margin-top:6mm"><b>Prototype disclaimer.</b> The accompanying demonstration uses fictional projects, requests, users and figures. It is not the official website of Riyadh Region Municipality, and no figure in it constitutes an official statistic.</div>
+</section>
+
+</body>
+</html>
