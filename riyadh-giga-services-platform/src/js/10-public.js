@@ -52,6 +52,7 @@
     var svcSearch = "";
     var svcSection, chipsRow;
 
+    var svcExpanded = false;
     function svcCards() {
       var list = S.services.filter(function (s) {
         if (phaseFilter && s.phase !== phaseFilter) return false;
@@ -61,22 +62,29 @@
         }
         return true;
       });
+      /* the portal keeps this section compact — first ten, then expand */
+      var total = list.length, capped = false;
+      if (!svcExpanded && !svcSearch && total > 10) { list = list.slice(0, 10); capped = true; }
       if (!list.length) return UI.empty("search", { ar: "لا توجد خدمات مطابقة", en: "No matching services" },
         { ar: "جرّب تعديل البحث أو عوامل التصفية.", en: "Try adjusting your search or filters." }, null, true);
-      return h("div.svc-grid.reveal", null, list.map(function (s) {
-        return h("button.svc-card", { onclick: function () { serviceModal(s); } },
-          h("div.flex.between.g1", null,
-            h("span.sc-icon", null, UI.icon(svcIcon(s), 20)),
-            s.gigaFastTrack ? UI.gigaBadge() : null),
+      var moreBtn = capped ? h("div.flex.mbs-3", { style: { justifyContent: "center" } },
+        h("button.gov-all-btn", {
+          style: { background: "transparent", border: "1.5px solid var(--gov-emerald)", color: "var(--gov-emerald)", minHeight: "44px" },
+          onclick: function () { svcExpanded = true; refreshSvc(); }
+        }, (RGP.i18n.lang === "ar" ? "عرض جميع الخدمات (" : "Show all services ("),
+          h("span.num", null, String(total)), ")")) : null;
+      return h("div", null, h("div.gov-cards", null, list.map(function (s) {
+        return h("button.gov-card", { onclick: function () { serviceModal(s); } },
+          h("span.gi", null, UI.icon(svcIcon(s), 24)),
           h("h4", null, td(s.name)),
-          h("div.t-caption.mut", { style: { fontWeight: 500 } }, td(RGP.categoryLabel(s.category)) + " · " + t("phase." + s.phase)),
-          h("div.sc-meta", null,
-            h("span.t-footnote.mut.flex.g05", null, UI.icon("clock", 13),
-              RGP.fmtWorkdays(s.slaDays)),
-            h("span.t-footnote.mut.flex.g05", null, UI.icon("docs", 13),
+          h("div.gc-sub", null, td(RGP.categoryLabel(s.category)) + " · " + t("phase." + s.phase)),
+          h("div.gc-meta", null,
+            h("span.flex.g05", null, UI.icon("clock", 12), h("span.num-date", null, RGP.fmtWorkdays(s.slaDays))),
+            h("span.flex.g05", null, UI.icon("docs", 12),
               h("span.num", null, String((s.requiredDocuments || []).length)),
-              RGP.i18n.lang === "ar" ? " مستندات" : " documents")));
-      }));
+              RGP.i18n.lang === "ar" ? " مستندات" : " docs"),
+            s.gigaFastTrack ? h("span", { style: { color: "var(--sand-deep)" } }, RGP.i18n.lang === "ar" ? "مسار أولوية" : "Fast-track") : null));
+      })), moreBtn);
     }
 
     function svcIcon(s) {
@@ -88,7 +96,7 @@
     function refreshSvc() {
       svcSection.innerHTML = "";
       svcSection.appendChild(svcCards());
-      RGP.$$(".chip", chipsRow).forEach(function (c) {
+      RGP.$$("button", chipsRow).forEach(function (c) {
         c.classList.toggle("active", c.dataset.phase === String(phaseFilter));
       });
     }
@@ -141,58 +149,81 @@
       });
     }
 
-    /* hero — cinematic full-bleed photograph, duotone-graded, notch-masked
-       into the page surface (flagship spec §1.1) */
-
-    var heroMedia = window.ASSETS.hero
-      ? h("img.hero-media", { src: window.ASSETS.hero, alt: "" })
-      : h("div.hero-fallback");
-    var heroSkyline = RGP.skylineSvg(0.55);
-    var heroNotch = h("div.hero-notch", { "aria-hidden": "true", html:
-      '<svg viewBox="0 0 1440 96" preserveAspectRatio="none">' +
-      '<path d="M0 66 C 320 108 620 6 900 28 C 1130 46 1310 90 1440 58 L1440 96 L0 96 Z"/></svg>' });
-
-    var hero = h("section.hero.hero-v2", null,
-      heroMedia,
-      h("div.hero-grade"),
-      heroSkyline,
-      h("div.pub-section.hero-inner", null,
-        h("div.kicker", null, t("brand.owner")),
-        h("h1", null, t("landing.heroTitle")),
-        h("p.hero-sub", null, t("landing.heroSub")),
-        h("div.flex.g15.mbs-4.wrap", null,
-          h("a.btn.primary.lg.btn-sheen", { href: RGP.auth.current() ? "#/wizard" : "#/login" }, t("landing.cta"), UI.fwd(18)),
-          h("a.btn.secondary.lg", {
-            href: "#services",
-            style: { background: "rgba(255,255,255,.1)", borderColor: "rgba(255,255,255,.3)", color: "#fff" },
-            onclick: function (e) { e.preventDefault(); document.getElementById("services").scrollIntoView({ behavior: "smooth" }); }
-          }, t("landing.explore"))),
-        h("div.mbs-6", null,
-          h("div.t-headline", { style: { color: "rgba(255,255,255,.85)" } }, t("landing.journeyTitle")),
-          h("div.t-footnote", { style: { color: "rgba(255,255,255,.6)" } }, t("landing.journeySub"))),
-        h("div.journey-cards", null, ["before", "during", "after"].map(function (ph, i) {
-          var descs = {
-            before: { ar: "القرار المساحي، طلب التخطيط، الدراسات التخطيطية، الاعتماد الأولي للمخططات.", en: "Survey decision, planning request, planning studies, initial plan approval." },
-            during: { ar: "رخص البناء، تصاريح التمكين الإنشائي، البنية التحتية، التصاريح البيئية.", en: "Building permits, construction enablement, infrastructure, environmental permits." },
-            after: { ar: "رخص التشغيل والأنشطة، الفعاليات، الامتثال الدوري، التجديد أو الإنهاء.", en: "Operating licenses, events, periodic compliance, renewal or exit." }
-          };
-          var card = h("button.journey-card", {
-            onclick: function () {
-              phaseFilter = ph; refreshSvc();
-              document.getElementById("services").scrollIntoView({ behavior: "smooth" });
-            }
-          },
-            h("div.jc-num.num", null, "0" + (i + 1)),
-            h("h3", null, t("phase." + ph)),
-            h("p", null, td(descs[ph])));
-          if (RGP.motion) RGP.motion.specular(card);
-          return card;
-        }))),
-      heroNotch);
-    if (RGP.motion && window.ASSETS.hero) {
-      RGP.motion.parallax(heroMedia, 0.14, 64);
-      RGP.motion.parallax(heroSkyline, 0.06, 28);
+    /* ================================================================
+       Gov chrome — the platform as a section of alriyadh.gov.sa:
+       utility bar, transparent header over the emerald gradient hero,
+       geometric backdrop, «تحدث معنا» tab. Recreated in our own code.
+       ================================================================ */
+    var ar = RGP.i18n.lang === "ar";
+    function toastDemo() {
+      UI.toast("info", { ar: "قسم من بوابة أمانة منطقة الرياض — خارج نطاق هذا العرض التجريبي", en: "Part of the Riyadh Municipality portal — outside this demo's scope" });
     }
+
+    var utilbar = h("div.gov-utilbar", null,
+      h("button", { onclick: function () { RGP.router.go("#/login"); } }, UI.icon("users", 14), ar ? "التسجيل في البوابة" : "Portal Login"),
+      h("a", { href: "#/login" }, UI.icon("user", 14), ar ? "تسجيل الدخول" : "Login"),
+      h("button.u-hide-sm", { onclick: toastDemo }, UI.icon("send", 14), ar ? "بريد الموظفين" : "Email"),
+      h("button.u-hide-sm", { onclick: toastDemo }, ar ? "مؤشر جودة الهواء" : "Air Quality Index"),
+      h("span.u-hide-sm.num", { style: { display: "inline-flex", alignItems: "center", gap: "6px" } }, UI.icon("drop", 14), "44°C"),
+      h("span.sep"),
+      h("button.u-hide-sm", { onclick: toastDemo }, UI.icon("doc", 14), ar ? "تطبيق مدينتي" : "My City"),
+      h("button", { onclick: function () { if (RGP.palette) RGP.palette.open(); } }, UI.icon("infoC", 14), ar ? "التساؤلات" : "Questions"));
+
+    /* abstract geometric backdrop — our own polygons in the portal's manner */
+    var geo = h("div.gov-geo", { html:
+      '<svg width="100%" height="100%" viewBox="0 0 1400 480" preserveAspectRatio="xMidYMid slice">' +
+      '<g fill="#fff">' +
+      '<polygon points="150,0 420,0 210,480 -60,480" opacity="0.045"/>' +
+      '<polygon points="480,0 640,0 430,480 270,480" opacity="0.03"/>' +
+      '<polygon points="1050,0 1400,0 1400,300" opacity="0.04"/>' +
+      '<polygon points="880,480 1400,480 1400,360" opacity="0.035"/>' +
+      '</g></svg>' });
+
+    var navItems = [
+      { l: { ar: "عن الأمانة", en: "About Us" }, chev: true, hide: false },
+      { l: { ar: "قطاعات التنمية المستدامة", en: "Development Sectors" }, chev: true, hide: true },
+      { l: { ar: "الخدمات الإلكترونية", en: "Services" }, chev: true, active: true },
+      { l: { ar: "الإعلام", en: "Media" }, chev: true, hide: true },
+      { l: { ar: "البيانات المفتوحة", en: "Open Data" }, chev: true, hide: true },
+      { l: { ar: "المشاركة الإلكترونية", en: "Participation" }, chev: false, hide: false }
+    ];
+    var govHeader = h("header.gov-header", null,
+      h("a.gov-brand", { href: "#/" },
+        h("img", { src: window.ASSETS.logo, alt: t("brand.owner") }),
+        h("span", null,
+          h("span.b-ar", { style: { display: "block" } }, t("brand.owner")),
+          h("span.b-en", { style: { display: "block" } }, "RIYADH REGION MUNICIPALITY"))),
+      h("nav.gov-nav", null,
+        navItems.map(function (it) {
+          return h("a" + (it.active ? ".active" : "") + (it.hide ? ".n-hide" : ""), {
+            href: "#services",
+            onclick: function (e) {
+              e.preventDefault();
+              if (it.active) document.getElementById("services").scrollIntoView({ behavior: "smooth" });
+              else toastDemo();
+            }
+          }, td(it.l), it.chev ? UI.icon("chevD", 13) : null);
+        }),
+        h("span.gov-icons", null,
+          h("button.iconbtn", { "aria-label": "language", onclick: function () { RGP.i18n.toggle(); } },
+            h("span", { style: { fontFamily: "var(--ff-display)", fontSize: "13px", fontWeight: "600" } }, ar ? "EN" : "ع")),
+          h("button.iconbtn", { "aria-label": t("prefs.title"), onclick: function () { if (RGP.prefs) RGP.prefs.openSheet(); } }, UI.icon("settings", 18)),
+          h("button.iconbtn", { "aria-label": t("common.search"), onclick: function () { if (RGP.palette) RGP.palette.open(); } }, UI.icon("search", 18)))));
+
+    var hero = h("section.gov-hero", null,
+      geo,
+      govHeader,
+      h("button.gov-chat-tab", { onclick: function () { if (RGP.palette) RGP.palette.open(); } },
+        h("span.dot", null, UI.icon("infoC", 13)), ar ? "تحدث معنا" : "Live Chat"),
+      h("div.gov-hero-body", null,
+        h("h1", null, t("landing.heroTitle")),
+        h("p.g-sub", null, t("landing.heroSub")),
+        h("div.g-ctas", null,
+          h("a.btn.primary.lg", { href: RGP.auth.current() ? "#/wizard" : "#/login" }, t("landing.cta"), UI.fwd(18)),
+          h("a.btn.ghost.lg", {
+            href: "#services",
+            onclick: function (e) { e.preventDefault(); document.getElementById("services").scrollIntoView({ behavior: "smooth" }); }
+          }, t("landing.explore")))));
 
     /* stats band — the projects label agrees with its dynamic count (تمييز العدد) */
     var projStatLabel = (function (n) {
@@ -202,99 +233,152 @@
       if (n >= 3 && n <= 10) return "مشاريع كبرى ممكّنة";
       return t("landing.statsProjects");
     })(kpis.enabledProjects);
-    var stats = h("div.stats-slab", { "data-io": "" },
-      UI.sadu({ tone: "white" }),
-      h("div.stat-grid", null,
+    /* «الأمانة في أرقام» — flat white stats band in the portal's manner */
+    var stats = h("section.gov-sec.pub-section", null,
+      h("h2.gov-title", null, ar ? "المنصة في أرقام" : "The platform in numbers"),
+      h("div.grid.mbs-3", { "data-io": "group", style: { gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "14px" } },
         statBig(kpis.enabledProjects, projStatLabel),
         statBig(S.services.length, t("landing.statsServices")),
         statBig(kpis.onTimePct, t("landing.statsOnTime"), "%"),
         statBig(kpis.avgProcessing, t("landing.statsAvg"))));
 
     function statBig(v, label, suffix) {
-      var el = h("div.stat-big", null, h("div.v.num", null, "0"), h("div.l", null, label), h("div.u"));
+      var el = h("div.gov-card", { style: { textAlign: "center", alignItems: "center", cursor: "default", minHeight: "110px", justifyContent: "center" } },
+        h("div.v.num", { style: { fontFamily: "var(--ff-display)", fontSize: "clamp(30px, 3vw, 40px)", fontWeight: "700", color: "var(--gov-emerald)" } }, "0"),
+        h("div", { style: { fontFamily: "var(--ff-display)", fontSize: "12.5px", fontWeight: "500", color: "var(--mut)" } }, label));
       var opts = { dec: suffix ? 0 : (v % 1 ? 1 : 0), suffix: suffix || "" };
       if (RGP.motion && RGP.motion.countUp) RGP.motion.countUp(RGP.$(".v", el), v, opts);
       else UI.countUp(RGP.$(".v", el), v, opts);
       return el;
     }
 
-    /* services explorer */
-    chipsRow = h("div.flex.g1.wrap", null,
-      h("button.chip" + (phaseFilter == null ? ".active" : ""), {
-        dataset: { phase: "null" },
-        onclick: function () { phaseFilter = null; refreshSvc(); }
-      }, t("common.all")),
-      ["before", "during", "after"].map(function (ph) {
-        return h("button.chip", { dataset: { phase: ph }, onclick: function () { phaseFilter = ph; refreshSvc(); } }, t("phase." + ph));
-      }));
+    /* services explorer — centered portal title + audience-style pill tabs */
+    var TAB_ICON = { "null": "grid", before: "map", during: "crane", after: "key" };
+    chipsRow = h("div.gov-tabs", null,
+      h("div.wrap2", null,
+        [null, "before", "during", "after"].map(function (ph) {
+          return h("button" + (phaseFilter === ph ? ".active" : ""), {
+            dataset: { phase: String(ph) },
+            onclick: function () { phaseFilter = ph; refreshSvc(); }
+          }, UI.icon(TAB_ICON[String(ph)], 18), ph == null ? t("common.all") : t("phase." + ph));
+        })));
 
     svcSection = h("div.mbs-3");
     svcSection.appendChild(svcCards());
 
-    var services = h("section.sec.svc-sec.pub-section#services", null,
-      UI.sadu({ tone: "ink" }),
-      h("div", { "data-io": "", style: { position: "relative" } },
-        h("div.kicker", null, t("brand.short")),
-        h("h2.t-title1", null, t("landing.servicesTitle")),
-        h("p.t-body.mut.mbs-1", { style: { maxWidth: "620px" } }, t("landing.servicesSub"))),
-      h("div.flex.g2.mbs-3.wrap", { style: { position: "relative" } },
+    var services = h("section.gov-sec.pub-section#services", null,
+      h("div", { "data-io": "" },
+        h("h2.gov-title", null, t("landing.servicesTitle")),
+        h("p.t-body.mut.mbs-1", { style: { maxWidth: "620px", marginInline: "auto", textAlign: "center" } }, t("landing.servicesSub"))),
+      chipsRow,
+      h("div.flex.mbs-2", { style: { justifyContent: "center" } },
         h("div.topbar-search", { style: { marginInlineStart: "0" } },
           UI.icon("search", 18),
           h("input", {
-            type: "search", style: { width: "min(520px, 80vw)" },
+            type: "search", style: { width: "min(520px, 86vw)" },
             placeholder: RGP.i18n.lang === "ar" ? "ابحث عن خدمة…" : "Search services…",
             oninput: RGP.debounce(function (e) { svcSearch = e.target.value; refreshSvc(); }, 200)
-          })),
-        chipsRow),
+          }))),
       svcSection);
-    svcSection.style.position = "relative";
 
-    /* the five official journeys — connected canvas strip (journey spec §6.1) */
-    var journeysStrip = h("section.sec.pub-section", null,
-      h("div", { "data-io": "" },
-        h("div.kicker", null, RGP.i18n.lang === "ar" ? "الدليل الاسترشادي" : "The official guide"),
-        h("h2.t-title1", null, RGP.i18n.lang === "ar" ? "رحلتك من الفكرة إلى التشغيل" : "Your journey, from concept to operation"),
-        h("p.t-body.mut.mbs-1", { style: { maxWidth: "640px" } },
-          RGP.i18n.lang === "ar"
-            ? "خمس رحلات رسمية مرسومة بخطواتها ومددها المعتمدة — قبل التطوير، أثناء التنفيذ، بعد الإنجاز."
-            : "Five official journeys drawn step by step with adopted timelines — before development, during delivery, after completion.")),
-      h("div.mbs-4", null,
+    /* the five official journeys — connected canvas strip under a portal title row */
+    var journeysStrip = h("section.gov-sec.pub-section", null,
+      h("div.gov-title-row", { "data-io": "" },
+        h("h2.gov-title", null, RGP.i18n.lang === "ar" ? "رحلات المطور والمستثمر العقاري" : "Developer & investor journeys"),
+        h("a.gov-all-btn", { href: RGP.auth.current() ? "#/portal/journeys" : "#/login" },
+          RGP.i18n.lang === "ar" ? "جميع الرحلات" : "All journeys", UI.fwd(14))),
+      h("div.mbs-3", null,
         RGP.journeyCanvas ? RGP.journeyCanvas.compact() :
           h("div.grid", { style: { gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" } },
             (S.journeys || []).map(function (jr) {
-              return h("a.svc-card", { href: RGP.auth.current() ? "#/portal/journeys" : "#/login", style: { textDecoration: "none", color: "inherit" } },
+              return h("a.gov-card", { href: RGP.auth.current() ? "#/portal/journeys" : "#/login", style: { textDecoration: "none" } },
                 h("h4", null, td(jr.name)),
                 h("span.num", null, String(jr.steps.length)));
             }))));
 
-    /* impact band — bleeding sand-duotone photograph + live impact counters */
-    var impactBand = h("section.sec.impact-sec.impact-band.pub-section#impact", null,
-      h("div.impact-wrap", null,
-        h("figure.impact-fig", { "data-io": "" },
-          h("img", { src: window.ASSETS.night || window.ASSETS.hero || "", alt: "" })),
-        h("div", { "data-io": "" },
-          h("div.kicker", null, RGP.i18n.lang === "ar" ? "مكتب المشاريع الكبرى" : "Giga Projects Office"),
-          h("h2.t-title1", null, RGP.i18n.lang === "ar" ? "أثرٌ يُقاس بمدنٍ تُبنى" : "Impact measured in cities being built"),
-          h("p.t-body.mut.mbs-1.mbe-3", null,
+    /* impact — the portal's deep-green rounded promo panel, carrying live counters */
+    var impactBand = h("section.gov-sec.impact-band.pub-section#impact", null,
+      h("div.gov-panel", { "data-io": "" },
+        UI.sadu({ tone: "white", opacity: 0.05 }),
+        h("div", { style: { position: "relative" } },
+          h("h2.gov-title", null, RGP.i18n.lang === "ar" ? "أثرٌ يُقاس بمدنٍ تُبنى" : "Impact measured in cities being built"),
+          h("p.g-lede", null,
             RGP.i18n.lang === "ar"
               ? "تقليل زمن الخدمات يعني رأس مال يُستثمر أبكر، ووظائف تُدعم، وناتجًا محليًا ينمو."
               : "Faster services mean capital deployed earlier, jobs supported, and a growing city economy."),
           RGP.impact && RGP.impact.band ? RGP.impact.band("landing") : null)));
 
+    /* «أهم مشاريع الرياض» — full-width photo tile strip */
+    var strip = window.ASSETS.diriyah ? h("section.gov-sec", null,
+      h("div.pub-section", null,
+        h("div.gov-title-row", { "data-io": "" },
+          h("h2.gov-title", null, RGP.i18n.lang === "ar" ? "أهم مشاريع الرياض الكبرى" : "Riyadh's flagship giga projects"),
+          h("a.gov-all-btn", {
+            href: "#rmap",
+            onclick: function (e) { e.preventDefault(); var el2 = document.getElementById("rmap"); if (el2) el2.scrollIntoView({ behavior: "smooth" }); }
+          }, RGP.i18n.lang === "ar" ? "جميع المشاريع" : "All projects", UI.fwd(14)))),
+      h("div.gov-strip", null,
+        [{ img: window.ASSETS.diriyah, t: { ar: "بوابة الدرعية", en: "Diriyah" }, s: { ar: "ثقافة وتراث", en: "Culture & heritage" } },
+         { img: window.ASSETS.hero, t: { ar: "المربع الجديد", en: "New Murabba" }, s: { ar: "وسط المدينة الجديد", en: "The new downtown" } },
+         { img: window.ASSETS.night, t: { ar: "مطار الملك سلمان الدولي", en: "King Salman Airport" }, s: { ar: "بنية تحتية", en: "Infrastructure" } },
+         { img: window.ASSETS.metro, t: { ar: "النقل والمواصلات", en: "Transport" }, s: { ar: "شبكة النقل العام", en: "Public transit network" } },
+         { img: null, t: { ar: "10 مشاريع كبرى ممكّنة", en: "10 giga projects enabled" }, s: { ar: "استعرض الخريطة", en: "View the map" } }
+        ].map(function (x) {
+          return h("button.gov-tile", {
+            onclick: function () { var el2 = document.getElementById("rmap"); if (el2) el2.scrollIntoView({ behavior: "smooth" }); }
+          },
+            x.img ? h("img", { src: x.img, alt: "" }) : UI.sadu({ tone: "white", opacity: 0.08 }),
+            h("span.tl", null, td(x.t), h("small", null, td(x.s))));
+        }))) : null;
+
+    /* «بوابات المنصة» — portal cards with outlined pill CTAs */
+    var portals = h("section.gov-sec.pub-section", null,
+      h("h2.gov-title", { "data-io": "" }, RGP.i18n.lang === "ar" ? "بوابات المنصة" : "Platform portals"),
+      h("div.gov-portals", { "data-io": "group" },
+        [{ img: window.ASSETS.hero, t: { ar: "بوابة المستفيدين", en: "Customer portal" },
+           d: { ar: "للمطورين والمستثمرين وجهات المشاريع الكبرى: تقديم الطلبات ومتابعتها ورفع التحديات.", en: "For developers, investors and giga-project entities: submit and track requests, raise challenges." } },
+         { img: window.ASSETS.metro, t: { ar: "لوحة موظفي الأمانة", en: "Municipality staff" },
+           d: { ar: "قوائم العمل والدراسة والقرارات ضمن المدد المعتمدة ولوحات المؤشرات.", en: "Work queues, reviews, decisions within adopted SLAs, and KPI dashboards." } },
+         { img: window.ASSETS.night, t: { ar: "الملخص التنفيذي", en: "Executive summary" },
+           d: { ar: "نظرة قيادية على الأداء والأثر الاقتصادي للمنصة على مدينة الرياض.", en: "A leadership view of performance and the platform's economic impact on Riyadh." } }
+        ].map(function (x) {
+          return h("div.gov-portal", null,
+            h("div.ph", null, h("img", { src: x.img || "", alt: "" })),
+            h("div.bd", null,
+              h("h4", null, td(x.t)),
+              h("p", null, td(x.d)),
+              h("a.pl", { href: "#/login" }, RGP.i18n.lang === "ar" ? "دخول البوابة" : "Enter portal", UI.fwd(13))));
+        })));
+
+    /* «الأدلة واللوائح» — guides band */
+    var guides = h("section.gov-sec.pub-section", null,
+      h("div.gov-guides", { "data-io": "" },
+        h("div.gov-title-row", null,
+          h("h2.gov-title", { style: { textAlign: "start" } }, RGP.i18n.lang === "ar" ? "الأدلة واللوائح" : "Guides & regulations"),
+          null),
+        h("div.list", null,
+          h("a.gd", { href: "#services", onclick: function (e) { e.preventDefault(); document.getElementById("services").scrollIntoView({ behavior: "smooth" }); } },
+            UI.icon("layers", 16), RGP.i18n.lang === "ar" ? "دليل الخدمات البلدية" : "Municipal services catalog"),
+          h("button.gd", { onclick: function () { if (RGP.impact) RGP.impact.methodologyModal(); } },
+            UI.icon("note", 16), RGP.i18n.lang === "ar" ? "منهجية احتساب الأثر" : "Impact methodology"),
+          h("a.gd", { href: RGP.auth.current() ? "#/portal/journeys" : "#/login" },
+            UI.icon("map", 16), RGP.i18n.lang === "ar" ? "دليل المطور والمستثمر العقاري" : "Developer & investor guide"),
+          h("a.gd", { href: "#/login" },
+            UI.icon("flag", 16), RGP.i18n.lang === "ar" ? "بلاغ عن تحدٍّ" : "Report a challenge"))));
+
     /* public Riyadh projects map (Track 9 — الواجهة الرئيسية) */
-    var publicMap = h("section.sec.after-impact.pub-section#rmap", null,
+    var publicMap = h("section.gov-sec.pub-section#rmap", null,
       h("div", { "data-io": "" },
-        h("div.kicker", null, t("brand.owner")),
-        h("h2.t-title1", null, RGP.i18n.lang === "ar" ? "خريطة المشاريع الكبرى في الرياض" : "The giga-projects map of Riyadh"),
-        h("p.t-body.mut.mbs-1", { style: { maxWidth: "620px" } },
+        h("h2.gov-title", null, RGP.i18n.lang === "ar" ? "خريطة المشاريع الكبرى في الرياض" : "The giga-projects map of Riyadh"),
+        h("p.t-body.mut.mbs-1", { style: { maxWidth: "620px", marginInline: "auto", textAlign: "center" } },
           RGP.i18n.lang === "ar"
             ? "المشاريع المسجلة في السجل الموحد لدى مكتب المشاريع الكبرى، بحسب حالتها ومرحلتها."
             : "Projects in the unified registry of the Giga Projects Office, by status and phase.")),
       h("div.mbs-3", null, RGP.map.render({ projects: S.projects, showLabels: true })));
 
     /* how it works */
-    var how = h("section.sec.pub-section", null,
-      h("h2.t-title1", { "data-io": "" }, t("landing.howTitle")),
+    var how = h("section.gov-sec.how-sec.pub-section", null,
+      h("h2.gov-title", { "data-io": "" }, t("landing.howTitle")),
       h("div.how-steps.mbs-4", { "data-io": "group" }, [1, 2, 3, 4].map(function (n) {
         return h("div.how-step", null,
           h("div.h-num.num", null, String(n)),
@@ -352,58 +436,59 @@
           RGP.store.state.settings.entities.filter(function (e) { return e.type === "external"; }).slice(0, 8)
             .map(function (e) { return h("span.t-footnote.mut", { style: { fontWeight: 600 } }, td(e.name)); }))));
 
-    /* footer */
-    var footer = h("footer.pub-footer", null,
-      UI.sadu({ tone: "white", opacity: 0.045 }),
-      h("div.pub-section", null,
-        h("div.cols", null,
-          h("div", null,
-            h("div.flex.g15.mbe-2", null,
-              h("img", { src: window.ASSETS.logo, style: { width: "44px", borderRadius: "50%" }, alt: "" }),
-              h("div", null,
-                h("div", { style: { color: "#fff", fontFamily: "var(--ff-display)", fontWeight: 700, fontSize: "14px" } }, t("brand.name")),
-                h("div.t-caption", { style: { color: "rgba(255,255,255,.55)", fontWeight: 500 } }, t("brand.owner") + " · Riyadh Region Municipality"))),
-            h("p", { style: { fontSize: "12.5px", lineHeight: 1.8, color: "rgba(255,255,255,.6)", maxWidth: "380px" } },
-              RGP.i18n.lang === "ar"
-                ? "منصة موحدة تقدم من خلالها أمانة منطقة الرياض الخدمات البلدية للمشاريع الكبرى وتتابعها وفق مدد زمنية معتمدة، إسهامًا في تحقيق مستهدفات رؤية المملكة 2030."
-                : "A unified platform through which Riyadh Region Municipality delivers and tracks municipal services for giga projects within approved timelines, in support of Saudi Vision 2030.")),
-          h("div", null, h("h5", null, RGP.i18n.lang === "ar" ? "المنصة" : "Platform"),
-            h("a", { href: "#/" }, RGP.i18n.lang === "ar" ? "الرئيسية" : "Home"),
-            h("a", { href: "#services", onclick: function (e) { e.preventDefault(); document.getElementById("services").scrollIntoView(); } }, t("landing.servicesTitle")),
-            h("a", { href: "#/login" }, RGP.i18n.lang === "ar" ? "بوابة المستفيدين" : "Customer portal")),
-          h("div", null, h("h5", null, RGP.i18n.lang === "ar" ? "الرحلات" : "Journeys"),
-            h("a", { href: "#/login" }, t("phase.before")),
-            h("a", { href: "#/login" }, t("phase.during")),
-            h("a", { href: "#/login" }, t("phase.after"))),
-          h("div", null, h("h5", null, RGP.i18n.lang === "ar" ? "الدعم" : "Support"),
-            h("a", { href: "#/login" }, RGP.i18n.lang === "ar" ? "مركز المساعدة 940" : "Help center 940"),
-            h("a", { href: "#/login" }, RGP.i18n.lang === "ar" ? "دليل المطور والمستثمر" : "Developer & investor guide"),
-            h("a", { href: "#/login" }, RGP.i18n.lang === "ar" ? "بلاغ عن تحدٍّ" : "Report a challenge"))),
-        h("div.hairline-t.mbs-4", { style: { paddingBlock: "20px 0", display: "flex", gap: "16px", flexWrap: "wrap", alignItems: "center" } },
-          h("span", { style: { fontSize: "11.5px", color: "rgba(255,255,255,.5)" } },
-            "© 2026 " + (RGP.i18n.lang === "ar" ? "أمانة منطقة الرياض — جميع الحقوق محفوظة" : "Riyadh Region Municipality — all rights reserved")),
-          h("span.grow"),
-          h("span.demo-note", { style: { color: "rgba(255,255,255,.45)" } }, t("common.demo")))));
+    /* footer — the portal's deep-green sitemap footer */
+    var footer = h("footer.gov-footer", null,
+      h("div.cols", null,
+        h("div", null,
+          h("div.flex.g15.mbe-2", null,
+            h("img", { src: window.ASSETS.logo, style: { width: "48px", height: "48px", borderRadius: "50%", background: "#fff", padding: "2px" }, alt: "" }),
+            h("div", null,
+              h("div", { style: { color: "#fff", fontFamily: "var(--ff-display)", fontWeight: 700, fontSize: "15px" } }, t("brand.owner")),
+              h("div", { style: { fontSize: "9px", letterSpacing: "1.4px", color: "rgba(255,255,255,.6)" } }, "RIYADH REGION MUNICIPALITY"))),
+          h("p", { style: { fontSize: "12.5px", lineHeight: 1.9, color: "rgba(255,255,255,.7)", maxWidth: "360px" } },
+            RGP.i18n.lang === "ar"
+              ? "منصة الخدمات البلدية للمشاريع الكبرى — البوابة الموحدة لتقديم الخدمات البلدية للمشاريع الكبرى في مدينة الرياض ومتابعتها."
+              : "The Giga-Projects Municipal Services Platform — the unified gateway for submitting and tracking municipal services for Riyadh's giga projects."),
+          h("a.gov-940", { href: "#/login" }, UI.icon("flag", 18), RGP.i18n.lang === "ar" ? "بلاغ 940" : "Report 940")),
+        h("div", null, h("h5", null, RGP.i18n.lang === "ar" ? "نظرة عامة" : "Overview"),
+          h("a", { href: "#/" }, RGP.i18n.lang === "ar" ? "الرئيسية" : "Home"),
+          h("a", { href: "#services", onclick: function (e) { e.preventDefault(); document.getElementById("services").scrollIntoView(); } }, t("landing.servicesTitle")),
+          h("a", { href: "#rmap", onclick: function (e) { e.preventDefault(); var el2 = document.getElementById("rmap"); if (el2) el2.scrollIntoView(); } }, RGP.i18n.lang === "ar" ? "خريطة المشاريع" : "Projects map"),
+          h("a", { href: "#impact", onclick: function (e) { e.preventDefault(); var el2 = document.getElementById("impact"); if (el2) el2.scrollIntoView(); } }, RGP.i18n.lang === "ar" ? "أثر المنصة" : "Platform impact")),
+        h("div", null, h("h5", null, RGP.i18n.lang === "ar" ? "البوابات" : "Portals"),
+          h("a", { href: "#/login" }, RGP.i18n.lang === "ar" ? "بوابة المستفيدين" : "Customer portal"),
+          h("a", { href: "#/login" }, RGP.i18n.lang === "ar" ? "لوحة موظفي الأمانة" : "Staff workspace"),
+          h("a", { href: "#/login" }, RGP.i18n.lang === "ar" ? "الملخص التنفيذي" : "Executive summary")),
+        h("div", null, h("h5", null, RGP.i18n.lang === "ar" ? "الدعم والمساندة" : "Support"),
+          h("a", { href: "#/login" }, RGP.i18n.lang === "ar" ? "مركز المساعدة" : "Help center"),
+          h("a", { href: RGP.auth.current() ? "#/portal/journeys" : "#/login" }, RGP.i18n.lang === "ar" ? "دليل المطور والمستثمر" : "Developer & investor guide"),
+          h("a", { href: "#/login" }, RGP.i18n.lang === "ar" ? "بلاغ عن تحدٍّ" : "Report a challenge"))),
+      h("div.bottom", null,
+        h("span", null, "© 2026 " + (RGP.i18n.lang === "ar" ? "أمانة منطقة الرياض — جميع الحقوق محفوظة" : "Riyadh Region Municipality — all rights reserved")),
+        h("span.grow"),
+        h("span", null, (RGP.i18n.lang === "ar" ? "آخر تحديث: " : "Last updated: "), h("span.num", null, "08/08/2026")),
+        h("span.demo-note", null, t("common.demo"))));
 
-    /* public nav */
-    var nav = h("nav.pub-nav", null,
-      h("img", { src: window.ASSETS.logo, style: { width: "40px", height: "40px", borderRadius: "50%" }, alt: t("brand.owner") }),
-      h("div", null,
-        h("div", { style: { fontFamily: "var(--ff-display)", fontWeight: 700, fontSize: "13.5px", lineHeight: 1.3 } }, t("brand.short")),
-        h("div.t-caption.mut", { style: { fontWeight: 500 } }, t("brand.owner"))),
-      h("div.links", null,
-        h("a", { href: "#/" }, RGP.i18n.lang === "ar" ? "الرئيسية" : "Home"),
-        h("a", { href: "#services", onclick: function (e) { e.preventDefault(); document.getElementById("services").scrollIntoView({ behavior: "smooth" }); } }, t("landing.servicesTitle")),
-        h("a", { href: "#rmap", onclick: function (e) { e.preventDefault(); var el2 = document.getElementById("rmap"); if (el2) el2.scrollIntoView({ behavior: "smooth" }); } }, RGP.i18n.lang === "ar" ? "خريطة المشاريع" : "Projects map")),
-      h("button.iconbtn", { style: { marginInlineStart: "auto" }, "aria-label": t("common.search"),
-        onclick: function () { if (RGP.palette) RGP.palette.open(); } }, UI.icon("search", 19)),
-      h("button.iconbtn", { "aria-label": t("prefs.title"),
-        onclick: function () { if (RGP.prefs) RGP.prefs.openSheet(); } }, UI.icon("sliders", 19)),
-      h("button.iconbtn", { "aria-label": "language", onclick: function () { RGP.i18n.toggle(); } }, UI.icon("lang", 20)),
-      h("a.btn.primary.sm", { href: "#/login", style: { marginInlineStart: "8px" } }, t("common.signin")));
-    nav.querySelector(".links").style.marginInlineStart = "auto";
+    /* demo notice — consent-banner vocabulary, used honestly */
+    var demoNote = null;
+    try { demoNote = sessionStorage.getItem("rgp.demoAck") ? null : h("div.gov-demo-note", null,
+      h("span", { style: { fontFamily: "var(--ff-display)", fontWeight: 700 } }, RGP.i18n.lang === "ar" ? "نموذج تجريبي" : "Demonstration prototype"),
+      h("span.grow", { style: { flex: "1 1 260px" } },
+        RGP.i18n.lang === "ar"
+          ? "هذه نسخة عرض تجريبية لمنصة الخدمات البلدية للمشاريع الكبرى ببيانات افتراضية، وليست الموقع الرسمي لأمانة منطقة الرياض."
+          : "This is a demonstration prototype of the Giga-Projects Municipal Services Platform with fictional data — not the official Riyadh Municipality website."),
+      h("button.btn.dark.sm", {
+        onclick: function (e) {
+          try { sessionStorage.setItem("rgp.demoAck", "1"); } catch (err) { /* noop */ }
+          var n = e.target.closest(".gov-demo-note"); if (n) n.remove();
+        }
+      }, RGP.i18n.lang === "ar" ? "فهمت" : "Got it")); } catch (e) { demoNote = null; }
 
-    return h("div.page-in", null, nav, hero, stats, journeysStrip, services, impactBand, publicMap, how, methodology, entities, footer);
+    return h("div.page-in.gov-page", null,
+      utilbar, hero,
+      services, impactBand, strip, journeysStrip, publicMap,
+      stats, how, methodology, portals, guides,
+      footer, demoNote);
   }
 
   /* ---------------- login ---------------- */
