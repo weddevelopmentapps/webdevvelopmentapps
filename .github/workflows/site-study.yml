@@ -1,0 +1,98 @@
+name: site-study
+on:
+  workflow_dispatch:
+  push:
+    branches: ["claude/riyadh-giga-services-platform-tafdfj"]
+    paths: [".github/workflows/site-study.yml"]
+
+permissions:
+  contents: write
+
+jobs:
+  study:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Playwright
+        run: |
+          npm init -y >/dev/null 2>&1
+          npm i -s playwright@1.49.1 >/dev/null 2>&1
+          npx playwright install --with-deps chromium >/dev/null 2>&1
+          pip3 install --quiet pillow
+      - name: Capture design reference
+        run: |
+          mkdir -p riyadh-giga-services-platform/reference
+          cat > study.js <<'EOF'
+          const { chromium } = require('playwright');
+          const fs = require('fs');
+          (async () => {
+            const browser = await chromium.launch();
+            async function shoot(url, name, w, h, full, lang) {
+              try {
+                const ctx = await browser.newContext({ viewport: { width: w, height: h }, locale: lang });
+                const p = await ctx.newPage();
+                await p.goto(url, { waitUntil: 'networkidle', timeout: 45000 }).catch(() => {});
+                await p.waitForTimeout(4000);
+                await p.screenshot({ path: 'riyadh-giga-services-platform/reference/' + name + '.png', fullPage: full });
+                return p;
+              } catch (e) { console.log('shoot fail', name, e.message); return null; }
+            }
+            // EN + AR home, top and full
+            const pEn = await shoot('https://www.alriyadh.gov.sa/en', 'en-top', 1512, 950, false, 'en');
+            await shoot('https://www.alriyadh.gov.sa/en', 'en-full', 1512, 950, true, 'en');
+            const pAr = await shoot('https://www.alriyadh.gov.sa/', 'ar-top', 1512, 950, false, 'ar');
+            await shoot('https://www.alriyadh.gov.sa/', 'ar-full', 1512, 950, true, 'ar');
+            await shoot('https://www.alriyadh.gov.sa/', 'ar-mobile', 390, 844, false, 'ar');
+            // style probe — my own extraction of computed design tokens
+            if (pAr) {
+              const probe = await pAr.evaluate(() => {
+                const pick = (el, props) => {
+                  if (!el) return null;
+                  const cs = getComputedStyle(el);
+                  const o = { tag: el.tagName, cls: (el.className || '').toString().slice(0, 120) };
+                  props.forEach(p => o[p] = cs.getPropertyValue(p));
+                  return o;
+                };
+                const P = ['font-family','font-size','font-weight','color','background-color','border-radius','height','line-height','letter-spacing','border-color','box-shadow','padding'];
+                const links = Array.from(document.querySelectorAll('header a, nav a')).slice(0, 40).map(a => a.textContent.trim()).filter(Boolean);
+                const btns = Array.from(document.querySelectorAll('button, a[class*="btn"], [class*="button"]')).slice(0, 12).map(b => pick(b, P));
+                const vars = {};
+                const rootCs = getComputedStyle(document.documentElement);
+                for (let i = 0; i < rootCs.length; i++) { const n = rootCs[i]; if (n.startsWith('--')) vars[n] = rootCs.getPropertyValue(n).trim(); }
+                return {
+                  htmlDir: document.documentElement.dir, lang: document.documentElement.lang,
+                  body: pick(document.body, P),
+                  header: pick(document.querySelector('header'), P),
+                  nav: pick(document.querySelector('nav'), P),
+                  h1: pick(document.querySelector('h1'), P),
+                  h2: pick(document.querySelector('h2'), P),
+                  footer: pick(document.querySelector('footer'), P),
+                  navLabels: links, buttons: btns, cssVars: vars,
+                  title: document.title
+                };
+              }).catch(e => ({ err: String(e) }));
+              fs.writeFileSync('riyadh-giga-services-platform/reference/style-probe.json', JSON.stringify(probe, null, 1));
+            }
+            await browser.close();
+          })();
+          EOF
+          node study.js
+          python3 - <<'EOF'
+          from PIL import Image
+          import os, glob
+          for f in glob.glob('riyadh-giga-services-platform/reference/*.png'):
+              im = Image.open(f)
+              # cap very tall fullpage shots and downscale for repo size
+              if im.height > 6000: im = im.crop((0, 0, im.width, 6000))
+              if im.width > 1100: im = im.resize((1100, int(im.height*1100/im.width)), Image.LANCZOS)
+              im.save(f.replace('.png', '.webp'), 'WEBP', quality=72, method=6)
+              os.remove(f)
+              print(f, '->', os.path.getsize(f.replace('.png', '.webp'))//1024, 'KB')
+          EOF
+      - name: Commit reference
+        run: |
+          git config user.name "site-study-bot"
+          git config user.email "actions@github.com"
+          git add riyadh-giga-services-platform/reference
+          git commit -m "Design reference capture for gov-chrome restyle" || echo "nothing to commit"
+          git push
