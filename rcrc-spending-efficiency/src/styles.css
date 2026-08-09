@@ -553,3 +553,7 @@ tbody tr.clickable{cursor:pointer}
   [dir=ltr] .hero-side{-webkit-mask-image:linear-gradient(90deg,#000 92%,transparent);mask-image:linear-gradient(90deg,#000 92%,transparent)}
 }
 [dir=ltr] .tab{padding:13px 10px 11px;font-size:12px;letter-spacing:-.1px}
+[dir=ltr] .pillar-card{display:flex;flex-direction:column}
+[dir=ltr] .pillar-card .ph{flex:1;align-items:flex-start}
+[dir=ltr] .pillar-card .owner-tag{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.scroll-fade{-webkit-mask-image:linear-gradient(180deg,#000 calc(100% - 26px),transparent);mask-image:linear-gradient(180deg,#000 calc(100% - 26px),transparent)}

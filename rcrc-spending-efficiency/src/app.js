@@ -17,6 +17,8 @@ let LANG = localStorage.getItem("rcrcSE.lang") || "ar";
 { const q = new URLSearchParams(location.search).get("lang");
   if(q==="en"||q==="ar"){ LANG=q; localStorage.setItem("rcrcSE.lang", q); } }
 const isAR = ()=>LANG==="ar";
+const QQ = x=> isAR()? "«"+x+"»" : `“${x}”`;
+const ARROW = ()=> isAR()? "←" : "→";
 function t(s){
   if(LANG==="ar" || s==null) return s;
   const k = String(s).trim().replace(/\s+/g," ");
@@ -618,7 +620,7 @@ RENDER.skep = {
       </div>
       <span class="mini-note">${t("اضغط على أي ركيزة لفتح معاييرها وتحديث الدرجات والوثائق")}</span>
       <div class="spacer"></div>
-      <span class="grade" style="background:${gradeColor(g)}18;color:${gradeColor(g)}">${t("الشامل")}: ${ltr(n(ov,1))} — ${t(g)}</span>
+      <span class="grade" style="background:${gradeColor(g)}18;color:${gradeColor(g)}">${t("الدرجة الإجمالية")}: ${ltr(n(ov,1))} — ${t(g)}</span>
     </div>
 
     <div class="grid g21">
@@ -655,7 +657,7 @@ RENDER.skep = {
     <div class="grid g21 mt">
       <div class="card">
         <h3>${t("مصفوفة المعايير")}</h3>
-        <div class="subt">${t("درجة كل معيار في وضع")} «${mode==="self"?t("الذاتي"):t("المحاكاة")}» — ${t("اضغط أي خلية للتفاصيل")}</div>
+        <div class="subt">${t("درجة كل معيار في وضع")} ${QQ(mode==="self"?t("الذاتي"):t("المحاكاة"))} — ${t("اضغط أي خلية للتفاصيل")}</div>
         <div style="overflow-x:auto">${heatmapHTML(mode)}</div>
         <div class="legend-dots">${S.data.maturity.levels.map(l=>`<span><i style="background:${l.color}"></i>${t(l.name)} (${l.n})</span>`).join("")}</div>
         <div class="mini-note" style="margin-top:6px">${t("مقياس نضج استرشادي قابل للمعايرة — تُعاير المسميات والحدود وفق الدليل الإرشادي المعتمد لدورة التقييم")}.</div>
@@ -727,7 +729,7 @@ function openPillar(pid){
     <div class="fld"><b>${t("الوصف")}</b><span>${esc(p.desc)}</span></div>
     <div class="fld"><b>${t("مالك الركيزة")}</b><span>${esc(p.owner)}</span></div>
     <div class="fld"><b>${t("الدرجات")}</b><span>${t("ذاتي")}: ${ltr(n(pillarScore(p,"self"),2))} · ${t("محاكاة")}: ${ltr(n(pillarScore(p,"sim"),2))} · ${t("الدورة السادسة")}: ${ltr(n(pillarScore(p,"prev"),2))}</span></div>
-    <div class="dsec"><h4>${t("المعايير")} (${n(p.criteria.length)}) — ${t("اضغط الدرجة لتعديلها في وضع")} «${mode==="self"?t("الذاتي"):t("المحاكاة")}»</h4>
+    <div class="dsec"><h4>${t("المعايير")} (${n(p.criteria.length)}) — ${t("اضغط الدرجة لتعديلها في وضع")} ${QQ(mode==="self"?t("الذاتي"):t("المحاكاة"))}</h4>
       ${p.criteria.map((c,ci)=>`
         <div class="card" style="padding:12px 14px;margin-bottom:10px">
           <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start">
@@ -788,7 +790,7 @@ RENDER.initiatives = {
       ${kpiTile("bulb","",t("إجمالي المبادرات"), `${ltr(n(ist.total))}`, `<span>${n(sc["تنفيذ"]+sc["قياس الأثر"])} ${t("قيد التنفيذ والقياس")}</span>`)}
       ${kpiTile("check","",t("نسبة الالتزام بالخط الزمني"), pct(ist.commitment,1),
         `<span>${t("المستهدف")} ${pct(92)}</span><span class="st ${ist.commitment>=92?"ok":"warn"}">${n(ist.flagged)} ${t("متأخرة/متعثرة")}</span>`)}
-      ${kpiTile("coins","g",t("الأثر المقدر للمحفظة"), `${ltr(n(it.identified))} <small>${t("مليون ريال")}</small>`, `<span>${t("المعتمد")} ${moneyShort(it.approved)}</span>`)}
+      ${kpiTile("coins","g",t("الأثر المقدر للمحفظة"), `${ltr(n(it.identified))} <small>${t("مليون ريال")}</small>`, `<span>${t("المعتمد")}: ${moneyShort(it.approved)}</span>`)}
       ${kpiTile("doc","n",t("متوسط طلبات التغيير"), `${ltr(n(ist.crAvg,2))}`, `<span>${t("لكل مبادرة — المستهدف")}: ${ltr("0.5")} ${t("أو أقل")}</span>`)}
     </div>
 
@@ -900,7 +902,7 @@ function openIni(id){
     <div class="fld"><b>${t("البرنامج")}</b><span>${esc(progName(i.program))}</span></div>
     <div class="fld"><b>${t("الفئة / نوع الأثر")}</b><span>${esc(i.category)} · ${esc(i.impactType)}</span></div>
     <div class="fld"><b>${t("المالك")}</b><span>${esc(i.owner)}</span></div>
-    <div class="fld"><b>${t("الفترة")}</b><span>${fmtDate(i.start)} ← ${fmtDate(i.end)}</span></div>
+    <div class="fld"><b>${t("الفترة")}</b><span>${fmtDate(i.start)} ${ARROW()} ${fmtDate(i.end)}</span></div>
     <div class="fld"><b>${t("نسبة الإنجاز")}</b><span>${pct(i.progress)}</span></div>
     <div class="dsec"><h4>${t("بطاقة الفرصة")}</h4>
       <div class="fld"><b>${t("مصدر الهدر")}</b><span>${esc(i.wasteSource)}</span></div>
@@ -930,10 +932,10 @@ function openIni(id){
     </div>`:""}
     ${i.note && !i.flag? `<div class="dsec"><h4>${t("ملاحظات")}</h4><div class="mini-note">${esc(i.note)}</div></div>`:""}
     <div class="dsec" style="display:flex;gap:8px;flex-wrap:wrap">
-      ${canAdvance? `<button class="btn primary" id="d-advance" ${gateBlocked?"disabled style='opacity:.5;cursor:not-allowed'":""}>${t("نقل إلى مرحلة")} «${t(nextStage)}»</button>`:""}
+      ${canAdvance? `<button class="btn primary" id="d-advance" ${gateBlocked?"disabled style='opacity:.5;cursor:not-allowed'":""}>${t("نقل إلى مرحلة")} ${QQ(t(nextStage))}</button>`:""}
       ${!i.financeValidated? `<button class="btn ghost" id="d-validate">${t("تأكيد التحقق المالي")}</button>`:""}
       <button class="btn ghost" id="d-edit">${t("تعديل البيانات")}</button>
-      ${i.flag? `<button class="btn ghost" id="d-unflag">${t("إلغاء حالة")} «${t(i.flag)}»</button>`:""}
+      ${i.flag? `<button class="btn ghost" id="d-unflag">${t("إلغاء حالة")} ${QQ(t(i.flag))}</button>`:""}
     </div>
     ${gateBlocked? `<div class="mini-note mt">⚠ ${gateMsg}</div>`:""}`;
   openDrawer(`${i.id} — ${t(i.name)}`, body);
@@ -942,7 +944,7 @@ function openIni(id){
     if(gateBlocked) return;
     i.status = nextStage;
     if(nextStage==="مقفلة") i.progress = 100;
-    save(); refresh(); openIni(id); toast(`${t("انتقلت المبادرة إلى مرحلة")} «${t(nextStage)}»`);
+    save(); refresh(); openIni(id); toast(`${t("انتقلت المبادرة إلى مرحلة")} ${QQ(t(nextStage))}`);
   });
   if(el("d-validate")) el("d-validate").addEventListener("click",()=>{
     i.financeValidated = true;
@@ -1108,8 +1110,8 @@ RENDER.impact = {
         let h=`<b>${ps[0].axisValue}</b>`; ps.forEach(p=>h+=ttRow(p.seriesName,`${n(p.value)} ${t("م.ر")}`,p.color)); return h; }}),
       legend:{ icon:"circle", itemWidth:9, itemHeight:9, top:0, textStyle:{fontFamily:"Cairo",fontSize:11,color:"#5C6E63"} },
       xAxis: hxAxis(v=>n(v)),
-      yAxis: hyAxis(types, 86),
-      grid:{ top:34, bottom:26, right:90, left:20 },
+      yAxis: hyAxis(types, isAR()? 86 : 134),
+      grid:{ top:34, bottom:26, right:isAR()? 90:146, left:20 },
       series:[
         { name:t("محقق"), type:"bar", stack:"t", barWidth:20, color:"#098A4E", data:types.map(t=>bt[t].realized) },
         { name:t("متبقٍ من المحدد"), type:"bar", stack:"t", color:"#DDEBE2", data:types.map(t=>({value:Math.max(0,bt[t].identified-bt[t].realized), itemStyle:{borderRadius:bRad(6)}})) },
@@ -1247,7 +1249,7 @@ function openFR(id){
       ${r.stage==="الإعداد"||r.stage==="معاد للاستكمال" ?
         `<button class="btn primary" id="fr-submit" ${!complete?`disabled style='opacity:.5;cursor:not-allowed' title='${t("استكمال المتطلبات أولاً")}'`:""}>${t("إحالة إلى سلسلة المراجعة")}</button>`:
        chainIdx>=1 && chainIdx<FR_CHAIN.length-1 ?
-        `<button class="btn primary" id="fr-advance">${t("نقل إلى مرحلة")} «${t(FR_CHAIN[chainIdx+1])}»</button>
+        `<button class="btn primary" id="fr-advance">${t("نقل إلى مرحلة")} ${QQ(t(FR_CHAIN[chainIdx+1]))}</button>
          <button class="btn danger" id="fr-return">${t("إعادة للاستكمال")}</button>`:""}
     </div>
     ${!complete && (r.stage==="الإعداد"||r.stage==="معاد للاستكمال")? `<div class="mini-note mt">⚠ ${t("لا يمكن الإحالة قبل اكتمال المتطلبات الثمانية")}.</div>`:""}`;
@@ -1271,7 +1273,7 @@ function openFR(id){
   if(el("fr-advance")) el("fr-advance").addEventListener("click",()=>{
     if(!frComplete(r)){ toast("لا يمكن نقل الطلب — يُعاد للاستكمال لمعالجة النواقص"); return; }
     r.stage = FR_CHAIN[chainIdx+1];
-    save(); refresh(); openFR(id); toast(`${t("انتقل الطلب إلى مرحلة")} «${t(r.stage)}»`);
+    save(); refresh(); openFR(id); toast(`${t("انتقل الطلب إلى مرحلة")} ${QQ(t(r.stage))}`);
   });
   if(el("fr-return")) el("fr-return").addEventListener("click",()=>{
     r.stage = "معاد للاستكمال"; r.note = "أعيد الطلب لاستيفاء ملاحظات المراجعة.";
@@ -1287,15 +1289,15 @@ RENDER.studies = {
     const f = S.filters.studyType;
     const types = ["الكل","سعة وطلب","الدراسات الخمس","هندسة قيمية"];
     const list = S.data.studies.filter(s=>f==="الكل"||s.type===f);
-    const avg = t=>{
-      const l = S.data.studies.filter(s=>t==="الكل"||s.type===t);
+    const avg = ty=>{
+      const l = S.data.studies.filter(s=>ty==="الكل"||s.type===ty);
       return l.length? Math.round(l.reduce((x,s)=>x+s.completeness,0)/l.length):0;
     };
     return `
     <div class="stat-strip">
       ${kpiTile("book","",t("إجمالي الدراسات"), `${ltr(n(S.data.studies.length))}`, `<span>${n(S.data.studies.filter(s=>s.status==="معتمدة"||s.status==="مكتملة").length)} ${t("معتمدة/مكتملة")}</span>`)}
-      ${kpiTile("gauge","",t("متوسط اكتمال دراسات السعة والطلب"), pct(avg(t("سعة وطلب"))), `<span>${t("منهجية الخطوات السبع حسب فئة الأصول")}</span>`)}
-      ${kpiTile("doc","n",t("متوسط اكتمال الدراسات الخمس"), pct(avg(t("الدراسات الخمس"))), `<span>${t("النموذج الخماسي للجدوى")}</span>`)}
+      ${kpiTile("gauge","",t("متوسط اكتمال دراسات السعة والطلب"), pct(avg("سعة وطلب")), `<span>${t("منهجية الخطوات السبع حسب فئة الأصول")}</span>`)}
+      ${kpiTile("doc","n",t("متوسط اكتمال الدراسات الخمس"), pct(avg("الدراسات الخمس")), `<span>${t("النموذج الخماسي للجدوى")}</span>`)}
       ${kpiTile("bulb","g",t("دراسات الهندسة القيمية"), `${ltr(n(S.data.studies.filter(s=>s.type==="هندسة قيمية").length))}`, `<span>${t("وفق منهجية SAVE ومراحل العمل الثماني")}</span>`)}
     </div>
 
@@ -1450,8 +1452,8 @@ RENDER.services = {
         const s = S.data.services[p.dataIndex];
         return `<b>${t(s.name)}</b>` + ttRow(t("تكلفة المعاملة"),`${n(s.unitCost,1)} ${t("ألف ريال")}`) + ttRow(t("الجودة"),n(s.qualityScore)) + ttRow(t("التكلفة الإجمالية"),`${n(s.totalCost,1)} ${t("م.ر")}`) + ttRow(t("التصنيف"),t(s.classification));
       }}),
-      xAxis: Object.assign(valAxis(v=>n(v)), { name:t("الجودة"), inverse:true, nameLocation:"start", nameGap:8, nameTextStyle:{fontFamily:"Cairo",color:"#8B9C91"}, min:60, max:100, position:"bottom" }),
-      yAxis: Object.assign(valAxis(v=>n(v)), { name:t("تكلفة المعاملة (ألف ريال)"), nameGap:16, nameTextStyle:{fontFamily:"Cairo",color:"#8B9C91",align:"left"} }),
+      xAxis: Object.assign(valAxis(v=>n(v)), { name:t("الجودة"), inverse:isAR(), nameLocation:"middle", nameGap:26, nameTextStyle:{fontFamily:"Cairo",color:"#8B9C91"}, min:60, max:100, position:"bottom" }),
+      yAxis: Object.assign(valAxis(v=>n(v)), { name:t("تكلفة المعاملة (ألف ريال)"), nameGap:16, nameTextStyle:{fontFamily:"Cairo",color:"#8B9C91",align:isAR()?"right":"left"} }),
       grid:{ top:44, bottom:44, right:64, left:24 },
       series:[{ type:"scatter",
         data:S.data.services.map(s=>({ value:[s.qualityScore, s.unitCost], symbolSize:Math.max(10,Math.sqrt(s.totalCost)*4),
@@ -1498,7 +1500,7 @@ RENDER.budget = {
       <div class="card">
         <h3>${t("عوامل التكلفة ومسببات الطلب")}</h3>
         <div class="subt">${t("دراسة بنود الميزانية — تصنيف إداري داخلي مواءم مع أبواب الميزانية")}</div>
-        <div style="max-height:380px;overflow-y:auto;padding-bottom:4px">
+        <div class="scroll-fade" style="max-height:380px;overflow-y:auto;padding-bottom:26px">
           ${B.map(c=>`
             <div style="padding:9px 0;border-bottom:1px dashed var(--line2)">
               <b style="font-family:var(--ff-d);font-size:12.5px">${esc(c.name)}</b>
@@ -1544,8 +1546,8 @@ RENDER.budget = {
         return h; }}),
       legend:{ icon:"circle", itemWidth:9, itemHeight:9, top:0, textStyle:{fontFamily:"Cairo",fontSize:11,color:"#5C6E63"} },
       xAxis: hxAxis(v=>n(v)),
-      yAxis: hyAxis(B.map(c=>c.name), 175),
-      grid:{ top:34, bottom:26, right:188, left:20 },
+      yAxis: hyAxis(B.map(c=>c.name), isAR()? 175 : 230),
+      grid:{ top:34, bottom:26, right:isAR()? 188:242, left:20 },
       series:[
         { name:t("المعتمد"), type:"bar", barGap:"-100%", barWidth:16, color:"#E0EEE5", data:B.map(c=>({value:c.approved, itemStyle:{borderRadius:bRad(8)}})), silent:true },
         { name:t("المنصرف"), type:"bar", barWidth:16, color:"#098A4E", data:B.map(c=>({value:c.spent, itemStyle:{borderRadius:bRad(8)}})) },
@@ -1796,7 +1798,7 @@ RENDER.capability = {
       ${kpiTile("users","",t("تغطية مصفوفة المهارات"), pct(C.skillsCoverage), `<span>${t("المستهدف")} ${pct(C.skillsTarget)}</span>`)}
       ${kpiTile("check","",t("نسبة الوعي بكفاءة الإنفاق"), pct(last.score), `<span>${t("آخر قياس")}: ${esc(last.label)} (${t("عدد المشاركين")}: ${n(last.respondents)})</span>`)}
       ${kpiTile("book","n",t("البرامج التدريبية"), `${ltr(n(done))} <small>${t("من")} ${n(C.trainings.length)} ${t("مكتملة")}</small>`, `<span>${n(C.trainings.reduce((s,t)=>s+t.hours,0))} ${t("ساعة تدريبية")}</span>`)}
-      ${kpiTile("flag","g",t("مستوى تبني كفاءة الإنفاق"), `${esc(C.adoption.current)}`, `<span>${t("المستهدف")} «${esc(C.adoption.target)}» 2026–2027</span>`)}
+      ${kpiTile("flag","g",t("مستوى تبني كفاءة الإنفاق"), `${esc(C.adoption.current)}`, `<span>${t("المستهدف")} ${QQ(esc(C.adoption.target))} 2026–2027</span>`)}
     </div>
 
     <div class="grid g21 mt">
@@ -1820,7 +1822,7 @@ RENDER.capability = {
           ${C.incentives.map(x=>`<div class="fld"><b>${esc(x.name)}</b><span><span class="st ${x.status==="مفعّلة"?"ok":"warn"}">${esc(x.status)}</span></span></div>`).join("")}
         </div>
         ${C.nominations? `<div class="dsec"><h4>${t("دورة الترشيح والتكريم (ترشيح ← تقييم اللجنة الإشرافية ← إعلان)")}</h4>
-          ${C.nominations.map(x=>`<div class="fld"><b style="max-width:60%">${esc(x.nominee)}</b><span><span class="st ${x.stage.startsWith("إعلان")?"ok":x.stage.startsWith("تقييم")?"info":"mut"}">${esc(x.stage)}</span> ${esc(x.criterion)}</span></div>`).join("")}
+          ${C.nominations.map(x=>`<div class="fld"><b style="max-width:60%">${esc(x.nominee).replace(/\(([A-Za-z0-9-]+)\)/g,'<span class="ltr">($1)</span>')}</b><span><span class="st ${x.stage.startsWith("إعلان")?"ok":x.stage.startsWith("تقييم")?"info":"mut"}">${esc(x.stage)}</span> · ${esc(x.criterion)}</span></div>`).join("")}
         </div>`:""}
       </div>
     </div>
@@ -1879,7 +1881,7 @@ RENDER.capability = {
       tooltip: Object.assign({},TT(),{trigger:"axis", formatter:ps=>`<b>${ps[0].axisValue}</b>`+ttRow(t("نسبة الوعي"),pct(ps[0].value),"#098A4E")}),
       xAxis: catXAxis(C.awareness.surveys.map(s=>s.label), { boundaryGap:false }),
       yAxis: Object.assign(valAxis(v=>n(v)+"%"), {max:100}),
-      grid:{ top:22, bottom:28, right:46, left:24 },
+      grid:{ top:22, bottom:28, right:74, left:74, containLabel:true },
       series:[{ type:"line", data:C.awareness.surveys.map(s=>s.score), smooth:true, symbol:"circle", symbolSize:8,
         lineStyle:{color:"#098A4E",width:3}, itemStyle:{color:"#098A4E"},
         label:{show:true, position:"top", fontFamily:"IBM Plex Sans Arabic", fontWeight:700, color:"#0B4028", formatter:p=>n(p.value)+"%"},
@@ -1912,7 +1914,7 @@ RENDER.reports = {
             <h3>${r.t}</h3>
           </div>
           <div class="mini-note">${r.d}</div>
-          <div style="margin-top:14px;font-family:var(--ff-d);font-weight:600;font-size:12px;color:var(--green)">${t("إنشاء التقرير")} ←</div>
+          <div style="margin-top:14px;font-family:var(--ff-d);font-weight:600;font-size:12px;color:var(--green)">${t("إنشاء التقرير")} ${ARROW()}</div>
         </div>`).join("")}
     </div>
 
