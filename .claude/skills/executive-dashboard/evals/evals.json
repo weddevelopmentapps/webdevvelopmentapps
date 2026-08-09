@@ -1,0 +1,21 @@
+{
+ "skill_name": "executive-dashboard",
+ "evals": [
+  {
+   "id": 0,
+   "prompt": "أحتاج منصة تنفيذية لمكتب إدارة المشاريع (PMO) في جهة حكومية سعودية (استخدم وزارة البلديات والإسكان كجهة تجريبية للعرض). عربي بالكامل، للقيادات: صحة محفظة المشاريع، بوابات المراحل، المشاريع المتعثرة، القيمة المكتسبة، تحقق المنافع، لجنة المحفظة وقراراتها، وتقارير دورية. أريدها جاهزة كملف واحد يفتح بدون إنترنت ويعمل على الجوال.",
+   "expected_output": "Self-contained Arabic RTL index.html PMO platform: portfolio health hero, stage-gate lifecycle with enforced gates, EVM KPIs, benefits register, governance, reports; zero console errors; clean at 390px; editorial design (no AI-dashboard tells); professional Arabic.",
+   "files": [],
+   "assertions": [
+    "index.html exists and is fully self-contained (no external http(s) resources referenced in src/href)",
+    "Page declares Arabic RTL (dir=\"rtl\" and lang=\"ar\")",
+    "Zero console/page errors across all tabs (qa_scan gate 1, exit 0)",
+    "Zero horizontal overflow at 390px on all tabs (qa_scan gate 2)",
+    "Mobile bottom navigation renders at 390px width",
+    "No Arabic calque terms in visible text (خط أنابيب / شلال / لوحة كانبان)",
+    "Data layer generate_data.py exists and contains reconciliation assert statements",
+    "App persists edits to localStorage"
+   ]
+  }
+ ]
+}
