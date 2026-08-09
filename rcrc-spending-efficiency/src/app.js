@@ -9,6 +9,45 @@ const SEED = window.DATA;
 const LS_KEY = "rcrcSE.v1";
 const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+/* ---------------- i18n ---------------- */
+const EN_DICT = {};
+for(const [k,v] of Object.entries(window.EN_DICT || {}))
+  EN_DICT[k.trim().replace(/\s+/g," ")] = v;
+let LANG = localStorage.getItem("rcrcSE.lang") || "ar";
+{ const q = new URLSearchParams(location.search).get("lang");
+  if(q==="en"||q==="ar"){ LANG=q; localStorage.setItem("rcrcSE.lang", q); } }
+const isAR = ()=>LANG==="ar";
+function t(s){
+  if(LANG==="ar" || s==null) return s;
+  const k = String(s).trim().replace(/\s+/g," ");
+  return EN_DICT[k] !== undefined ? EN_DICT[k] : s;
+}
+function setLang(l){
+  LANG = l;
+  localStorage.setItem("rcrcSE.lang", l);
+  document.documentElement.dir = l==="ar" ? "rtl" : "ltr";
+  document.documentElement.lang = l;
+  applyStaticI18n();
+  refresh();
+}
+function applyStaticI18n(){
+  const q = s=>document.querySelector(s);
+  const set = (sel, ar)=>{ const el=q(sel); if(el) el.textContent = t(ar); };
+  set("#mast-h1", "منصة استدامة كفاءة الإنفاق");
+  set(".mast-title .entity", "الهيئة الملكية لمدينة الرياض");
+  const sub = q("#mast-sub"); if(sub) sub.textContent = t(S.data.meta.subtitle);
+  set("#demo-chip", "بيانات تجريبية لأغراض العرض");
+  const asof = q("#asof-chip"); if(asof) asof.textContent = `${t("محدثة حتى")} ${fmtDate(S.data.meta.asOf)}`;
+  const labels = { "btn-export":"تصدير", "btn-import":"استيراد", "btn-print":"طباعة", "btn-reset":"استرجاع" };
+  Object.entries(labels).forEach(([id, ar])=>{
+    const b = document.getElementById(id);
+    if(b){ const node=[...b.childNodes].find(n=>n.nodeType===3 && n.textContent.trim()); if(node) node.textContent = " " + t(ar); }
+  });
+  const bl = document.getElementById("btn-lang");
+  if(bl) bl.textContent = LANG==="ar" ? "English" : "العربية";
+  document.title = t("منصة استدامة كفاءة الإنفاق") + " — " + t("الهيئة الملكية لمدينة الرياض");
+}
+
 function deepClone(o){ return JSON.parse(JSON.stringify(o)); }
 
 let S = {
@@ -38,7 +77,7 @@ function save(){
   }, 250);
 }
 function resetData(){
-  if(!confirm("سيجري استرجاع بيانات العرض الأصلية وستُفقد جميع التعديلات المحلية. هل تريد المتابعة؟")) return;
+  if(!confirm(t("سيجري استرجاع بيانات العرض الأصلية وستُفقد جميع التعديلات المحلية. هل تريد المتابعة؟"))) return;
   localStorage.removeItem(LS_KEY);
   S.data = deepClone(SEED);
   refresh(); toast("تم استرجاع البيانات الأصلية");
@@ -50,20 +89,20 @@ function n(x, d){ return (d==null? NF.format(Math.round(x)) : Number(x).toLocale
 function ltr(s){ return `<span class="ltr">${s}</span>`; }
 function money(m){  // m in SAR millions
   if(m == null) return "—";
-  if(Math.abs(m) >= 1000) return `${ltr(n(m/1000,2))} مليار ريال`;
-  return `${ltr(n(m))} مليون ريال`;
+  if(Math.abs(m) >= 1000) return `${ltr(n(m/1000,2))} ${t("مليار ريال")}`;
+  return `${ltr(n(m))} ${t("مليون ريال")}`;
 }
 function moneyShort(m){
-  if(Math.abs(m) >= 1000) return `${ltr(n(m/1000,1))} مليار`;
-  return `${ltr(n(m))} م.ر`;
+  if(Math.abs(m) >= 1000) return `${ltr(n(m/1000,1))} ${t("مليار")}`;
+  return `${ltr(n(m))} ${t("م.ر")}`;
 }
 function pct(x,d){ return `${ltr(n(x, d==null?0:d)+"%")}`; }
-function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+function esc(s){ return String(s==null?"":t(s)).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
 const AR_MONTHS = {"01":"يناير","02":"فبراير","03":"مارس","04":"أبريل","05":"مايو","06":"يونيو","07":"يوليو","08":"أغسطس","09":"سبتمبر","10":"أكتوبر","11":"نوفمبر","12":"ديسمبر"};
 function fmtDate(iso){
   if(!iso) return "—";
   const [y,m,d] = iso.split("-");
-  return `${parseInt(d||1)} ${AR_MONTHS[m]||""} ${y}`;
+  return `${parseInt(d||1)} ${t(AR_MONTHS[m]||"")} ${y}`;
 }
 function daysBetween(a, b){ return Math.round((new Date(b) - new Date(a)) / 86400000); }
 
@@ -120,8 +159,8 @@ function statusCount(){
   S.data.initiatives.forEach(i=>{ if(m[i.status]!=null) m[i.status]++; });
   return m;
 }
-function progName(id){ const p = S.data.programs.find(p=>p.id===id); return p? p.name : id; }
-function progShort(id){ const p = S.data.programs.find(p=>p.id===id); return p? (p.short||p.name) : id; }
+function progName(id){ const p = S.data.programs.find(p=>p.id===id); return p? t(p.name) : id; }
+function progShort(id){ const p = S.data.programs.find(p=>p.id===id); return p? t(p.short||p.name) : id; }
 
 /* ---------------- funding chain ---------------- */
 const FR_CHAIN = ["الإعداد","مراجعة المقيّم","مراجعة قائد الفريق","مراجعة المالية","اعتماد المسؤول الأول","مرفوع لوزارة المالية","معتمد"];
@@ -141,19 +180,19 @@ function buildAlerts(){
   const A = [];
   const asOf = S.data.meta.asOf;
   S.data.initiatives.filter(i=>i.flag==="متعثرة").forEach(i=>
-    A.push({sev:"bad", t:`مبادرة متعثرة: ${i.name}`, d:i.note||"تتطلب قراراً من اللجنة الإشرافية.", tab:"initiatives"}));
+    A.push({sev:"bad", t:`${t("مبادرة متعثرة")}: ${t(i.name)}`, d:i.note||"تتطلب قراراً من اللجنة الإشرافية.", tab:"initiatives"}));
   S.data.initiatives.filter(i=>i.flag==="متأخرة").forEach(i=>
-    A.push({sev:"warn", t:`مبادرة متأخرة عن الخط الزمني: ${i.name}`, d:i.note||"يلزم تحديث خطة المعالجة.", tab:"initiatives"}));
+    A.push({sev:"warn", t:`${t("مبادرة متأخرة عن الخط الزمني")}: ${t(i.name)}`, d:i.note||"يلزم تحديث خطة المعالجة.", tab:"initiatives"}));
   S.data.fundingRequests.filter(r=>r.stage==="معاد للاستكمال").forEach(r=>
-    A.push({sev:"warn", t:`طلب تمويل معاد للاستكمال: ${r.name}`, d:r.note||"استكمال المتطلبات قبل إعادة الرفع.", tab:"funding"}));
+    A.push({sev:"warn", t:`${t("طلب تمويل معاد للاستكمال")}: ${t(r.name)}`, d:r.note||"استكمال المتطلبات قبل إعادة الرفع.", tab:"funding"}));
   const missing = allCriteria().filter(c=>c.evidence.some(e=>e.status==="غير متوفر"));
   if(missing.length)
-    A.push({sev:"warn", t:`${n(missing.length)} من المعايير تنقصها وثائق داعمة`, d:"استكمال الوثائق شرط أساسي لدرجة «متميز» في التقييم.", tab:"skep"});
+    A.push({sev:"warn", t:`${n(missing.length)} ${t("من المعايير تنقصها وثائق داعمة")}`, d:"استكمال الوثائق شرط أساسي لدرجة «متميز» في التقييم.", tab:"skep"});
   const weak = allCriteria().filter(c=>c.simScore<=2);
-  weak.forEach(c=>A.push({sev:"bad", t:`معيار منخفض في تقييم المحاكاة: ${c.code} ${c.name}`, d:"يتطلب خطة معالجة عاجلة قبل التقييم النهائي.", tab:"skep"}));
+  weak.forEach(c=>A.push({sev:"bad", t:`${t("معيار منخفض في تقييم المحاكاة")}: ${c.code} ${t(c.name)}`, d:"يتطلب خطة معالجة عاجلة قبل التقييم النهائي.", tab:"skep"}));
   const dLeft = daysBetween(asOf, S.data.assessmentCycle.selfDue);
-  A.push({sev: dLeft<=45?"warn":"info", t:`${n(dLeft)} يوماً حتى موعد التقييم الذاتي للدورة السابعة`,
-          d:`آخر موعد للتقييم الذاتي ${fmtDate(S.data.assessmentCycle.selfDue)} ورفع الوثائق ${fmtDate(S.data.assessmentCycle.docsDue)}.`, tab:"skep"});
+  A.push({sev: dLeft<=45?"warn":"info", t:`${n(dLeft)} ${t("يوماً حتى موعد التقييم الذاتي للدورة السابعة")}`,
+          d:`${t("آخر موعد للتقييم الذاتي")} ${fmtDate(S.data.assessmentCycle.selfDue)} ${t("ورفع الوثائق")} ${fmtDate(S.data.assessmentCycle.docsDue)}.`, tab:"skep"});
   return A;
 }
 
@@ -174,51 +213,59 @@ function chart(id){
   if(!CH[id]) CH[id] = echarts.init(el);
   return CH[id];
 }
-const TT = {
+const TT = ()=>({
   trigger:"item", backgroundColor:"#131D17", borderColor:"transparent", borderWidth:0,
   textStyle:{ color:"#F1F5F2", fontFamily:"Cairo", fontSize:12 },
-  extraCssText:"direction:rtl;text-align:right;box-shadow:0 14px 40px rgba(10,20,15,.35);border-radius:13px;padding:11px 15px;",
-};
+  extraCssText:(isAR()? "direction:rtl;text-align:right;" : "direction:ltr;text-align:left;") +
+    "box-shadow:0 14px 40px rgba(10,20,15,.35);border-radius:13px;padding:11px 15px;",
+});
 function ttRow(k, v, color){
   return `<div style="display:flex;justify-content:space-between;gap:18px;align-items:center;margin:2px 0">
-    <span style="color:#A9B6AE">${color?`<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${color};margin-left:6px"></span>`:""}${k}</span>
+    <span style="color:#A9B6AE">${color?`<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${color};margin-inline-end:6px"></span>`:""}${k}</span>
     <b style="font-family:'IBM Plex Sans Arabic';color:#FFF">${v}</b></div>`;
 }
 function base(extra){
-  return Object.assign({
+  const o = Object.assign({
     animation: !REDUCED,
     animationDuration: 300,          // short: printed/captured views always show final values
     textStyle:{ fontFamily:"Cairo" },
     grid:{ top:30, bottom:28, right:14, left:52, containLabel:false },
   }, extra);
+  /* grid insets are authored for RTL (value labels at the right); mirror for LTR */
+  if(!isAR() && o.grid && o.grid.left!=null && o.grid.right!=null)
+    o.grid = Object.assign({}, o.grid, { left:o.grid.right, right:o.grid.left });
+  return o;
 }
 const AX_LINE = "rgba(17,24,21,.1)", AX_SPLIT = "rgba(17,24,21,.055)", AX_LBL = "#93A099", AX_CAT = "#6B7870";
+const tArr = a=>a.map(x=>t(x));
+const bRad = r=> isAR()? [r,0,0,r] : [0,r,r,0];       // rounded tip of horizontal bars
+const hLbl = ()=> isAR()? "left" : "right";           // value label at the growing tip
 function catAxis(data){
-  return { type:"category", data, inverse:true,
+  return { type:"category", data:tArr(data), inverse:isAR(),
     axisLine:{ lineStyle:{ color:AX_LINE } }, axisTick:{ show:false },
     axisLabel:{ color:AX_CAT, fontFamily:"Cairo", fontSize:11 } };
 }
 function valAxis(fmt){
-  return { type:"value", position:"right",
+  return { type:"value", position: isAR()? "right":"left",
     splitLine:{ lineStyle:{ color:AX_SPLIT } }, axisLabel:{ color:AX_LBL, fontFamily:"IBM Plex Sans Arabic", fontSize:10.5, formatter:fmt } };
 }
-/* RTL horizontal bars: bars grow right<-left, category labels on the RIGHT */
+/* horizontal bars: grow from the inline-start edge, category labels at inline-start */
 function hxAxis(fmt, max){
-  const a = { type:"value", inverse:true,
+  const a = { type:"value", inverse:isAR(),
     splitLine:{ lineStyle:{ color:AX_SPLIT } },
     axisLabel:{ color:AX_LBL, fontFamily:"IBM Plex Sans Arabic", fontSize:10.5, formatter:fmt } };
   if(max!=null) a.max = max;
   return a;
 }
 function hyAxis(data, labelWidth){
-  return { type:"category", data, position:"right", inverse:true,
+  return { type:"category", data:tArr(data), position: isAR()? "right":"left", inverse:true,
     axisLine:{ lineStyle:{ color:"transparent" } }, axisTick:{ show:false },
     axisLabel:{ color:AX_CAT, fontFamily:"Cairo", fontSize:11,
       width: labelWidth||null, overflow: labelWidth? "truncate":"none" } };
 }
-/* RTL vertical charts: category x-axis reads right -> left */
+/* vertical charts: category x-axis reads with the language direction */
 function catXAxis(data, extra){
-  return Object.assign({ type:"category", data, inverse:true,
+  return Object.assign({ type:"category", data:tArr(data), inverse:isAR(),
     axisLine:{ lineStyle:{ color:AX_LINE } }, axisTick:{ show:false },
     axisLabel:{ color:AX_CAT, fontFamily:"Cairo", fontSize:11 } }, extra||{});
 }
@@ -282,8 +329,8 @@ const TABS = [
 ];
 const BN_MAIN = ["home","skep","initiatives","impact"];
 function renderTabbar(){
-  document.getElementById("tabbar-inner").innerHTML = TABS.map(t=>
-    `<button class="tab ${S.tab===t.id?"on":""}" data-tab="${t.id}" ${S.tab===t.id?'aria-current="page"':""}>${svgi(t.icon)}${t.name}</button>`
+  document.getElementById("tabbar-inner").innerHTML = TABS.map(tb=>
+    `<button class="tab ${S.tab===tb.id?"on":""}" data-tab="${tb.id}" ${S.tab===tb.id?'aria-current="page"':""}>${svgi(tb.icon)}${t(tb.name)}</button>`
   ).join("");
   renderBottomNav();
 }
@@ -292,26 +339,26 @@ function renderBottomNav(){
   if(!bn) return;
   const inMore = !BN_MAIN.includes(S.tab);
   bn.innerHTML = BN_MAIN.map(id=>{
-    const t = TABS.find(x=>x.id===id);
-    return `<button class="bn-item ${S.tab===id?"on":""}" data-tab="${id}">${svgi(t.icon)}${t.name}</button>`;
-  }).join("") + `<button class="bn-item ${inMore?"on":""}" id="bn-more">${svgi("gridic")}المزيد</button>`;
+    const tb = TABS.find(x=>x.id===id);
+    return `<button class="bn-item ${S.tab===id?"on":""}" data-tab="${id}">${svgi(tb.icon)}${t(tb.name)}</button>`;
+  }).join("") + `<button class="bn-item ${inMore?"on":""}" id="bn-more">${svgi("gridic")}${t("المزيد")}</button>`;
   bn.querySelectorAll("[data-tab]").forEach(b=>b.addEventListener("click",()=>{ closeMoreSheet(); go(b.dataset.tab); }));
   document.getElementById("bn-more").addEventListener("click", openMoreSheet);
 }
 function openMoreSheet(){
   const ms = document.getElementById("ms-body");
   ms.innerHTML = `
-    <h4>الأقسام</h4>
+    <h4>${t("الأقسام")}</h4>
     <div class="ms-grid">
-      ${TABS.filter(t=>!BN_MAIN.includes(t.id)).map(t=>
-        `<button class="ms-item ${S.tab===t.id?"on":""}" data-tab="${t.id}">${svgi(t.icon)}${t.name}</button>`).join("")}
+      ${TABS.filter(tb=>!BN_MAIN.includes(tb.id)).map(tb=>
+        `<button class="ms-item ${S.tab===tb.id?"on":""}" data-tab="${tb.id}">${svgi(tb.icon)}${t(tb.name)}</button>`).join("")}
     </div>
-    <h4>البيانات</h4>
+    <h4>${t("البيانات")}</h4>
     <div class="ms-grid">
-      <button class="ms-item" data-act="export">${svgi("doc")}تصدير</button>
-      <button class="ms-item" data-act="import">${svgi("doc")}استيراد</button>
-      <button class="ms-item" data-act="print">${svgi("file")}طباعة</button>
-      <button class="ms-item" data-act="reset">${svgi("clock")}استرجاع</button>
+      <button class="ms-item" data-act="export">${svgi("doc")}${t("تصدير")}</button>
+      <button class="ms-item" data-act="import">${svgi("doc")}${t("استيراد")}</button>
+      <button class="ms-item" data-act="print">${svgi("file")}${t("طباعة")}</button>
+      <button class="ms-item" data-act="reset">${svgi("clock")}${t("استرجاع")}</button>
     </div>`;
   ms.querySelectorAll("[data-tab]").forEach(b=>b.addEventListener("click",()=>{ closeMoreSheet(); go(b.dataset.tab); }));
   ms.querySelectorAll("[data-act]").forEach(b=>b.addEventListener("click",()=>{
@@ -342,12 +389,12 @@ const APP = document.getElementById("app");
 function refresh(){
   renderTabbar();
   const R = RENDER[S.tab] || RENDER.home;
-  const t = TABS.find(x=>x.id===S.tab);
-  const head = (!R.hero && t && t.desc)
+  const tb = TABS.find(x=>x.id===S.tab);
+  const head = (!R.hero && tb && tb.desc)
     ? `<header class="page-head">
-         <div class="kicker">${esc(t.kicker||"")}</div>
-         <h1>${esc(t.name)}</h1>
-         <div class="desc">${esc(t.desc)}</div>
+         <div class="kicker">${esc(tb.kicker||"")}</div>
+         <h1>${esc(tb.name)}</h1>
+         <div class="desc">${esc(tb.desc)}</div>
        </header>`
     : "";
   APP.innerHTML = head + R.html();
@@ -387,69 +434,69 @@ RENDER.home = {
     <section class="hero">
       <div class="hero-top">
         <div class="hero-main">
-          <div class="lbl">الجاهزية الشاملة لبرنامج ركائز استدامة كفاءة الإنفاق — الدورة السابعة</div>
-          <div class="hero-score"><span class="big num">${n(ov,1)}</span><span class="of">من 5</span></div>
-          <div class="hero-grade"><i></i> ${g} — التقييم الذاتي · المحاكاة المستقلة ${ltr(n(ovSim,1))} (${gradeOf(ovSim)})</div>
+          <div class="lbl">${t("الجاهزية الشاملة لبرنامج ركائز استدامة كفاءة الإنفاق — الدورة السابعة")}</div>
+          <div class="hero-score"><span class="big num">${n(ov,1)}</span><span class="of">${t("من 5")}</span></div>
+          <div class="hero-grade"><i></i> ${g} — ${t("التقييم الذاتي · المحاكاة المستقلة")} ${ltr(n(ovSim,1))} (${gradeOf(ovSim)})</div>
         </div>
         <div class="hero-side">
           <div class="hero-cell">
-            <div class="l">الأثر المالي المحقق 2026</div>
+            <div class="l">${t("الأثر المالي المحقق 2026")}</div>
             <div class="v num">${n(real2026)}</div>
-            <div class="s">مليون ريال · ${pct(real2026/tgt*100)} من المستهدف</div>
+            <div class="s">${t("مليون ريال")} · ${pct(real2026/tgt*100)} ${t("من المستهدف")}</div>
           </div>
           <div class="hero-cell">
-            <div class="l">الالتزام بالمبادرات</div>
+            <div class="l">${t("الالتزام بالمبادرات")}</div>
             <div class="v num">${n(ist.commitment,1)}%</div>
-            <div class="s">المستهدف ${pct(92)} · ${n(ist.flagged)} متأخرة/متعثرة</div>
+            <div class="s">${t("المستهدف")} ${pct(92)} · ${n(ist.flagged)} ${t("متأخرة/متعثرة")}</div>
           </div>
           <div class="hero-cell">
-            <div class="l">الوثائق الداعمة</div>
+            <div class="l">${t("الوثائق الداعمة")}</div>
             <div class="v num">${evs.coverage}%</div>
-            <div class="s">${n(evs.ready)} من ${n(evs.total)} وثيقة متوفرة</div>
+            <div class="s">${n(evs.ready)} ${t("من")} ${n(evs.total)} ${t("وثيقة متوفرة")}</div>
           </div>
           <div class="hero-cell">
-            <div class="l">المتبقي للتقييم الذاتي</div>
+            <div class="l">${t("المتبقي للتقييم الذاتي")}</div>
             <div class="v num">${n(dLeft)}</div>
-            <div class="s">يوماً · ${fmtDate(S.data.assessmentCycle.selfDue)}</div>
+            <div class="s">${t("يوماً")} · ${fmtDate(S.data.assessmentCycle.selfDue)}</div>
           </div>
         </div>
       </div>
-      <div class="meter" aria-label="مسار النضج نحو متميز">
+      <div class="meter" aria-label="${t("مسار النضج نحو متميز")}">
         <div class="meter-track">
-          <div class="meter-zone" style="right:${pos(S.data.maturity.targetScore)}%;left:0"></div>
+          <div class="meter-zone" style="inset-inline-start:${pos(S.data.maturity.targetScore)}%;inset-inline-end:0"></div>
           <div class="meter-fill" style="width:${pos(ov)}%"></div>
         </div>
         <div class="meter-marks">
-          <div class="meter-mark" style="right:${pos(ovPrev)}%"><b class="num">${n(ovPrev,1)}</b><span class="ml">الدورة السادسة</span></div>
-          <div class="meter-mark" style="right:${pos(ovSim)}%"><b class="num">${n(ovSim,1)}</b><span class="ml">المحاكاة المستقلة</span></div>
-          <div class="meter-mark strong" style="right:${pos(ov)}%"><b class="num">${n(ov,1)}</b><span class="ml">التقييم الذاتي</span></div>
-          <div class="meter-mark gold" style="right:${pos(S.data.maturity.targetScore)}%"><b class="num">${n(S.data.maturity.targetScore,1)}</b><span class="ml">درجة «متميز»</span></div>
+          <div class="meter-mark" style="inset-inline-start:${pos(ovPrev)}%"><b class="num">${n(ovPrev,1)}</b><span class="ml">${t("الدورة السادسة")}</span></div>
+          <div class="meter-mark" style="inset-inline-start:${pos(ovSim)}%"><b class="num">${n(ovSim,1)}</b><span class="ml">${t("المحاكاة المستقلة")}</span></div>
+          <div class="meter-mark strong" style="inset-inline-start:${pos(ov)}%"><b class="num">${n(ov,1)}</b><span class="ml">${t("التقييم الذاتي")}</span></div>
+          <div class="meter-mark gold" style="inset-inline-start:${pos(S.data.maturity.targetScore)}%"><b class="num">${n(S.data.maturity.targetScore,1)}</b><span class="ml">${t("درجة «متميز»")}</span></div>
         </div>
       </div>
     </section>
 
     <div class="grid g21 mt">
       <div class="card">
-        <h3>مسار الأثر المالي 2026</h3>
-        <div class="subt">المخطط مقابل المحقق شهرياً (مليون ريال) — المستهدف السنوي ${moneyShort(tgt)}</div>
+        <h3>${t("مسار الأثر المالي 2026")}</h3>
+        <div class="subt">${t("المخطط مقابل المحقق شهرياً (مليون ريال) — المستهدف السنوي")} ${moneyShort(tgt)}</div>
         <div id="ch-home-monthly" class="chart ch-290"></div>
       </div>
       <div class="card">
-        <h3>نضج الركائز السبع</h3>
-        <div class="subt">ذاتي / محاكاة / الدورة السادسة</div>
+        <h3>${t("نضج الركائز السبع")}</h3>
+        <div class="subt">${t("ذاتي / محاكاة / الدورة السادسة")}</div>
         <div id="ch-home-radar" class="chart ch-290"></div>
       </div>
     </div>
 
     <div class="grid g2 mt">
       <div class="card">
-        <h3>المبادرات حسب مراحل دورة الحياة</h3>
-        <div class="subt">عدد المبادرات في كل مرحلة</div>
+        <h3>${t("المبادرات حسب مراحل دورة الحياة")}</h3>
+        <div class="subt">${t("عدد المبادرات في كل مرحلة")}</div>
         <div id="ch-home-pipe" class="chart ch-260"></div>
       </div>
       <div class="card">
-        <h3>تنبيهات تستدعي اتخاذ إجراء</h3>
-        <div class="subt">تُستخلص تلقائياً من بيانات المنصة</div>
+        <h3>${t("تنبيهات تستدعي اتخاذ إجراء")}</h3>
+        <div class="subt">${t("تُستخلص تلقائياً من بيانات المنصة")}</div>
         <div style="max-height:260px;overflow-y:auto">
           ${alerts.slice(0,7).map(a=>`
             <div class="alert ${a.sev}" role="button" data-goto="${a.tab}" style="cursor:pointer">
@@ -462,23 +509,23 @@ RENDER.home = {
 
     <div class="grid g21 mt">
       <div class="card">
-        <h3>الملخص التنفيذي</h3>
-        <div class="subt">أبرز الملاحظات المستخلصة من الوضع الراهن</div>
+        <h3>${t("الملخص التنفيذي")}</h3>
+        <div class="subt">${t("أبرز الملاحظات المستخلصة من الوضع الراهن")}</div>
         ${homeInsights()}
       </div>
       <div class="card goldrule">
-        <h3>دورة التقييم السابعة</h3>
+        <h3>${t("دورة التقييم السابعة")}</h3>
         <div class="subt">${esc(S.data.assessmentCycle.name)}</div>
         <div class="countdown" style="margin:12px 0 16px">
-          <div class="cd-box"><b>${n(dLeft)}</b><span>يوماً للتقييم الذاتي</span></div>
-          <div class="cd-box"><b>${n(daysBetween(S.data.meta.asOf, S.data.assessmentCycle.docsDue))}</b><span>يوماً لرفع الوثائق</span></div>
+          <div class="cd-box"><b>${n(dLeft)}</b><span>${t("يوماً للتقييم الذاتي")}</span></div>
+          <div class="cd-box"><b>${n(daysBetween(S.data.meta.asOf, S.data.assessmentCycle.docsDue))}</b><span>${t("يوماً لرفع الوثائق")}</span></div>
         </div>
-        <div class="fld"><b>التقييم الذاتي</b><span>${fmtDate(S.data.assessmentCycle.selfDue)}</span></div>
-        <div class="fld"><b>رفع الوثائق الداعمة</b><span>${fmtDate(S.data.assessmentCycle.docsDue)}</span></div>
-        <div class="fld"><b>النتائج المتوقعة</b><span>${fmtDate(S.data.assessmentCycle.resultsExpected)}</span></div>
-        <div class="fld"><b>جهة التقييم الرسمية</b><span>${esc(S.data.assessmentCycle.committee)}</span></div>
-        <div class="fld"><b>محاكاة التقييم</b><span>${esc(S.data.assessmentCycle.simulation||"")}</span></div>
-        <button class="btn primary mt" data-goto="skep" style="width:100%;justify-content:center">فتح لوحة الركائز</button>
+        <div class="fld"><b>${t("التقييم الذاتي")}</b><span>${fmtDate(S.data.assessmentCycle.selfDue)}</span></div>
+        <div class="fld"><b>${t("رفع الوثائق الداعمة")}</b><span>${fmtDate(S.data.assessmentCycle.docsDue)}</span></div>
+        <div class="fld"><b>${t("النتائج المتوقعة")}</b><span>${fmtDate(S.data.assessmentCycle.resultsExpected)}</span></div>
+        <div class="fld"><b>${t("جهة التقييم الرسمية")}</b><span>${esc(S.data.assessmentCycle.committee)}</span></div>
+        <div class="fld"><b>${t("محاكاة التقييم")}</b><span>${esc(S.data.assessmentCycle.simulation||"")}</span></div>
+        <button class="btn primary mt" data-goto="skep" style="width:100%;justify-content:center">${t("فتح لوحة الركائز")}</button>
       </div>
     </div>`;
   },
@@ -487,18 +534,18 @@ RENDER.home = {
     // monthly line
     const m = S.data.impact.monthly2026;
     chart("ch-home-monthly").setOption(base({
-      tooltip: Object.assign({},TT,{trigger:"axis", formatter: ps=>{
+      tooltip: Object.assign({},TT(),{trigger:"axis", formatter: ps=>{
         let h = `<b>${ps[0].axisValue}</b>`;
-        ps.forEach(p=>h+=ttRow(p.seriesName, `${n(p.value)} م.ر`, p.color));
+        ps.forEach(p=>h+=ttRow(p.seriesName, `${n(p.value)} ${t("م.ر")}`, p.color));
         return h; }}),
       legend:{ icon:"circle", itemWidth:9, itemHeight:9, textStyle:{fontFamily:"Cairo",fontSize:11,color:"#5C6E63"}, top:0 },
       xAxis: catXAxis(m.map(x=>x.m)),
       yAxis: valAxis(v=>n(v)),
       grid:{ top:34, bottom:26, right:46, left:12 },
       series:[
-        { name:"المخطط", type:"line", data:m.map(x=>x.plan), smooth:true, symbol:"circle", symbolSize:6,
+        { name:t("المخطط"), type:"line", data:m.map(x=>x.plan), smooth:true, symbol:"circle", symbolSize:6,
           lineStyle:{color:"#C7A34F",width:2.5,type:"dashed"}, itemStyle:{color:"#C7A34F"} },
-        { name:"المحقق", type:"line", data:m.map(x=>x.real), smooth:true, symbol:"circle", symbolSize:6,
+        { name:t("المحقق"), type:"line", data:m.map(x=>x.real), smooth:true, symbol:"circle", symbolSize:6,
           lineStyle:{color:"#098A4E",width:3}, itemStyle:{color:"#098A4E"},
           areaStyle:{color:{type:"linear",x:0,y:0,x2:0,y2:1,colorStops:[{offset:0,color:"rgba(9,138,78,.22)"},{offset:1,color:"rgba(9,138,78,0)"}]}} },
       ],
@@ -508,12 +555,12 @@ RENDER.home = {
     // pipeline
     const sc = statusCount();
     chart("ch-home-pipe").setOption(base({
-      tooltip: Object.assign({},TT,{formatter: p=>ttRow(p.name, p.value>=3&&p.value<=10? `${n(p.value)} مبادرات` : p.value===2? "مبادرتان" : p.value===1? "مبادرة واحدة" : `${n(p.value)} مبادرة`, p.color)}),
+      tooltip: Object.assign({},TT(),{formatter: p=>ttRow(p.name, p.value>=3&&p.value<=10? `${n(p.value)} ${t("مبادرات")}` : p.value===2? "مبادرتان" : p.value===1? "مبادرة واحدة" : `${n(p.value)} ${t("مبادرة")}`, p.color)}),
       xAxis: hxAxis(v=>n(v)),
       yAxis: hyAxis(INI_STAGES),
       grid:{ top:12, bottom:26, right:86, left:34 },
-      series:[{ type:"bar", data: INI_STAGES.map(s=>({value:sc[s], itemStyle:{color:"#098A4E", borderRadius:[6,0,0,6]}})),
-        barWidth:14, label:{show:true, position:"left", fontFamily:"IBM Plex Sans Arabic", color:"#6B7870", formatter:p=>n(p.value)} }],
+      series:[{ type:"bar", data: INI_STAGES.map(s=>({value:sc[s], itemStyle:{color:"#098A4E", borderRadius:bRad(6)}})),
+        barWidth:14, label:{show:true, position:hLbl(), fontFamily:"IBM Plex Sans Arabic", color:"#6B7870", formatter:p=>n(p.value)} }],
     }));
   },
 };
@@ -525,20 +572,20 @@ function homeInsights(){
   const real2026 = S.data.impact.monthly2026.reduce((s,m)=>s+m.real,0);
   const tgt = S.data.meta.impactTarget2026;
   return `
-    <div class="insight navy">التقييم الذاتي الشامل ${ltr(n(overallScore("self"),1))} ومحاكاة التقييم المستقل ${ltr(n(overallScore("sim"),1))} من 5 — الفجوة الفعلية إلى «متميز» تُقاس على نتيجة المحاكاة (${ltr(n(Math.max(0,S.data.maturity.targetScore-overallScore("sim")),1))} نقطة)، ويتركز الجهد المطلوب في ركيزتي <b>قياس الأثر</b> و<b>الأصول والمرافق</b>.</div>
-    <div class="insight">تحقق ${pct(real2026/tgt*100)} من مستهدف الأثر المالي لعام 2026 حتى نهاية يوليو، مع فرص معتمدة من الشؤون المالية بقيمة ${money(it.approved)} بما يدعم بلوغ المستهدف قبل نهاية العام.</div>
-    <div class="insight gold">${n(gaps)} معياراً دون درجة «متمكن» في تقييم المحاكاة المستقلة — معالجة هذه المعايير مع رفع اكتمال الوثائق (حالياً ${pct(evs.coverage)}) هي المسار الأسرع لبلوغ درجة «متميز».</div>
-    <div class="insight">جودة طلبات التمويل المسجلة في لائحة التعقب عند ${pct(fr)} من حيث اكتمال الدراسات الخمس ودراسات السعة والطلب قبل الرفع لوزارة المالية.</div>`;
+    <div class="insight navy">${t("التقييم الذاتي الشامل")} ${ltr(n(overallScore("self"),1))} ${t("ومحاكاة التقييم المستقل")} ${ltr(n(overallScore("sim"),1))} ${t("من 5 — الفجوة الفعلية إلى «متميز» تُقاس على نتيجة المحاكاة")} (${ltr(n(Math.max(0,S.data.maturity.targetScore-overallScore("sim")),1))} ${t("نقطة)، ويتركز الجهد المطلوب في ركيزتي")} <b>${t("قياس الأثر")}</b> ${t("و")}<b>${t("الأصول والمرافق")}</b>.</div>
+    <div class="insight">${t("تحقق")} ${pct(real2026/tgt*100)} ${t("من مستهدف الأثر المالي لعام 2026 حتى نهاية يوليو، مع فرص معتمدة من الشؤون المالية بقيمة")} ${money(it.approved)} ${t("بما يدعم بلوغ المستهدف قبل نهاية العام")}.</div>
+    <div class="insight gold">${n(gaps)} ${t("معياراً دون درجة «متمكن» في تقييم المحاكاة المستقلة — معالجة هذه المعايير مع رفع اكتمال الوثائق (حالياً")} ${pct(evs.coverage)}) ${t("هي المسار الأسرع لبلوغ درجة «متميز»")}.</div>
+    <div class="insight">${t("جودة طلبات التمويل المسجلة في لائحة التعقب عند")} ${pct(fr)} ${t("من حيث اكتمال الدراسات الخمس ودراسات السعة والطلب قبل الرفع لوزارة المالية")}.</div>`;
 }
 function mountRadar(id){
   const c = chart(id); if(!c) return;
   const P = S.data.pillars;
   c.setOption({
     animation:!REDUCED,
-    tooltip: Object.assign({},TT),
+    tooltip: Object.assign({},TT()),
     legend:{ icon:"circle", itemWidth:9, itemHeight:9, bottom:0, textStyle:{fontFamily:"Cairo",fontSize:11,color:"#5C6E63"} },
     radar:{
-      indicator:P.map(p=>({name:p.short, max:5})),
+      indicator:P.map(p=>({name:t(p.short), max:5})),
       radius:"64%", center:["50%","47%"], splitNumber:5,
       axisName:{ color:"#5C6E63", fontFamily:"Cairo", fontSize:11.5 },
       splitArea:{ areaStyle:{ color:["#FFFFFF","#F3F8F4"] } },
@@ -546,9 +593,9 @@ function mountRadar(id){
     },
     series:[{ type:"radar", symbolSize:4,
       data:[
-        { name:"الذاتي", value:P.map(p=>pillarScore(p,"self")), lineStyle:{color:"#098A4E",width:2.5}, itemStyle:{color:"#098A4E"}, areaStyle:{color:"rgba(9,138,78,.14)"} },
-        { name:"المحاكاة", value:P.map(p=>pillarScore(p,"sim")), lineStyle:{color:"#0B4028",width:2}, itemStyle:{color:"#0B4028"} },
-        { name:"الدورة 6", value:P.map(p=>pillarScore(p,"prev")), lineStyle:{color:"#9AA8A0",width:1.6,type:"dashed"}, itemStyle:{color:"#9AA8A0"} },
+        { name:t("الذاتي"), value:P.map(p=>pillarScore(p,"self")), lineStyle:{color:"#098A4E",width:2.5}, itemStyle:{color:"#098A4E"}, areaStyle:{color:"rgba(9,138,78,.14)"} },
+        { name:t("المحاكاة"), value:P.map(p=>pillarScore(p,"sim")), lineStyle:{color:"#0B4028",width:2}, itemStyle:{color:"#0B4028"} },
+        { name:t("الدورة 6"), value:P.map(p=>pillarScore(p,"prev")), lineStyle:{color:"#9AA8A0",width:1.6,type:"dashed"}, itemStyle:{color:"#9AA8A0"} },
       ]}],
   });
 }
@@ -565,30 +612,30 @@ RENDER.skep = {
     const gaps = allCriteria().filter(c=>critScore(c,mode) < 4.5).sort((a,b)=>critScore(a,mode)-critScore(b,mode));
     return `
     <div class="toolbar">
-      <div class="pillbar" role="tablist" aria-label="وضع التقييم">
+      <div class="pillbar" role="tablist" aria-label="${t("وضع التقييم")}">
         <button class="pill ${mode==="self"?"on":""}" data-mode="self">التقييم الذاتي</button>
         <button class="pill ${mode==="sim"?"on":""}" data-mode="sim">محاكاة التقييم المستقل</button>
       </div>
-      <span class="mini-note">اضغط على أي ركيزة لفتح معاييرها وتحديث الدرجات والوثائق</span>
+      <span class="mini-note">${t("اضغط على أي ركيزة لفتح معاييرها وتحديث الدرجات والوثائق")}</span>
       <div class="spacer"></div>
       <span class="grade" style="background:${gradeColor(g)}18;color:${gradeColor(g)}">الشامل: ${ltr(n(ov,1))} — ${g}</span>
     </div>
 
     <div class="grid g21">
       <div class="card">
-        <h3>خريطة نضج الركائز السبع</h3>
-        <div class="subt">درجة كل ركيزة (${mode==="self"?"التقييم الذاتي":"محاكاة التقييم المستقل"}) — الخط الذهبي المتقطع: مستهدف «متميز» ${ltr(n(S.data.maturity.targetScore,1))}</div>
+        <h3>${t("خريطة نضج الركائز السبع")}</h3>
+        <div class="subt">${t("درجة كل ركيزة")} (${mode==="self"?t("التقييم الذاتي"):t("محاكاة التقييم المستقل")}) — ${t("الخط الذهبي المتقطع: مستهدف «متميز»")} ${ltr(n(S.data.maturity.targetScore,1))}</div>
         <div id="ch-skep-bars" class="chart ch-340"></div>
       </div>
       <div class="card">
-        <h3>مقارنة الدورات</h3>
-        <div class="subt">ذاتي / محاكاة / الدورة السادسة</div>
+        <h3>${t("مقارنة الدورات")}</h3>
+        <div class="subt">${t("ذاتي / محاكاة / الدورة السادسة")}</div>
         <div id="ch-skep-radar" class="chart ch-340"></div>
       </div>
     </div>
 
-    <div class="section-head"><h2>الركائز السبع — دورة حياة الإنفاق</h2>
-      <span class="hint">الوثائق الداعمة: ${n(evs.ready)} متوفرة · ${n(evs.prep)} قيد الإعداد · ${n(evs.missing)} غير متوفرة</span></div>
+    <div class="section-head"><h2>${t("الركائز السبع — دورة حياة الإنفاق")}</h2>
+      <span class="hint">${t("الوثائق الداعمة")}: ${n(evs.ready)} ${t("متوفرة")} · ${n(evs.prep)} ${t("قيد الإعداد")} · ${n(evs.missing)} ${t("غير متوفرة")}</span></div>
     <div class="grid g4" style="grid-template-columns:repeat(auto-fit,minmax(192px,1fr))">
       ${S.data.pillars.map((p,i)=>{
         const s = pillarScore(p,mode); const pg = gradeOf(s);
@@ -600,28 +647,28 @@ RENDER.skep = {
             <span class="st" style="background:${gradeColor(pg)}18;color:${gradeColor(pg)}">${pg}</span>
           </div>
           <div class="bar-mini" style="margin-top:8px"><i style="width:${s/5*100}%"></i></div>
-          <div class="pillar-row"><span class="mini-note">${n(p.criteria.length)} معايير</span>
-            <span class="mini-note">وثائق: ${pct(pe.coverage)}</span></div>
+          <div class="pillar-row"><span class="mini-note">${n(p.criteria.length)} ${t("معايير")}</span>
+            <span class="mini-note">${t("وثائق")}: ${pct(pe.coverage)}</span></div>
         </div>`;}).join("")}
     </div>
 
     <div class="grid g21 mt">
       <div class="card">
-        <h3>مصفوفة المعايير</h3>
-        <div class="subt">درجة كل معيار في وضع «${mode==="self"?"الذاتي":"المحاكاة"}» — اضغط أي خلية للتفاصيل</div>
+        <h3>${t("مصفوفة المعايير")}</h3>
+        <div class="subt">${t("درجة كل معيار في وضع")} «${mode==="self"?t("الذاتي"):t("المحاكاة")}» — ${t("اضغط أي خلية للتفاصيل")}</div>
         <div style="overflow-x:auto">${heatmapHTML(mode)}</div>
         <div class="legend-dots">${S.data.maturity.levels.map(l=>`<span><i style="background:${l.color}"></i>${l.name} (${l.n})</span>`).join("")}</div>
-        <div class="mini-note" style="margin-top:6px">مقياس نضج استرشادي قابل للمعايرة — تُعاير المسميات والحدود وفق الدليل الإرشادي المعتمد لدورة التقييم.</div>
+        <div class="mini-note" style="margin-top:6px">${t("مقياس نضج استرشادي قابل للمعايرة — تُعاير المسميات والحدود وفق الدليل الإرشادي المعتمد لدورة التقييم")}.</div>
       </div>
       <div class="card">
-        <h3>فجوات الوصول إلى «متميز»</h3>
-        <div class="subt">المعايير دون ${ltr(n(S.data.maturity.targetScore,1))} مرتبة من الأدنى (${n(gaps.length)} معياراً)</div>
+        <h3>${t("فجوات الوصول إلى «متميز»")}</h3>
+        <div class="subt">${t("المعايير دون")} ${ltr(n(S.data.maturity.targetScore,1))} ${t("مرتبة من الأدنى")} (${n(gaps.length)} ${t("معياراً")})</div>
         <div style="max-height:420px;overflow-y:auto">
         ${gaps.slice(0,14).map(c=>`
           <div class="alert ${critScore(c,mode)<=2?"bad":critScore(c,mode)<4?"warn":"info"}" data-pillar="${c.pillar.id}" style="cursor:pointer">
             <div class="ai">${svgi("alertT")}</div>
             <div style="flex:1"><b>${esc(c.code)} — ${esc(c.name)}</b>
-              <div class="at">${esc(c.pillar.name)} · الدرجة الحالية ${ltr(n(critScore(c,mode)))} · ${c.actions.length? esc(c.actions[0].name) : "لا توجد إجراءات مسجلة — أضف إجراء معالجة"}</div>
+              <div class="at">${esc(c.pillar.name)} · ${t("الدرجة الحالية")} ${ltr(n(critScore(c,mode)))} · ${c.actions.length? esc(c.actions[0].name) : t("لا توجد إجراءات مسجلة — أضف إجراء معالجة")}</div>
             </div>
           </div>`).join("")}
         </div>
@@ -635,17 +682,17 @@ RENDER.skep = {
     const mode = S.skepMode;
     const P = S.data.pillars;
     chart("ch-skep-bars").setOption(base({
-      tooltip: Object.assign({},TT,{formatter:p=> {
+      tooltip: Object.assign({},TT(),{formatter:p=> {
         const pl = P[p.dataIndex];
-        return `<b>${pl.name}</b>` + ttRow("الدرجة", n(p.value,2), p.color) + ttRow("الدورة السادسة", n(pillarScore(pl,"prev"),2)) + ttRow("عدد المعايير", n(pl.criteria.length));
+        return `<b>${t(pl.name)}</b>` + ttRow(t("الدرجة"), n(p.value,2), p.color) + ttRow(t("الدورة السادسة"), n(pillarScore(pl,"prev"),2)) + ttRow(t("عدد المعايير"), n(pl.criteria.length));
       }}),
       xAxis: hxAxis(v=>n(v), 5),
       yAxis: hyAxis(P.map(p=>p.short)),
       grid:{ top:14, bottom:26, right:96, left:44 },
       series:[
         { type:"bar", barWidth:16,
-          data: P.map(p=>({ value:pillarScore(p,mode), itemStyle:{ color:"#098A4E", borderRadius:[9,0,0,9] } })),
-          label:{ show:true, position:"left", formatter:p=>n(p.value,2), fontFamily:"IBM Plex Sans Arabic", fontWeight:700, color:"#5C6E63" },
+          data: P.map(p=>({ value:pillarScore(p,mode), itemStyle:{ color:"#098A4E", borderRadius:bRad(9) } })),
+          label:{ show:true, position:hLbl(), formatter:p=>n(p.value,2), fontFamily:"IBM Plex Sans Arabic", fontWeight:700, color:"#5C6E63" },
           markLine:{ symbol:"none", lineStyle:{color:"#C7A34F",type:"dashed",width:2},
             label:{ show:false },
             data:[{xAxis:4.5}] } },
@@ -657,8 +704,8 @@ RENDER.skep = {
 function heatmapHTML(mode){
   const P = S.data.pillars;
   const maxC = Math.max(...P.map(p=>p.criteria.length));
-  let h = `<table style="min-width:520px"><thead><tr><th>الركيزة</th>`;
-  for(let i=0;i<maxC;i++) h+=`<th style="text-align:center">معيار ${i+1}</th>`;
+  let h = `<table style="min-width:520px"><thead><tr><th>${t("الركيزة")}</th>`;
+  for(let i=0;i<maxC;i++) h+=`<th style="text-align:center">${t("معيار")} ${i+1}</th>`;
   h += `</tr></thead><tbody>`;
   P.forEach(p=>{
     h += `<tr><td style="font-family:var(--ff-d);font-weight:600;white-space:nowrap">${esc(p.short)}</td>`;
@@ -677,40 +724,40 @@ function openPillar(pid){
   const p = S.data.pillars.find(x=>x.id===pid); if(!p) return;
   const mode = S.skepMode;
   const body = `
-    <div class="fld"><b>الوصف</b><span>${esc(p.desc)}</span></div>
-    <div class="fld"><b>مالك الركيزة</b><span>${esc(p.owner)}</span></div>
-    <div class="fld"><b>الدرجات</b><span>ذاتي: ${ltr(n(pillarScore(p,"self"),2))} · محاكاة: ${ltr(n(pillarScore(p,"sim"),2))} · الدورة السادسة: ${ltr(n(pillarScore(p,"prev"),2))}</span></div>
-    <div class="dsec"><h4>المعايير (${n(p.criteria.length)}) — اضغط الدرجة لتعديلها في وضع «${mode==="self"?"الذاتي":"المحاكاة"}»</h4>
+    <div class="fld"><b>${t("الوصف")}</b><span>${esc(p.desc)}</span></div>
+    <div class="fld"><b>${t("مالك الركيزة")}</b><span>${esc(p.owner)}</span></div>
+    <div class="fld"><b>${t("الدرجات")}</b><span>${t("ذاتي")}: ${ltr(n(pillarScore(p,"self"),2))} · ${t("محاكاة")}: ${ltr(n(pillarScore(p,"sim"),2))} · ${t("الدورة السادسة")}: ${ltr(n(pillarScore(p,"prev"),2))}</span></div>
+    <div class="dsec"><h4>${t("المعايير")} (${n(p.criteria.length)}) — ${t("اضغط الدرجة لتعديلها في وضع")} «${mode==="self"?t("الذاتي"):t("المحاكاة")}»</h4>
       ${p.criteria.map((c,ci)=>`
         <div class="card" style="padding:12px 14px;margin-bottom:10px">
           <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start">
             <div><b style="font-family:var(--ff-d)">${esc(c.code)} — ${esc(c.name)}</b></div>
             <div class="score-chips" data-crit="${ci}">
-              ${[1,2,3,4,5].map(v=>`<button class="sc ${critScore(c,mode)===v?"on":""}" data-score="${v}" aria-label="الدرجة ${v}">${v}</button>`).join("")}
+              ${[1,2,3,4,5].map(v=>`<button class="sc ${critScore(c,mode)===v?"on":""}" data-score="${v}" aria-label="${t("الدرجة")} ${v}">${v}</button>`).join("")}
             </div>
           </div>
-          <div class="mini-note" style="margin:4px 0 8px">ذاتي: ${ltr(n(c.selfScore))} · محاكاة: ${ltr(n(c.simScore))} · الدورة السادسة: ${ltr(n(c.prevScore))} · المستهدف: ${ltr(n(c.target))}</div>
+          <div class="mini-note" style="margin:4px 0 8px">${t("ذاتي")}: ${ltr(n(c.selfScore))} · ${t("محاكاة")}: ${ltr(n(c.simScore))} · ${t("الدورة السادسة")}: ${ltr(n(c.prevScore))} · ${t("المستهدف")}: ${ltr(n(c.target))}</div>
           <div class="cklist">
             ${c.evidence.map((e,ei)=>`
-              <button class="ck ${e.status==="متوفر"?"y":"n"}" data-ev="${ci}:${ei}" title="اضغط لتغيير الحالة">
+              <button class="ck ${e.status==="متوفر"?"y":"n"}" data-ev="${ci}:${ei}" title="${t("اضغط لتغيير الحالة")}">
                 <span class="box">${e.status==="متوفر"?"✓":""}</span>
-                <span style="flex:1;text-align:right">${esc(e.name)}${e.updated?`<span class="owner-tag" style="display:block">نسخة ${esc(e.version||"1.0")} · ${fmtDate(e.updated)} · ${esc(e.owner||"")}</span>`:""}</span>
+                <span style="flex:1;text-align:start">${esc(e.name)}${e.updated?`<span class="owner-tag" style="display:block">${t("نسخة")} ${esc(e.version||"1.0")} · ${fmtDate(e.updated)} · ${esc(e.owner||"")}</span>`:""}</span>
                 <span class="st ${e.status==="متوفر"?"ok":e.status==="قيد الإعداد"?"warn":"bad"}">${e.status}</span>
               </button>`).join("")}
           </div>
-          ${c.actions.length? `<div class="dsec"><h4>إجراءات المعالجة</h4>
+          ${c.actions.length? `<div class="dsec"><h4>${t("إجراءات المعالجة")}</h4>
             ${c.actions.map(a=>`<div class="fld"><b>${esc(a.name)}</b><span><span class="st ${a.status==="مكتمل"?"ok":a.status==="قيد التنفيذ"?"info":"mut"}">${esc(a.status)}</span> ${esc(a.owner)} · ${fmtDate(a.due)}</span></div>`).join("")}
           </div>`:""}
         </div>`).join("")}
     </div>`;
-  openDrawer(`${p.name} — ${ltr(n(pillarScore(p,mode),2))} من 5`, body);
+  openDrawer(`${t(p.name)} — ${ltr(n(pillarScore(p,mode),2))} ${t("من 5")}`, body);
   const DB = document.getElementById("drawer-body");
   DB.querySelectorAll("[data-crit] [data-score]").forEach(btn=>{
     btn.addEventListener("click",()=>{
       const ci = +btn.closest("[data-crit]").dataset.crit;
       p.criteria[ci][MODES[mode]] = +btn.dataset.score;
       save(); refresh(); openPillar(pid);
-      toast(`تم تحديث درجة المعيار ${p.criteria[ci].code}`);
+      toast(`${t("تم تحديث درجة المعيار")} ${p.criteria[ci].code}`);
     });
   });
   DB.querySelectorAll("[data-ev]").forEach(btn=>{
@@ -738,18 +785,18 @@ RENDER.initiatives = {
     const it = impactTotals();
     return `
     <div class="stat-strip">
-      ${kpiTile("bulb","","إجمالي المبادرات", `${ltr(n(ist.total))}`, `<span>${n(sc["تنفيذ"]+sc["قياس الأثر"])} قيد التنفيذ والقياس</span>`)}
-      ${kpiTile("check","","نسبة الالتزام بالخط الزمني", pct(ist.commitment,1),
-        `<span>المستهدف ${pct(92)}</span><span class="st ${ist.commitment>=92?"ok":"warn"}">${n(ist.flagged)} متأخرة/متعثرة</span>`)}
-      ${kpiTile("coins","g","الأثر المقدر للمحفظة", `${ltr(n(it.identified))} <small>مليون ريال</small>`, `<span>المعتمد ${moneyShort(it.approved)}</span>`)}
-      ${kpiTile("doc","n","متوسط طلبات التغيير", `${ltr(n(ist.crAvg,2))}`, `<span>لكل مبادرة — المستهدف: ${ltr("0.5")} أو أقل</span>`)}
+      ${kpiTile("bulb","",t("إجمالي المبادرات"), `${ltr(n(ist.total))}`, `<span>${n(sc[t("تنفيذ")]+sc[t("قياس الأثر")])} ${t("قيد التنفيذ والقياس")}</span>`)}
+      ${kpiTile("check","",t("نسبة الالتزام بالخط الزمني"), pct(ist.commitment,1),
+        `<span>${t("المستهدف")} ${pct(92)}</span><span class="st ${ist.commitment>=92?"ok":"warn"}">${n(ist.flagged)} ${t("متأخرة/متعثرة")}</span>`)}
+      ${kpiTile("coins","g",t("الأثر المقدر للمحفظة"), `${ltr(n(it.identified))} <small>${t("مليون ريال")}</small>`, `<span>${t("المعتمد")} ${moneyShort(it.approved)}</span>`)}
+      ${kpiTile("doc","n",t("متوسط طلبات التغيير"), `${ltr(n(ist.crAvg,2))}`, `<span>${t("لكل مبادرة — المستهدف")}: ${ltr("0.5")} ${t("أو أقل")}</span>`)}
     </div>
 
-    <div class="section-head"><h2>دورة حياة المبادرات</h2>
-      <span class="hint">وفق منهجية هيئة كفاءة الإنفاق: بطاقة الفرصة ← الدراسة ← الميثاق والاعتماد ← التنفيذ ← قياس الأثر ← الإقفال</span></div>
+    <div class="section-head"><h2>${t("دورة حياة المبادرات")}</h2>
+      <span class="hint">${t("وفق منهجية هيئة كفاءة الإنفاق: بطاقة الفرصة ← الدراسة ← الميثاق والاعتماد ← التنفيذ ← قياس الأثر ← الإقفال")}</span></div>
     <div class="kanban">
       ${INI_STAGES.map((st,si)=>`
-        <div class="kcol"><h4>${st}<span class="cnt">${n(sc[st])}</span></h4>
+        <div class="kcol"><h4>${t(st)}<span class="cnt">${n(sc[st])}</span></h4>
           ${S.data.initiatives.filter(i=>i.status===st).map(i=>`
             <div class="kcard" data-ini="${i.id}">
               <div class="kn">${esc(i.name)}</div>
@@ -762,23 +809,23 @@ RENDER.initiatives = {
         </div>`).join("")}
     </div>
 
-    <div class="section-head"><h2>سجل المبادرات</h2></div>
+    <div class="section-head"><h2>${t("سجل المبادرات")}</h2></div>
     <div class="card">
       <div class="toolbar">
-        <input class="fsearch" id="ini-q" placeholder="بحث بالاسم أو الفئة أو المالك…" value="${esc(f.iniQ)}">
+        <input class="fsearch" id="ini-q" placeholder="${t("بحث بالاسم أو الفئة أو المالك…")}" value="${esc(f.iniQ)}">
         <select class="fsel" id="ini-status">
-          ${["الكل",...INI_STAGES,"متأخرة/متعثرة"].map(s=>`<option ${f.iniStatus===s?"selected":""}>${s}</option>`).join("")}
+          ${["الكل",...INI_STAGES,"متأخرة/متعثرة"].map(s=>`<option value="${s}" ${f.iniStatus===s?"selected":""}>${t(s)}</option>`).join("")}
         </select>
         <select class="fsel" id="ini-program">
-          <option ${f.iniProgram==="الكل"?"selected":""} value="الكل">كل البرامج</option>
+          <option ${f.iniProgram==="الكل"?"selected":""} value="${t("الكل")}">كل البرامج</option>
           ${S.data.programs.map(p=>`<option value="${p.id}" ${f.iniProgram===p.id?"selected":""}>${esc(p.name)}</option>`).join("")}
         </select>
         <div class="spacer"></div>
-        <button class="btn primary" id="ini-add">${svgi("bulb")} مبادرة جديدة</button>
+        <button class="btn primary" id="ini-add">${svgi("bulb")} ${t("مبادرة جديدة")}</button>
       </div>
       <div class="tblwrap">
         <table>
-          <thead><tr><th>الرمز</th><th>المبادرة</th><th>البرنامج</th><th>الفئة</th><th>نوع الأثر</th><th>المرحلة</th><th>الأثر المقدر</th><th>المحقق</th><th>التقدم</th></tr></thead>
+          <thead><tr><th>${t("الرمز")}</th><th>${t("المبادرة")}</th><th>${t("البرنامج")}</th><th>${t("الفئة")}</th><th>${t("نوع الأثر")}</th><th>${t("المرحلة")}</th><th>${t("الأثر المقدر")}</th><th>${t("المحقق")}</th><th>${t("التقدم")}</th></tr></thead>
           <tbody>
             ${list.map(i=>`
               <tr class="clickable" data-ini="${i.id}">
@@ -791,19 +838,19 @@ RENDER.initiatives = {
                 <td class="num">${n(i.estImpact)}</td>
                 <td class="num">${n(i.realizedImpact)}</td>
                 <td><div class="bar-mini"><i style="width:${i.progress}%"></i></div></td>
-              </tr>`).join("") || `<tr><td colspan="9" class="empty">لا توجد نتائج مطابقة</td></tr>`}
+              </tr>`).join("") || `<tr><td colspan="9" class="empty">${t("لا توجد نتائج مطابقة")}</td></tr>`}
           </tbody>
         </table>
       </div>
-      <div class="mini-note mt">القيم بالمليون ريال. المبادرات المقفلة اعتُمد أثرها المالي من الشؤون المالية واللجنة التوجيهية.</div>
+      <div class="mini-note mt">${t("القيم بالمليون ريال. المبادرات المقفلة اعتُمد أثرها المالي من الشؤون المالية واللجنة التوجيهية")}.</div>
     </div>
 
-    <div class="section-head"><h2>قاعدة بيانات مبادرات الجهات الحكومية (مرجعية)</h2>
-      <span class="hint">المخرج الخامس — ممارسات مطبقة مصنفة حسب الفئات مع مصادر الهدر وآلية احتساب الأثر (أسماء الجهات معمّاة لأغراض العرض)</span></div>
+    <div class="section-head"><h2>${t("قاعدة بيانات مبادرات الجهات الحكومية (مرجعية)")}</h2>
+      <span class="hint">${t("المخرج الخامس — ممارسات مطبقة مصنفة حسب الفئات مع مصادر الهدر وآلية احتساب الأثر (أسماء الجهات معمّاة لأغراض العرض)")}</span></div>
     <div class="card">
       <div class="tblwrap">
         <table>
-          <thead><tr><th>الفئة</th><th>نوع الجهة</th><th>المبادرة</th><th>مصدر الهدر</th><th>آلية المعالجة</th><th>آلية احتساب الأثر</th><th>الأثر المرجعي</th></tr></thead>
+          <thead><tr><th>${t("الفئة")}</th><th>${t("نوع الجهة")}</th><th>${t("المبادرة")}</th><th>${t("مصدر الهدر")}</th><th>${t("آلية المعالجة")}</th><th>${t("آلية احتساب الأثر")}</th><th>${t("الأثر المرجعي")}</th></tr></thead>
           <tbody>
             ${(S.data.benchmarkInitiatives||[]).map(b=>`
               <tr>
@@ -847,55 +894,55 @@ function openIni(id){
     : "وفق منهجية الهيئة: لا يمكن اعتماد المبادرة قبل تحقق الشؤون المالية من خط الأساس ومعادلة قياس الأثر.";
   const body = `
     <div class="stepper" style="margin-bottom:12px">
-      ${INI_STAGES.map((st,k)=>`<div class="step ${k<si?"done":k===si?"cur":""}"><div class="dotp">${k<si?"✓":k+1}</div><span>${st}</span></div>`).join("")}
+      ${INI_STAGES.map((st,k)=>`<div class="step ${k<si?"done":k===si?"cur":""}"><div class="dotp">${k<si?"✓":k+1}</div><span>${t(st)}</span></div>`).join("")}
     </div>
     ${i.flag? `<div class="alert ${i.flag==="متعثرة"?"bad":"warn"}"><div class="ai">${svgi("alertT")}</div><div><b>${i.flag}</b><div class="at">${esc(i.note||"")}</div></div></div>`:""}
-    <div class="fld"><b>البرنامج</b><span>${esc(progName(i.program))}</span></div>
-    <div class="fld"><b>الفئة / نوع الأثر</b><span>${esc(i.category)} · ${esc(i.impactType)}</span></div>
-    <div class="fld"><b>المالك</b><span>${esc(i.owner)}</span></div>
-    <div class="fld"><b>الفترة</b><span>${fmtDate(i.start)} ← ${fmtDate(i.end)}</span></div>
-    <div class="fld"><b>نسبة الإنجاز</b><span>${pct(i.progress)}</span></div>
-    <div class="dsec"><h4>بطاقة الفرصة</h4>
-      <div class="fld"><b>مصدر الهدر</b><span>${esc(i.wasteSource)}</span></div>
-      <div class="fld"><b>آلية المعالجة</b><span>${esc(i.treatment)}</span></div>
-      <div class="fld"><b>خط الأساس</b><span>${esc(i.baselineMethod)}</span></div>
+    <div class="fld"><b>${t("البرنامج")}</b><span>${esc(progName(i.program))}</span></div>
+    <div class="fld"><b>${t("الفئة / نوع الأثر")}</b><span>${esc(i.category)} · ${esc(i.impactType)}</span></div>
+    <div class="fld"><b>${t("المالك")}</b><span>${esc(i.owner)}</span></div>
+    <div class="fld"><b>${t("الفترة")}</b><span>${fmtDate(i.start)} ← ${fmtDate(i.end)}</span></div>
+    <div class="fld"><b>${t("نسبة الإنجاز")}</b><span>${pct(i.progress)}</span></div>
+    <div class="dsec"><h4>${t("بطاقة الفرصة")}</h4>
+      <div class="fld"><b>${t("مصدر الهدر")}</b><span>${esc(i.wasteSource)}</span></div>
+      <div class="fld"><b>${t("آلية المعالجة")}</b><span>${esc(i.treatment)}</span></div>
+      <div class="fld"><b>${t("خط الأساس")}</b><span>${esc(i.baselineMethod)}</span></div>
     </div>
-    <div class="dsec"><h4>الأثر المالي (مليون ريال)</h4>
-      <div class="fld"><b>المقدر</b><span class="num">${n(i.estImpact)}</span></div>
-      <div class="fld"><b>المعتمد من الشؤون المالية</b><span class="num">${n(i.approvedImpact)}</span></div>
-      <div class="fld"><b>المحقق</b><span class="num">${n(i.realizedImpact)}</span></div>
-      <div class="fld"><b>التحقق المالي</b><span><span class="st ${i.financeValidated?"ok":"warn"}">${i.financeValidated?"معتمد من الشؤون المالية":"بانتظار التحقق المالي"}</span></span></div>
-      <div class="fld"><b>طلبات التغيير</b><span class="num">${n(i.changeRequests)}</span></div>
+    <div class="dsec"><h4>${t("الأثر المالي (مليون ريال)")}</h4>
+      <div class="fld"><b>${t("المقدر")}</b><span class="num">${n(i.estImpact)}</span></div>
+      <div class="fld"><b>${t("المعتمد من الشؤون المالية")}</b><span class="num">${n(i.approvedImpact)}</span></div>
+      <div class="fld"><b>${t("المحقق")}</b><span class="num">${n(i.realizedImpact)}</span></div>
+      <div class="fld"><b>${t("التحقق المالي")}</b><span><span class="st ${i.financeValidated?"ok":"warn"}">${i.financeValidated?t("معتمد من الشؤون المالية"):t("بانتظار التحقق المالي")}</span></span></div>
+      <div class="fld"><b>${t("طلبات التغيير")}</b><span class="num">${n(i.changeRequests)}</span></div>
     </div>
-    ${i.charter? `<div class="dsec"><h4>ميثاق المبادرة</h4>
-      <div class="fld"><b>الهدف</b><span>${esc(i.charter.objective)}</span></div>
-      <div class="fld"><b>الأنشطة الرئيسية</b><span>${i.charter.activities.map(esc).join("؛ ")}</span></div>
-      <div class="fld"><b>المخاطر</b><span>${esc(i.charter.risks)}</span></div>
-      <div class="fld"><b>البيانات المطلوبة</b><span>${esc(i.charter.dataNeeded)}</span></div>
-      <div class="fld"><b>آلية قياس الأثر</b><span>${esc(i.charter.mechanism)}</span></div>
+    ${i.charter? `<div class="dsec"><h4>${t("ميثاق المبادرة")}</h4>
+      <div class="fld"><b>${t("الهدف")}</b><span>${esc(i.charter.objective)}</span></div>
+      <div class="fld"><b>${t("الأنشطة الرئيسية")}</b><span>${i.charter.activities.map(esc).join(isAR()? "؛ " : "; ")}</span></div>
+      <div class="fld"><b>${t("المخاطر")}</b><span>${esc(i.charter.risks)}</span></div>
+      <div class="fld"><b>${t("البيانات المطلوبة")}</b><span>${esc(i.charter.dataNeeded)}</span></div>
+      <div class="fld"><b>${t("آلية قياس الأثر")}</b><span>${esc(i.charter.mechanism)}</span></div>
     </div>`:""}
-    ${i.docs? `<div class="dsec"><h4>وثائق المبادرة</h4>
+    ${i.docs? `<div class="dsec"><h4>${t("وثائق المبادرة")}</h4>
       <div class="cklist">${i.docs.map(d=>`
         <div class="ck ${d.status==="متوفر"?"y":"n"}"><span class="box">${d.status==="متوفر"?"✓":""}</span>
         <span style="flex:1">${esc(d.name)}</span>
         <span class="st ${d.status==="متوفر"?"ok":d.status==="قيد الإعداد"?"warn":"bad"}">${d.status}</span></div>`).join("")}
       </div>
     </div>`:""}
-    ${i.note && !i.flag? `<div class="dsec"><h4>ملاحظات</h4><div class="mini-note">${esc(i.note)}</div></div>`:""}
+    ${i.note && !i.flag? `<div class="dsec"><h4>${t("ملاحظات")}</h4><div class="mini-note">${esc(i.note)}</div></div>`:""}
     <div class="dsec" style="display:flex;gap:8px;flex-wrap:wrap">
-      ${canAdvance? `<button class="btn primary" id="d-advance" ${gateBlocked?"disabled style='opacity:.5;cursor:not-allowed'":""}>نقل إلى مرحلة «${nextStage}»</button>`:""}
-      ${!i.financeValidated? `<button class="btn ghost" id="d-validate">تأكيد التحقق المالي</button>`:""}
-      <button class="btn ghost" id="d-edit">تعديل البيانات</button>
-      ${i.flag? `<button class="btn ghost" id="d-unflag">إلغاء حالة «${i.flag}»</button>`:""}
+      ${canAdvance? `<button class="btn primary" id="d-advance" ${gateBlocked?"disabled style='opacity:.5;cursor:not-allowed'":""}>${t("نقل إلى مرحلة")} «${t(nextStage)}»</button>`:""}
+      ${!i.financeValidated? `<button class="btn ghost" id="d-validate">${t("تأكيد التحقق المالي")}</button>`:""}
+      <button class="btn ghost" id="d-edit">${t("تعديل البيانات")}</button>
+      ${i.flag? `<button class="btn ghost" id="d-unflag">${t("إلغاء حالة")} «${t(i.flag)}»</button>`:""}
     </div>
     ${gateBlocked? `<div class="mini-note mt">⚠ ${gateMsg}</div>`:""}`;
-  openDrawer(`${i.id} — ${i.name}`, body);
+  openDrawer(`${i.id} — ${t(i.name)}`, body);
   const el = id2=>document.getElementById(id2);
   if(el("d-advance")) el("d-advance").addEventListener("click",()=>{
     if(gateBlocked) return;
     i.status = nextStage;
     if(nextStage==="مقفلة") i.progress = 100;
-    save(); refresh(); openIni(id); toast(`انتقلت المبادرة إلى مرحلة «${nextStage}»`);
+    save(); refresh(); openIni(id); toast(`${t("انتقلت المبادرة إلى مرحلة")} «${t(nextStage)}»`);
   });
   if(el("d-validate")) el("d-validate").addEventListener("click",()=>{
     i.financeValidated = true;
@@ -913,28 +960,28 @@ function iniForm(i){
     status:"فرصة", flag:null, estImpact:0, approvedImpact:0, realizedImpact:0, financeValidated:false,
     changeRequests:0, progress:0, owner:"", wasteSource:"", treatment:"", baselineMethod:"",
     start:S.data.meta.asOf, end:"", note:"" };
-  openModal(isNew? "مبادرة جديدة — بطاقة الفرصة" : `تعديل ${d.id}`, `
-    <div class="frow one"><div class="fgrp"><label>اسم المبادرة *</label><input id="f-name" value="${esc(d.name)}"></div></div>
+  openModal(isNew? t("مبادرة جديدة — بطاقة الفرصة") : `${t("تعديل")} ${d.id}`, `
+    <div class="frow one"><div class="fgrp"><label>${t("اسم المبادرة *")}</label><input id="f-name" value="${esc(d.name)}"></div></div>
     <div class="frow">
-      <div class="fgrp"><label>البرنامج</label><select id="f-program">${S.data.programs.map(p=>`<option value="${p.id}" ${d.program===p.id?"selected":""}>${esc(p.name)}</option>`).join("")}</select></div>
-      <div class="fgrp"><label>الفئة</label><select id="f-cat">${["مشتريات","مشاريع","أصول ومرافق","خدمات","طاقة وموارد","رقمنة","إيرادات"].map(c=>`<option ${d.category===c?"selected":""}>${c}</option>`).join("")}</select></div>
+      <div class="fgrp"><label>${t("البرنامج")}</label><select id="f-program">${S.data.programs.map(p=>`<option value="${p.id}" ${d.program===p.id?"selected":""}>${esc(p.name)}</option>`).join("")}</select></div>
+      <div class="fgrp"><label>${t("الفئة")}</label><select id="f-cat">${["مشتريات","مشاريع","أصول ومرافق","خدمات","طاقة وموارد","رقمنة","إيرادات"].map(c=>`<option value="${c}" ${d.category===c?"selected":""}>${t(c)}</option>`).join("")}</select></div>
     </div>
     <div class="frow">
-      <div class="fgrp"><label>نوع الأثر</label><select id="f-itype">${["وفر مباشر","تجنب تكلفة","تعظيم إيراد"].map(c=>`<option ${d.impactType===c?"selected":""}>${c}</option>`).join("")}</select></div>
-      <div class="fgrp"><label>المرحلة</label><select id="f-status">${INI_STAGES.map(c=>`<option ${d.status===c?"selected":""}>${c}</option>`).join("")}</select></div>
+      <div class="fgrp"><label>${t("نوع الأثر")}</label><select id="f-itype">${["وفر مباشر","تجنب تكلفة","تعظيم إيراد"].map(c=>`<option value="${c}" ${d.impactType===c?"selected":""}>${t(c)}</option>`).join("")}</select></div>
+      <div class="fgrp"><label>${t("المرحلة")}</label><select id="f-status">${INI_STAGES.map(c=>`<option value="${c}" ${d.status===c?"selected":""}>${t(c)}</option>`).join("")}</select></div>
     </div>
     <div class="frow">
-      <div class="fgrp"><label>الأثر المقدر (م.ر)</label><input id="f-est" type="number" min="0" value="${d.estImpact}"></div>
-      <div class="fgrp"><label>المالك</label><input id="f-owner" value="${esc(d.owner)}"></div>
+      <div class="fgrp"><label>${t("الأثر المقدر (م.ر)")}</label><input id="f-est" type="number" min="0" value="${d.estImpact}"></div>
+      <div class="fgrp"><label>${t("المالك")}</label><input id="f-owner" value="${esc(d.owner)}"></div>
     </div>
     <div class="frow">
-      <div class="fgrp"><label>تاريخ البداية (يوم / شهر / سنة)</label><input id="f-start" type="date" value="${d.start}"></div>
-      <div class="fgrp"><label>تاريخ النهاية (يوم / شهر / سنة)</label><input id="f-end" type="date" value="${d.end}"></div>
+      <div class="fgrp"><label>${t("تاريخ البداية (يوم / شهر / سنة)")}</label><input id="f-start" type="date" value="${d.start}"></div>
+      <div class="fgrp"><label>${t("تاريخ النهاية (يوم / شهر / سنة)")}</label><input id="f-end" type="date" value="${d.end}"></div>
     </div>
-    <div class="frow one"><div class="fgrp"><label>مصدر الهدر</label><input id="f-waste" value="${esc(d.wasteSource)}"></div></div>
-    <div class="frow one"><div class="fgrp"><label>آلية المعالجة</label><input id="f-treat" value="${esc(d.treatment)}"></div></div>
-    <div class="frow one"><div class="fgrp"><label>خط الأساس وطريقة الاحتساب</label><input id="f-base" value="${esc(d.baselineMethod)}"></div></div>
-    <div class="frow one"><div class="fgrp"><label>ملاحظات</label><textarea id="f-note">${esc(d.note||"")}</textarea></div></div>
+    <div class="frow one"><div class="fgrp"><label>${t("مصدر الهدر")}</label><input id="f-waste" value="${esc(d.wasteSource)}"></div></div>
+    <div class="frow one"><div class="fgrp"><label>${t("آلية المعالجة")}</label><input id="f-treat" value="${esc(d.treatment)}"></div></div>
+    <div class="frow one"><div class="fgrp"><label>${t("خط الأساس وطريقة الاحتساب")}</label><input id="f-base" value="${esc(d.baselineMethod)}"></div></div>
+    <div class="frow one"><div class="fgrp"><label>${t("ملاحظات")}</label><textarea id="f-note">${esc(d.note||"")}</textarea></div></div>
   `, [
     { label:"إلغاء", cls:"ghost", fn:closeModal },
     { label: isNew? "إضافة المبادرة" : "حفظ التعديلات", cls:"primary", fn:()=>{
@@ -952,7 +999,7 @@ function iniForm(i){
         });
         if(isNew) S.data.initiatives.push(d);
         save(); closeModal(); refresh();
-        toast(isNew? `تمت إضافة المبادرة ${d.id}` : "تم حفظ التعديلات");
+        toast(isNew? `${t("تمت إضافة المبادرة")} ${d.id}` : "تم حفظ التعديلات");
       }},
   ]);
 }
@@ -972,44 +1019,44 @@ RENDER.impact = {
     const share = Math.round(real2026 / S.data.meta.budgetApproved * 1000)/10;
     return `
     <div class="stat-strip">
-      ${kpiTile("bulb","","الأثر المالي المحدد (الفرص المرصودة)", `${ltr(n(it.identified))} <small>مليون ريال</small>`, `<span>${n(S.data.initiatives.length)} مبادرة وفرصة</span>`)}
-      ${kpiTile("check","","أثر معتمد من الشؤون المالية", `${ltr(n(it.approved))} <small>مليون ريال</small>`, `<span>${pct(it.identified? it.approved/it.identified*100:0)} من المحدد</span>`)}
-      ${kpiTile("coins","g","أثر محقق تراكمي", `${ltr(n(it.realized))} <small>مليون ريال</small>`, `<span>منه ${moneyShort(it.documented)} موثق بالإقفال</span>`)}
-      ${kpiTile("gauge","n","نسبة الأثر من الميزانية المعتمدة 2026", pct(share,1), `<span>محقق 2026: ${moneyShort(real2026)} من ميزانية ${moneyShort(S.data.meta.budgetApproved)}</span>`)}
+      ${kpiTile("bulb","",t("الأثر المالي المحدد (الفرص المرصودة)"), `${ltr(n(it.identified))} <small>${t("مليون ريال")}</small>`, `<span>${n(S.data.initiatives.length)} ${t("مبادرة وفرصة")}</span>`)}
+      ${kpiTile("check","",t("أثر معتمد من الشؤون المالية"), `${ltr(n(it.approved))} <small>${t("مليون ريال")}</small>`, `<span>${pct(it.identified? it.approved/it.identified*100:0)} ${t("من المحدد")}</span>`)}
+      ${kpiTile("coins","g",t("أثر محقق تراكمي"), `${ltr(n(it.realized))} <small>${t("مليون ريال")}</small>`, `<span>${t("منه")} ${moneyShort(it.documented)} ${t("موثق بالإقفال")}</span>`)}
+      ${kpiTile("gauge","n",t("نسبة الأثر من الميزانية المعتمدة 2026"), pct(share,1), `<span>${t("محقق 2026")}: ${moneyShort(real2026)} ${t("من ميزانية")} ${moneyShort(S.data.meta.budgetApproved)}</span>`)}
     </div>
 
     <div class="grid g21 mt">
       <div class="card">
-        <h3>مراحل تحقق الأثر المالي</h3>
-        <div class="subt">من الأثر المحدد إلى الموثق (مليون ريال) — منهجية: وفر مباشر، تجنب تكلفة، تعظيم إيراد</div>
+        <h3>${t("مراحل تحقق الأثر المالي")}</h3>
+        <div class="subt">${t("من الأثر المحدد إلى الموثق (مليون ريال) — منهجية: وفر مباشر، تجنب تكلفة، تعظيم إيراد")}</div>
         <div id="ch-imp-water" class="chart ch-340"></div>
       </div>
       <div class="card">
-        <h3>الأثر حسب النوع</h3>
-        <div class="subt">محقق مقابل محدد</div>
+        <h3>${t("الأثر حسب النوع")}</h3>
+        <div class="subt">${t("محقق مقابل محدد")}</div>
         <div id="ch-imp-type" class="chart ch-340"></div>
       </div>
     </div>
 
     <div class="grid g2 mt">
       <div class="card">
-        <h3>الأثر حسب البرنامج</h3>
-        <div class="subt">محقق ومتبقٍ من المحدد (مليون ريال)</div>
+        <h3>${t("الأثر حسب البرنامج")}</h3>
+        <div class="subt">${t("محقق ومتبقٍ من المحدد (مليون ريال)")}</div>
         <div id="ch-imp-prog" class="chart ch-300"></div>
       </div>
       <div class="card">
-        <h3>الأثر حسب الفئة</h3>
-        <div class="subt">محقق ومتبقٍ من المحدد (مليون ريال)</div>
+        <h3>${t("الأثر حسب الفئة")}</h3>
+        <div class="subt">${t("محقق ومتبقٍ من المحدد (مليون ريال)")}</div>
         <div id="ch-imp-cat" class="chart ch-300"></div>
       </div>
     </div>
 
-    <div class="section-head"><h2>سجل الوفورات المعتمد</h2>
-      <span class="hint">لا يُدرج أثر إلا بعد التحقق المالي — خفض مستوى الخدمة لا يُعد وفراً</span></div>
+    <div class="section-head"><h2>${t("سجل الوفورات المعتمد")}</h2>
+      <span class="hint">${t("لا يُدرج أثر إلا بعد التحقق المالي — خفض مستوى الخدمة لا يُعد وفراً")}</span></div>
     <div class="card">
       <div class="tblwrap">
         <table>
-          <thead><tr><th>المبادرة</th><th>النوع</th><th>خط الأساس</th><th>معتمد</th><th>محقق</th><th>التحقق المالي</th><th>الحالة</th></tr></thead>
+          <thead><tr><th>${t("المبادرة")}</th><th>${t("النوع")}</th><th>${t("خط الأساس")}</th><th>${t("معتمد")}</th><th>${t("محقق")}</th><th>${t("التحقق المالي")}</th><th>${t("الحالة")}</th></tr></thead>
           <tbody>
             ${S.data.initiatives.filter(i=>i.approvedImpact>0 || i.realizedImpact>0).map(i=>`
               <tr class="clickable" data-ini="${i.id}">
@@ -1018,7 +1065,7 @@ RENDER.impact = {
                 <td style="max-width:220px;font-size:11.5px;color:var(--muted)">${esc(i.baselineMethod)}</td>
                 <td class="num">${n(i.approvedImpact)}</td>
                 <td class="num"><b>${n(i.realizedImpact)}</b></td>
-                <td>${i.financeValidated? '<span class="st ok">معتمد</span>':'<span class="st warn">قيد التحقق</span>'}</td>
+                <td>${i.financeValidated? `<span class="st ok">${t("معتمد")}</span>` : `<span class="st warn">${t("قيد التحقق")}</span>`}</td>
                 <td><span class="st ${i.status==="مقفلة"?"ok":"info"}">${esc(i.status)}</span></td>
               </tr>`).join("")}
           </tbody>
@@ -1032,14 +1079,14 @@ RENDER.impact = {
     // waterfall: محدد -> غير معتمد -> معتمد -> محقق -> موثق
     const identified = it.identified, approved = it.approved, realized = it.realized, doc = it.documented;
     const steps = [
-      { name:"الأثر المحدد", base:0, val:identified, color:"#75837B" },
-      { name:"قيد الدراسة/الاعتماد", base:0, val:identified-approved, color:"#C9D3CD" },
-      { name:"المعتمد", base:0, val:approved, color:"#2E7D57" },
-      { name:"المحقق", base:0, val:realized, color:"#098A4E" },
-      { name:"الموثق بالإقفال", base:0, val:doc, color:"#0B4028" },
+      { name:t("الأثر المحدد"), base:0, val:identified, color:"#75837B" },
+      { name:t("قيد الدراسة/الاعتماد"), base:0, val:identified-approved, color:"#C9D3CD" },
+      { name:t("المعتمد"), base:0, val:approved, color:"#2E7D57" },
+      { name:t("المحقق"), base:0, val:realized, color:"#098A4E" },
+      { name:t("الموثق بالإقفال"), base:0, val:doc, color:"#0B4028" },
     ];
     chart("ch-imp-water").setOption(base({
-      tooltip: Object.assign({},TT,{formatter:p=> p.seriesIndex===1? `<b>${p.name}</b>`+ttRow("القيمة",`${n(steps[p.dataIndex].val)} م.ر`, steps[p.dataIndex].color):""}),
+      tooltip: Object.assign({},TT(),{formatter:p=> p.seriesIndex===1? `<b>${p.name}</b>`+ttRow(t("القيمة"),`${n(steps[p.dataIndex].val)} ${t("م.ر")}`, steps[p.dataIndex].color):""}),
       xAxis: catXAxis(steps.map(s=>s.name), { axisLabel:{color:"#5C6E63",fontFamily:"Cairo",fontSize:11,interval:0} }),
       yAxis: valAxis(v=>n(v)),
       grid:{ top:24, bottom:30, right:50, left:14 },
@@ -1057,15 +1104,15 @@ RENDER.impact = {
     });
     const types = Object.keys(bt);
     chart("ch-imp-type").setOption(base({
-      tooltip: Object.assign({},TT,{trigger:"axis", formatter:ps=>{
-        let h=`<b>${ps[0].axisValue}</b>`; ps.forEach(p=>h+=ttRow(p.seriesName,`${n(p.value)} م.ر`,p.color)); return h; }}),
+      tooltip: Object.assign({},TT(),{trigger:"axis", formatter:ps=>{
+        let h=`<b>${ps[0].axisValue}</b>`; ps.forEach(p=>h+=ttRow(p.seriesName,`${n(p.value)} ${t("م.ر")}`,p.color)); return h; }}),
       legend:{ icon:"circle", itemWidth:9, itemHeight:9, top:0, textStyle:{fontFamily:"Cairo",fontSize:11,color:"#5C6E63"} },
       xAxis: hxAxis(v=>n(v)),
       yAxis: hyAxis(types),
       grid:{ top:34, bottom:26, right:90, left:20 },
       series:[
-        { name:"محقق", type:"bar", stack:"t", barWidth:20, color:"#098A4E", data:types.map(t=>bt[t].realized) },
-        { name:"متبقٍ من المحدد", type:"bar", stack:"t", color:"#DDEBE2", data:types.map(t=>({value:Math.max(0,bt[t].identified-bt[t].realized), itemStyle:{borderRadius:[6,0,0,6]}})) },
+        { name:t("محقق"), type:"bar", stack:"t", barWidth:20, color:"#098A4E", data:types.map(t=>bt[t].realized) },
+        { name:t("متبقٍ من المحدد"), type:"bar", stack:"t", color:"#DDEBE2", data:types.map(t=>({value:Math.max(0,bt[t].identified-bt[t].realized), itemStyle:{borderRadius:bRad(6)}})) },
       ],
     }));
     // by program / category (two similar charts)
@@ -1081,15 +1128,15 @@ RENDER.impact = {
     [["ch-imp-prog","program"],["ch-imp-cat","category"]].forEach(([cid,key])=>{
       const rows = agg(key);
       chart(cid).setOption(base({
-        tooltip: Object.assign({},TT,{trigger:"axis", formatter:ps=>{
-          let h=`<b>${ps[0].axisValue}</b>`; ps.forEach(p=>h+=ttRow(p.seriesName,`${n(p.value)} م.ر`,p.color)); return h; }}),
+        tooltip: Object.assign({},TT(),{trigger:"axis", formatter:ps=>{
+          let h=`<b>${ps[0].axisValue}</b>`; ps.forEach(p=>h+=ttRow(p.seriesName,`${n(p.value)} ${t("م.ر")}`,p.color)); return h; }}),
         legend:{ icon:"circle", itemWidth:9, itemHeight:9, top:0, textStyle:{fontFamily:"Cairo",fontSize:11,color:"#5C6E63"} },
         xAxis: hxAxis(v=>n(v)),
         yAxis: hyAxis(rows.map(r=>r[0]), 155),
         grid:{ top:34, bottom:26, right:168, left:20 },
         series:[
-          { name:"محقق", type:"bar", stack:"s", barWidth:13, color:"#098A4E", data:rows.map(r=>r[1].realized) },
-          { name:"متبقٍ", type:"bar", stack:"s", color:"#DDEBE2", data:rows.map(r=>({value:Math.max(0,r[1].identified-r[1].realized), itemStyle:{borderRadius:[6,0,0,6]}})) },
+          { name:t("محقق"), type:"bar", stack:"s", barWidth:13, color:"#098A4E", data:rows.map(r=>r[1].realized) },
+          { name:t("متبقٍ"), type:"bar", stack:"s", color:"#DDEBE2", data:rows.map(r=>({value:Math.max(0,r[1].identified-r[1].realized), itemStyle:{borderRadius:bRad(6)}})) },
         ],
       }));
     });
@@ -1108,19 +1155,19 @@ RENDER.funding = {
     const total = FR.reduce((s,r)=>s+r.amount,0);
     return `
     <div class="stat-strip">
-      ${kpiTile("doc","","طلبات التمويل المسجلة", `${ltr(n(FR.length))}`, `<span>بقيمة إجمالية ${money(total)}</span>`)}
-      ${kpiTile("check","","اكتمال متطلبات الطلبات المسجلة", pct(comp), `<span class="st ${comp>=80?"ok":"warn"}">جودة الطلبات عند التسجيل</span><span>لا يدخل سلسلة المراجعة إلا طلب مكتمل المتطلبات</span>`)}
-      ${kpiTile("clock","g","طلبات معادة للاستكمال", `${ltr(n(returned))}`, `<span>تتطلب استيفاء الملاحظات قبل إعادة الدخول</span>`)}
-      ${kpiTile("coins","n","طلبات معتمدة", `${ltr(n(approved))}`, `<span>${money(FR.filter(r=>r.stage==="معتمد").reduce((s,r)=>s+r.amount,0))}</span>`)}
+      ${kpiTile("doc","",t("طلبات التمويل المسجلة"), `${ltr(n(FR.length))}`, `<span>${t("بقيمة إجمالية")} ${money(total)}</span>`)}
+      ${kpiTile("check","",t("اكتمال متطلبات الطلبات المسجلة"), pct(comp), `<span class="st ${comp>=80?"ok":"warn"}">${t("جودة الطلبات عند التسجيل")}</span><span>${t("لا يدخل سلسلة المراجعة إلا طلب مكتمل المتطلبات")}</span>`)}
+      ${kpiTile("clock","g",t("طلبات معادة للاستكمال"), `${ltr(n(returned))}`, `<span>${t("تتطلب استيفاء الملاحظات قبل إعادة الدخول")}</span>`)}
+      ${kpiTile("coins","n",t("طلبات معتمدة"), `${ltr(n(approved))}`, `<span>${money(FR.filter(r=>r.stage==="معتمد").reduce((s,r)=>s+r.amount,0))}</span>`)}
     </div>
 
-    <div class="section-head"><h2>لائحة التعقب — سلسلة المراجعة الرباعية</h2>
-      <span class="hint">المقيّم ← قائد الفريق ← الشؤون المالية ← المسؤول الأول، مع اشتراط اكتمال الدراسات</span>
-      <button class="btn primary" id="fr-add">${svgi("doc")} طلب تمويل جديد</button></div>
+    <div class="section-head"><h2>${t("لائحة التعقب — سلسلة المراجعة الرباعية")}</h2>
+      <span class="hint">${t("المقيّم ← قائد الفريق ← الشؤون المالية ← المسؤول الأول، مع اشتراط اكتمال الدراسات")}</span>
+      <button class="btn primary" id="fr-add">${svgi("doc")} ${t("طلب تمويل جديد")}</button></div>
     <div class="card">
       <div class="tblwrap">
         <table>
-          <thead><tr><th>الرمز</th><th>الطلب</th><th>البرنامج</th><th>النوع</th><th>القيمة (م.ر)</th><th>اكتمال الدراسات</th><th>المرحلة</th></tr></thead>
+          <thead><tr><th>${t("الرمز")}</th><th>${t("الطلب")}</th><th>${t("البرنامج")}</th><th>${t("النوع")}</th><th>${t("القيمة (م.ر)")}</th><th>${t("اكتمال الدراسات")}</th><th>${t("المرحلة")}</th></tr></thead>
           <tbody>
             ${FR.map(r=>{
               const done = Object.values(r.fiveStudies).filter(Boolean).length + (r.cdStudy?1:0) + (r.scopeDoc?1:0) + (r.valueDoc?1:0);
@@ -1137,21 +1184,20 @@ RENDER.funding = {
           </tbody>
         </table>
       </div>
-      <div class="mini-note mt">ضابط الاكتمال: لا يُحال الطلب إلى سلسلة المراجعة إلا باكتمال الدراسات الخمس (الاستراتيجية، الاقتصادية، التجارية، المالية، الإدارية) ودراسة السعة والطلب ووثيقتي النطاق والقيمة — وفق تعليمات تنفيذ الميزانية ومتطلبات هيئة كفاءة الإنفاق والمشروعات الحكومية.
-      مرحلة «مرفوع لوزارة المالية» امتداد خاص بالهيئة لطلبات الميزانية الجديدة؛ وبعد الاعتماد يُؤرشف الطلب وتُحدَّث لائحة التعقب وفق النموذج التشغيلي.</div>
+      <div class="mini-note mt">${t("ضابط الاكتمال: لا يُحال الطلب إلى سلسلة المراجعة إلا باكتمال الدراسات الخمس (الاستراتيجية، الاقتصادية، التجارية، المالية، الإدارية) ودراسة السعة والطلب ووثيقتي النطاق والقيمة — وفق تعليمات تنفيذ الميزانية ومتطلبات هيئة كفاءة الإنفاق والمشروعات الحكومية. مرحلة «مرفوع لوزارة المالية» امتداد خاص بالهيئة لطلبات الميزانية الجديدة؛ وبعد الاعتماد يُؤرشف الطلب وتُحدَّث لائحة التعقب وفق النموذج التشغيلي")}.</div>
     </div>`;
   },
   mount(){
     APP.querySelectorAll("[data-fr]").forEach(el=>el.addEventListener("click",()=>openFR(el.dataset.fr)));
     document.getElementById("fr-add").addEventListener("click",()=>{
-      openModal("طلب تمويل جديد", `
-        <div class="frow one"><div class="fgrp"><label>اسم الطلب *</label><input id="nf-name"></div></div>
+      openModal(t("طلب تمويل جديد"), `
+        <div class="frow one"><div class="fgrp"><label>${t("اسم الطلب *")}</label><input id="nf-name"></div></div>
         <div class="frow">
-          <div class="fgrp"><label>البرنامج</label><select id="nf-program">${S.data.programs.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join("")}</select></div>
-          <div class="fgrp"><label>النوع</label><select id="nf-type"><option>رأسمالي</option><option>تشغيلي</option></select></div>
+          <div class="fgrp"><label>${t("البرنامج")}</label><select id="nf-program">${S.data.programs.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join("")}</select></div>
+          <div class="fgrp"><label>${t("النوع")}</label><select id="nf-type"><option value="رأسمالي">${t("رأسمالي")}</option><option value="تشغيلي">${t("تشغيلي")}</option></select></div>
         </div>
-        <div class="frow one"><div class="fgrp"><label>القيمة (مليون ريال) *</label><input id="nf-amount" type="number" min="1"></div></div>
-        <div class="mini-note">يُسجل الطلب في مرحلة «الإعداد»؛ وتُستكمل الدراسات الخمس ودراسة السعة والطلب من بطاقة الطلب قبل دخول سلسلة المراجعة.</div>
+        <div class="frow one"><div class="fgrp"><label>${t("القيمة (مليون ريال) *")}</label><input id="nf-amount" type="number" min="1"></div></div>
+        <div class="mini-note">${t("يُسجل الطلب في مرحلة «الإعداد»؛ وتُستكمل الدراسات الخمس ودراسة السعة والطلب من بطاقة الطلب قبل دخول سلسلة المراجعة")}.</div>
       `, [
         { label:"إلغاء", cls:"ghost", fn:closeModal },
         { label:"تسجيل الطلب", cls:"primary", fn:()=>{
@@ -1178,34 +1224,34 @@ function openFR(id){
   const chainIdx = FR_CHAIN.indexOf(r.stage);
   const complete = frComplete(r);
   const checks = [
-    ...Object.entries(r.fiveStudies).map(([k,v])=>({key:`fs:${k}`, label:`الدراسة ال${k}`, val:v})),
+    ...Object.entries(r.fiveStudies).map(([k,v])=>({key:`fs:${k}`, label: isAR()? `الدراسة ال${k}` : `${t(k)} study`, val:v})),
     {key:"cd", label:"دراسة السعة والطلب", val:r.cdStudy},
     {key:"scope", label:"وثيقة نطاق العمل", val:r.scopeDoc},
     {key:"value", label:"قيمة التمويل ومبرراتها", val:r.valueDoc},
   ];
   const body = `
     <div class="stepper" style="margin-bottom:14px">
-      ${FR_CHAIN.map((st,k)=>`<div class="step ${chainIdx>k?"done":chainIdx===k?"cur":""}"><div class="dotp">${chainIdx>k?"✓":k+1}</div><span>${st}</span></div>`).join("")}
+      ${FR_CHAIN.map((st,k)=>`<div class="step ${chainIdx>k?"done":chainIdx===k?"cur":""}"><div class="dotp">${chainIdx>k?"✓":k+1}</div><span>${t(st)}</span></div>`).join("")}
     </div>
-    ${r.stage==="معاد للاستكمال"? `<div class="alert bad"><div class="ai">${svgi("alertT")}</div><div><b>معاد للاستكمال</b><div class="at">${esc(r.note||"")}</div></div></div>`:""}
-    <div class="fld"><b>البرنامج</b><span>${esc(progName(r.program))}</span></div>
-    <div class="fld"><b>النوع</b><span>${esc(r.type)}</span></div>
-    <div class="fld"><b>القيمة</b><span>${money(r.amount)}</span></div>
-    ${r.note && r.stage!=="معاد للاستكمال"? `<div class="fld"><b>ملاحظات</b><span>${esc(r.note)}</span></div>`:""}
-    <div class="dsec"><h4>متطلبات الاكتمال — اضغط لتحديث الحالة</h4>
+    ${r.stage==="معاد للاستكمال"? `<div class="alert bad"><div class="ai">${svgi("alertT")}</div><div><b>${t("معاد للاستكمال")}</b><div class="at">${esc(r.note||"")}</div></div></div>`:""}
+    <div class="fld"><b>${t("البرنامج")}</b><span>${esc(progName(r.program))}</span></div>
+    <div class="fld"><b>${t("النوع")}</b><span>${esc(r.type)}</span></div>
+    <div class="fld"><b>${t("القيمة")}</b><span>${money(r.amount)}</span></div>
+    ${r.note && r.stage!=="معاد للاستكمال"? `<div class="fld"><b>${t("ملاحظات")}</b><span>${esc(r.note)}</span></div>`:""}
+    <div class="dsec"><h4>${t("متطلبات الاكتمال — اضغط لتحديث الحالة")}</h4>
       <div class="cklist">
-        ${checks.map(c=>`<button class="ck ${c.val?"y":"n"}" data-ck="${c.key}"><span class="box">${c.val?"✓":""}</span><span style="flex:1;text-align:right">${c.label}</span></button>`).join("")}
+        ${checks.map(c=>`<button class="ck ${c.val?"y":"n"}" data-ck="${c.key}"><span class="box">${c.val?"✓":""}</span><span style="flex:1;text-align:start">${t(c.label)}</span></button>`).join("")}
       </div>
     </div>
     <div class="dsec" style="display:flex;gap:8px;flex-wrap:wrap">
       ${r.stage==="الإعداد"||r.stage==="معاد للاستكمال" ?
-        `<button class="btn primary" id="fr-submit" ${!complete?"disabled style='opacity:.5;cursor:not-allowed' title='استكمال المتطلبات أولاً'":""}>إحالة إلى سلسلة المراجعة</button>`:
+        `<button class="btn primary" id="fr-submit" ${!complete?`disabled style='opacity:.5;cursor:not-allowed' title='${t("استكمال المتطلبات أولاً")}'`:""}>${t("إحالة إلى سلسلة المراجعة")}</button>`:
        chainIdx>=1 && chainIdx<FR_CHAIN.length-1 ?
-        `<button class="btn primary" id="fr-advance">نقل إلى مرحلة «${FR_CHAIN[chainIdx+1]}»</button>
-         <button class="btn danger" id="fr-return">إعادة للاستكمال</button>`:""}
+        `<button class="btn primary" id="fr-advance">${t("نقل إلى مرحلة")} «${t(FR_CHAIN[chainIdx+1])}»</button>
+         <button class="btn danger" id="fr-return">${t("إعادة للاستكمال")}</button>`:""}
     </div>
-    ${!complete && (r.stage==="الإعداد"||r.stage==="معاد للاستكمال")? `<div class="mini-note mt">⚠ لا يمكن الإحالة قبل اكتمال المتطلبات الثمانية.</div>`:""}`;
-  openDrawer(`${r.id} — ${r.name}`, body);
+    ${!complete && (r.stage==="الإعداد"||r.stage==="معاد للاستكمال")? `<div class="mini-note mt">⚠ ${t("لا يمكن الإحالة قبل اكتمال المتطلبات الثمانية")}.</div>`:""}`;
+  openDrawer(`${r.id} — ${t(r.name)}`, body);
   document.querySelectorAll("#drawer-body [data-ck]").forEach(btn=>{
     btn.addEventListener("click",()=>{
       const k = btn.dataset.ck;
@@ -1225,7 +1271,7 @@ function openFR(id){
   if(el("fr-advance")) el("fr-advance").addEventListener("click",()=>{
     if(!frComplete(r)){ toast("لا يمكن نقل الطلب — يُعاد للاستكمال لمعالجة النواقص"); return; }
     r.stage = FR_CHAIN[chainIdx+1];
-    save(); refresh(); openFR(id); toast(`انتقل الطلب إلى مرحلة «${r.stage}»`);
+    save(); refresh(); openFR(id); toast(`${t("انتقل الطلب إلى مرحلة")} «${t(r.stage)}»`);
   });
   if(el("fr-return")) el("fr-return").addEventListener("click",()=>{
     r.stage = "معاد للاستكمال"; r.note = "أعيد الطلب لاستيفاء ملاحظات المراجعة.";
@@ -1247,23 +1293,23 @@ RENDER.studies = {
     };
     return `
     <div class="stat-strip">
-      ${kpiTile("book","","إجمالي الدراسات", `${ltr(n(S.data.studies.length))}`, `<span>${n(S.data.studies.filter(s=>s.status==="معتمدة"||s.status==="مكتملة").length)} معتمدة/مكتملة</span>`)}
-      ${kpiTile("gauge","","متوسط اكتمال دراسات السعة والطلب", pct(avg("سعة وطلب")), `<span>منهجية الخطوات السبع حسب فئة الأصول</span>`)}
-      ${kpiTile("doc","n","متوسط اكتمال الدراسات الخمس", pct(avg("الدراسات الخمس")), `<span>النموذج الخماسي للجدوى</span>`)}
-      ${kpiTile("bulb","g","دراسات الهندسة القيمية", `${ltr(n(S.data.studies.filter(s=>s.type==="هندسة قيمية").length))}`, `<span>وفق منهجية SAVE ومراحل العمل الثماني</span>`)}
+      ${kpiTile("book","",t("إجمالي الدراسات"), `${ltr(n(S.data.studies.length))}`, `<span>${n(S.data.studies.filter(s=>s.status==="معتمدة"||s.status==="مكتملة").length)} ${t("معتمدة/مكتملة")}</span>`)}
+      ${kpiTile("gauge","",t("متوسط اكتمال دراسات السعة والطلب"), pct(avg(t("سعة وطلب"))), `<span>${t("منهجية الخطوات السبع حسب فئة الأصول")}</span>`)}
+      ${kpiTile("doc","n",t("متوسط اكتمال الدراسات الخمس"), pct(avg(t("الدراسات الخمس"))), `<span>${t("النموذج الخماسي للجدوى")}</span>`)}
+      ${kpiTile("bulb","g",t("دراسات الهندسة القيمية"), `${ltr(n(S.data.studies.filter(s=>s.type==="هندسة قيمية").length))}`, `<span>${t("وفق منهجية SAVE ومراحل العمل الثماني")}</span>`)}
     </div>
 
-    <div class="section-head"><h2>سجل الدراسات</h2>
-      <span class="hint">أتمتة إعداد دراسات السعة والطلب والدراسات الخمس ومتابعتها — المسار الثالث من نطاق العمل</span></div>
+    <div class="section-head"><h2>${t("سجل الدراسات")}</h2>
+      <span class="hint">${t("أتمتة إعداد دراسات السعة والطلب والدراسات الخمس ومتابعتها — المسار الثالث من نطاق العمل")}</span></div>
     <div class="card">
       <div class="toolbar">
         <div class="pillbar">
-          ${types.map(t=>`<button class="pill ${f===t?"on":""}" data-stype="${t}">${t}</button>`).join("")}
+          ${types.map(ty=>`<button class="pill ${f===ty?"on":""}" data-stype="${ty}">${t(ty)}</button>`).join("")}
         </div>
       </div>
       <div class="tblwrap">
         <table>
-          <thead><tr><th>الرمز</th><th>الدراسة</th><th>النوع</th><th>فئة الأصول</th><th>البرنامج</th><th>الاكتمال</th><th>الحالة</th></tr></thead>
+          <thead><tr><th>${t("الرمز")}</th><th>${t("الدراسة")}</th><th>${t("النوع")}</th><th>${t("فئة الأصول")}</th><th>${t("البرنامج")}</th><th>${t("الاكتمال")}</th><th>${t("الحالة")}</th></tr></thead>
           <tbody>
             ${list.map(s=>`
               <tr>
@@ -1282,29 +1328,29 @@ RENDER.studies = {
 
     <div class="grid g2 mt">
       <div class="card">
-        <h3>تغطية الدراسات حسب فئة الأصول</h3>
-        <div class="subt">عدد الدراسات لكل فئة</div>
+        <h3>${t("تغطية الدراسات حسب فئة الأصول")}</h3>
+        <div class="subt">${t("عدد الدراسات لكل فئة")}</div>
         <div id="ch-st-class" class="chart ch-260"></div>
       </div>
       <div class="card">
-        <h3>مكتبة المنهجيات والأدلة الاسترشادية</h3>
-        <div class="subt">المسار الثاني — 13 منهجية معتمدة أو قيد التطوير مع أدلتها التفصيلية</div>
+        <h3>${t("مكتبة المنهجيات والأدلة الاسترشادية")}</h3>
+        <div class="subt">${t("المسار الثاني — 13 منهجية معتمدة أو قيد التطوير مع أدلتها التفصيلية")}</div>
         <div class="cklist" style="margin-top:6px;max-height:300px;overflow-y:auto">
           ${(S.data.methodologies||[]).map(m=>`
             <div class="ck ${m.status==="مفعّلة"?"y":"n"}"><span class="box">${m.status==="مفعّلة"?"✓":""}</span>
-            <span style="flex:1">${esc(m.name)}<span class="owner-tag" style="display:block">نسخة ${esc(m.version)} · ${esc(m.guide)}</span></span>
+            <span style="flex:1">${esc(m.name)}<span class="owner-tag" style="display:block">${t("نسخة")} ${esc(m.version)} · ${esc(m.guide)}</span></span>
             <span class="st ${m.status==="مفعّلة"?"ok":"warn"}">${esc(m.status)}</span></div>`).join("")}
         </div>
       </div>
     </div>
 
-    <div class="section-head"><h2>المقارنات المعيارية بمساعدة الذكاء الاصطناعي</h2>
-      <span class="hint">نموذج أولي — المسار الثالث: توظيف الذكاء الاصطناعي في إعداد المقارنات المعيارية واحتساب السعة والطلب وتحديد مصادر البيانات</span></div>
+    <div class="section-head"><h2>${t("المقارنات المعيارية بمساعدة الذكاء الاصطناعي")}</h2>
+      <span class="hint">${t("نموذج أولي — المسار الثالث: توظيف الذكاء الاصطناعي في إعداد المقارنات المعيارية واحتساب السعة والطلب وتحديد مصادر البيانات")}</span></div>
     <div class="card goldrule">
       <div class="insight gold" style="margin-bottom:12px">${esc((S.data.aiBenchmarks||{}).note||"")}</div>
       <div class="tblwrap">
         <table>
-          <thead><tr><th>فئة الأصول</th><th>البند المرجعي</th><th>متوسط تكلفة الوحدة بالهيئة</th><th>النطاق المرجعي</th><th>مصدر البيانات</th></tr></thead>
+          <thead><tr><th>${t("فئة الأصول")}</th><th>${t("البند المرجعي")}</th><th>${t("متوسط تكلفة الوحدة بالهيئة")}</th><th>${t("النطاق المرجعي")}</th><th>${t("مصدر البيانات")}</th></tr></thead>
           <tbody>
             ${((S.data.aiBenchmarks||{}).rows||[]).map(r=>`
               <tr>
@@ -1317,7 +1363,7 @@ RENDER.studies = {
           </tbody>
         </table>
       </div>
-      <div class="mini-note mt">المخرجات المولدة بمساعدة الذكاء الاصطناعي مسودات استرشادية — الاعتماد النهائي للمختصين وفريق كفاءة الإنفاق.</div>
+      <div class="mini-note mt">${t("المخرجات المولدة بمساعدة الذكاء الاصطناعي مسودات استرشادية — الاعتماد النهائي للمختصين وفريق كفاءة الإنفاق")}.</div>
     </div>`;
   },
   mount(){
@@ -1326,12 +1372,12 @@ RENDER.studies = {
     S.data.studies.forEach(s=>{ m[s.assetClass]=(m[s.assetClass]||0)+1; });
     const rows = Object.entries(m).sort((a,b)=>b[1]-a[1]);
     chart("ch-st-class").setOption(base({
-      tooltip: Object.assign({},TT,{formatter:p=>ttRow(p.name, p.value>=3&&p.value<=10? `${n(p.value)} دراسات` : p.value===2? "دراستان" : p.value===1? "دراسة واحدة" : `${n(p.value)} دراسة`,p.color)}),
+      tooltip: Object.assign({},TT(),{formatter:p=>ttRow(p.name, p.value>=3&&p.value<=10? `${n(p.value)} ${t("دراسات")}` : p.value===2? "دراستان" : p.value===1? "دراسة واحدة" : `${n(p.value)} ${t("دراسة")}`,p.color)}),
       xAxis: hxAxis(v=>n(v)),
       yAxis: hyAxis(rows.map(r=>r[0]), 130),
       grid:{ top:12, bottom:26, right:142, left:34 },
-      series:[{ type:"bar", barWidth:12, data:rows.map(r=>({value:r[1], itemStyle:{color:"#098A4E", borderRadius:[6,0,0,6]}})),
-        label:{show:true, position:"left", fontFamily:"IBM Plex Sans Arabic", color:"#6B7870", formatter:p=>n(p.value)} }],
+      series:[{ type:"bar", barWidth:12, data:rows.map(r=>({value:r[1], itemStyle:{color:"#098A4E", borderRadius:bRad(6)}})),
+        label:{show:true, position:hLbl(), fontFamily:"IBM Plex Sans Arabic", color:"#6B7870", formatter:p=>n(p.value)} }],
     }));
   },
 };
@@ -1348,34 +1394,34 @@ RENDER.services = {
     const digital = Math.round(S.data.services.reduce((s,x)=>s+x.digitalShare*x.volume,0)/S.data.services.reduce((s,x)=>s+x.volume,0));
     return `
     <div class="stat-strip">
-      ${kpiTile("gridic","","خدمات الدليل المعتمد", `${ltr(n(S.data.services.length))}`, `<span>تكلفة سنوية ${money(totalCost)}</span>`)}
-      ${kpiTile("check","","متوسط جودة الخدمة", `${ltr(n(avgQ))} <small>/ 100</small>`, `<span class="delta ${avgQ>=85?"up":"fl"}">المستهدف ${ltr("85")}</span>`)}
-      ${kpiTile("chartic","n","النسبة الرقمية المرجحة", pct(digital), `<span>من إجمالي المعاملات</span>`)}
-      ${kpiTile("alertT","g","خدمات تحتاج تحسيناً", `${ltr(n(needs))}`, `<span>ضمن خطة الارتقاء بتصنيف الجودة</span>`)}
+      ${kpiTile("gridic","",t("خدمات الدليل المعتمد"), `${ltr(n(S.data.services.length))}`, `<span>${t("تكلفة سنوية")} ${money(totalCost)}</span>`)}
+      ${kpiTile("check","",t("متوسط جودة الخدمة"), `${ltr(n(avgQ))} <small>/ 100</small>`, `<span class="delta ${avgQ>=85?"up":"fl"}">${t("المستهدف")} ${ltr("85")}</span>`)}
+      ${kpiTile("chartic","n",t("النسبة الرقمية المرجحة"), pct(digital), `<span>${t("من إجمالي المعاملات")}</span>`)}
+      ${kpiTile("alertT","g",t("خدمات تحتاج تحسيناً"), `${ltr(n(needs))}`, `<span>${t("ضمن خطة الارتقاء بتصنيف الجودة")}</span>`)}
     </div>
 
     <div class="grid g21 mt">
       <div class="card">
-        <h3>التكلفة مقابل الجودة</h3>
-        <div class="subt">كل نقطة تمثل خدمة، وحجمها يعكس تكلفتها الإجمالية — اضغط أي نقطة للتفاصيل</div>
+        <h3>${t("التكلفة مقابل الجودة")}</h3>
+        <div class="subt">${t("كل نقطة تمثل خدمة، وحجمها يعكس تكلفتها الإجمالية — اضغط أي نقطة للتفاصيل")}</div>
         <div id="ch-svc-scatter" class="chart ch-340"></div>
       </div>
       <div class="card">
-        <h3>تصنيف جودة الخدمات</h3>
-        <div class="subt">وفق منهجية مراجعة الخدمات</div>
+        <h3>${t("تصنيف جودة الخدمات")}</h3>
+        <div class="subt">${t("وفق منهجية مراجعة الخدمات")}</div>
         <div id="ch-svc-class" class="chart ch-340"></div>
       </div>
     </div>
 
-    <div class="section-head"><h2>دليل الخدمات والتكاليف</h2>
-      <span class="hint">تطوير دليل خدمات الهيئة واحتساب تكلفتها — متطلب أساسي في المسار الأول</span></div>
+    <div class="section-head"><h2>${t("دليل الخدمات والتكاليف")}</h2>
+      <span class="hint">${t("تطوير دليل خدمات الهيئة واحتساب تكلفتها — متطلب أساسي في المسار الأول")}</span></div>
     <div class="card">
       <div class="toolbar">
-        <input class="fsearch" id="svc-q" placeholder="بحث في الخدمات…" value="${esc(S.filters.svcQ)}">
+        <input class="fsearch" id="svc-q" placeholder="${t("بحث في الخدمات…")}" value="${esc(S.filters.svcQ)}">
       </div>
       <div class="tblwrap">
         <table>
-          <thead><tr><th>الخدمة</th><th>القطاع</th><th>القناة</th><th>تكلفة المعاملة (ألف ريال)</th><th>الحجم السنوي</th><th>التكلفة الإجمالية (م.ر)</th><th>الجودة</th><th>نقاط المراجعة</th><th>التصنيف</th></tr></thead>
+          <thead><tr><th>${t("الخدمة")}</th><th>${t("القطاع")}</th><th>${t("القناة")}</th><th>${t("تكلفة المعاملة (ألف ريال)")}</th><th>${t("الحجم السنوي")}</th><th>${t("التكلفة الإجمالية (م.ر)")}</th><th>${t("الجودة")}</th><th>${t("نقاط المراجعة")}</th><th>${t("التصنيف")}</th></tr></thead>
           <tbody>
             ${list.map(s=>`
               <tr>
@@ -1392,7 +1438,7 @@ RENDER.services = {
           </tbody>
         </table>
       </div>
-      <div class="mini-note mt">كل مؤشر تكلفة وحدة مقرون بمؤشر جودة — خفض التكلفة مع تراجع الجودة لا يُحتسب تحسناً وفق إطار جودة الإنفاق.</div>
+      <div class="mini-note mt">${t("كل مؤشر تكلفة وحدة مقرون بمؤشر جودة — خفض التكلفة مع تراجع الجودة لا يُحتسب تحسناً وفق إطار جودة الإنفاق")}.</div>
     </div>`;
   },
   mount(){
@@ -1400,12 +1446,12 @@ RENDER.services = {
     q.addEventListener("input",()=>{ S.filters.svcQ=q.value; refreshKeepFocus("svc-q"); });
     const cls = {"ممتاز":"#1E7F5C","جيد":"#3A6EA5","يحتاج تحسين":"#C88A16"};
     chart("ch-svc-scatter").setOption(base({
-      tooltip: Object.assign({},TT,{formatter:p=>{
+      tooltip: Object.assign({},TT(),{formatter:p=>{
         const s = S.data.services[p.dataIndex];
-        return `<b>${s.name}</b>` + ttRow("تكلفة المعاملة",`${n(s.unitCost,1)} ألف ريال`) + ttRow("الجودة",n(s.qualityScore)) + ttRow("التكلفة الإجمالية",`${n(s.totalCost,1)} م.ر`) + ttRow("التصنيف",s.classification);
+        return `<b>${t(s.name)}</b>` + ttRow(t("تكلفة المعاملة"),`${n(s.unitCost,1)} ${t("ألف ريال")}`) + ttRow(t("الجودة"),n(s.qualityScore)) + ttRow(t("التكلفة الإجمالية"),`${n(s.totalCost,1)} ${t("م.ر")}`) + ttRow(t("التصنيف"),t(s.classification));
       }}),
-      xAxis: Object.assign(valAxis(v=>n(v)), { name:"الجودة", inverse:true, nameLocation:"start", nameGap:8, nameTextStyle:{fontFamily:"Cairo",color:"#8B9C91"}, min:60, max:100, position:"bottom" }),
-      yAxis: Object.assign(valAxis(v=>n(v)), { name:"تكلفة المعاملة (ألف ريال)", nameGap:16, nameTextStyle:{fontFamily:"Cairo",color:"#8B9C91",align:"left"} }),
+      xAxis: Object.assign(valAxis(v=>n(v)), { name:t("الجودة"), inverse:true, nameLocation:"start", nameGap:8, nameTextStyle:{fontFamily:"Cairo",color:"#8B9C91"}, min:60, max:100, position:"bottom" }),
+      yAxis: Object.assign(valAxis(v=>n(v)), { name:t("تكلفة المعاملة (ألف ريال)"), nameGap:16, nameTextStyle:{fontFamily:"Cairo",color:"#8B9C91",align:"left"} }),
       grid:{ top:44, bottom:44, right:64, left:24 },
       series:[{ type:"scatter",
         data:S.data.services.map(s=>({ value:[s.qualityScore, s.unitCost], symbolSize:Math.max(10,Math.sqrt(s.totalCost)*4),
@@ -1414,13 +1460,13 @@ RENDER.services = {
     const cc = {"ممتاز":0,"جيد":0,"يحتاج تحسين":0};
     S.data.services.forEach(s=>cc[s.classification]++);
     chart("ch-svc-class").setOption(base({
-      tooltip: Object.assign({},TT,{formatter:p=>ttRow(p.name,`${n(p.value)} خدمات`,p.color)}),
+      tooltip: Object.assign({},TT(),{formatter:p=>ttRow(p.name,`${n(p.value)} ${t("خدمات")}`,p.color)}),
       xAxis: hxAxis(v=>n(v)),
       yAxis: hyAxis(Object.keys(cc)),
       grid:{ top:12, bottom:26, right:110, left:34 },
       series:[{ type:"bar", barWidth:22,
-        data:Object.entries(cc).map(([k,v])=>({value:v, itemStyle:{color:cls[k], borderRadius:[7,0,0,7]}})),
-        label:{show:true, position:"left", fontFamily:"IBM Plex Sans Arabic", fontWeight:700, color:"#5C6E63", formatter:p=>n(p.value)} }],
+        data:Object.entries(cc).map(([k,v])=>({value:v, itemStyle:{color:cls[k], borderRadius:bRad(7)}})),
+        label:{show:true, position:hLbl(), fontFamily:"IBM Plex Sans Arabic", fontWeight:700, color:"#5C6E63", formatter:p=>n(p.value)} }],
     }));
   },
 };
@@ -1437,21 +1483,21 @@ RENDER.budget = {
     const reviewed = B.filter(c=>c.reviewStatus==="مكتملة").length;
     return `
     <div class="stat-strip">
-      ${kpiTile("pie","","الميزانية المعتمدة 2026", `${ltr(n(total/1000,1))} <small>مليار ريال</small>`, `<span>${n(B.length)} أبواب رئيسية</span>`)}
-      ${kpiTile("chartic","","نسبة المنصرف حتى تاريخه", pct(spent/total*100), `<span>${money(spent)} حتى ${fmtDate(S.data.meta.asOf)}</span>`)}
-      ${kpiTile("book","n","تغطية مراجعات الإنفاق", `${ltr(n(reviewed))} <small>من ${n(B.length)}</small>`, `<span>وفق منهجية هيئة كفاءة الإنفاق</span>`)}
-      ${kpiTile("bulb","g","فرص كفاءة محددة من المراجعات", `${ltr(n(opp))} <small>م.ر</small>`, `<span>تُغذّي محفظة المبادرات</span>`)}
+      ${kpiTile("pie","",t("الميزانية المعتمدة 2026"), `${ltr(n(total/1000,1))} <small>${t("مليار ريال")}</small>`, `<span>${n(B.length)} ${t("أبواب رئيسية")}</span>`)}
+      ${kpiTile("chartic","",t("نسبة المنصرف حتى تاريخه"), pct(spent/total*100), `<span>${money(spent)} ${t("حتى")} ${fmtDate(S.data.meta.asOf)}</span>`)}
+      ${kpiTile("book","n",t("تغطية مراجعات الإنفاق"), `${ltr(n(reviewed))} <small>${t("من")} ${n(B.length)}</small>`, `<span>${t("وفق منهجية هيئة كفاءة الإنفاق")}</span>`)}
+      ${kpiTile("bulb","g",t("فرص كفاءة محددة من المراجعات"), `${ltr(n(opp))} <small>${t("م.ر")}</small>`, `<span>${t("تُغذّي محفظة المبادرات")}</span>`)}
     </div>
 
     <div class="grid g21 mt">
       <div class="card">
-        <h3>الأبواب: المعتمد مقابل المنصرف</h3>
-        <div class="subt">مليون ريال — مع فرص الكفاءة المحددة لكل باب</div>
+        <h3>${t("الأبواب: المعتمد مقابل المنصرف")}</h3>
+        <div class="subt">${t("مليون ريال — مع فرص الكفاءة المحددة لكل باب")}</div>
         <div id="ch-bud-bars" class="chart ch-340"></div>
       </div>
       <div class="card">
-        <h3>عوامل التكلفة ومسببات الطلب</h3>
-        <div class="subt">دراسة بنود الميزانية — تصنيف إداري داخلي مواءم مع أبواب الميزانية</div>
+        <h3>${t("عوامل التكلفة ومسببات الطلب")}</h3>
+        <div class="subt">${t("دراسة بنود الميزانية — تصنيف إداري داخلي مواءم مع أبواب الميزانية")}</div>
         <div style="max-height:380px;overflow-y:auto;padding-bottom:4px">
           ${B.map(c=>`
             <div style="padding:9px 0;border-bottom:1px dashed var(--line2)">
@@ -1462,12 +1508,12 @@ RENDER.budget = {
               </div>
             </div>`).join("")}
         </div>
-        <div class="legend-dots mt"><span><i style="background:var(--navy)"></i>عوامل تكلفة</span><span><i style="background:var(--gold)"></i>مسببات طلب</span></div>
+        <div class="legend-dots mt"><span><i style="background:var(--navy)"></i>${t("عوامل تكلفة")}</span><span><i style="background:var(--gold)"></i>${t("مسببات طلب")}</span></div>
       </div>
     </div>
 
-    <div class="section-head"><h2>سجل مراجعات الإنفاق</h2>
-      <span class="hint">خدمة مراجعة الإنفاق تُنفذ بالتكامل مع هيئة كفاءة الإنفاق وتُختتم بفرص محددة ودروس مستفادة</span></div>
+    <div class="section-head"><h2>${t("سجل مراجعات الإنفاق")}</h2>
+      <span class="hint">${t("خدمة مراجعة الإنفاق تُنفذ بالتكامل مع هيئة كفاءة الإنفاق وتُختتم بفرص محددة ودروس مستفادة")}</span></div>
     <div class="grid g2">
       ${S.data.spendingReviews.map(r=>`
         <div class="card lift">
@@ -1475,12 +1521,12 @@ RENDER.budget = {
             <h3 style="font-size:13.5px">${esc(r.scope)}</h3>
             <span class="st ${r.status==="مكتملة"?"ok":r.status==="قيد التنفيذ"?"info":"mut"}">${esc(r.status)}</span>
           </div>
-          <div class="subt">دورة ${esc(r.period)}</div>
+          <div class="subt">${t("دورة")} ${esc(r.period)}</div>
           <div style="display:flex;flex-wrap:wrap;gap:5px;margin:8px 0">
             ${r.axes.map(a=>`<span class="st teal">${esc(a)}</span>`).join("")}
           </div>
           ${r.opportunities.length? `<div class="divider"></div>
-            ${r.opportunities.map(o=>`<div class="fld"><b>فرصة ${esc(o.type)}${o.value?` — ${moneyShort(o.value)}`:""}</b><span><span class="st ${o.status==="معتمدة"?"ok":"info"}">${esc(o.status)}</span></span></div>`).join("")}`:""}
+            ${r.opportunities.map(o=>`<div class="fld"><b>${t("فرصة")} ${esc(o.type)}${o.value?` — ${moneyShort(o.value)}`:""}</b><span><span class="st ${o.status==="معتمدة"?"ok":"info"}">${esc(o.status)}</span></span></div>`).join("")}`:""}
           ${r.lessons? `<div class="insight" style="margin-top:10px">${esc(r.lessons)}</div>`:""}
         </div>`).join("")}
     </div>`;
@@ -1488,22 +1534,22 @@ RENDER.budget = {
   mount(){
     const B = S.data.budgetChapters;
     chart("ch-bud-bars").setOption(base({
-      tooltip: Object.assign({},TT,{trigger:"axis", formatter:ps=>{
+      tooltip: Object.assign({},TT(),{trigger:"axis", formatter:ps=>{
         const c = B[ps[0].dataIndex];
-        let h=`<b>${c.name}</b>`;
-        h+=ttRow("المعتمد",`${n(c.approved)} م.ر`,"#0B4028");
-        h+=ttRow("المنصرف",`${n(c.spent)} م.ر`,"#098A4E");
-        h+=ttRow("فرص الكفاءة",`${n(c.opportunities)} م.ر`,"#C7A34F");
-        h+=ttRow("حالة المراجعة",c.reviewStatus);
+        let h=`<b>${t(c.name)}</b>`;
+        h+=ttRow(t("المعتمد"),`${n(c.approved)} ${t("م.ر")}`,"#0B4028");
+        h+=ttRow(t("المنصرف"),`${n(c.spent)} ${t("م.ر")}`,"#098A4E");
+        h+=ttRow(t("فرص الكفاءة"),`${n(c.opportunities)} ${t("م.ر")}`,"#C7A34F");
+        h+=ttRow(t("حالة المراجعة"),c.reviewStatus);
         return h; }}),
       legend:{ icon:"circle", itemWidth:9, itemHeight:9, top:0, textStyle:{fontFamily:"Cairo",fontSize:11,color:"#5C6E63"} },
       xAxis: hxAxis(v=>n(v)),
       yAxis: hyAxis(B.map(c=>c.name), 175),
       grid:{ top:34, bottom:26, right:188, left:20 },
       series:[
-        { name:"المعتمد", type:"bar", barGap:"-100%", barWidth:16, color:"#E0EEE5", data:B.map(c=>({value:c.approved, itemStyle:{borderRadius:[8,0,0,8]}})), silent:true },
-        { name:"المنصرف", type:"bar", barWidth:16, color:"#098A4E", data:B.map(c=>({value:c.spent, itemStyle:{borderRadius:[8,0,0,8]}})) },
-        { name:"فرص الكفاءة", type:"scatter", symbol:"diamond", symbolSize:12, color:"#C7A34F", data:B.map(c=>c.opportunities) },
+        { name:t("المعتمد"), type:"bar", barGap:"-100%", barWidth:16, color:"#E0EEE5", data:B.map(c=>({value:c.approved, itemStyle:{borderRadius:bRad(8)}})), silent:true },
+        { name:t("المنصرف"), type:"bar", barWidth:16, color:"#098A4E", data:B.map(c=>({value:c.spent, itemStyle:{borderRadius:bRad(8)}})) },
+        { name:t("فرص الكفاءة"), type:"scatter", symbol:"diamond", symbolSize:12, color:"#C7A34F", data:B.map(c=>c.opportunities) },
       ],
     }));
   },
@@ -1535,15 +1581,15 @@ RENDER.kpis = {
       ${famStats.map((fs,i)=>`
         <div class="kpi lift" data-fam="${fs.fam}" style="cursor:pointer;${f===fs.fam?"outline:2px solid var(--teal)":""}">
           <div class="icn ${i%2?"n":""}">${svgi(["coins","shield","chartic","bulb"][i])}</div>
-          <div class="lbl">${fs.fam}</div>
-          <div class="val">${ltr(n(fs.ok))} <small>من ${n(fs.total)} ضمن المستهدف</small></div>
-          <div class="foot"><span class="st ${fs.near?"warn":"mut"}">${n(fs.near)} قريب من المستهدف</span><div class="bar-mini" style="flex:1"><i style="width:${fs.total? (fs.ok+fs.near*0.5)/fs.total*100:0}%;${fs.ok===0? (fs.near? "background:var(--warn)":"background:var(--bad)"):""}"></i></div></div>
+          <div class="lbl">${t(fs.fam)}</div>
+          <div class="val">${ltr(n(fs.ok))} <small>${t("من")} ${n(fs.total)} ${t("ضمن المستهدف")}</small></div>
+          <div class="foot"><span class="st ${fs.near?"warn":"mut"}">${n(fs.near)} ${t("قريب من المستهدف")}</span><div class="bar-mini" style="flex:1"><i style="width:${fs.total? (fs.ok+fs.near*0.5)/fs.total*100:0}%;${fs.ok===0? (fs.near? "background:var(--warn)":"background:var(--bad)"):""}"></i></div></div>
         </div>`).join("")}
     </div>
 
-    <div class="section-head"><h2>مؤشرات إدارة الأداء ${f!=="الكل"?`— ${f}`:""}</h2>
-      <span class="hint">المجموعات الأربع وفق النموذج التشغيلي لفرق كفاءة الإنفاق (القسم 2.7) — اضغط أي مؤشر لعرض تطوره الزمني</span>
-      ${f!=="الكل"?`<button class="btn ghost" id="kpi-all">عرض الكل</button>`:""}</div>
+    <div class="section-head"><h2>${t("مؤشرات إدارة الأداء")} ${f!=="الكل"?`— ${f}`:""}</h2>
+      <span class="hint">${t("المجموعات الأربع وفق النموذج التشغيلي لفرق كفاءة الإنفاق (القسم 2.7) — اضغط أي مؤشر لعرض تطوره الزمني")}</span>
+      ${f!=="الكل"?`<button class="btn ghost" id="kpi-all">${t("عرض الكل")}</button>`:""}</div>
     <div class="grid g3" style="grid-template-columns:repeat(auto-fill,minmax(330px,1fr))">
       ${KP.map(k=>{
         const st = kpiStatus(k);
@@ -1552,13 +1598,13 @@ RENDER.kpis = {
         const progress = k.direction==="up"? Math.min(100, v/k.target*100) : Math.min(100, k.target/Math.max(v,0.0001)*100);
         return `<div class="card lift" data-kpi="${k.id}" style="cursor:pointer">
           <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start">
-            <h3 style="font-size:12.5px;line-height:1.5;flex:1">${esc(k.name)}${k.extra?` <span class="st gold" style="font-size:10px">مؤشر إضافي خاص بالهيئة</span>`:""}</h3>
-            <span class="st ${st}">${st==="ok"?"ضمن المستهدف":st==="warn"?"قريب":"حرج"}</span>
+            <h3 style="font-size:12.5px;line-height:1.5;flex:1">${esc(k.name)}${k.extra?` <span class="st gold" style="font-size:10px">${t("مؤشر إضافي خاص بالهيئة")}</span>`:""}</h3>
+            <span class="st ${st}">${st==="ok"?t("ضمن المستهدف"):st==="warn"?t("قريب"):t("حرج")}</span>
           </div>
           <div style="display:flex;align-items:baseline;gap:9px;margin-top:6px">
             <span class="pscore" style="font-size:24px">${ltr(n(v, v%1?1:0))}</span>
-            <span class="mini-note">${esc(k.unit)} · المستهدف ${ltr(n(k.target, k.target%1?1:0))} ${k.direction==="down"?"(الأقل أفضل)":""}</span>
-            ${better!=null? `<span class="delta ${better?"up":"dn"}">${better?"تحسن":"تراجع"}</span>`:""}
+            <span class="mini-note">${esc(k.unit)} · ${t("المستهدف")} ${ltr(n(k.target, k.target%1?1:0))} ${k.direction==="down"?t("(الأقل أفضل)"):""}</span>
+            ${better!=null? `<span class="delta ${better?"up":"dn"}">${better?t("تحسن"):t("تراجع")}</span>`:""}
           </div>
           <div class="bar-mini" style="margin-top:8px"><i style="width:${progress}%;${st==="bad"?"background:var(--bad)":st==="warn"?"background:var(--warn)":""}"></i></div>
           <div class="mini-note" style="margin-top:5px">${esc(k.freq)} · ${esc(k.family)}</div>
@@ -1575,18 +1621,18 @@ RENDER.kpis = {
 function openKpi(id){
   const k = S.data.kpis.find(x=>x.id===id); if(!k) return;
   const body = `
-    <div class="fld"><b>المجموعة</b><span>${esc(k.family)}</span></div>
-    <div class="fld"><b>الدورية</b><span>${esc(k.freq)}</span></div>
-    <div class="fld"><b>الاتجاه</b><span>${k.direction==="up"?"الأعلى أفضل":"الأقل أفضل"}</span></div>
-    <div class="fld"><b>المستهدف</b><span class="num">${n(k.target, k.target%1?1:0)} ${esc(k.unit)}</span></div>
-    <div class="fld"><b>المالك</b><span>${esc(k.owner)}</span></div>
-    ${k.formula? `<div class="fld"><b>المعادلة</b><span>${esc(k.formula)}</span></div>`:""}
-    <div class="dsec"><h4>التطور الزمني</h4><div id="ch-kpi-trend" class="chart ch-220"></div></div>`;
-  openDrawer(k.name, body);
+    <div class="fld"><b>${t("المجموعة")}</b><span>${esc(k.family)}</span></div>
+    <div class="fld"><b>${t("الدورية")}</b><span>${esc(k.freq)}</span></div>
+    <div class="fld"><b>${t("الاتجاه")}</b><span>${k.direction==="up"?t("الأعلى أفضل"):t("الأقل أفضل")}</span></div>
+    <div class="fld"><b>${t("المستهدف")}</b><span class="num">${n(k.target, k.target%1?1:0)} ${esc(k.unit)}</span></div>
+    <div class="fld"><b>${t("المالك")}</b><span>${esc(k.owner)}</span></div>
+    ${k.formula? `<div class="fld"><b>${t("المعادلة")}</b><span>${esc(k.formula)}</span></div>`:""}
+    <div class="dsec"><h4>${t("التطور الزمني")}</h4><div id="ch-kpi-trend" class="chart ch-220"></div></div>`;
+  openDrawer(t(k.name), body);
   requestAnimationFrame(()=>{
     const c = chart("ch-kpi-trend"); if(!c) return;
     c.setOption(base({
-      tooltip: Object.assign({},TT,{trigger:"axis", formatter:ps=>`<b>${ps[0].axisValue}</b>`+ttRow("القيمة",`${n(ps[0].value, ps[0].value%1?1:0)} ${k.unit}`,"#098A4E")}),
+      tooltip: Object.assign({},TT(),{trigger:"axis", formatter:ps=>`<b>${ps[0].axisValue}</b>`+ttRow(t("القيمة"),`${n(ps[0].value, ps[0].value%1?1:0)} ${t(k.unit)}`,"#098A4E")}),
       xAxis: catXAxis(k.series.map(s=>s.p), { axisLabel:{color:"#5C6E63",fontFamily:"Cairo",fontSize:10, interval:0, rotate:k.series.length>4?26:0} }),
       yAxis: Object.assign(valAxis(v=>n(v)), {
         max: v=>Math.max(v.max, k.target)*1.08,
@@ -1597,7 +1643,7 @@ function openKpi(id){
         lineStyle:{color:"#098A4E",width:3}, itemStyle:{color:"#098A4E"},
         areaStyle:{color:{type:"linear",x:0,y:0,x2:0,y2:1,colorStops:[{offset:0,color:"rgba(9,138,78,.2)"},{offset:1,color:"rgba(9,138,78,0)"}]}},
         markLine:{ symbol:"none", lineStyle:{color:"#C7A34F",type:"dashed",width:2},
-          label:{formatter:`المستهدف ${n(k.target,k.target%1?1:0)}`, fontFamily:"Cairo", color:"#A98A3C", position:"insideStartTop"},
+          label:{formatter:`${t("المستهدف")} ${n(k.target,k.target%1?1:0)}`, fontFamily:"Cairo", color:"#A98A3C", position:"insideStartTop"},
           data:[{yAxis:k.target}] } }],
     }));
     c.resize();
@@ -1613,11 +1659,11 @@ RENDER.governance = {
     return `
     <div class="grid g21">
       <div class="card">
-        <h3>النموذج التشغيلي — ${esc(G.model)}</h3>
-        <div class="subt">وفق النموذج التشغيلي لفرق كفاءة الإنفاق الصادر عن هيئة كفاءة الإنفاق والمشروعات الحكومية</div>
+        <h3>${t("النموذج التشغيلي")} — ${esc(G.model)}</h3>
+        <div class="subt">${t("وفق النموذج التشغيلي لفرق كفاءة الإنفاق الصادر عن هيئة كفاءة الإنفاق والمشروعات الحكومية")}</div>
         <div class="grid" style="gap:10px;margin-top:10px">
-          <div class="org-box head"><b>${esc(G.reportsTo)}</b><span style="font-size:11px;opacity:.8">المرجعية المباشرة للفريق</span></div>
-          <div class="org-box head" style="background:var(--teal)"><b>${esc(G.leader)}</b><span style="font-size:11px;opacity:.85">نقطة التواصل الوحيدة مع إكسبرو</span></div>
+          <div class="org-box head"><b>${esc(G.reportsTo)}</b><span style="font-size:11px;opacity:.8">${t("المرجعية المباشرة للفريق")}</span></div>
+          <div class="org-box head" style="background:var(--teal)"><b>${esc(G.leader)}</b><span style="font-size:11px;opacity:.85">${t("نقطة التواصل الوحيدة مع إكسبرو")}</span></div>
           <div class="grid g3" style="gap:10px">
             ${G.sections.map(s=>`
               <div class="org-box sec"><b>${esc(s.name)}</b>
@@ -1628,8 +1674,8 @@ RENDER.governance = {
         <div class="insight navy mt">${esc(G.singlePoint)}</div>
       </div>
       <div class="card">
-        <h3>سلم التصعيد مع هيئة كفاءة الإنفاق والمشروعات الحكومية</h3>
-        <div class="subt">ضوابط التفاعل ثلاثية المستويات (إكسبرو)</div>
+        <h3>${t("سلم التصعيد مع هيئة كفاءة الإنفاق والمشروعات الحكومية")}</h3>
+        <div class="subt">${t("ضوابط التفاعل ثلاثية المستويات (إكسبرو)")}</div>
         ${G.escalation.map(e=>`
           <div class="esc-row">
             <div class="esc-lvl">${e.level}</div>
@@ -1637,14 +1683,14 @@ RENDER.governance = {
               <div class="mini-note">${esc(e.expro)}</div></div>
             <span class="esc-arrow">⇄</span>
           </div>`).join("")}
-        <div class="mini-note mt">التصعيد وطلب الدعم يتجهان لأعلى، والقرارات والتوجيهات تعود لأسفل — القنوات: الاجتماعات والتقارير والبريد الرسمي.</div>
+        <div class="mini-note mt">${t("التصعيد وطلب الدعم يتجهان لأعلى، والقرارات والتوجيهات تعود لأسفل — القنوات: الاجتماعات والتقارير والبريد الرسمي")}.</div>
       </div>
     </div>
 
-    <div class="section-head"><h2>ملاك الركائز</h2><span class="hint">كل ركيزة يملكها قسم مسؤول عن خطتها التصحيحية وتقاريرها</span></div>
+    <div class="section-head"><h2>${t("ملاك الركائز")}</h2><span class="hint">${t("كل ركيزة يملكها قسم مسؤول عن خطتها التصحيحية وتقاريرها")}</span></div>
     <div class="card">
       <div class="tblwrap"><table>
-        <thead><tr><th>الركيزة</th><th>المالك</th><th>الدرجة الذاتية</th><th>درجة المحاكاة</th><th>وثائق متوفرة</th></tr></thead>
+        <thead><tr><th>${t("الركيزة")}</th><th>${t("المالك")}</th><th>${t("الدرجة الذاتية")}</th><th>${t("درجة المحاكاة")}</th><th>${t("وثائق متوفرة")}</th></tr></thead>
         <tbody>
           ${S.data.pillars.map(p=>{
             const pe = evStats(p.criteria);
@@ -1659,11 +1705,11 @@ RENDER.governance = {
       </table></div>
     </div>
 
-    <div class="section-head"><h2>سجل السياسات والتكليفات المعممة</h2>
-      <span class="hint">المرجع النظامي لمؤشر الالتزام بالسياسات — أوامر سامية وتعليمات وأدلة وطنية</span></div>
+    <div class="section-head"><h2>${t("سجل السياسات والتكليفات المعممة")}</h2>
+      <span class="hint">${t("المرجع النظامي لمؤشر الالتزام بالسياسات — أوامر سامية وتعليمات وأدلة وطنية")}</span></div>
     <div class="card">
       <div class="tblwrap"><table>
-        <thead><tr><th>المرجع</th><th>النوع</th><th>الموضوع</th><th>حالة الالتزام</th><th>شاهد الالتزام</th></tr></thead>
+        <thead><tr><th>${t("المرجع")}</th><th>${t("النوع")}</th><th>${t("الموضوع")}</th><th>${t("حالة الالتزام")}</th><th>${t("شاهد الالتزام")}</th></tr></thead>
         <tbody>
           ${(S.data.policies||[]).map(p=>`
             <tr>
@@ -1675,16 +1721,16 @@ RENDER.governance = {
             </tr>`).join("")}
         </tbody>
       </table></div>
-      <div class="mini-note mt">يغذي هذا السجل مؤشر «نسبة الالتزام بالسياسات والتكليفات المعممة» وفق آلية الاحتساب المعتمدة من هيئة كفاءة الإنفاق والمشروعات الحكومية.</div>
+      <div class="mini-note mt">${t("يغذي هذا السجل مؤشر «نسبة الالتزام بالسياسات والتكليفات المعممة» وفق آلية الاحتساب المعتمدة من هيئة كفاءة الإنفاق والمشروعات الحكومية")}.</div>
     </div>
 
-    <div class="section-head"><h2>اللجان والاجتماعات</h2></div>
+    <div class="section-head"><h2>${t("اللجان والاجتماعات")}</h2></div>
     <div class="grid g21">
       <div class="card">
         <div class="toolbar" style="margin-bottom:8px">
-          <h3 style="margin:0">سجل الاجتماعات والقرارات</h3>
+          <h3 style="margin:0">${t("سجل الاجتماعات والقرارات")}</h3>
           <div class="spacer"></div>
-          <button class="btn primary" id="mtg-add">تسجيل اجتماع</button>
+          <button class="btn primary" id="mtg-add">${t("تسجيل اجتماع")}</button>
         </div>
         ${G.meetings.map(m=>`
           <div style="padding:10px 0;border-bottom:1px dashed var(--line2)">
@@ -1703,8 +1749,8 @@ RENDER.governance = {
             <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
               <h3>${esc(c.name)}</h3><span class="st teal">${esc(c.freq)}</span>
             </div>
-            <div class="fld"><b>الرئيس</b><span>${esc(c.chair)}</span></div>
-            <div class="fld"><b>الأعضاء</b><span class="num">${n(c.members)}</span></div>
+            <div class="fld"><b>${t("الرئيس")}</b><span>${esc(c.chair)}</span></div>
+            <div class="fld"><b>${t("الأعضاء")}</b><span class="num">${n(c.members)}</span></div>
             <div class="mini-note" style="margin-top:6px">${esc(c.mandate)}</div>
           </div>`).join("")}
       </div>
@@ -1713,12 +1759,12 @@ RENDER.governance = {
   mount(){
     APP.querySelectorAll("[data-pillar]").forEach(el=>el.addEventListener("click",()=>{ go("skep"); setTimeout(()=>openPillar(el.dataset.pillar),80); }));
     document.getElementById("mtg-add").addEventListener("click",()=>{
-      openModal("تسجيل اجتماع جديد", `
+      openModal(t("تسجيل اجتماع جديد"), `
         <div class="frow">
-          <div class="fgrp"><label>اللجنة</label><select id="m-comm">${S.data.governance.committees.map(c=>`<option>${esc(c.name)}</option>`).join("")}</select></div>
-          <div class="fgrp"><label>التاريخ</label><input id="m-date" type="date" value="${S.data.meta.asOf}"></div>
+          <div class="fgrp"><label>${t("اللجنة")}</label><select id="m-comm">${S.data.governance.committees.map(c=>`<option value="${c.name}">${esc(c.name)}</option>`).join("")}</select></div>
+          <div class="fgrp"><label>${t("التاريخ")}</label><input id="m-date" type="date" value="${S.data.meta.asOf}"></div>
         </div>
-        <div class="frow one"><div class="fgrp"><label>القرارات (سطر لكل قرار)</label><textarea id="m-dec" rows="4"></textarea></div></div>
+        <div class="frow one"><div class="fgrp"><label>${t("القرارات (سطر لكل قرار")})</label><textarea id="m-dec" rows="4"></textarea></div></div>
       `, [
         { label:"إلغاء", cls:"ghost", fn:closeModal },
         { label:"حفظ", cls:"primary", fn:()=>{
@@ -1747,33 +1793,33 @@ RENDER.capability = {
     const done = C.trainings.filter(t=>t.status==="مكتمل").length;
     return `
     <div class="stat-strip">
-      ${kpiTile("users","","تغطية مصفوفة المهارات", pct(C.skillsCoverage), `<span>المستهدف ${pct(C.skillsTarget)}</span>`)}
-      ${kpiTile("check","","نسبة الوعي بكفاءة الإنفاق", pct(last.score), `<span>آخر قياس: ${esc(last.label)} (عدد المشاركين: ${n(last.respondents)})</span>`)}
-      ${kpiTile("book","n","البرامج التدريبية", `${ltr(n(done))} <small>من ${n(C.trainings.length)} مكتملة</small>`, `<span>${n(C.trainings.reduce((s,t)=>s+t.hours,0))} ساعة تدريبية</span>`)}
-      ${kpiTile("flag","g","مستوى تبني كفاءة الإنفاق", `${esc(C.adoption.current)}`, `<span>المستهدف «${esc(C.adoption.target)}» 2026–2027</span>`)}
+      ${kpiTile("users","",t("تغطية مصفوفة المهارات"), pct(C.skillsCoverage), `<span>${t("المستهدف")} ${pct(C.skillsTarget)}</span>`)}
+      ${kpiTile("check","",t("نسبة الوعي بكفاءة الإنفاق"), pct(last.score), `<span>${t("آخر قياس")}: ${esc(last.label)} (${t("عدد المشاركين")}: ${n(last.respondents)})</span>`)}
+      ${kpiTile("book","n",t("البرامج التدريبية"), `${ltr(n(done))} <small>${t("من")} ${n(C.trainings.length)} ${t("مكتملة")}</small>`, `<span>${n(C.trainings.reduce((s,t)=>s+t.hours,0))} ${t("ساعة تدريبية")}</span>`)}
+      ${kpiTile("flag","g",t("مستوى تبني كفاءة الإنفاق"), `${esc(C.adoption.current)}`, `<span>${t("المستهدف")} «${esc(C.adoption.target)}» 2026–2027</span>`)}
     </div>
 
     <div class="grid g21 mt">
       <div class="card">
-        <h3>تطور نسبة الوعي بكفاءة الإنفاق</h3>
-        <div class="subt">دورة قياس وتحسين متكاملة: قياس ← تحديد الفجوات ← تدخلات ← إعادة قياس (المستهدف ${pct(C.awareness.target)})</div>
+        <h3>${t("تطور نسبة الوعي بكفاءة الإنفاق")}</h3>
+        <div class="subt">${t("دورة قياس وتحسين متكاملة: قياس ← تحديد الفجوات ← تدخلات ← إعادة قياس (المستهدف")} ${pct(C.awareness.target)})</div>
         <div id="ch-cap-aw" class="chart ch-260"></div>
       </div>
       <div class="card">
-        <h3>مستويات التبني</h3>
-        <div class="subt">خطة إدارة التغيير وآلية التحفيز</div>
+        <h3>${t("مستويات التبني")}</h3>
+        <div class="subt">${t("خطة إدارة التغيير وآلية التحفيز")}</div>
         <div class="stepper" style="margin-top:16px">
           ${C.adoption.levels.map((l,i)=>`
             <div class="step ${i<C.adoption.currentIndex?"done":i===C.adoption.currentIndex?"cur":""}">
               <div class="dotp">${i<C.adoption.currentIndex?"✓":i+1}</div>
-              <span style="font-weight:${i===C.adoption.targetIndex?700:400};${i===C.adoption.targetIndex?"color:var(--gold2)":""}">${l}${i===C.adoption.targetIndex?" ◈":""}</span>
+              <span style="font-weight:${i===C.adoption.targetIndex?700:400};${i===C.adoption.targetIndex?"color:var(--gold2)":""}">${t(l)}${i===C.adoption.targetIndex?" ◈":""}</span>
             </div>`).join("")}
         </div>
         <div class="insight gold mt">${esc(C.adoption.note)}</div>
-        <div class="dsec"><h4>آلية التحفيز</h4>
+        <div class="dsec"><h4>${t("آلية التحفيز")}</h4>
           ${C.incentives.map(x=>`<div class="fld"><b>${esc(x.name)}</b><span><span class="st ${x.status==="مفعّلة"?"ok":"warn"}">${esc(x.status)}</span></span></div>`).join("")}
         </div>
-        ${C.nominations? `<div class="dsec"><h4>دورة الترشيح والتكريم (ترشيح ← تقييم اللجنة الإشرافية ← إعلان)</h4>
+        ${C.nominations? `<div class="dsec"><h4>${t("دورة الترشيح والتكريم (ترشيح ← تقييم اللجنة الإشرافية ← إعلان")})</h4>
           ${C.nominations.map(x=>`<div class="fld"><b style="max-width:60%">${esc(x.nominee)}</b><span><span class="st ${x.stage.startsWith("إعلان")?"ok":x.stage.startsWith("تقييم")?"info":"mut"}">${esc(x.stage)}</span> ${esc(x.criterion)}</span></div>`).join("")}
         </div>`:""}
       </div>
@@ -1781,15 +1827,15 @@ RENDER.capability = {
 
     ${C.succession? `<div class="grid g2 mt">
       <div class="card">
-        <h3>خطة التعاقب الوظيفي</h3>
-        <div class="subt">تغطية الأدوار الحرجة: ${pct(C.succession.coverage)} — المستهدف ${pct(C.succession.target)}</div>
+        <h3>${t("خطة التعاقب الوظيفي")}</h3>
+        <div class="subt">${t("تغطية الأدوار الحرجة")}: ${pct(C.succession.coverage)} — ${t("المستهدف")} ${pct(C.succession.target)}</div>
         <div class="bar-mini" style="margin:8px 0 12px"><i style="width:${C.succession.coverage}%"></i></div>
-        ${C.succession.roles.map(r=>`<div class="fld"><b>${esc(r.role)}</b><span><span class="st ${r.status==="مغطى"?"ok":"warn"}">${esc(r.status)}</span> ${r.ready>1?"مرشحان جاهزان":"مرشح واحد جاهز"}</span></div>`).join("")}
+        ${C.succession.roles.map(r=>`<div class="fld"><b>${esc(r.role)}</b><span><span class="st ${r.status==="مغطى"?"ok":"warn"}">${esc(r.status)}</span> ${r.ready>1?t("مرشحان جاهزان"):t("مرشح واحد جاهز")}</span></div>`).join("")}
         <div class="mini-note mt">${esc(C.succession.note)}</div>
       </div>
       <div class="card">
-        <h3>منظومة إدارة المعرفة</h3>
-        <div class="subt">مستودع موحد للمنهجيات والدروس المستفادة وقصص النجاح</div>
+        <h3>${t("منظومة إدارة المعرفة")}</h3>
+        <div class="subt">${t("مستودع موحد للمنهجيات والدروس المستفادة وقصص النجاح")}</div>
         ${C.knowledge.assets.map(a=>`<div class="fld"><b>${esc(a.name)}</b><span><span class="st ${a.status==="محدّث"?"ok":"warn"}">${esc(a.status)}</span></span></div>`).join("")}
         <div class="mini-note mt">${esc(C.knowledge.note)}</div>
       </div>
@@ -1797,10 +1843,10 @@ RENDER.capability = {
 
     <div class="grid g21 mt">
       <div class="card">
-        <h3>الخطة التدريبية ونقل المعرفة</h3>
-        <div class="subt">مرتبطة بفجوات مصفوفة المهارات — تشمل ورش نقل المعرفة من الاستشاريين</div>
+        <h3>${t("الخطة التدريبية ونقل المعرفة")}</h3>
+        <div class="subt">${t("مرتبطة بفجوات مصفوفة المهارات — تشمل ورش نقل المعرفة من الاستشاريين")}</div>
         <div class="tblwrap"><table>
-          <thead><tr><th>البرنامج</th><th>الفئة المستهدفة</th><th>الساعات</th><th>المشاركون</th><th>الموعد</th><th>الحالة</th></tr></thead>
+          <thead><tr><th>${t("البرنامج")}</th><th>${t("الفئة المستهدفة")}</th><th>${t("الساعات")}</th><th>${t("المشاركون")}</th><th>${t("الموعد")}</th><th>${t("الحالة")}</th></tr></thead>
           <tbody>
             ${C.trainings.map(t=>`
               <tr>
@@ -1815,8 +1861,8 @@ RENDER.capability = {
         </table></div>
       </div>
       <div class="card">
-        <h3>الفعاليات والحملات</h3>
-        <div class="subt">بما يشمل يوم كفاءة الإنفاق على مستوى الهيئة</div>
+        <h3>${t("الفعاليات والحملات")}</h3>
+        <div class="subt">${t("بما يشمل يوم كفاءة الإنفاق على مستوى الهيئة")}</div>
         ${C.events.map(e=>`
           <div class="alert info">
             <div class="ai">${svgi("clock")}</div>
@@ -1830,7 +1876,7 @@ RENDER.capability = {
   mount(){
     const C = S.data.capability;
     chart("ch-cap-aw").setOption(base({
-      tooltip: Object.assign({},TT,{trigger:"axis", formatter:ps=>`<b>${ps[0].axisValue}</b>`+ttRow("نسبة الوعي",pct(ps[0].value),"#098A4E")}),
+      tooltip: Object.assign({},TT(),{trigger:"axis", formatter:ps=>`<b>${ps[0].axisValue}</b>`+ttRow(t("نسبة الوعي"),pct(ps[0].value),"#098A4E")}),
       xAxis: catXAxis(C.awareness.surveys.map(s=>s.label), { boundaryGap:false }),
       yAxis: Object.assign(valAxis(v=>n(v)+"%"), {max:100}),
       grid:{ top:22, bottom:28, right:46, left:24 },
@@ -1839,7 +1885,7 @@ RENDER.capability = {
         label:{show:true, position:"top", fontFamily:"IBM Plex Sans Arabic", fontWeight:700, color:"#0B4028", formatter:p=>n(p.value)+"%"},
         areaStyle:{color:{type:"linear",x:0,y:0,x2:0,y2:1,colorStops:[{offset:0,color:"rgba(9,138,78,.18)"},{offset:1,color:"rgba(9,138,78,0)"}]}},
         markLine:{ symbol:"none", lineStyle:{color:"#B8963E",type:"dashed",width:1.6},
-          label:{formatter:`المستهدف ${C.awareness.target}%`, fontFamily:"Cairo", color:"#9A7D33", position:"insideEndTop"},
+          label:{formatter:`${t("المستهدف")} ${C.awareness.target}%`, fontFamily:"Cairo", color:"#9A7D33", position:"insideEndTop"},
           data:[{yAxis:C.awareness.target}] } }],
     }));
   },
@@ -1851,14 +1897,14 @@ RENDER.capability = {
 RENDER.reports = {
   html(){
     return `
-    <div class="section-head"><h2>إنشاء التقارير</h2>
-      <span class="hint">تقارير جاهزة للطباعة والرفع — تُبنى لحظياً من بيانات المنصة الحية</span></div>
+    <div class="section-head"><h2>${t("إنشاء التقارير")}</h2>
+      <span class="hint">${t("تقارير جاهزة للطباعة والرفع — تُبنى لحظياً من بيانات المنصة الحية")}</span></div>
     <div class="grid g4" style="grid-template-columns:repeat(auto-fit,minmax(250px,1fr))">
       ${[
-        { id:"pillar", icon:"skep", t:"تقرير جاهزية الركائز", d:"درجات المعايير والوثائق والفجوات لكل ركيزة — نموذج الرفع لدورة التقييم" },
-        { id:"quarterly", icon:"file", t:"التقرير الربع سنوي", d:"إنجازات الفريق والمبادرات والأثر المالي — للمسؤول الأول ونسخة لإكسبرو" },
-        { id:"annual", icon:"book", t:"التقرير السنوي 2026", d:"الحصاد السنوي الشامل لكفاءة الإنفاق في الهيئة" },
-        { id:"expro", icon:"doc", t:"حزمة منصة فرق كفاءة الإنفاق", d:"ملخص الرفع الدوري: مبادرات، وفورات، مؤشرات، حالة الركائز" },
+        { id:"pillar", icon:"skep", t:t("تقرير جاهزية الركائز"), d:t("درجات المعايير والوثائق والفجوات لكل ركيزة — نموذج الرفع لدورة التقييم") },
+        { id:"quarterly", icon:"file", t:t("التقرير الربع سنوي"), d:t("إنجازات الفريق والمبادرات والأثر المالي — للمسؤول الأول ونسخة لإكسبرو") },
+        { id:"annual", icon:"book", t:t("التقرير السنوي 2026"), d:t("الحصاد السنوي الشامل لكفاءة الإنفاق في الهيئة") },
+        { id:"expro", icon:"doc", t:t("حزمة منصة فرق كفاءة الإنفاق"), d:t("ملخص الرفع الدوري: مبادرات، وفورات، مؤشرات، حالة الركائز") },
       ].map(r=>`
         <div class="card lift" style="cursor:pointer;padding:22px 20px" data-report="${r.id}">
           <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
@@ -1866,14 +1912,14 @@ RENDER.reports = {
             <h3>${r.t}</h3>
           </div>
           <div class="mini-note">${r.d}</div>
-          <div style="margin-top:14px;font-family:var(--ff-d);font-weight:600;font-size:12px;color:var(--green)">إنشاء التقرير ←</div>
+          <div style="margin-top:14px;font-family:var(--ff-d);font-weight:600;font-size:12px;color:var(--green)">${t("إنشاء التقرير")} ←</div>
         </div>`).join("")}
     </div>
 
-    <div class="section-head"><h2>سجل التقارير</h2></div>
+    <div class="section-head"><h2>${t("سجل التقارير")}</h2></div>
     <div class="card">
       <div class="tblwrap"><table>
-        <thead><tr><th>التقرير</th><th>النوع</th><th>الفترة</th><th>الاستحقاق</th><th>الحالة</th></tr></thead>
+        <thead><tr><th>${t("التقرير")}</th><th>${t("النوع")}</th><th>${t("الفترة")}</th><th>${t("الاستحقاق")}</th><th>${t("الحالة")}</th></tr></thead>
         <tbody>
           ${S.data.reports.map(r=>`
             <tr>
@@ -1905,83 +1951,83 @@ function buildReport(type){
   const evs = evStats(allCriteria());
   let title="", body="";
   if(type==="pillar"){
-    title = "تقرير جاهزية برنامج ركائز استدامة كفاءة الإنفاق";
+    title = t("تقرير جاهزية برنامج ركائز استدامة كفاءة الإنفاق");
     body = S.data.pillars.map(p=>`
-      <h2>${esc(p.name)} — ${n(pillarScore(p,"self"),2)} من 5 (${gradeOf(pillarScore(p,"self"))})</h2>
-      <table><thead><tr><th>المعيار</th><th>ذاتي</th><th>محاكاة</th><th>الدورة 6</th><th>الوثائق</th><th>الإجراءات</th></tr></thead><tbody>
+      <h2>${esc(p.name)} — ${n(pillarScore(p,"self"),2)} ${t("من 5")} (${gradeOf(pillarScore(p,"self"))})</h2>
+      <table><thead><tr><th>${t("المعيار")}</th><th>${t("ذاتي")}</th><th>${t("محاكاة")}</th><th>${t("الدورة 6")}</th><th>${t("الوثائق")}</th><th>${t("الإجراءات")}</th></tr></thead><tbody>
         ${p.criteria.map(c=>`<tr>
           <td>${esc(c.code)} — ${esc(c.name)}</td>
           <td class="num">${n(c.selfScore)}</td><td class="num">${n(c.simScore)}</td><td class="num">${n(c.prevScore)}</td>
-          <td>${c.evidence.map(e=>`${esc(e.name)} (${e.status})`).join("؛ ")}</td>
-          <td>${c.actions.map(a=>esc(a.name)).join("؛ ")||"—"}</td>
+          <td>${c.evidence.map(e=>`${esc(e.name)} (${e.status})`).join(isAR()? "؛ " : "; ")}</td>
+          <td>${c.actions.map(a=>esc(a.name)).join(isAR()? "؛ " : "; ")||"—"}</td>
         </tr>`).join("")}
       </tbody></table>`).join("");
   } else if(type==="quarterly"){
-    title = "التقرير الربع سنوي لأعمال فريق كفاءة الإنفاق";
+    title = t("التقرير الربع سنوي لأعمال فريق كفاءة الإنفاق");
     body = `
-      <h2>الملخص التنفيذي</h2>
-      <p>بلغ التقييم الذاتي الشامل ${n(overallScore("self"),1)} من 5 (${gradeOf(overallScore("self"))})، وبلغ الأثر المالي المحقق التراكمي ${n(it.realized)} مليون ريال (منه ${n(it.documented)} مليون ريال موثق بالإقفال)، فيما بلغت نسبة الالتزام بالمبادرات ${n(ist.commitment,1)}%.</p>
-      <h2>المبادرات حسب المرحلة</h2>
-      <table><thead><tr><th>المرحلة</th><th>العدد</th></tr></thead><tbody>
+      <h2>${t("الملخص التنفيذي")}</h2>
+      <p>${t("بلغ التقييم الذاتي الشامل")} ${n(overallScore("self"),1)} ${t("من 5")} (${gradeOf(overallScore("self"))})${t("، وبلغ الأثر المالي المحقق التراكمي")} ${n(it.realized)} ${t("مليون ريال (منه")} ${n(it.documented)} ${t("مليون ريال موثق بالإقفال)، فيما بلغت نسبة الالتزام بالمبادرات")} ${n(ist.commitment,1)}%.</p>
+      <h2>${t("المبادرات حسب المرحلة")}</h2>
+      <table><thead><tr><th>${t("المرحلة")}</th><th>${t("العدد")}</th></tr></thead><tbody>
         ${INI_STAGES.map(s=>`<tr><td>${s}</td><td class="num">${n(statusCount()[s])}</td></tr>`).join("")}
       </tbody></table>
-      <h2>المبادرات المتأخرة والمتعثرة</h2>
-      <table><thead><tr><th>المبادرة</th><th>الحالة</th><th>الإجراء</th></tr></thead><tbody>
+      <h2>${t("المبادرات المتأخرة والمتعثرة")}</h2>
+      <table><thead><tr><th>${t("المبادرة")}</th><th>${t("الحالة")}</th><th>${t("الإجراء")}</th></tr></thead><tbody>
         ${S.data.initiatives.filter(i=>i.flag).map(i=>`<tr><td>${esc(i.name)}</td><td>${i.flag}</td><td>${esc(i.note||"—")}</td></tr>`).join("")||'<tr><td colspan="3">لا توجد</td></tr>'}
       </tbody></table>
-      <h2>مؤشرات الأداء الرئيسية</h2>
-      <table><thead><tr><th>المؤشر</th><th>القيمة</th><th>المستهدف</th><th>الحالة</th></tr></thead><tbody>
-        ${S.data.kpis.slice(0,10).map(k=>`<tr><td>${esc(k.name)}</td><td class="num">${n(kpiLatest(k),kpiLatest(k)%1?1:0)} ${esc(k.unit)}</td><td class="num">${n(k.target,k.target%1?1:0)}</td><td>${kpiStatus(k)==="ok"?"ضمن المستهدف":kpiStatus(k)==="warn"?"قريب":"حرج"}</td></tr>`).join("")}
+      <h2>${t("مؤشرات الأداء الرئيسية")}</h2>
+      <table><thead><tr><th>${t("المؤشر")}</th><th>${t("القيمة")}</th><th>${t("المستهدف")}</th><th>${t("الحالة")}</th></tr></thead><tbody>
+        ${S.data.kpis.slice(0,10).map(k=>`<tr><td>${esc(k.name)}</td><td class="num">${n(kpiLatest(k),kpiLatest(k)%1?1:0)} ${esc(k.unit)}</td><td class="num">${n(k.target,k.target%1?1:0)}</td><td>${kpiStatus(k)==="ok"?t("ضمن المستهدف"):kpiStatus(k)==="warn"?t("قريب"):t("حرج")}</td></tr>`).join("")}
       </tbody></table>`;
   } else if(type==="annual"){
-    title = "التقرير السنوي لكفاءة الإنفاق في الهيئة — 2026";
+    title = t("التقرير السنوي لكفاءة الإنفاق في الهيئة — 2026");
     body = `
-      <h2>أبرز النتائج</h2>
+      <h2>${t("أبرز النتائج")}</h2>
       <table><tbody>
-        <tr><td>التقييم الذاتي الشامل (الدورة السابعة)</td><td class="num">${n(overallScore("self"),1)} / 5 — ${gradeOf(overallScore("self"))}</td></tr>
-        <tr><td>تقييم الدورة السادسة</td><td class="num">${n(overallScore("prev"),1)} / 5</td></tr>
-        <tr><td>الأثر المالي المحدد (إجمالي الفرص)</td><td class="num">${n(it.identified)} مليون ريال</td></tr>
-        <tr><td>الأثر المعتمد من الشؤون المالية</td><td class="num">${n(it.approved)} مليون ريال</td></tr>
-        <tr><td>الأثر المحقق التراكمي</td><td class="num">${n(it.realized)} مليون ريال</td></tr>
-        <tr><td>اكتمال الوثائق الداعمة</td><td class="num">${evs.coverage}%</td></tr>
-        <tr><td>عدد المبادرات</td><td class="num">${n(ist.total)}</td></tr>
+        <tr><td>${t("التقييم الذاتي الشامل (الدورة السابعة")})</td><td class="num">${n(overallScore("self"),1)} / 5 — ${gradeOf(overallScore("self"))}</td></tr>
+        <tr><td>${t("تقييم الدورة السادسة")}</td><td class="num">${n(overallScore("prev"),1)} / 5</td></tr>
+        <tr><td>${t("الأثر المالي المحدد (إجمالي الفرص)")}</td><td class="num">${n(it.identified)} ${t("مليون ريال")}</td></tr>
+        <tr><td>${t("الأثر المعتمد من الشؤون المالية")}</td><td class="num">${n(it.approved)} ${t("مليون ريال")}</td></tr>
+        <tr><td>${t("الأثر المحقق التراكمي")}</td><td class="num">${n(it.realized)} ${t("مليون ريال")}</td></tr>
+        <tr><td>${t("اكتمال الوثائق الداعمة")}</td><td class="num">${evs.coverage}%</td></tr>
+        <tr><td>${t("عدد المبادرات")}</td><td class="num">${n(ist.total)}</td></tr>
       </tbody></table>
-      <h2>نضج الركائز</h2>
-      <table><thead><tr><th>الركيزة</th><th>ذاتي</th><th>محاكاة</th><th>الدورة 6</th><th>المالك</th></tr></thead><tbody>
+      <h2>${t("نضج الركائز")}</h2>
+      <table><thead><tr><th>${t("الركيزة")}</th><th>${t("ذاتي")}</th><th>${t("محاكاة")}</th><th>${t("الدورة 6")}</th><th>${t("المالك")}</th></tr></thead><tbody>
         ${S.data.pillars.map(p=>`<tr><td>${esc(p.name)}</td><td class="num">${n(pillarScore(p,"self"),2)}</td><td class="num">${n(pillarScore(p,"sim"),2)}</td><td class="num">${n(pillarScore(p,"prev"),2)}</td><td>${esc(p.owner)}</td></tr>`).join("")}
       </tbody></table>
-      <h2>قصص النجاح</h2>
-      ${S.data.initiatives.filter(i=>i.status==="مقفلة").map(i=>`<p><b>${esc(i.name)}:</b> ${esc(i.wasteSource)} — عولج مصدر الهدر عبر ${esc(i.treatment)}، بأثر موثق قدره ${n(i.realizedImpact)} مليون ريال.</p>`).join("")}`;
+      <h2>${t("قصص النجاح")}</h2>
+      ${S.data.initiatives.filter(i=>i.status==="مقفلة").map(i=>`<p><b>${esc(i.name)}:</b> ${esc(i.wasteSource)} — ${t("عولج مصدر الهدر عبر")} ${esc(i.treatment)}${t("، بأثر موثق قدره")} ${n(i.realizedImpact)} ${t("مليون ريال")}.</p>`).join("")}`;
   } else {
-    title = "حزمة الرفع الدوري — منصة فرق كفاءة الإنفاق";
+    title = t("حزمة الرفع الدوري — منصة فرق كفاءة الإنفاق");
     body = `
-      <h2>ملخص الرفع</h2>
+      <h2>${t("ملخص الرفع")}</h2>
       <table><tbody>
-        <tr><td>الجهة</td><td>${esc(S.data.meta.entity)}</td></tr>
-        <tr><td>الفترة</td><td>الربع الثالث 2026 (حتى ${asOf})</td></tr>
-        <tr><td>الأثر المحقق 2026</td><td class="num">${n(S.data.impact.monthly2026.reduce((s,m)=>s+m.real,0))} مليون ريال</td></tr>
-        <tr><td>نسبة الالتزام بالمبادرات</td><td class="num">${n(ist.commitment,1)}%</td></tr>
-        <tr><td>حالة التقييم الذاتي</td><td>قيد الاستكمال — الاستحقاق ${fmtDate(S.data.assessmentCycle.selfDue)}</td></tr>
+        <tr><td>${t("الجهة")}</td><td>${esc(S.data.meta.entity)}</td></tr>
+        <tr><td>${t("الفترة")}</td><td>${t("الربع الثالث 2026 (حتى")} ${asOf})</td></tr>
+        <tr><td>${t("الأثر المحقق 2026")}</td><td class="num">${n(S.data.impact.monthly2026.reduce((s,m)=>s+m.real,0))} ${t("مليون ريال")}</td></tr>
+        <tr><td>${t("نسبة الالتزام بالمبادرات")}</td><td class="num">${n(ist.commitment,1)}%</td></tr>
+        <tr><td>${t("حالة التقييم الذاتي")}</td><td>${t("قيد الاستكمال — الاستحقاق")} ${fmtDate(S.data.assessmentCycle.selfDue)}</td></tr>
       </tbody></table>
-      <h2>المبادرات النشطة (${n(S.data.initiatives.filter(i=>["تنفيذ","قياس الأثر"].includes(i.status)).length)})</h2>
-      <table><thead><tr><th>المبادرة</th><th>المرحلة</th><th>معتمد</th><th>محقق</th><th>الإنجاز</th></tr></thead><tbody>
-        ${S.data.initiatives.filter(i=>["تنفيذ","قياس الأثر"].includes(i.status)).map(i=>`<tr><td>${esc(i.name)}</td><td>${i.status}</td><td class="num">${n(i.approvedImpact)}</td><td class="num">${n(i.realizedImpact)}</td><td class="num">${n(i.progress)}%</td></tr>`).join("")}
+      <h2>${t("المبادرات النشطة")} (${n(S.data.initiatives.filter(i=>[t("تنفيذ"),t("قياس الأثر")].includes(i.status)).length)})</h2>
+      <table><thead><tr><th>${t("المبادرة")}</th><th>${t("المرحلة")}</th><th>${t("معتمد")}</th><th>${t("محقق")}</th><th>${t("الإنجاز")}</th></tr></thead><tbody>
+        ${S.data.initiatives.filter(i=>[t("تنفيذ"),t("قياس الأثر")].includes(i.status)).map(i=>`<tr><td>${esc(i.name)}</td><td>${i.status}</td><td class="num">${n(i.approvedImpact)}</td><td class="num">${n(i.realizedImpact)}</td><td class="num">${n(i.progress)}%</td></tr>`).join("")}
       </tbody></table>
-      <h2>الوثائق الداعمة للركائز</h2>
-      <p>متوفرة: ${n(evs.ready)} · قيد الإعداد: ${n(evs.prep)} · غير متوفرة: ${n(evs.missing)} — نسبة الاكتمال ${evs.coverage}%.</p>`;
+      <h2>${t("الوثائق الداعمة للركائز")}</h2>
+      <p>${t("متوفرة")}: ${n(evs.ready)} · ${t("قيد الإعداد")}: ${n(evs.prep)} · ${t("غير متوفرة")}: ${n(evs.missing)} — ${t("نسبة الاكتمال")} ${evs.coverage}%.</p>`;
   }
   rv.innerHTML = `
     <div class="rv-head">
       <div style="display:flex;align-items:center;gap:18px;min-width:0">
-        <img src="__LOGO_FULL__" alt="شعار الهيئة الملكية لمدينة الرياض" style="height:72px;flex:0 0 auto">
+        <img src="__LOGO_FULL__" alt="${t("شعار الهيئة الملكية لمدينة الرياض")}" style="height:72px;flex:0 0 auto">
         <div style="min-width:0">
           <h1>${title}</h1>
-          <div class="rv-meta">${esc(S.data.meta.entity)} — فريق كفاءة الإنفاق · تاريخ الإصدار: ${asOf} · ${S.data.meta.demo? "بيانات تجريبية لأغراض العرض":""}</div>
+          <div class="rv-meta">${esc(S.data.meta.entity)} — ${t("فريق كفاءة الإنفاق · تاريخ الإصدار")}: ${asOf} · ${S.data.meta.demo? t("بيانات تجريبية لأغراض العرض"):""}</div>
         </div>
       </div>
       <div style="display:flex;gap:8px" class="no-print">
-        <button class="btn primary" id="rv-print">طباعة / PDF</button>
-        <button class="btn ghost" id="rv-close">إغلاق</button>
+        <button class="btn primary" id="rv-print">${t("طباعة / PDF")}</button>
+        <button class="btn ghost" id="rv-close">${t("إغلاق")}</button>
       </div>
     </div>
     ${body}`;
@@ -2010,7 +2056,7 @@ const MO = document.getElementById("modal");
 function openModal(title, body, buttons){
   document.getElementById("modal-title").textContent = title;
   document.getElementById("modal-body").innerHTML = body;
-  document.getElementById("modal-foot").innerHTML = buttons.map((b,i)=>`<button class="btn ${b.cls}" data-mb="${i}">${b.label}</button>`).join("");
+  document.getElementById("modal-foot").innerHTML = buttons.map((b,i)=>`<button class="btn ${b.cls}" data-mb="${i}">${t(b.label)}</button>`).join("");
   MO.classList.add("on"); OV.classList.add("on");
   buttons.forEach((b,i)=>document.querySelector(`[data-mb="${i}"]`).addEventListener("click",b.fn));
   const first = document.querySelector("#modal-body input,#modal-body select,#modal-body textarea");
@@ -2021,11 +2067,11 @@ document.getElementById("modal-x").addEventListener("click",closeModal);
 
 let toastT=null;
 function toast(msg){
-  const t = document.getElementById("toast");
-  document.getElementById("toast-msg").textContent = msg;
-  t.hidden = false; t.classList.add("on");
+  const el = document.getElementById("toast");
+  document.getElementById("toast-msg").textContent = t(msg);
+  el.hidden = false; el.classList.add("on");
   clearTimeout(toastT);
-  toastT = setTimeout(()=>{ t.classList.remove("on"); }, 2600);
+  toastT = setTimeout(()=>{ el.classList.remove("on"); }, 2600);
 }
 
 /* ---------------- export / import / print / reset ---------------- */
@@ -2056,9 +2102,12 @@ document.getElementById("btn-print").addEventListener("click",()=>window.print()
 document.getElementById("btn-reset").addEventListener("click",resetData);
 
 /* ---------------- boot ---------------- */
-document.getElementById("mast-sub").textContent = S.data.meta.subtitle;
-document.getElementById("asof-chip").textContent = `محدثة حتى ${fmtDate(S.data.meta.asOf)}`;
+document.documentElement.dir = isAR() ? "rtl" : "ltr";
+document.documentElement.lang = LANG;
+applyStaticI18n();
 if(!S.data.meta.demo) document.getElementById("demo-chip").style.display="none";
+const BL = document.getElementById("btn-lang");
+if(BL) BL.addEventListener("click",()=>setLang(LANG==="ar" ? "en" : "ar"));
 const initTab = (location.hash||"").replace("#","");
 if(TABS.some(t=>t.id===initTab)) S.tab = initTab;
 addEventListener("hashchange",()=>{
