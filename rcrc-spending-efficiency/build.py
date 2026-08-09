@@ -20,6 +20,8 @@ logo_emblem = data_uri("assets/logo-emblem.png")
 logo_full   = data_uri("assets/logo-full.png")
 data    = json.dumps(json.load(open(os.path.join(HERE, "data.json"), encoding="utf-8")),
                      ensure_ascii=False, separators=(",", ":"))
+en_dict = json.dumps(json.load(open(os.path.join(HERE, "src/i18n-en.json"), encoding="utf-8")),
+                     ensure_ascii=False, separators=(",", ":"))
 
 html = f"""<!DOCTYPE html>
 <html dir="rtl" lang="ar">
@@ -43,6 +45,7 @@ html = f"""<!DOCTYPE html>
 </script>
 <script>
 window.DATA = {data};
+window.EN_DICT = {en_dict};
 </script>
 <script>
 {app}
