@@ -552,3 +552,4 @@ tbody tr.clickable{cursor:pointer}
 @media (max-width:768px){
   [dir=ltr] .hero-side{-webkit-mask-image:linear-gradient(90deg,#000 92%,transparent);mask-image:linear-gradient(90deg,#000 92%,transparent)}
 }
+[dir=ltr] .tab{padding:13px 10px 11px;font-size:12px;letter-spacing:-.1px}
