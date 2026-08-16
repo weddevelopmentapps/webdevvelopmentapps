@@ -1,0 +1,667 @@
+[
+ {
+  "gate": "demand.sector_sum",
+  "ok": true,
+  "detail": "Σ=1420000"
+ },
+ {
+  "gate": "licensing.sector_beds_sum",
+  "ok": true,
+  "detail": "Σ=612400"
+ },
+ {
+  "gate": "monitoring.visits_sum",
+  "ok": true,
+  "detail": "Σ=19651"
+ },
+ {
+  "gate": "monitoring.violations_by_sector",
+  "ok": true,
+  "detail": "Σ=3617"
+ },
+ {
+  "gate": "monitoring.violations_by_type",
+  "ok": true,
+  "detail": "Σ=3617"
+ },
+ {
+  "gate": "monitoring.monthly_visits",
+  "ok": true,
+  "detail": "Σ=19651"
+ },
+ {
+  "gate": "monitoring.monthly_violations",
+  "ok": true,
+  "detail": "Σ=3617"
+ },
+ {
+  "gate": "monitoring.monitors_sum",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "gate": "monitoring.closures_sum",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "gate": "licensing.facility_types",
+  "ok": true,
+  "detail": "Σ=140"
+ },
+ {
+  "gate": "demand.collar_sum",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "gate": "demand.economic_sum",
+  "ok": true,
+  "detail": "Σ=1420000"
+ },
+ {
+  "gate": "licensing.baseline_plus_monthly.building",
+  "ok": true,
+  "detail": "64+Σ=96 مقابل 96"
+ },
+ {
+  "gate": "licensing.sector_sum.building",
+  "ok": true,
+  "detail": "Σ=96"
+ },
+ {
+  "gate": "licensing.baseline_plus_monthly.operational",
+  "ok": true,
+  "detail": "118+Σ=140 مقابل 140"
+ },
+ {
+  "gate": "licensing.sector_sum.operational",
+  "ok": true,
+  "detail": "Σ=140"
+ },
+ {
+  "gate": "licensing.baseline_plus_monthly.beds",
+  "ok": true,
+  "detail": "563900+Σ=612400 مقابل 612400"
+ },
+ {
+  "gate": "licensing.sector_sum.beds",
+  "ok": true,
+  "detail": "Σ=612400"
+ },
+ {
+  "gate": "occupancy.not_exceeding",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "gate": "occupancy.vacancy",
+  "ok": true,
+  "detail": "50829"
+ },
+ {
+  "gate": "occupancy.rate",
+  "ok": true,
+  "detail": "91.7"
+ },
+ {
+  "gate": "coverage.city",
+  "ok": true,
+  "detail": "43.1"
+ },
+ {
+  "gate": "deficit.city",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "gate": "monitoring.months_consecutive",
+  "ok": true,
+  "detail": "سبتمبر 2025 → أغسطس 2026"
+ },
+ {
+  "gate": "licensing.months_consecutive",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "gate": "scenarios.months_consecutive",
+  "ok": true,
+  "detail": "سبتمبر 2026 → يونيو 2027"
+ },
+ {
+  "gate": "scenarios.ordering",
+  "ok": true,
+  "detail": "متحفظ ≥ أساسي ≥ متفائل"
+ },
+ {
+  "gate": "monitoring.period_end",
+  "ok": true,
+  "detail": "نهاية الفترة المعتمدة"
+ },
+ {
+  "gate": "counts.nonnegative_integers",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "gate": "nbhd.unique_names",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "gate": "nbhd.valid_sectors",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "gate": "nbhd.sample_le_sector.north",
+  "ok": true,
+  "detail": "قطاع الشمال"
+ },
+ {
+  "gate": "nbhd.sample_le_sector.east",
+  "ok": true,
+  "detail": "قطاع الشرق"
+ },
+ {
+  "gate": "nbhd.sample_le_sector.center",
+  "ok": true,
+  "detail": "قطاع الوسط"
+ },
+ {
+  "gate": "nbhd.sample_le_sector.west",
+  "ok": true,
+  "detail": "قطاع الغرب"
+ },
+ {
+  "gate": "nbhd.sample_le_sector.south",
+  "ok": true,
+  "detail": "قطاع الجنوب"
+ },
+ {
+  "gate": "insight.s03",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "gate": "insight.s04",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "gate": "insight.s05",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "gate": "insight.s07",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "gate": "rankings.consistency",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "gate": "wb.total_demand",
+  "ok": true,
+  "detail": "C4=1420000"
+ },
+ {
+  "gate": "wb.demand.north",
+  "ok": true,
+  "detail": "صف 7"
+ },
+ {
+  "gate": "wb.demand.east",
+  "ok": true,
+  "detail": "صف 8"
+ },
+ {
+  "gate": "wb.demand.center",
+  "ok": true,
+  "detail": "صف 9"
+ },
+ {
+  "gate": "wb.demand.west",
+  "ok": true,
+  "detail": "صف 10"
+ },
+ {
+  "gate": "wb.demand.south",
+  "ok": true,
+  "detail": "صف 11"
+ },
+ {
+  "gate": "wb.baseline",
+  "ok": true,
+  "detail": "التراخيص!C5:E5"
+ },
+ {
+  "gate": "wb.lic.2025-09",
+  "ok": true,
+  "detail": "صف 8"
+ },
+ {
+  "gate": "wb.lic.2025-10",
+  "ok": true,
+  "detail": "صف 9"
+ },
+ {
+  "gate": "wb.lic.2025-11",
+  "ok": true,
+  "detail": "صف 10"
+ },
+ {
+  "gate": "wb.lic.2025-12",
+  "ok": true,
+  "detail": "صف 11"
+ },
+ {
+  "gate": "wb.lic.2026-01",
+  "ok": true,
+  "detail": "صف 12"
+ },
+ {
+  "gate": "wb.lic.2026-02",
+  "ok": true,
+  "detail": "صف 13"
+ },
+ {
+  "gate": "wb.lic.2026-03",
+  "ok": true,
+  "detail": "صف 14"
+ },
+ {
+  "gate": "wb.lic.2026-04",
+  "ok": true,
+  "detail": "صف 15"
+ },
+ {
+  "gate": "wb.lic.2026-05",
+  "ok": true,
+  "detail": "صف 16"
+ },
+ {
+  "gate": "wb.lic.2026-06",
+  "ok": true,
+  "detail": "صف 17"
+ },
+ {
+  "gate": "wb.lic.2026-07",
+  "ok": true,
+  "detail": "صف 18"
+ },
+ {
+  "gate": "wb.lic.2026-08",
+  "ok": true,
+  "detail": "صف 19"
+ },
+ {
+  "gate": "wb.lic.sector.north",
+  "ok": true,
+  "detail": "صف 23"
+ },
+ {
+  "gate": "wb.lic.sector.east",
+  "ok": true,
+  "detail": "صف 24"
+ },
+ {
+  "gate": "wb.lic.sector.center",
+  "ok": true,
+  "detail": "صف 25"
+ },
+ {
+  "gate": "wb.lic.sector.west",
+  "ok": true,
+  "detail": "صف 26"
+ },
+ {
+  "gate": "wb.lic.sector.south",
+  "ok": true,
+  "detail": "صف 27"
+ },
+ {
+  "gate": "wb.coverage_target",
+  "ok": true,
+  "detail": "التراخيص!C31"
+ },
+ {
+  "gate": "wb.mon.sector.north",
+  "ok": true,
+  "detail": "صف 5"
+ },
+ {
+  "gate": "wb.mon.sector.east",
+  "ok": true,
+  "detail": "صف 6"
+ },
+ {
+  "gate": "wb.mon.sector.center",
+  "ok": true,
+  "detail": "صف 7"
+ },
+ {
+  "gate": "wb.mon.sector.west",
+  "ok": true,
+  "detail": "صف 8"
+ },
+ {
+  "gate": "wb.mon.sector.south",
+  "ok": true,
+  "detail": "صف 9"
+ },
+ {
+  "gate": "wb.compliance",
+  "ok": true,
+  "detail": "الرقابة!C12"
+ },
+ {
+  "gate": "wb.viol.overcrowding",
+  "ok": true,
+  "detail": "صف 15: الاكتظاظ وتجاوز الطاقة الاستيعابية"
+ },
+ {
+  "gate": "wb.viol.fire-safety",
+  "ok": true,
+  "detail": "صف 16: اشتراطات السلامة والحماية من الحريق"
+ },
+ {
+  "gate": "wb.viol.hygiene",
+  "ok": true,
+  "detail": "صف 17: النظافة والصحة العامة"
+ },
+ {
+  "gate": "wb.viol.unlicensed",
+  "ok": true,
+  "detail": "صف 18: مزاولة النشاط بدون ترخيص"
+ },
+ {
+  "gate": "wb.viol.electrical",
+  "ok": true,
+  "detail": "صف 19: مخالفات الكهرباء والسباكة"
+ },
+ {
+  "gate": "wb.viol.ventilation",
+  "ok": true,
+  "detail": "صف 20: التهوية والعزل غير المطابق"
+ },
+ {
+  "gate": "wb.nbhd.0",
+  "ok": true,
+  "detail": "صف 5: حي الملقا"
+ },
+ {
+  "gate": "wb.nbhd.1",
+  "ok": true,
+  "detail": "صف 6: حي الصحافة"
+ },
+ {
+  "gate": "wb.nbhd.2",
+  "ok": true,
+  "detail": "صف 7: حي حطين"
+ },
+ {
+  "gate": "wb.nbhd.3",
+  "ok": true,
+  "detail": "صف 8: حي الياسمين"
+ },
+ {
+  "gate": "wb.nbhd.4",
+  "ok": true,
+  "detail": "صف 9: حي النسيم الشرقي"
+ },
+ {
+  "gate": "wb.nbhd.5",
+  "ok": true,
+  "detail": "صف 10: حي السلي"
+ },
+ {
+  "gate": "wb.nbhd.6",
+  "ok": true,
+  "detail": "صف 11: حي النظيم"
+ },
+ {
+  "gate": "wb.nbhd.7",
+  "ok": true,
+  "detail": "صف 12: حي النسيم الغربي"
+ },
+ {
+  "gate": "wb.nbhd.8",
+  "ok": true,
+  "detail": "صف 13: حي منفوحة"
+ },
+ {
+  "gate": "wb.nbhd.9",
+  "ok": true,
+  "detail": "صف 14: حي غبيرة"
+ },
+ {
+  "gate": "wb.nbhd.10",
+  "ok": true,
+  "detail": "صف 15: حي الجرادية"
+ },
+ {
+  "gate": "wb.nbhd.11",
+  "ok": true,
+  "detail": "صف 16: حي الديرة"
+ },
+ {
+  "gate": "wb.nbhd.12",
+  "ok": true,
+  "detail": "صف 17: حي السويدي الغربي"
+ },
+ {
+  "gate": "wb.nbhd.13",
+  "ok": true,
+  "detail": "صف 18: حي ظهرة لبن"
+ },
+ {
+  "gate": "wb.nbhd.14",
+  "ok": true,
+  "detail": "صف 19: حي العريجاء الغربي"
+ },
+ {
+  "gate": "wb.nbhd.15",
+  "ok": true,
+  "detail": "صف 20: حي طويق"
+ },
+ {
+  "gate": "wb.nbhd.16",
+  "ok": true,
+  "detail": "صف 21: حي المنصورية"
+ },
+ {
+  "gate": "wb.nbhd.17",
+  "ok": true,
+  "detail": "صف 22: حي العزيزية"
+ },
+ {
+  "gate": "wb.nbhd.18",
+  "ok": true,
+  "detail": "صف 23: حي الشفا"
+ },
+ {
+  "gate": "wb.nbhd.19",
+  "ok": true,
+  "detail": "صف 24: حي بدر"
+ },
+ {
+  "gate": "wb.occupied",
+  "ok": true,
+  "detail": "السياق!C4"
+ },
+ {
+  "gate": "wb.asof",
+  "ok": true,
+  "detail": "السياق!C5"
+ },
+ {
+  "gate": "wb.calc_date",
+  "ok": true,
+  "detail": "السياق!C6"
+ },
+ {
+  "gate": "wb.fac.compound",
+  "ok": true,
+  "detail": "صف 9"
+ },
+ {
+  "gate": "wb.fac.building",
+  "ok": true,
+  "detail": "صف 10"
+ },
+ {
+  "gate": "wb.fac.cabins",
+  "ok": true,
+  "detail": "صف 11"
+ },
+ {
+  "gate": "wb.collar",
+  "ok": true,
+  "detail": "السياق!C15:C16"
+ },
+ {
+  "gate": "wb.econ.construction",
+  "ok": true,
+  "detail": "صف 20"
+ },
+ {
+  "gate": "wb.econ.retail",
+  "ok": true,
+  "detail": "صف 21"
+ },
+ {
+  "gate": "wb.econ.industry",
+  "ok": true,
+  "detail": "صف 22"
+ },
+ {
+  "gate": "wb.econ.public-services",
+  "ok": true,
+  "detail": "صف 23"
+ },
+ {
+  "gate": "wb.econ.hospitality",
+  "ok": true,
+  "detail": "صف 24"
+ },
+ {
+  "gate": "wb.econ.other",
+  "ok": true,
+  "detail": "صف 25"
+ },
+ {
+  "gate": "wb.monm.2025-09",
+  "ok": true,
+  "detail": "صف 30"
+ },
+ {
+  "gate": "wb.monm.2025-10",
+  "ok": true,
+  "detail": "صف 31"
+ },
+ {
+  "gate": "wb.monm.2025-11",
+  "ok": true,
+  "detail": "صف 32"
+ },
+ {
+  "gate": "wb.monm.2025-12",
+  "ok": true,
+  "detail": "صف 33"
+ },
+ {
+  "gate": "wb.monm.2026-01",
+  "ok": true,
+  "detail": "صف 34"
+ },
+ {
+  "gate": "wb.monm.2026-02",
+  "ok": true,
+  "detail": "صف 35"
+ },
+ {
+  "gate": "wb.monm.2026-03",
+  "ok": true,
+  "detail": "صف 36"
+ },
+ {
+  "gate": "wb.monm.2026-04",
+  "ok": true,
+  "detail": "صف 37"
+ },
+ {
+  "gate": "wb.monm.2026-05",
+  "ok": true,
+  "detail": "صف 38"
+ },
+ {
+  "gate": "wb.monm.2026-06",
+  "ok": true,
+  "detail": "صف 39"
+ },
+ {
+  "gate": "wb.monm.2026-07",
+  "ok": true,
+  "detail": "صف 40"
+ },
+ {
+  "gate": "wb.monm.2026-08",
+  "ok": true,
+  "detail": "صف 41"
+ },
+ {
+  "gate": "wb.scn.2026-09",
+  "ok": true,
+  "detail": "صف 46"
+ },
+ {
+  "gate": "wb.scn.2026-10",
+  "ok": true,
+  "detail": "صف 47"
+ },
+ {
+  "gate": "wb.scn.2026-11",
+  "ok": true,
+  "detail": "صف 48"
+ },
+ {
+  "gate": "wb.scn.2026-12",
+  "ok": true,
+  "detail": "صف 49"
+ },
+ {
+  "gate": "wb.scn.2027-01",
+  "ok": true,
+  "detail": "صف 50"
+ },
+ {
+  "gate": "wb.scn.2027-02",
+  "ok": true,
+  "detail": "صف 51"
+ },
+ {
+  "gate": "wb.scn.2027-03",
+  "ok": true,
+  "detail": "صف 52"
+ },
+ {
+  "gate": "wb.scn.2027-04",
+  "ok": true,
+  "detail": "صف 53"
+ },
+ {
+  "gate": "wb.scn.2027-05",
+  "ok": true,
+  "detail": "صف 54"
+ },
+ {
+  "gate": "wb.scn.2027-06",
+  "ok": true,
+  "detail": "صف 55"
+ }
+]

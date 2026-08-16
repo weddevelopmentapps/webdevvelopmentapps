@@ -1,0 +1,27 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   print.css — الطباعة ليست قناة أساسية لهذا المنتج (عرض حي)،
+   لكن طباعة صفحة إدارة (فحوص الجودة/سجل التدقيق) يجب أن تخرج نظيفة.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+@media print {
+  body.mode-presenter #stage,
+  body.mode-presenter #hud,
+  #release-badge,
+  .adm-nav,
+  .adm-header .actions,
+  .btn, .btn-primary, .btn-line, .btn-quiet {
+    display: none !important;
+  }
+
+  body.mode-admin {
+    background: #FFF;
+  }
+
+  .adm-card {
+    box-shadow: none;
+    border-color: #CCC;
+    break-inside: avoid;
+  }
+
+  .adm-table th { position: static; }
+}

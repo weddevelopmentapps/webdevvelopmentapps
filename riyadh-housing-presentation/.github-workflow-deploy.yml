@@ -1,0 +1,65 @@
+# سير نشر GitHub Pages — انسخه إلى ‎.github/workflows/deploy-presentation.yml
+# في المستودع الذي سيستضيف النشر (الحالي أو aliklth/riyadh-housing-dashboard).
+#
+# ملاحظات إلزامية:
+#   • النشر من dist/ فقط — المصادر الخاصة (private-sources/) لا تُنشر أبداً.
+#   • مسارات التطبيق نسبية ومسارات العرض هاش، فيعمل تحت أي مسار أساس
+#     (/riyadh-housing-dashboard/ أو غيره) دون إعادة بناء.
+#   • التحويلات القديمة (#/summary…) داخل التطبيق نفسه.
+
+name: deploy-presentation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "riyadh-housing-presentation/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Generate data (reconciliation gates)
+        working-directory: riyadh-housing-presentation
+        run: |
+          pip install openpyxl
+          python3 generate_data.py
+
+      - name: Unit tests
+        working-directory: riyadh-housing-presentation
+        run: |
+          if [ -d tests/unit ]; then node --test tests/unit/; fi
+
+      - name: Build self-contained app
+        working-directory: riyadh-housing-presentation
+        run: python3 build.py
+
+      - name: Guard — no private sources in artifact
+        run: |
+          ! find riyadh-housing-presentation/dist -name "*.xlsx" | grep . || exit 1
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: riyadh-housing-presentation/dist
+
+      - id: deployment
+        uses: actions/deploy-pages@v4

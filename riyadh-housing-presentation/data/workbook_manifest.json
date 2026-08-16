@@ -1,0 +1,149 @@
+{
+ "template_version": "V1",
+ "accept": {
+  "extensions": [
+   ".xlsx"
+  ],
+  "reject": [
+   "macro-enabled",
+   "encrypted",
+   "external-links",
+   "unknown-template"
+  ]
+ },
+ "limits": {
+  "max_bytes": 5000000,
+  "max_sheets": 12,
+  "max_rows_per_sheet": 400
+ },
+ "required_sheets": [
+  "تعليمات",
+  "الطلب",
+  "التراخيص",
+  "الرقابة",
+  "الأحياء",
+  "السياق"
+ ],
+ "anchors": {
+  "الطلب": {
+   "total_demand": {
+    "cell": "C4",
+    "type": "int",
+    "min": 0
+   },
+   "sector_table": {
+    "range": "B7:C11",
+    "labels_col": "B",
+    "expected_labels": [
+     "قطاع الشمال",
+     "قطاع الشرق",
+     "قطاع الوسط",
+     "قطاع الغرب",
+     "قطاع الجنوب"
+    ]
+   }
+  },
+  "التراخيص": {
+   "baseline": {
+    "range": "C5:E5",
+    "type": "int"
+   },
+   "monthly": {
+    "range": "B8:E19",
+    "months": 12,
+    "consecutive": true
+   },
+   "sector_table": {
+    "range": "B23:E27",
+    "expected_labels": [
+     "قطاع الشمال",
+     "قطاع الشرق",
+     "قطاع الوسط",
+     "قطاع الغرب",
+     "قطاع الجنوب"
+    ]
+   },
+   "coverage_target": {
+    "cell": "C31",
+    "type": "number",
+    "status": "indicative"
+   }
+  },
+  "الرقابة": {
+   "sector_table": {
+    "range": "B5:F9",
+    "expected_labels": [
+     "قطاع الشمال",
+     "قطاع الشرق",
+     "قطاع الوسط",
+     "قطاع الغرب",
+     "قطاع الجنوب"
+    ]
+   },
+   "compliance_rate": {
+    "cell": "C12",
+    "type": "number",
+    "status": "pending_methodology"
+   },
+   "violation_types": {
+    "range": "B15:C20",
+    "count": 6
+   }
+  },
+  "الأحياء": {
+   "sample_table": {
+    "range": "B5:G24",
+    "count": 20,
+    "note": "عينة — لا تتجاوز إجماليات القطاع"
+   }
+  },
+  "السياق": {
+   "occupied_beds": {
+    "cell": "C4",
+    "type": "int"
+   },
+   "as_of": {
+    "cell": "C5",
+    "type": "text"
+   },
+   "calc_date": {
+    "cell": "C6",
+    "type": "date"
+   },
+   "facility_types": {
+    "range": "B9:C11",
+    "count": 3
+   },
+   "collar": {
+    "range": "C15:C16"
+   },
+   "economic_activities": {
+    "range": "B20:C25",
+    "count": 6
+   },
+   "monthly_monitoring": {
+    "range": "B30:D41",
+    "months": 12,
+    "consecutive": true
+   },
+   "scenarios": {
+    "range": "B46:E55",
+    "months": 10,
+    "consecutive": true,
+    "ordering": "conservative>=base>=optimistic"
+   }
+  }
+ },
+ "normalization": {
+  "unicode": "NFC",
+  "whitespace": "strip + collapse-internal",
+  "accepted_variants": {
+   "بدون ترخيص": "دون ترخيص"
+  }
+ },
+ "ignore": [
+  "formula-cells",
+  "cached-formula-results",
+  "check-cells (✓)"
+ ]
+}

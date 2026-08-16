@@ -1,0 +1,134 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   appendix.css — الملاحق: صفحات فرعية بحجم الإطار مع عودة سياقية دقيقة
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.ax {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  padding: calc(var(--su) * 64) calc(var(--su) * 84) calc(var(--su) * 56);
+  background:
+    radial-gradient(120% 100% at 85% -10%, rgba(22, 41, 31, 0.65) 0%, transparent 55%),
+    var(--stage-0);
+}
+
+.ax-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: calc(var(--su) * 30);
+}
+.ax-kicker {
+  font-size: calc(var(--su) * 15.5);
+  font-weight: 600;
+  color: var(--gold);
+  letter-spacing: 0.4px;
+  margin-bottom: calc(var(--su) * 8);
+}
+.ax-title {
+  font-family: var(--f-display);
+  font-size: calc(var(--su) * 38);
+  font-weight: 600;
+  color: var(--ivory);
+}
+.btn-return {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--su) * 10);
+  font-size: calc(var(--su) * 17);
+  font-weight: 700;
+  color: var(--ivory);
+  background: var(--stage-2);
+  border: 1px solid var(--hair-d);
+  border-radius: 999px;
+  padding: calc(var(--su) * 12) calc(var(--su) * 26);
+  transition: background var(--dur-micro), border-color var(--dur-micro);
+}
+.btn-return:hover, .btn-return:focus-visible { background: var(--stage-3); border-color: var(--gold); }
+
+.ax-body {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+}
+.ax-page {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 24);
+}
+.ax-page .chart-area { flex: 1; min-height: 0; position: relative; }
+.ax-page .chart-area .chart { position: absolute; inset: 0; }
+
+.ax-note {
+  font-size: calc(var(--su) * 16);
+  color: var(--mut-d);
+  line-height: 1.75;
+  max-width: calc(var(--su) * 1250);
+}
+.ax-note b { color: var(--gold); font-weight: 600; }
+
+/* ترقيم صفحات الملحق */
+.ax-pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--su) * 14);
+  margin-top: calc(var(--su) * 24);
+}
+.ax-pager .pbtn {
+  font-size: calc(var(--su) * 15.5);
+  font-weight: 600;
+  color: var(--mut-d);
+  padding: calc(var(--su) * 8) calc(var(--su) * 18);
+  border: 1px solid var(--hair-d2);
+  border-radius: 999px;
+}
+.ax-pager .pbtn:hover:not(:disabled), .ax-pager .pbtn:focus-visible { color: var(--ivory); }
+.ax-pager .pbtn:disabled { opacity: 0.35; cursor: default; }
+.ax-pager .pdots { display: flex; gap: 8px; }
+.ax-pager .pdot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--hair-d);
+  padding: 0;
+}
+.ax-pager .pdot.now { background: var(--gold); }
+
+/* جداول الملاحق (الصيغ والمصادر) */
+.ax-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: calc(var(--su) * 16.5);
+}
+.ax-table th {
+  text-align: start;
+  font-size: calc(var(--su) * 13.5);
+  font-weight: 600;
+  color: var(--mut-d);
+  padding: calc(var(--su) * 10) calc(var(--su) * 16);
+  border-bottom: 1px solid var(--hair-d);
+}
+.ax-table td {
+  padding: calc(var(--su) * 11) calc(var(--su) * 16);
+  border-bottom: 1px solid var(--hair-d2);
+  color: var(--ink2-d);
+  vertical-align: top;
+}
+.ax-table tr:last-child td { border-bottom: 0; }
+.ax-table td.num {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  color: var(--ivory);
+}
+.ax-table td .formula {
+  font-size: calc(var(--su) * 14.5);
+  color: var(--mut-d);
+  direction: ltr;
+  unicode-bidi: isolate;
+  text-align: left;
+  display: inline-block;
+}
+.ax-table .rank-note { color: var(--faint-d); font-size: calc(var(--su) * 13.5); }

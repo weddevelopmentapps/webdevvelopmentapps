@@ -1,0 +1,564 @@
+{
+ "errors": [],
+ "extracted": {
+  "baseline": {
+   "beds": 563900,
+   "building": 64,
+   "operational": 118
+  },
+  "calculation_date": "2026-08-11",
+  "collar": {
+   "blue": 1164400,
+   "white": 255600
+  },
+  "compliance": 81.6,
+  "coverage_target": 60,
+  "data_as_of": "أغسطس 2026",
+  "economic": [
+   {
+    "demand": 505000,
+    "name": "التشييد والبناء"
+   },
+   {
+    "demand": 217000,
+    "name": "التجارة والتجزئة"
+   },
+   {
+    "demand": 198000,
+    "name": "الصناعة"
+   },
+   {
+    "demand": 165000,
+    "name": "الخدمات العامة"
+   },
+   {
+    "demand": 152000,
+    "name": "الضيافة والإعاشة"
+   },
+   {
+    "demand": 183000,
+    "name": "قطاعات أخرى"
+   }
+  ],
+  "facility_types": [
+   {
+    "count": 38,
+    "name": "مجمع سكني"
+   },
+   {
+    "count": 68,
+    "name": "مبنى سكني"
+   },
+   {
+    "count": 34,
+    "name": "كبائن متنقلة"
+   }
+  ],
+  "monthly": {
+   "licensing": [
+    {
+     "beds": 3200,
+     "building": 3,
+     "iso": "2025-09",
+     "label": "سبتمبر 2025",
+     "operational": 1
+    },
+    {
+     "beds": 3600,
+     "building": 2,
+     "iso": "2025-10",
+     "label": "أكتوبر 2025",
+     "operational": 2
+    },
+    {
+     "beds": 4100,
+     "building": 3,
+     "iso": "2025-11",
+     "label": "نوفمبر 2025",
+     "operational": 2
+    },
+    {
+     "beds": 3900,
+     "building": 3,
+     "iso": "2025-12",
+     "label": "ديسمبر 2025",
+     "operational": 2
+    },
+    {
+     "beds": 4200,
+     "building": 2,
+     "iso": "2026-01",
+     "label": "يناير 2026",
+     "operational": 1
+    },
+    {
+     "beds": 4400,
+     "building": 3,
+     "iso": "2026-02",
+     "label": "فبراير 2026",
+     "operational": 2
+    },
+    {
+     "beds": 4100,
+     "building": 3,
+     "iso": "2026-03",
+     "label": "مارس 2026",
+     "operational": 2
+    },
+    {
+     "beds": 4300,
+     "building": 3,
+     "iso": "2026-04",
+     "label": "أبريل 2026",
+     "operational": 2
+    },
+    {
+     "beds": 4200,
+     "building": 2,
+     "iso": "2026-05",
+     "label": "مايو 2026",
+     "operational": 2
+    },
+    {
+     "beds": 4200,
+     "building": 3,
+     "iso": "2026-06",
+     "label": "يونيو 2026",
+     "operational": 2
+    },
+    {
+     "beds": 4100,
+     "building": 3,
+     "iso": "2026-07",
+     "label": "يوليو 2026",
+     "operational": 2
+    },
+    {
+     "beds": 4200,
+     "building": 2,
+     "iso": "2026-08",
+     "label": "أغسطس 2026",
+     "operational": 2
+    }
+   ],
+   "monitoring": [
+    {
+     "iso": "2025-09",
+     "label": "سبتمبر 2025",
+     "violations": 292,
+     "visits": 1548
+    },
+    {
+     "iso": "2025-10",
+     "label": "أكتوبر 2025",
+     "violations": 288,
+     "visits": 1504
+    },
+    {
+     "iso": "2025-11",
+     "label": "نوفمبر 2025",
+     "violations": 293,
+     "visits": 1601
+    },
+    {
+     "iso": "2025-12",
+     "label": "ديسمبر 2025",
+     "violations": 279,
+     "visits": 1580
+    },
+    {
+     "iso": "2026-01",
+     "label": "يناير 2026",
+     "violations": 292,
+     "visits": 1609
+    },
+    {
+     "iso": "2026-02",
+     "label": "فبراير 2026",
+     "violations": 304,
+     "visits": 1654
+    },
+    {
+     "iso": "2026-03",
+     "label": "مارس 2026",
+     "violations": 316,
+     "visits": 1736
+    },
+    {
+     "iso": "2026-04",
+     "label": "أبريل 2026",
+     "violations": 309,
+     "visits": 1755
+    },
+    {
+     "iso": "2026-05",
+     "label": "مايو 2026",
+     "violations": 310,
+     "visits": 1800
+    },
+    {
+     "iso": "2026-06",
+     "label": "يونيو 2026",
+     "violations": 300,
+     "visits": 1747
+    },
+    {
+     "iso": "2026-07",
+     "label": "يوليو 2026",
+     "violations": 317,
+     "visits": 1558
+    },
+    {
+     "iso": "2026-08",
+     "label": "أغسطس 2026",
+     "violations": 317,
+     "visits": 1559
+    }
+   ]
+  },
+  "neighbourhoods": [
+   {
+    "beds": 21500,
+    "building": 6,
+    "name": "حي الملقا",
+    "operational": 5,
+    "sector": "north",
+    "sector_name": "قطاع الشمال",
+    "violations": 84
+   },
+   {
+    "beds": 16800,
+    "building": 5,
+    "name": "حي الصحافة",
+    "operational": 4,
+    "sector": "north",
+    "sector_name": "قطاع الشمال",
+    "violations": 61
+   },
+   {
+    "beds": 15200,
+    "building": 4,
+    "name": "حي حطين",
+    "operational": 4,
+    "sector": "north",
+    "sector_name": "قطاع الشمال",
+    "violations": 57
+   },
+   {
+    "beds": 11900,
+    "building": 3,
+    "name": "حي الياسمين",
+    "operational": 3,
+    "sector": "north",
+    "sector_name": "قطاع الشمال",
+    "violations": 48
+   },
+   {
+    "beds": 34600,
+    "building": 7,
+    "name": "حي النسيم الشرقي",
+    "operational": 8,
+    "sector": "east",
+    "sector_name": "قطاع الشرق",
+    "violations": 216
+   },
+   {
+    "beds": 30200,
+    "building": 6,
+    "name": "حي السلي",
+    "operational": 6,
+    "sector": "east",
+    "sector_name": "قطاع الشرق",
+    "violations": 246
+   },
+   {
+    "beds": 24800,
+    "building": 5,
+    "name": "حي النظيم",
+    "operational": 5,
+    "sector": "east",
+    "sector_name": "قطاع الشرق",
+    "violations": 168
+   },
+   {
+    "beds": 27400,
+    "building": 4,
+    "name": "حي النسيم الغربي",
+    "operational": 6,
+    "sector": "east",
+    "sector_name": "قطاع الشرق",
+    "violations": 152
+   },
+   {
+    "beds": 23200,
+    "building": 4,
+    "name": "حي منفوحة",
+    "operational": 7,
+    "sector": "center",
+    "sector_name": "قطاع الوسط",
+    "violations": 187
+   },
+   {
+    "beds": 19400,
+    "building": 3,
+    "name": "حي غبيرة",
+    "operational": 5,
+    "sector": "center",
+    "sector_name": "قطاع الوسط",
+    "violations": 149
+   },
+   {
+    "beds": 15300,
+    "building": 2,
+    "name": "حي الجرادية",
+    "operational": 4,
+    "sector": "center",
+    "sector_name": "قطاع الوسط",
+    "violations": 102
+   },
+   {
+    "beds": 11600,
+    "building": 2,
+    "name": "حي الديرة",
+    "operational": 3,
+    "sector": "center",
+    "sector_name": "قطاع الوسط",
+    "violations": 76
+   },
+   {
+    "beds": 18900,
+    "building": 5,
+    "name": "حي السويدي الغربي",
+    "operational": 5,
+    "sector": "west",
+    "sector_name": "قطاع الغرب",
+    "violations": 121
+   },
+   {
+    "beds": 15600,
+    "building": 4,
+    "name": "حي ظهرة لبن",
+    "operational": 4,
+    "sector": "west",
+    "sector_name": "قطاع الغرب",
+    "violations": 96
+   },
+   {
+    "beds": 14800,
+    "building": 3,
+    "name": "حي العريجاء الغربي",
+    "operational": 4,
+    "sector": "west",
+    "sector_name": "قطاع الغرب",
+    "violations": 78
+   },
+   {
+    "beds": 11200,
+    "building": 3,
+    "name": "حي طويق",
+    "operational": 3,
+    "sector": "west",
+    "sector_name": "قطاع الغرب",
+    "violations": 44
+   },
+   {
+    "beds": 26400,
+    "building": 5,
+    "name": "حي المنصورية",
+    "operational": 7,
+    "sector": "south",
+    "sector_name": "قطاع الجنوب",
+    "violations": 358
+   },
+   {
+    "beds": 24100,
+    "building": 5,
+    "name": "حي العزيزية",
+    "operational": 6,
+    "sector": "south",
+    "sector_name": "قطاع الجنوب",
+    "violations": 292
+   },
+   {
+    "beds": 21800,
+    "building": 4,
+    "name": "حي الشفا",
+    "operational": 5,
+    "sector": "south",
+    "sector_name": "قطاع الجنوب",
+    "violations": 247
+   },
+   {
+    "beds": 17600,
+    "building": 4,
+    "name": "حي بدر",
+    "operational": 4,
+    "sector": "south",
+    "sector_name": "قطاع الجنوب",
+    "violations": 214
+   }
+  ],
+  "occupied_beds": 561571,
+  "scenarios": [
+   {
+    "base": 821088,
+    "conservative": 830540,
+    "iso": "2026-09",
+    "label": "سبتمبر 2026",
+    "optimistic": 810736
+   },
+   {
+    "base": 825768,
+    "conservative": 838380,
+    "iso": "2026-10",
+    "label": "أكتوبر 2026",
+    "optimistic": 811888
+   },
+   {
+    "base": 830562,
+    "conservative": 846320,
+    "iso": "2026-11",
+    "label": "نوفمبر 2026",
+    "optimistic": 813040
+   },
+   {
+    "base": 835464,
+    "conservative": 854356,
+    "iso": "2026-12",
+    "label": "ديسمبر 2026",
+    "optimistic": 814192
+   },
+   {
+    "base": 840294,
+    "conservative": 862492,
+    "iso": "2027-01",
+    "label": "يناير 2027",
+    "optimistic": 815344
+   },
+   {
+    "base": 845238,
+    "conservative": 870724,
+    "iso": "2027-02",
+    "label": "فبراير 2027",
+    "optimistic": 816496
+   },
+   {
+    "base": 850158,
+    "conservative": 879052,
+    "iso": "2027-03",
+    "label": "مارس 2027",
+    "optimistic": 817648
+   },
+   {
+    "base": 855102,
+    "conservative": 887480,
+    "iso": "2027-04",
+    "label": "أبريل 2027",
+    "optimistic": 818800
+   },
+   {
+    "base": 860028,
+    "conservative": 896004,
+    "iso": "2027-05",
+    "label": "مايو 2027",
+    "optimistic": 819952
+   },
+   {
+    "base": 865008,
+    "conservative": 904628,
+    "iso": "2027-06",
+    "label": "يونيو 2027",
+    "optimistic": 821788
+   }
+  ],
+  "sectors": {
+   "center": {
+    "beds": 96000,
+    "building": 12,
+    "closures": 19,
+    "demand": 246000,
+    "monitors": 4,
+    "operational": 26,
+    "violations": 548,
+    "visits": 3341
+   },
+   "east": {
+    "beds": 172400,
+    "building": 26,
+    "closures": 27,
+    "demand": 331000,
+    "monitors": 4,
+    "operational": 34,
+    "violations": 907,
+    "visits": 4716
+   },
+   "north": {
+    "beds": 128000,
+    "building": 22,
+    "closures": 15,
+    "demand": 258000,
+    "monitors": 4,
+    "operational": 30,
+    "violations": 439,
+    "visits": 3538
+   },
+   "south": {
+    "beds": 128000,
+    "building": 20,
+    "closures": 40,
+    "demand": 368000,
+    "monitors": 3,
+    "operational": 28,
+    "violations": 1367,
+    "visits": 5503
+   },
+   "west": {
+    "beds": 88000,
+    "building": 16,
+    "closures": 12,
+    "demand": 217000,
+    "monitors": 3,
+    "operational": 22,
+    "violations": 356,
+    "visits": 2553
+   }
+  },
+  "total_demand": 1420000,
+  "violation_types": [
+   {
+    "count": 1121,
+    "name": "الاكتظاظ وتجاوز الطاقة الاستيعابية"
+   },
+   {
+    "count": 868,
+    "name": "اشتراطات السلامة والحماية من الحريق"
+   },
+   {
+    "count": 615,
+    "name": "النظافة والصحة العامة"
+   },
+   {
+    "count": 434,
+    "name": "مزاولة النشاط دون ترخيص"
+   },
+   {
+    "count": 326,
+    "name": "مخالفات الكهرباء والسباكة"
+   },
+   {
+    "count": 253,
+    "name": "التهوية والعزل غير المطابق"
+   }
+  ]
+ },
+ "file": {
+  "name": "platform-data.xlsx",
+  "sha256": "0e01d6158e9f712255340461ecce70ec85480baa138ab2d06d58b91d27e34a61",
+  "size": 19101,
+  "template_version": "V1"
+ },
+ "ok": true,
+ "warnings": [
+  "لا توجد خلية إصدار قالب في ورقة «تعليمات» — قُبل الملف بعد مطابقة كل مراسي V1 بنيوياً"
+ ]
+}
