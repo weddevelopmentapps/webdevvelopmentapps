@@ -1,0 +1,267 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   presenter.css — المسرح، الانتقالات، عناصر تحكم المقدِّم
+   تكوين 16:9 صارم: المشهد يملأ إطاراً واحداً، وletterbox متحكم خارج النسبة.
+   كل المقاسات بوحدة --su (عرض المسرح ÷ 1920) فتبقى النِسَب مطابقة للمواصفة
+   على 1366×768 و2560×1440 و4K دون تمدد.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.stage {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--stage-abyss);
+}
+
+.scene-host {
+  position: absolute;
+  width: var(--host-w, 100vw);
+  height: var(--host-h, 56.25vw);
+  background: var(--stage-0);
+  overflow: hidden;
+}
+
+/* ── انتقال المشاهد: موتيف الكشف الجانبي المتحكم ──
+   في السياق العربي «التالي» يتحرك يساراً: الخارج ينزاح يميناً بخفوت،
+   والداخل يصل من اليسار. لا قطعات مفاجئة. */
+.scene-host.leaving-fwd { animation: sc-leave-fwd var(--dur-std) var(--ease) forwards; }
+.scene-host.entering-fwd { animation: sc-enter-fwd var(--dur-std) var(--ease); }
+.scene-host.leaving-back { animation: sc-leave-back var(--dur-std) var(--ease) forwards; }
+.scene-host.entering-back { animation: sc-enter-back var(--dur-std) var(--ease); }
+.scene-host.entering-major { animation: sc-enter-major var(--dur-major) var(--ease); }
+
+@keyframes sc-leave-fwd {
+  to { opacity: 0; transform: translateX(calc(var(--su) * 60)); }
+}
+@keyframes sc-enter-fwd {
+  from { opacity: 0; transform: translateX(calc(var(--su) * -60)); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes sc-leave-back {
+  to { opacity: 0; transform: translateX(calc(var(--su) * -60)); }
+}
+@keyframes sc-enter-back {
+  from { opacity: 0; transform: translateX(calc(var(--su) * 60)); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes sc-enter-major {
+  0% { opacity: 0; transform: scale(1.035); filter: brightness(0.4); }
+  60% { filter: brightness(0.9); }
+  100% { opacity: 1; transform: none; filter: none; }
+}
+
+/* ── هيكل المشهد ── */
+.sc {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  padding: calc(var(--su) * 72) calc(var(--su) * 84);
+}
+
+/* دخول عناصر المحتوى: صعود 7 بكسل مدرّج + خفوت */
+.sc .rise {
+  opacity: 0;
+  transform: translateY(calc(var(--su) * 10));
+  animation: rise 420ms var(--ease) forwards;
+}
+@keyframes rise { to { opacity: 1; transform: none; } }
+.sc .rise:nth-child(1) { animation-delay: 40ms; }
+.sc .rise:nth-child(2) { animation-delay: 90ms; }
+.sc .rise:nth-child(3) { animation-delay: 140ms; }
+.sc .rise:nth-child(4) { animation-delay: 190ms; }
+.sc .rise:nth-child(5) { animation-delay: 240ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  .sc .rise { animation: none; opacity: 1; transform: none; }
+  .scene-host.leaving-fwd, .scene-host.entering-fwd,
+  .scene-host.leaving-back, .scene-host.entering-back,
+  .scene-host.entering-major { animation: none; opacity: 1; transform: none; filter: none; }
+}
+
+/* ── طباعة المشهد التحليلي ── */
+.sc-question {
+  font-size: calc(var(--su) * 20);
+  font-weight: 600;
+  color: var(--gold);
+  letter-spacing: 0.3px;
+  margin-bottom: calc(var(--su) * 14);
+}
+.sc-headline {
+  text-wrap: balance;
+  font-family: var(--f-display);
+  font-size: calc(var(--su) * 54);
+  line-height: 1.35;
+  font-weight: 600;
+  color: var(--ivory);
+  max-width: calc(var(--su) * 1560);
+}
+.sc-headline b { color: var(--green-hi); font-weight: 700; }
+.sc-headline .neg { color: var(--coral); }
+
+.sc-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  gap: calc(var(--su) * 56);
+  margin-top: calc(var(--su) * 40);
+}
+
+.sc-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: calc(var(--su) * 28);
+  min-height: calc(var(--su) * 44);
+}
+.sc-source {
+  font-size: calc(var(--su) * 15);
+  color: var(--faint-d);
+}
+.sc-implication {
+  font-size: calc(var(--su) * 21);
+  color: var(--ink2-d);
+  line-height: 1.7;
+  max-width: calc(var(--su) * 1180);
+}
+.sc-implication b { color: var(--ivory); font-weight: 700; }
+
+/* الأرقام البطولية */
+.figs {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: calc(var(--su) * 44);
+  min-width: calc(var(--su) * 430);
+}
+.fig .fig-label {
+  font-size: calc(var(--su) * 19);
+  font-weight: 600;
+  color: var(--mut-d);
+  margin-bottom: calc(var(--su) * 6);
+}
+.fig .fig-value {
+  display: flex;
+  align-items: baseline;
+  gap: calc(var(--su) * 14);
+  font-family: var(--f-display);
+  font-size: calc(var(--su) * 84);
+  font-weight: 300;
+  line-height: 1.05;
+  color: var(--ivory);
+  white-space: nowrap;
+}
+.fig .fig-value .num { letter-spacing: calc(var(--su) * -3); direction: ltr; unicode-bidi: isolate; }
+.fig .fig-value .word { font-size: calc(var(--su) * 42); font-weight: 400; }
+.fig .fig-value .unit {
+  font-size: calc(var(--su) * 24);
+  font-weight: 500;
+  color: var(--mut-d);
+}
+.fig.accent .fig-value { color: var(--green-hi); }
+.fig.deficit .fig-value { color: var(--coral); }
+.fig .fig-foot {
+  font-size: calc(var(--su) * 15.5);
+  color: var(--faint-d);
+  margin-top: calc(var(--su) * 6);
+}
+
+/* منطقة المرئي المهيمن */
+.sc-visual {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  position: relative;
+}
+.sc-visual .chart {
+  position: absolute;
+  inset: 0;
+}
+
+/* زر الملحق غير الملفت */
+.btn-appendix {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--su) * 8);
+  font-size: calc(var(--su) * 16.5);
+  font-weight: 600;
+  color: var(--mut-d);
+  padding: calc(var(--su) * 10) calc(var(--su) * 20);
+  border: 1px solid var(--hair-d);
+  border-radius: 999px;
+  transition: color var(--dur-micro), border-color var(--dur-micro), background var(--dur-micro);
+}
+.btn-appendix:hover, .btn-appendix:focus-visible {
+  color: var(--ivory);
+  border-color: var(--ivory);
+  background: var(--hair-d2);
+}
+
+/* ── عناصر تحكم المقدِّم (HUD) ── */
+.hud { pointer-events: none; }
+.hud > * { pointer-events: auto; }
+.hud-btn {
+  position: fixed;
+  top: calc(var(--su) * 26);
+  z-index: 50;
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--su) * 8);
+  font-size: max(12px, calc(var(--su) * 14.5));
+  font-weight: 600;
+  color: var(--mut-d);
+  background: rgba(8, 16, 9, 0.55);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--hair-d2);
+  border-radius: 999px;
+  padding: calc(var(--su) * 9) calc(var(--su) * 18);
+  opacity: 1;
+  transition: opacity var(--dur-std) var(--ease), color var(--dur-micro);
+}
+.hud-btn:hover, .hud-btn:focus-visible { color: var(--ivory); }
+.hud-next { inset-inline-end: auto; left: calc(var(--su) * 30); }
+.hud-prev { right: calc(var(--su) * 30); }
+.hud-agenda {
+  top: auto;
+  bottom: calc(var(--su) * 24);
+  right: calc(var(--su) * 30);
+  font-size: max(11px, calc(var(--su) * 13));
+  padding: calc(var(--su) * 7) calc(var(--su) * 15);
+}
+.hud-progress {
+  position: fixed;
+  bottom: calc(var(--su) * 30);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  display: flex;
+  gap: 7px;
+  transition: opacity var(--dur-std) var(--ease);
+}
+.hud-progress .seg {
+  width: calc(var(--su) * 26);
+  height: 3px;
+  border-radius: 2px;
+  background: var(--hair-d);
+  transition: background var(--dur-std);
+}
+.hud-progress .seg.done { background: var(--faint-d); }
+.hud-progress .seg.now { background: var(--gold); }
+
+/* إخفاء تلقائي بعد الخمول */
+body.hud-idle .hud-btn,
+body.hud-idle .hud-progress { opacity: 0; }
+body.hud-idle .hud-btn:focus-visible { opacity: 1; }
+
+/* في الغلاف لا عناصر تحكم ولا شارة إصدار (متطلب الغلاف النظيف) */
+body.on-cover .hud-btn, body.on-cover .hud-progress { opacity: 0; pointer-events: none; }
+body.on-cover .release-badge { opacity: 0; }
+
+/* داخل الملاحق: التنقل بالترقيم المرئي — أزرار المشاهد تختفي */
+body.in-appendix .hud-next, body.in-appendix .hud-prev,
+body.in-appendix .hud-progress { opacity: 0; pointer-events: none; }
+
+/* قفل النقر أثناء الانتقال */
+body.transitioning .stage { pointer-events: none; }

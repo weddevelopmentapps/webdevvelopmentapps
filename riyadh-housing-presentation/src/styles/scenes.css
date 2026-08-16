@@ -1,0 +1,586 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   scenes.css — تنسيقات المشاهد الاثني عشر ومكوناتها المشتركة
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* ═══ المشهد 00 — الغلاف ═══ */
+.sc-cover { padding: 0; }
+.cover-media {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.cover-media video, .cover-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 38%;   /* إخراج فني: الأفق منخفض ليصفو أعلى الإطار للعنوان */
+}
+/* البديل المدرّج عند غياب الوسائط: سماء غسق مرسومة كوداً — لا إطار مكسور أبداً */
+.cover-fallback {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(115% 90% at 50% 108%, #27492F 0%, #16301F 34%, #0B1A12 62%, #060D09 100%);
+}
+.cover-fallback .skyline {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 34%;
+  opacity: 0.9;
+}
+.cover-scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(4, 8, 6, 0.62) 0%, rgba(4, 8, 6, 0.18) 34%,
+                    rgba(4, 8, 6, 0.14) 58%, rgba(4, 8, 6, 0.78) 100%);
+}
+.cover-content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: calc(var(--su) * 72);
+}
+.cover-title {
+  font-family: var(--f-display);
+  font-size: calc(var(--su) * 66);
+  font-weight: 700;
+  line-height: 1.5;
+  color: var(--ivory);
+  max-width: calc(var(--su) * 1280);
+  text-shadow: 0 2px 30px rgba(0, 0, 0, 0.55);
+}
+.cover-rule {
+  width: calc(var(--su) * 88);
+  height: 2px;
+  background: var(--gold);
+  margin: calc(var(--su) * 34) 0 calc(var(--su) * 26);
+}
+.cover-date {
+  font-size: calc(var(--su) * 23);
+  font-weight: 500;
+  color: var(--ink2-d);
+  letter-spacing: 0.5px;
+}
+.cover-asof {
+  font-size: calc(var(--su) * 15.5);
+  color: var(--mut-d);
+  margin-top: calc(var(--su) * 10);
+}
+.cover-actions {
+  position: absolute;
+  bottom: calc(var(--su) * 96);
+  inset-inline: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(var(--su) * 18);
+}
+.btn-begin {
+  font-family: var(--f-display);
+  font-size: calc(var(--su) * 22);
+  font-weight: 700;
+  color: #071009;
+  background: var(--ivory);
+  border-radius: 999px;
+  padding: calc(var(--su) * 18) calc(var(--su) * 58);
+  box-shadow: 0 10px 44px rgba(0, 0, 0, 0.45);
+  transition: transform var(--dur-micro) var(--ease), background var(--dur-micro);
+}
+.btn-begin:hover, .btn-begin:focus-visible { background: #FFFFFF; transform: translateY(-2px); }
+.btn-fullscreen {
+  font-size: calc(var(--su) * 15);
+  font-weight: 600;
+  color: var(--mut-d);
+  padding: calc(var(--su) * 8) calc(var(--su) * 18);
+}
+.btn-fullscreen:hover, .btn-fullscreen:focus-visible { color: var(--ivory); }
+
+/* ═══ المشهد 01 — محاور العرض ═══ */
+.sc-agenda { padding: calc(var(--su) * 88) calc(var(--su) * 84); }
+.agenda-title {
+  font-family: var(--f-display);
+  font-size: calc(var(--su) * 44);
+  font-weight: 600;
+  color: var(--ivory);
+  margin-bottom: calc(var(--su) * 52);
+}
+.agenda-panels {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: calc(var(--su) * 36);
+}
+.agenda-panel {
+  position: relative;
+  border-radius: calc(var(--su) * 26);
+  overflow: hidden;
+  text-align: start;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: calc(var(--su) * 44);
+  background: linear-gradient(200deg, var(--stage-2), var(--stage-1) 68%);
+  border: 1px solid var(--hair-d2);
+  transition: transform var(--dur-std) var(--ease), border-color var(--dur-std);
+  isolation: isolate;
+}
+.agenda-panel::after {          /* قناع زجاجي هادئ عند أسفل اللوحة */
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(180deg, transparent 42%, rgba(5, 10, 8, 0.72) 100%);
+}
+.agenda-panel .art {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  opacity: 0.85;
+}
+.agenda-panel .art svg, .agenda-panel .art img { width: 100%; height: 100%; object-fit: cover; }
+.agenda-panel:hover, .agenda-panel:focus-visible {
+  transform: translateY(calc(var(--su) * -8));
+  border-color: var(--gold);
+}
+.agenda-num {
+  font-family: var(--f-display);
+  font-size: calc(var(--su) * 19);
+  font-weight: 600;
+  color: var(--gold);
+  margin-bottom: calc(var(--su) * 12);
+}
+.agenda-name {
+  font-family: var(--f-display);
+  font-size: calc(var(--su) * 33);
+  font-weight: 700;
+  line-height: 1.45;
+  color: var(--ivory);
+}
+
+/* ═══ المشهدان 02 و08 — البوابات ═══ */
+.hub-panels {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  gap: calc(var(--su) * 36);
+}
+.hub-panels.g3 { grid-template-columns: repeat(3, 1fr); }
+.hub-panels.g2 { grid-template-columns: repeat(2, 1fr); }
+.hub-panel {
+  position: relative;
+  border-radius: calc(var(--su) * 26);
+  border: 1px solid var(--hair-d2);
+  background: linear-gradient(210deg, var(--stage-2), var(--stage-1) 72%);
+  padding: calc(var(--su) * 48);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-align: start;
+  overflow: hidden;
+  transition: transform var(--dur-std) var(--ease), border-color var(--dur-std);
+}
+.hub-panel:hover, .hub-panel:focus-visible {
+  transform: translateY(calc(var(--su) * -8));
+  border-color: var(--green);
+}
+.hub-glyph { width: calc(var(--su) * 56); height: calc(var(--su) * 56); color: var(--green); }
+.hub-glyph svg { width: 100%; height: 100%; }
+.hub-name {
+  display: block;
+  font-family: var(--f-display);
+  font-size: calc(var(--su) * 36);
+  font-weight: 700;
+  color: var(--ivory);
+  margin-top: calc(var(--su) * 26);
+}
+.hub-fact {
+  display: block;
+  font-size: calc(var(--su) * 18);
+  color: var(--mut-d);
+  margin-top: calc(var(--su) * 12);
+  line-height: 1.8;
+  max-width: calc(var(--su) * 420);
+}
+.hub-fact b { color: var(--ink2-d); font-weight: 700; }
+
+/* ═══ مقياس التغطية العلائقي (المشهد 03) — بديل العدادات الدائرية ═══ */
+.coverage-meter { position: relative; }
+.coverage-meter .track {
+  height: calc(var(--su) * 116);
+  border-radius: calc(var(--su) * 18);
+  background: var(--coral-dim);
+  position: relative;
+  overflow: hidden;
+}
+.coverage-meter .inlabel {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--f-display);
+  font-size: calc(var(--su) * 22);
+  font-weight: 600;
+  color: rgba(6, 16, 10, 0.92);
+  white-space: nowrap;
+}
+.coverage-meter .inlabel.on-deficit { color: var(--ivory); opacity: 0.92; }
+.coverage-meter .fill {
+  position: absolute;
+  inset-inline-start: 0;
+  top: 0;
+  bottom: 0;
+  border-radius: calc(var(--su) * 14);
+  background: linear-gradient(90deg, var(--green), var(--green-hi));
+  transition: width 900ms var(--ease);
+}
+.coverage-meter .tick-target {
+  position: absolute;
+  top: calc(var(--su) * -12);
+  bottom: calc(var(--su) * -12);
+  width: 0;
+  border-inline-start: 2px dashed var(--gold);
+}
+.coverage-meter .mlabel {
+  position: absolute;
+  font-size: calc(var(--su) * 16);
+  color: var(--mut-d);
+  top: calc(100% + var(--su) * 12);
+  white-space: nowrap;
+}
+.coverage-meter .mlabel b { color: var(--ivory); font-weight: 700; }
+
+/* ═══ الخريطة القطاعية ═══ */
+.sector-map { width: 100%; height: 100%; }
+.sector-map .sector-shape {
+  stroke: var(--stage-0);
+  stroke-width: 3;
+  cursor: pointer;
+  transition: filter var(--dur-std) var(--ease), opacity var(--dur-std);
+}
+.sector-map .sector-shape:hover { filter: brightness(1.25); }
+.sector-map .sector-shape.dim { opacity: 0.38; }
+.sector-map .sector-shape.focus { filter: brightness(1.18); stroke: var(--gold); stroke-width: 2.5; }
+.sector-map .slabel {
+  font-family: var(--f-display);
+  fill: var(--ivory);
+  text-anchor: middle;
+  pointer-events: none;
+}
+.sector-map .slabel .sname { font-weight: 600; }
+.sector-map .slabel .svalue { font-weight: 300; }
+.sector-map .wadi { fill: none; stroke: var(--hair-d); stroke-width: 2; stroke-dasharray: 3 7; }
+.map-disclaimer {
+  font-size: calc(var(--su) * 15);
+  color: var(--mut-d);
+}
+.map-legend {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--su) * 10);
+  font-size: calc(var(--su) * 16.5);
+  color: var(--mut-d);
+}
+.map-legend .ramp {
+  width: calc(var(--su) * 130);
+  height: calc(var(--su) * 10);
+  border-radius: 5px;
+}
+
+/* بطاقة تفصيل القطاع (تنكشف عند النقر دون مغادرة السرد) */
+.sector-detail {
+  position: absolute;
+  inset-inline-end: 0;
+  top: 0;
+  bottom: 0;
+  width: calc(var(--su) * 470);
+  border-radius: calc(var(--su) * 22);
+  background: rgba(16, 32, 26, 0.66);
+  backdrop-filter: blur(22px) saturate(1.15);
+  -webkit-backdrop-filter: blur(22px) saturate(1.15);
+  border: 1px solid var(--hair-d);
+  padding: calc(var(--su) * 38);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 22);
+  transform: translateX(calc(var(--su) * -24));
+  opacity: 0;
+  animation: detail-in var(--dur-std) var(--ease) forwards;
+}
+@keyframes detail-in { to { transform: none; opacity: 1; } }
+.sector-detail h3 {
+  font-family: var(--f-display);
+  font-size: calc(var(--su) * 30);
+  font-weight: 700;
+  color: var(--ivory);
+}
+.sector-detail .drow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  border-bottom: 1px solid var(--hair-d2);
+  padding-bottom: calc(var(--su) * 14);
+}
+.sector-detail .drow:last-child { border-bottom: 0; }
+.sector-detail .dlabel { font-size: calc(var(--su) * 16.5); color: var(--mut-d); }
+.sector-detail .dvalue {
+  font-family: var(--f-display);
+  font-size: calc(var(--su) * 30);
+  font-weight: 400;
+  color: var(--ivory);
+}
+.sector-detail .dvalue.pos { color: var(--green-hi); }
+.sector-detail .dvalue.neg { color: var(--coral); }
+.sector-detail .dclose {
+  align-self: flex-start;
+  font-size: calc(var(--su) * 14);
+  color: var(--mut-d);
+  padding: calc(var(--su) * 6) calc(var(--su) * 14);
+  border: 1px solid var(--hair-d);
+  border-radius: 999px;
+}
+.sector-detail .dclose:hover { color: var(--ivory); }
+
+/* خطوات البناء داخل المشهد (طبقات الخريطة) */
+.layer-steps {
+  display: inline-flex;
+  gap: calc(var(--su) * 8);
+  padding: calc(var(--su) * 5);
+  border: 1px solid var(--hair-d2);
+  border-radius: 999px;
+  background: rgba(8, 16, 9, 0.5);
+}
+.layer-steps button {
+  font-size: calc(var(--su) * 15.5);
+  font-weight: 600;
+  color: var(--mut-d);
+  padding: calc(var(--su) * 8) calc(var(--su) * 20);
+  border-radius: 999px;
+  transition: background var(--dur-micro), color var(--dur-micro);
+}
+.layer-steps button.on { background: var(--stage-3); color: var(--ivory); }
+.layer-steps button:hover:not(.on) { color: var(--ink2-d); }
+
+/* ═══ المشهد 07 — السطر الثانوي ═══ */
+.secondary-line {
+  display: flex;
+  gap: calc(var(--su) * 40);
+  align-items: baseline;
+  font-size: calc(var(--su) * 17.5);
+  color: var(--mut-d);
+}
+.secondary-line b {
+  font-family: var(--f-display);
+  font-size: calc(var(--su) * 26);
+  font-weight: 500;
+  color: var(--ink2-d);
+}
+.badge-pending {
+  display: inline-block;
+  font-size: calc(var(--su) * 15);
+  font-weight: 700;
+  color: var(--gold-hi);
+  border: 1px solid rgba(214, 171, 76, 0.55);
+  border-radius: 999px;
+  padding: calc(var(--su) * 4) calc(var(--su) * 14);
+  vertical-align: middle;
+}
+
+/* ═══ المشهد 09 — كوكبة الركائز / حالة الاعتماد ═══ */
+.pending-scene {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: calc(var(--su) * 26);
+}
+.pending-scene .glyph {
+  width: calc(var(--su) * 120);
+  height: calc(var(--su) * 120);
+  color: var(--gold);
+  opacity: 0.9;
+}
+.pending-scene .glyph svg { width: 100%; height: 100%; }
+.pending-scene h2 {
+  font-family: var(--f-display);
+  font-size: calc(var(--su) * 40);
+  font-weight: 600;
+  color: var(--ivory);
+  max-width: calc(var(--su) * 1150);
+  line-height: 1.6;
+}
+.pending-scene p {
+  font-size: calc(var(--su) * 20);
+  color: var(--mut-d);
+  max-width: calc(var(--su) * 980);
+  line-height: 1.8;
+}
+.pending-scene .src-name { color: var(--gold); font-weight: 700; }
+
+.constellation { width: 100%; height: 100%; }
+.constellation .ring-track { stroke: var(--hair-d); fill: none; }
+.constellation .ring-fill {
+  stroke: var(--green);
+  fill: none;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1100ms var(--ease);
+}
+.constellation .ring-core { fill: var(--stage-2); stroke: var(--hair-d2); }
+.constellation .pname {
+  font-family: var(--f-display);
+  font-weight: 600;
+  fill: var(--ivory);
+  text-anchor: middle;
+}
+.constellation .ppct {
+  font-family: var(--f-display);
+  font-weight: 300;
+  fill: var(--ivory);
+  text-anchor: middle;
+}
+
+/* ═══ المشهد 11 — الخطوات القادمة ═══ */
+.steps-list {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: calc(var(--su) * 30);
+  max-width: calc(var(--su) * 1420);
+}
+.step-item {
+  display: grid;
+  grid-template-columns: calc(var(--su) * 74) 1fr auto;
+  gap: calc(var(--su) * 30);
+  align-items: start;
+  padding: calc(var(--su) * 30) 0;
+  border-bottom: 1px solid var(--hair-d2);
+}
+.step-item:last-child { border-bottom: 0; }
+.step-num {
+  font-family: var(--f-display);
+  font-size: calc(var(--su) * 42);
+  font-weight: 300;
+  color: var(--gold);
+  line-height: 1;
+}
+.step-action {
+  font-family: var(--f-display);
+  font-size: calc(var(--su) * 27);
+  font-weight: 600;
+  color: var(--ivory);
+  line-height: 1.55;
+}
+.step-meta {
+  display: flex;
+  gap: calc(var(--su) * 26);
+  margin-top: calc(var(--su) * 10);
+  font-size: calc(var(--su) * 16);
+  color: var(--mut-d);
+}
+.step-meta b { color: var(--ink2-d); font-weight: 600; }
+.step-decision {
+  font-size: calc(var(--su) * 16.5);
+  font-weight: 600;
+  color: var(--gold);
+  max-width: calc(var(--su) * 330);
+  line-height: 1.65;
+  text-align: start;
+}
+
+/* ═══ أدوات مشتركة ═══ */
+.stat-strip {
+  display: flex;
+  border-block: 1px solid var(--hair-d);
+}
+.stat-strip .cell {
+  flex: 1;
+  padding: calc(var(--su) * 20) calc(var(--su) * 26);
+  border-inline-start: 1px solid var(--hair-d2);
+}
+.stat-strip .cell:first-child { border-inline-start: 0; }
+.stat-strip .slabel { font-size: calc(var(--su) * 15); color: var(--mut-d); font-weight: 600; }
+.stat-strip .svalue {
+  font-family: var(--f-display);
+  font-size: calc(var(--su) * 34);
+  font-weight: 400;
+  color: var(--ivory);
+  margin-top: calc(var(--su) * 4);
+}
+.stat-strip .svalue .unit { font-size: calc(var(--su) * 16); color: var(--mut-d); }
+
+.chart-tip {
+  position: fixed;
+  z-index: 80;
+  pointer-events: none;
+  background: #131D17;
+  color: #F1F5F2;
+  font-size: 13px;
+  font-family: var(--f-body);
+  direction: rtl;
+  text-align: right;
+  border-radius: 13px;
+  padding: 11px 15px;
+  box-shadow: 0 14px 40px rgba(4, 10, 8, 0.5);
+  max-width: 320px;
+}
+.chart-tip b { font-family: var(--f-display); color: #FFF; }
+
+/* ═══ بطاقات المؤشرات (المشهد 10) ═══ */
+.kpi-card {
+  border: 1px solid var(--hair-d2);
+  border-radius: calc(var(--su) * 22);
+  background: linear-gradient(210deg, var(--stage-2), var(--stage-1) 75%);
+  padding: calc(var(--su) * 26) calc(var(--su) * 30);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.kpi-card .kpi-name {
+  font-family: var(--f-display);
+  font-size: calc(var(--su) * 20);
+  font-weight: 600;
+  color: var(--ivory);
+  line-height: 1.5;
+  min-height: calc(var(--su) * 60);
+}
+.kpi-card svg { flex: 1; min-height: 0; }
+.kpi-card .kpi-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--su) * 6) calc(var(--su) * 20);
+  font-size: calc(var(--su) * 13.5);
+  color: var(--mut-d);
+  border-top: 1px solid var(--hair-d2);
+  padding-top: calc(var(--su) * 12);
+}
+.kpi-card .kpi-meta b { color: var(--ink2-d); font-weight: 600; }
+
+/* إشارة نقر ساكنة رصينة للوحات القابلة للنقر (بوابات ومحاور) */
+.agenda-panel::before, .hub-panel::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: calc(var(--su) * 40);
+  bottom: calc(var(--su) * 34);
+  width: calc(var(--su) * 30);
+  height: calc(var(--su) * 30);
+  border-radius: 50%;
+  border: 1px solid var(--hair-d);
+  background:
+    no-repeat center / 55% url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2393A096' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 6l-6 6 6 6'/%3E%3C/svg%3E");
+  opacity: 0.85;
+  transition: border-color var(--dur-micro), opacity var(--dur-micro);
+}
+.agenda-panel:hover::before, .agenda-panel:focus-visible::before,
+.hub-panel:hover::before, .hub-panel:focus-visible::before {
+  border-color: var(--gold);
+  opacity: 1;
+}

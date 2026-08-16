@@ -1,0 +1,269 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   admin.css — تجربة الإدارة: «حكومي تحريري» فاتح، تمرير طبيعي
+   لا يظهر أي عنصر من هذا في وضع المقدِّم — الفصل يفرضه الجذر #admin-root.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.admin-root {
+  min-height: 100vh;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 15px;
+}
+
+/* ── بوابة الدخول ── */
+.adm-gate {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 32px;
+}
+.adm-gate-card {
+  width: min(430px, 100%);
+  background: var(--surface);
+  border: 1px solid var(--hair);
+  border-radius: var(--r);
+  box-shadow: var(--shadow);
+  padding: 40px;
+}
+.adm-gate-card h1 {
+  font-family: var(--f-display);
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.adm-gate-card .sub { color: var(--mut); font-size: 13.5px; margin-bottom: 26px; }
+.adm-gate-card label { display: block; font-size: 12.5px; font-weight: 600; color: var(--ink2); margin-bottom: 6px; }
+.adm-gate-card input {
+  width: 100%;
+  font-family: inherit;
+  font-size: 15px;
+  padding: 11px 14px;
+  border: 1px solid var(--hair);
+  border-radius: var(--r-sm);
+  background: var(--paper);
+  color: var(--ink);
+  margin-bottom: 16px;
+}
+.adm-gate-card input:focus { outline: 2px solid var(--accent); outline-offset: 0; }
+.adm-gate-note {
+  margin-top: 18px;
+  font-size: 12.5px;
+  color: var(--mut);
+  line-height: 1.8;
+  border-top: 1px solid var(--hair2);
+  padding-top: 14px;
+}
+.adm-err { color: var(--bad); font-size: 13px; margin-top: 4px; min-height: 18px; }
+
+/* ── هيكل الإدارة ── */
+.adm-shell { max-width: 1560px; margin: 0 auto; padding: 0 28px 80px; }
+.adm-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--hair);
+  background: var(--surface);
+  margin: 0 -28px;
+  padding-inline: 28px;
+}
+.adm-header .brand-kicker { font-size: 11.5px; font-weight: 700; color: var(--accent); letter-spacing: 0.4px; }
+.adm-header h1 { font-family: var(--f-display); font-size: 19px; font-weight: 700; }
+.adm-header .who { font-size: 12.5px; color: var(--mut); }
+.adm-header .who b { color: var(--ink2); }
+.adm-mode-chip {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--warn);
+  border: 1px solid rgba(183, 122, 18, 0.35);
+  border-radius: 999px;
+  padding: 3px 12px;
+}
+
+.adm-nav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.86);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--hair);
+  margin: 0 -28px 30px;
+  padding: 0 28px;
+  overflow-x: auto;
+}
+.adm-nav button {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--mut);
+  padding: 14px 18px;
+  border-bottom: 2.5px solid transparent;
+  white-space: nowrap;
+}
+.adm-nav button.on { color: var(--accent); border-bottom-color: var(--accent); }
+.adm-nav button:hover:not(.on) { color: var(--ink2); }
+
+.adm-page-head { margin-bottom: 26px; }
+.adm-page-head .kicker { font-size: 12px; font-weight: 700; color: var(--accent); letter-spacing: 0.4px; }
+.adm-page-head h2 { font-family: var(--f-display); font-size: 26px; font-weight: 700; margin-top: 4px; }
+.adm-page-head .desc { font-size: 13.5px; color: var(--mut); margin-top: 6px; max-width: 720px; line-height: 1.8; }
+
+/* ── بطاقات ونماذج ── */
+.adm-card {
+  background: var(--surface);
+  border: 1px solid var(--hair);
+  border-radius: var(--r);
+  box-shadow: var(--shadow);
+  padding: 26px;
+  margin-bottom: 22px;
+}
+.adm-card > h3 { font-family: var(--f-display); font-size: 15.5px; font-weight: 700; margin-bottom: 4px; }
+.adm-card > .sub { font-size: 12.5px; color: var(--mut); margin-bottom: 18px; }
+
+.frow { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 18px; margin-bottom: 14px; }
+.frow.single { grid-template-columns: 1fr; }
+.fitem label { display: block; font-size: 12.5px; font-weight: 600; color: var(--ink2); margin-bottom: 6px; }
+.fitem input, .fitem select, .fitem textarea {
+  width: 100%;
+  font-family: inherit;
+  font-size: 14.5px;
+  padding: 10px 13px;
+  border: 1px solid var(--hair);
+  border-radius: var(--r-sm);
+  background: var(--paper);
+  color: var(--ink);
+}
+.fitem textarea { min-height: 92px; resize: vertical; line-height: 1.8; }
+.fitem input:focus, .fitem select:focus, .fitem textarea:focus { outline: 2px solid var(--accent); outline-offset: 0; }
+.fitem .hint { font-size: 11.5px; color: var(--faint); margin-top: 4px; }
+.fitem.locked input { background: #F1F3F0; color: var(--mut); }
+
+/* أزرار */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 10px 22px;
+  transition: background var(--dur-micro), color var(--dur-micro);
+}
+.btn-primary { background: var(--accent); color: #FFF; }
+.btn-primary:hover { background: var(--accent2); }
+.btn-primary:disabled { background: var(--faint); cursor: not-allowed; }
+.btn-quiet { color: var(--ink2); }
+.btn-quiet:hover { color: var(--accent); }
+.btn-danger-quiet { color: var(--bad); }
+.btn-line { border: 1px solid var(--hair); color: var(--ink2); background: var(--surface); }
+.btn-line:hover { border-color: var(--accent); color: var(--accent); }
+
+/* حالة نقطية — لا أقراص ملوّنة مصمتة */
+.st { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; font-weight: 600; }
+.st::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.st.ok { color: var(--ok); }
+.st.warn { color: var(--warn); }
+.st.bad { color: var(--bad); }
+.st.info { color: var(--info); }
+.st.mut { color: var(--mut); }
+
+/* جداول الإدارة */
+.adm-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.adm-table th {
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+  text-align: start;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--mut);
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--hair);
+}
+.adm-table td { padding: 11px 12px; border-bottom: 1px solid var(--hair2); vertical-align: top; }
+.adm-table tr:last-child td { border-bottom: 0; }
+.adm-table tr:hover td { background: var(--accent-softer); }
+.adm-table td.num { font-family: var(--f-display); font-variant-numeric: tabular-nums; }
+.adm-table .cell-actions { display: flex; gap: 10px; }
+.adm-table .cell-actions button { font-size: 12.5px; font-weight: 600; color: var(--accent); }
+.adm-table .cell-actions button.danger { color: var(--bad); }
+
+/* فحوص الجودة */
+.qgate {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--hair2);
+  font-size: 13.5px;
+}
+.qgate:last-child { border-bottom: 0; }
+.qgate .qicon { flex: 0 0 auto; width: 20px; height: 20px; margin-top: 1px; }
+.qgate.pass .qicon { color: var(--ok); }
+.qgate.warn .qicon { color: var(--warn); }
+.qgate.block .qicon { color: var(--bad); }
+.qgate .qname { font-weight: 700; }
+.qgate .qdetail { color: var(--mut); font-size: 12.5px; margin-top: 2px; line-height: 1.7; }
+.qgate .qwaive { margin-inline-start: auto; }
+
+/* سجل الإصدارات والتدقيق */
+.rel-item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 16px;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--hair2);
+}
+.rel-item:last-child { border-bottom: 0; }
+.rel-item .rid { font-family: var(--f-display); font-weight: 700; font-size: 13.5px; direction: ltr; }
+.rel-item .rmeta { font-size: 12.5px; color: var(--mut); }
+.rel-item.current .rid { color: var(--accent); }
+
+.audit-row { display: grid; grid-template-columns: 150px 110px 1fr; gap: 14px; padding: 9px 0; border-bottom: 1px solid var(--hair2); font-size: 12.5px; }
+.audit-row .at { color: var(--mut); direction: ltr; text-align: end; }
+.audit-row .aw { font-weight: 700; }
+
+/* استيراد الملف */
+.drop-zone {
+  border: 2px dashed var(--hair);
+  border-radius: var(--r);
+  padding: 44px;
+  text-align: center;
+  color: var(--mut);
+  font-size: 14px;
+  transition: border-color var(--dur-micro), background var(--dur-micro);
+}
+.drop-zone.hover { border-color: var(--accent); background: var(--accent-softer); }
+.import-diff { font-size: 13px; }
+.import-diff .chg { color: var(--warn); font-weight: 700; }
+.import-diff .same { color: var(--faint); }
+
+/* معاينة المقدِّم داخل الإدارة */
+.preview-frame {
+  border: 1px solid var(--hair);
+  border-radius: var(--r);
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  background: var(--stage-0);
+}
+
+/* Toast */
+#adm-toast {
+  position: fixed;
+  bottom: 26px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 200;
+  background: var(--ink);
+  color: #FFF;
+  font-size: 13.5px;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 11px 24px;
+  box-shadow: 0 14px 40px rgba(17, 24, 21, 0.25);
+}
+#adm-toast[hidden] { display: none; }

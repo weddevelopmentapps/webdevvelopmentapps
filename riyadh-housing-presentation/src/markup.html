@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>لوحة معلومات السكن الجماعي للأفراد في مدينة الرياض</title>
+<link rel="icon" href="__FAVICON__">
+<style>
+/*__FONTS__*/
+</style>
+<style>
+/*__CSS__*/
+</style>
+</head>
+<body class="mode-presenter">
+
+<!-- مسرح المقدِّم: مشهد واحد يملأ الإطار — لا تمرير -->
+<div id="stage" class="stage" role="main" aria-label="العرض التقديمي">
+  <div id="scene-host" class="scene-host"></div>
+  <div id="scene-next" class="scene-host scene-incoming" aria-hidden="true"></div>
+</div>
+
+<!-- عناصر تحكم المقدِّم (تختفي بعد الخمول) -->
+<div id="hud" class="hud" aria-hidden="false">
+  <button id="hud-next" class="hud-btn hud-next" aria-label="التالي">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
+    <span>التالي</span>
+  </button>
+  <button id="hud-prev" class="hud-btn hud-prev" aria-label="السابق">
+    <span>السابق</span>
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+  </button>
+  <button id="hud-agenda" class="hud-btn hud-agenda" aria-label="العودة إلى المحاور">العودة إلى المحاور</button>
+  <div id="hud-progress" class="hud-progress" role="progressbar" aria-label="تقدم العرض"></div>
+</div>
+
+<!-- مؤشر حالة الاتصال/الإصدار — رصين وغير ملفت -->
+<div id="release-badge" class="release-badge" hidden></div>
+
+<!-- جذر الإدارة (يُبنى عند الطلب فقط — لا يظهر في تجربة المقدِّم إطلاقاً) -->
+<div id="admin-root" class="admin-root" hidden></div>
+
+<!-- حاجز الأخطاء: شاشة عربية رشيقة بدل انهيار صامت -->
+<div id="fatal" class="fatal" hidden>
+  <div class="fatal-card">
+    <h1>تعذر عرض المحتوى</h1>
+    <p id="fatal-msg">حدث خطأ غير متوقع. أعد تحميل الصفحة، وإن تكرر الخطأ تواصل مع مسؤول المنصة.</p>
+    <button onclick="location.reload()">إعادة التحميل</button>
+  </div>
+</div>
+
+<script>
+//__RELEASE__
+</script>
+<script>
+//__ECHARTS__
+</script>
+<script>
+//__APP__
+</script>
+</body>
+</html>

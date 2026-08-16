@@ -1,0 +1,1069 @@
+{
+ "schema_version": "1.0.0",
+ "release": {
+  "id": "rel-2026-08-16-001",
+  "status": "published",
+  "published_at": "2026-08-16T12:00:00Z",
+  "published_by": "system-seed",
+  "base_release_id": null,
+  "notes": "الإصدار التأسيسي المولَّد من platform-data.xlsx (مرساة V1)",
+  "sha256": "fc5a93b370a80ec75db593acefd862a16a3637ca2dcf7a667713810402b356c0"
+ },
+ "meta": {
+  "title": "لوحة معلومات السكن الجماعي للأفراد في مدينة الرياض",
+  "entity": null,
+  "presentation_date": "2026-08-16",
+  "presentation_date_needs_confirmation": true,
+  "data_as_of": "أغسطس 2026",
+  "monitoring_period_start": "2025-09",
+  "monitoring_period_end": "2026-08",
+  "monitoring_period_label": "سبتمبر 2025 – أغسطس 2026",
+  "baseline_label": "خط الأساس قبل سبتمبر 2025",
+  "comparison_qualifier": "مقارنة بخط الأساس قبل سبتمبر 2025، وحتى أغسطس 2026",
+  "calculation_date": "2026-08-11",
+  "map_disclaimer": "خريطة توضيحية",
+  "sample_label": "عينة من الأحياء المدرجة في قاعدة البيانات"
+ },
+ "sources": [
+  {
+   "id": "src-workbook-v1",
+   "name": "platform-data.xlsx",
+   "kind": "workbook",
+   "template_version": "V1",
+   "sha256": "0e01d6158e9f712255340461ecce70ec85480baa138ab2d06d58b91d27e34a61",
+   "imported_at": "2026-08-16T11:50:00Z",
+   "private": true
+  }
+ ],
+ "metrics": {
+  "total_demand": {
+   "id": "total_demand",
+   "value": 1420000,
+   "unit": "سرير",
+   "kind": "raw",
+   "source_id": "src-workbook-v1",
+   "sheet": "الطلب",
+   "anchor": "C4",
+   "label": "إجمالي الطلب التقديري على الأسرّة"
+  },
+  "licensed_beds": {
+   "id": "licensed_beds",
+   "value": 612400,
+   "unit": "سرير",
+   "kind": "raw",
+   "source_id": "src-workbook-v1",
+   "sheet": "التراخيص",
+   "anchor": "E20",
+   "label": "الطاقة الاستيعابية المرخصة"
+  },
+  "occupied_beds": {
+   "id": "occupied_beds",
+   "value": 561571,
+   "unit": "سرير",
+   "kind": "raw",
+   "source_id": "src-workbook-v1",
+   "sheet": "السياق",
+   "anchor": "C4",
+   "label": "الأسرّة المشغولة"
+  },
+  "current_building": {
+   "id": "current_building",
+   "value": 96,
+   "unit": "رخصة",
+   "kind": "raw",
+   "source_id": "src-workbook-v1",
+   "sheet": "التراخيص",
+   "anchor": "C20",
+   "label": "رخص البناء"
+  },
+  "current_operational": {
+   "id": "current_operational",
+   "value": 140,
+   "unit": "رخصة",
+   "kind": "raw",
+   "source_id": "src-workbook-v1",
+   "sheet": "التراخيص",
+   "anchor": "D20",
+   "label": "الرخص التشغيلية"
+  },
+  "baseline_building": {
+   "id": "baseline_building",
+   "value": 64,
+   "unit": "رخصة",
+   "kind": "raw",
+   "source_id": "src-workbook-v1",
+   "sheet": "التراخيص",
+   "anchor": "C5",
+   "label": "رخص البناء — خط الأساس قبل سبتمبر 2025"
+  },
+  "baseline_operational": {
+   "id": "baseline_operational",
+   "value": 118,
+   "unit": "رخصة",
+   "kind": "raw",
+   "source_id": "src-workbook-v1",
+   "sheet": "التراخيص",
+   "anchor": "D5",
+   "label": "الرخص التشغيلية — خط الأساس قبل سبتمبر 2025"
+  },
+  "baseline_beds": {
+   "id": "baseline_beds",
+   "value": 563900,
+   "unit": "سرير",
+   "kind": "raw",
+   "source_id": "src-workbook-v1",
+   "sheet": "التراخيص",
+   "anchor": "E5",
+   "label": "الطاقة المرخصة — خط الأساس قبل سبتمبر 2025"
+  },
+  "blue_collar": {
+   "id": "blue_collar",
+   "value": 1164400,
+   "unit": "سرير",
+   "kind": "raw",
+   "source_id": "src-workbook-v1",
+   "sheet": "السياق",
+   "anchor": "C15",
+   "label": "الطلب على الأسرّة للعمالة ذات الياقات الزرقاء"
+  },
+  "white_collar": {
+   "id": "white_collar",
+   "value": 255600,
+   "unit": "سرير",
+   "kind": "raw",
+   "source_id": "src-workbook-v1",
+   "sheet": "السياق",
+   "anchor": "C16",
+   "label": "الطلب على الأسرّة للعمالة ذات الياقات البيضاء"
+  },
+  "total_monitors": {
+   "id": "total_monitors",
+   "value": 18,
+   "unit": "مراقب",
+   "kind": "raw",
+   "source_id": "src-workbook-v1",
+   "sheet": "الرقابة",
+   "anchor": "C10",
+   "label": "إجمالي المراقبين حتى أغسطس 2026"
+  },
+  "total_visits": {
+   "id": "total_visits",
+   "value": 19651,
+   "unit": "زيارة",
+   "kind": "raw",
+   "source_id": "src-workbook-v1",
+   "sheet": "الرقابة",
+   "anchor": "E10",
+   "label": "الزيارات الميدانية خلال سبتمبر 2025–أغسطس 2026"
+  },
+  "total_violations": {
+   "id": "total_violations",
+   "value": 3617,
+   "unit": "مخالفة",
+   "kind": "raw",
+   "source_id": "src-workbook-v1",
+   "sheet": "الرقابة",
+   "anchor": "D10",
+   "label": "المخالفات المسجلة خلال الفترة نفسها"
+  },
+  "total_closures": {
+   "id": "total_closures",
+   "value": 113,
+   "unit": "قرار",
+   "kind": "raw",
+   "source_id": "src-workbook-v1",
+   "sheet": "الرقابة",
+   "anchor": "F10",
+   "label": "قرارات الإغلاق خلال الفترة نفسها"
+  },
+  "south_violations": {
+   "id": "south_violations",
+   "value": 1367,
+   "unit": "مخالفة",
+   "kind": "raw",
+   "source_id": "src-workbook-v1",
+   "sheet": "الرقابة",
+   "anchor": "D9",
+   "label": "مخالفات قطاع الجنوب"
+  }
+ },
+ "derived": {
+  "deficit_beds": {
+   "id": "deficit_beds",
+   "value": 807600,
+   "unit": "سرير",
+   "kind": "derived",
+   "formula": "max(total_demand − licensed_beds, 0)",
+   "formula_version": "fv1",
+   "inputs": [
+    "total_demand",
+    "licensed_beds"
+   ]
+  },
+  "coverage_pct": {
+   "id": "coverage_pct",
+   "value": 43.1,
+   "unit": "٪",
+   "kind": "derived",
+   "formula": "licensed_beds ÷ total_demand × 100",
+   "formula_version": "fv1",
+   "inputs": [
+    "licensed_beds",
+    "total_demand"
+   ]
+  },
+  "uncovered_pct": {
+   "id": "uncovered_pct",
+   "value": 56.9,
+   "unit": "٪",
+   "kind": "derived",
+   "formula": "100 − coverage_pct",
+   "formula_version": "fv1",
+   "inputs": [
+    "coverage_pct"
+   ]
+  },
+  "occupancy_pct": {
+   "id": "occupancy_pct",
+   "value": 91.7,
+   "unit": "٪",
+   "kind": "derived",
+   "formula": "occupied_beds ÷ licensed_beds × 100",
+   "formula_version": "fv1",
+   "inputs": [
+    "occupied_beds",
+    "licensed_beds"
+   ]
+  },
+  "vacant_beds": {
+   "id": "vacant_beds",
+   "value": 50829,
+   "unit": "سرير",
+   "kind": "derived",
+   "formula": "licensed_beds − occupied_beds",
+   "formula_version": "fv1",
+   "inputs": [
+    "licensed_beds",
+    "occupied_beds"
+   ]
+  },
+  "blue_share_pct": {
+   "id": "blue_share_pct",
+   "value": 82.0,
+   "unit": "٪",
+   "kind": "derived",
+   "formula": "blue_collar ÷ total_demand × 100",
+   "formula_version": "fv1",
+   "inputs": [
+    "blue_collar",
+    "total_demand"
+   ]
+  },
+  "white_share_pct": {
+   "id": "white_share_pct",
+   "value": 18.0,
+   "unit": "٪",
+   "kind": "derived",
+   "formula": "white_collar ÷ total_demand × 100",
+   "formula_version": "fv1",
+   "inputs": [
+    "white_collar",
+    "total_demand"
+   ]
+  },
+  "growth_building_abs": {
+   "id": "growth_building_abs",
+   "value": 32,
+   "unit": "رخصة",
+   "kind": "derived",
+   "formula": "current_building − baseline_building",
+   "formula_version": "fv1",
+   "inputs": [
+    "current_building",
+    "baseline_building"
+   ]
+  },
+  "growth_building_pct": {
+   "id": "growth_building_pct",
+   "value": 50.0,
+   "unit": "٪",
+   "kind": "derived",
+   "formula": "(current_building − baseline_building) ÷ baseline_building × 100",
+   "formula_version": "fv1",
+   "inputs": [
+    "current_building",
+    "baseline_building"
+   ]
+  },
+  "growth_operational_abs": {
+   "id": "growth_operational_abs",
+   "value": 22,
+   "unit": "رخصة",
+   "kind": "derived",
+   "formula": "current_operational − baseline_operational",
+   "formula_version": "fv1",
+   "inputs": [
+    "current_operational",
+    "baseline_operational"
+   ]
+  },
+  "growth_operational_pct": {
+   "id": "growth_operational_pct",
+   "value": 18.6,
+   "unit": "٪",
+   "kind": "derived",
+   "formula": "(current_operational − baseline_operational) ÷ baseline_operational × 100",
+   "formula_version": "fv1",
+   "inputs": [
+    "current_operational",
+    "baseline_operational"
+   ]
+  },
+  "growth_beds_abs": {
+   "id": "growth_beds_abs",
+   "value": 48500,
+   "unit": "سرير",
+   "kind": "derived",
+   "formula": "current_beds − baseline_beds",
+   "formula_version": "fv1",
+   "inputs": [
+    "current_beds",
+    "baseline_beds"
+   ]
+  },
+  "growth_beds_pct": {
+   "id": "growth_beds_pct",
+   "value": 8.6,
+   "unit": "٪",
+   "kind": "derived",
+   "formula": "(current_beds − baseline_beds) ÷ baseline_beds × 100",
+   "formula_version": "fv1",
+   "inputs": [
+    "current_beds",
+    "baseline_beds"
+   ]
+  },
+  "sector_derived": {
+   "north": {
+    "coverage_pct": 49.6,
+    "coverage_raw": 0.49612403100775193,
+    "deficit_beds": 130000,
+    "violations_share_pct": 12.1,
+    "visits_share_pct": 18.0,
+    "demand_share_pct": 18.2
+   },
+   "east": {
+    "coverage_pct": 52.1,
+    "coverage_raw": 0.5208459214501511,
+    "deficit_beds": 158600,
+    "violations_share_pct": 25.1,
+    "visits_share_pct": 24.0,
+    "demand_share_pct": 23.3
+   },
+   "center": {
+    "coverage_pct": 39.0,
+    "coverage_raw": 0.3902439024390244,
+    "deficit_beds": 150000,
+    "violations_share_pct": 15.2,
+    "visits_share_pct": 17.0,
+    "demand_share_pct": 17.3
+   },
+   "west": {
+    "coverage_pct": 40.6,
+    "coverage_raw": 0.4055299539170507,
+    "deficit_beds": 129000,
+    "violations_share_pct": 9.8,
+    "visits_share_pct": 13.0,
+    "demand_share_pct": 15.3
+   },
+   "south": {
+    "coverage_pct": 34.8,
+    "coverage_raw": 0.34782608695652173,
+    "deficit_beds": 240000,
+    "violations_share_pct": 37.8,
+    "visits_share_pct": 28.0,
+    "demand_share_pct": 25.9
+   }
+  },
+  "rankings": {
+   "lowest_coverage": "south",
+   "highest_coverage": "east",
+   "highest_demand": "south",
+   "highest_violations": "south",
+   "highest_building": "east",
+   "lowest_building": "center",
+   "highest_operational": "east",
+   "lowest_operational": "west",
+   "highest_beds": "east",
+   "lowest_beds": "west"
+  },
+  "avg_monthly_visits": {
+   "id": "avg_monthly_visits",
+   "value": 1638,
+   "unit": "زيارة",
+   "kind": "derived",
+   "formula": "total_visits ÷ 12",
+   "formula_version": "fv1",
+   "inputs": [
+    "total_visits"
+   ]
+  },
+  "south_violations_share_pct": {
+   "id": "south_violations_share_pct",
+   "value": 37.8,
+   "unit": "٪",
+   "kind": "derived",
+   "formula": "south_violations ÷ total_violations × 100",
+   "formula_version": "fv1",
+   "inputs": [
+    "south_violations",
+    "total_violations"
+   ]
+  }
+ },
+ "sectors": [
+  {
+   "id": "north",
+   "name": "قطاع الشمال",
+   "short": "الشمال",
+   "demand": 258000,
+   "building": 22,
+   "operational": 30,
+   "beds": 128000,
+   "monitors": 4,
+   "violations": 439,
+   "visits": 3538,
+   "closures": 15
+  },
+  {
+   "id": "east",
+   "name": "قطاع الشرق",
+   "short": "الشرق",
+   "demand": 331000,
+   "building": 26,
+   "operational": 34,
+   "beds": 172400,
+   "monitors": 4,
+   "violations": 907,
+   "visits": 4716,
+   "closures": 27
+  },
+  {
+   "id": "center",
+   "name": "قطاع الوسط",
+   "short": "الوسط",
+   "demand": 246000,
+   "building": 12,
+   "operational": 26,
+   "beds": 96000,
+   "monitors": 4,
+   "violations": 548,
+   "visits": 3341,
+   "closures": 19
+  },
+  {
+   "id": "west",
+   "name": "قطاع الغرب",
+   "short": "الغرب",
+   "demand": 217000,
+   "building": 16,
+   "operational": 22,
+   "beds": 88000,
+   "monitors": 3,
+   "violations": 356,
+   "visits": 2553,
+   "closures": 12
+  },
+  {
+   "id": "south",
+   "name": "قطاع الجنوب",
+   "short": "الجنوب",
+   "demand": 368000,
+   "building": 20,
+   "operational": 28,
+   "beds": 128000,
+   "monitors": 3,
+   "violations": 1367,
+   "visits": 5503,
+   "closures": 40
+  }
+ ],
+ "monthly": {
+  "licensing": [
+   {
+    "iso": "2025-09",
+    "label": "سبتمبر 2025",
+    "building": 3,
+    "operational": 1,
+    "beds": 3200
+   },
+   {
+    "iso": "2025-10",
+    "label": "أكتوبر 2025",
+    "building": 2,
+    "operational": 2,
+    "beds": 3600
+   },
+   {
+    "iso": "2025-11",
+    "label": "نوفمبر 2025",
+    "building": 3,
+    "operational": 2,
+    "beds": 4100
+   },
+   {
+    "iso": "2025-12",
+    "label": "ديسمبر 2025",
+    "building": 3,
+    "operational": 2,
+    "beds": 3900
+   },
+   {
+    "iso": "2026-01",
+    "label": "يناير 2026",
+    "building": 2,
+    "operational": 1,
+    "beds": 4200
+   },
+   {
+    "iso": "2026-02",
+    "label": "فبراير 2026",
+    "building": 3,
+    "operational": 2,
+    "beds": 4400
+   },
+   {
+    "iso": "2026-03",
+    "label": "مارس 2026",
+    "building": 3,
+    "operational": 2,
+    "beds": 4100
+   },
+   {
+    "iso": "2026-04",
+    "label": "أبريل 2026",
+    "building": 3,
+    "operational": 2,
+    "beds": 4300
+   },
+   {
+    "iso": "2026-05",
+    "label": "مايو 2026",
+    "building": 2,
+    "operational": 2,
+    "beds": 4200
+   },
+   {
+    "iso": "2026-06",
+    "label": "يونيو 2026",
+    "building": 3,
+    "operational": 2,
+    "beds": 4200
+   },
+   {
+    "iso": "2026-07",
+    "label": "يوليو 2026",
+    "building": 3,
+    "operational": 2,
+    "beds": 4100
+   },
+   {
+    "iso": "2026-08",
+    "label": "أغسطس 2026",
+    "building": 2,
+    "operational": 2,
+    "beds": 4200
+   }
+  ],
+  "monitoring": [
+   {
+    "iso": "2025-09",
+    "label": "سبتمبر 2025",
+    "visits": 1548,
+    "violations": 292
+   },
+   {
+    "iso": "2025-10",
+    "label": "أكتوبر 2025",
+    "visits": 1504,
+    "violations": 288
+   },
+   {
+    "iso": "2025-11",
+    "label": "نوفمبر 2025",
+    "visits": 1601,
+    "violations": 293
+   },
+   {
+    "iso": "2025-12",
+    "label": "ديسمبر 2025",
+    "visits": 1580,
+    "violations": 279
+   },
+   {
+    "iso": "2026-01",
+    "label": "يناير 2026",
+    "visits": 1609,
+    "violations": 292
+   },
+   {
+    "iso": "2026-02",
+    "label": "فبراير 2026",
+    "visits": 1654,
+    "violations": 304
+   },
+   {
+    "iso": "2026-03",
+    "label": "مارس 2026",
+    "visits": 1736,
+    "violations": 316
+   },
+   {
+    "iso": "2026-04",
+    "label": "أبريل 2026",
+    "visits": 1755,
+    "violations": 309
+   },
+   {
+    "iso": "2026-05",
+    "label": "مايو 2026",
+    "visits": 1800,
+    "violations": 310
+   },
+   {
+    "iso": "2026-06",
+    "label": "يونيو 2026",
+    "visits": 1747,
+    "violations": 300
+   },
+   {
+    "iso": "2026-07",
+    "label": "يوليو 2026",
+    "visits": 1558,
+    "violations": 317
+   },
+   {
+    "iso": "2026-08",
+    "label": "أغسطس 2026",
+    "visits": 1559,
+    "violations": 317
+   }
+  ]
+ },
+ "baseline": {
+  "building": 64,
+  "operational": 118,
+  "beds": 563900
+ },
+ "facility_types": [
+  {
+   "id": "compound",
+   "name": "مجمع سكني",
+   "count": 38
+  },
+  {
+   "id": "building",
+   "name": "مبنى سكني",
+   "count": 68
+  },
+  {
+   "id": "cabins",
+   "name": "كبائن متنقلة",
+   "count": 34
+  }
+ ],
+ "economic_activities": [
+  {
+   "id": "construction",
+   "name": "التشييد والبناء",
+   "demand": 505000
+  },
+  {
+   "id": "retail",
+   "name": "التجارة والتجزئة",
+   "demand": 217000
+  },
+  {
+   "id": "industry",
+   "name": "الصناعة",
+   "demand": 198000
+  },
+  {
+   "id": "public-services",
+   "name": "الخدمات العامة",
+   "demand": 165000
+  },
+  {
+   "id": "hospitality",
+   "name": "الضيافة والإعاشة",
+   "demand": 152000
+  },
+  {
+   "id": "other",
+   "name": "قطاعات أخرى",
+   "demand": 183000
+  }
+ ],
+ "violation_types": [
+  {
+   "id": "overcrowding",
+   "name": "الاكتظاظ وتجاوز الطاقة الاستيعابية",
+   "count": 1121
+  },
+  {
+   "id": "fire-safety",
+   "name": "اشتراطات السلامة والحماية من الحريق",
+   "count": 868
+  },
+  {
+   "id": "hygiene",
+   "name": "النظافة والصحة العامة",
+   "count": 615
+  },
+  {
+   "id": "unlicensed",
+   "name": "مزاولة النشاط دون ترخيص",
+   "count": 434
+  },
+  {
+   "id": "electrical",
+   "name": "مخالفات الكهرباء والسباكة",
+   "count": 326
+  },
+  {
+   "id": "ventilation",
+   "name": "التهوية والعزل غير المطابق",
+   "count": 253
+  }
+ ],
+ "collar": {
+  "blue": 1164400,
+  "white": 255600
+ },
+ "neighbourhoods": {
+  "label": "عينة من الأحياء المدرجة في قاعدة البيانات",
+  "ranking_note": "أي ترتيب هو ضمن العينة المورّدة فقط، مع تسمية المقياس المرتب",
+  "rows": [
+   {
+    "name": "حي الملقا",
+    "sector": "north",
+    "building": 6,
+    "operational": 5,
+    "beds": 21500,
+    "violations": 84
+   },
+   {
+    "name": "حي الصحافة",
+    "sector": "north",
+    "building": 5,
+    "operational": 4,
+    "beds": 16800,
+    "violations": 61
+   },
+   {
+    "name": "حي حطين",
+    "sector": "north",
+    "building": 4,
+    "operational": 4,
+    "beds": 15200,
+    "violations": 57
+   },
+   {
+    "name": "حي الياسمين",
+    "sector": "north",
+    "building": 3,
+    "operational": 3,
+    "beds": 11900,
+    "violations": 48
+   },
+   {
+    "name": "حي النسيم الشرقي",
+    "sector": "east",
+    "building": 7,
+    "operational": 8,
+    "beds": 34600,
+    "violations": 216
+   },
+   {
+    "name": "حي السلي",
+    "sector": "east",
+    "building": 6,
+    "operational": 6,
+    "beds": 30200,
+    "violations": 246
+   },
+   {
+    "name": "حي النظيم",
+    "sector": "east",
+    "building": 5,
+    "operational": 5,
+    "beds": 24800,
+    "violations": 168
+   },
+   {
+    "name": "حي النسيم الغربي",
+    "sector": "east",
+    "building": 4,
+    "operational": 6,
+    "beds": 27400,
+    "violations": 152
+   },
+   {
+    "name": "حي منفوحة",
+    "sector": "center",
+    "building": 4,
+    "operational": 7,
+    "beds": 23200,
+    "violations": 187
+   },
+   {
+    "name": "حي غبيرة",
+    "sector": "center",
+    "building": 3,
+    "operational": 5,
+    "beds": 19400,
+    "violations": 149
+   },
+   {
+    "name": "حي الجرادية",
+    "sector": "center",
+    "building": 2,
+    "operational": 4,
+    "beds": 15300,
+    "violations": 102
+   },
+   {
+    "name": "حي الديرة",
+    "sector": "center",
+    "building": 2,
+    "operational": 3,
+    "beds": 11600,
+    "violations": 76
+   },
+   {
+    "name": "حي السويدي الغربي",
+    "sector": "west",
+    "building": 5,
+    "operational": 5,
+    "beds": 18900,
+    "violations": 121
+   },
+   {
+    "name": "حي ظهرة لبن",
+    "sector": "west",
+    "building": 4,
+    "operational": 4,
+    "beds": 15600,
+    "violations": 96
+   },
+   {
+    "name": "حي العريجاء الغربي",
+    "sector": "west",
+    "building": 3,
+    "operational": 4,
+    "beds": 14800,
+    "violations": 78
+   },
+   {
+    "name": "حي طويق",
+    "sector": "west",
+    "building": 3,
+    "operational": 3,
+    "beds": 11200,
+    "violations": 44
+   },
+   {
+    "name": "حي المنصورية",
+    "sector": "south",
+    "building": 5,
+    "operational": 7,
+    "beds": 26400,
+    "violations": 358
+   },
+   {
+    "name": "حي العزيزية",
+    "sector": "south",
+    "building": 5,
+    "operational": 6,
+    "beds": 24100,
+    "violations": 292
+   },
+   {
+    "name": "حي الشفا",
+    "sector": "south",
+    "building": 4,
+    "operational": 5,
+    "beds": 21800,
+    "violations": 247
+   },
+   {
+    "name": "حي بدر",
+    "sector": "south",
+    "building": 4,
+    "operational": 4,
+    "beds": 17600,
+    "violations": 214
+   }
+  ]
+ },
+ "scenarios": {
+  "title": "سيناريوهات العجز المتوقع في الطاقة الاستيعابية (بعدد الأسرّة)، سبتمبر 2026–يونيو 2027",
+  "caveat": "سيناريوهات العجز المورّدة في ملف البيانات — لا تمثل نموذج تنبؤ معتمداً؛ تُعتمد بعد توثيق الافتراضات ومالك النموذج وإصداره وطريقة التحديث.",
+  "status": "supplied_unvalidated",
+  "unit": "سرير",
+  "rows": [
+   {
+    "iso": "2026-09",
+    "label": "سبتمبر 2026",
+    "conservative": 830540,
+    "base": 821088,
+    "optimistic": 810736
+   },
+   {
+    "iso": "2026-10",
+    "label": "أكتوبر 2026",
+    "conservative": 838380,
+    "base": 825768,
+    "optimistic": 811888
+   },
+   {
+    "iso": "2026-11",
+    "label": "نوفمبر 2026",
+    "conservative": 846320,
+    "base": 830562,
+    "optimistic": 813040
+   },
+   {
+    "iso": "2026-12",
+    "label": "ديسمبر 2026",
+    "conservative": 854356,
+    "base": 835464,
+    "optimistic": 814192
+   },
+   {
+    "iso": "2027-01",
+    "label": "يناير 2027",
+    "conservative": 862492,
+    "base": 840294,
+    "optimistic": 815344
+   },
+   {
+    "iso": "2027-02",
+    "label": "فبراير 2027",
+    "conservative": 870724,
+    "base": 845238,
+    "optimistic": 816496
+   },
+   {
+    "iso": "2027-03",
+    "label": "مارس 2027",
+    "conservative": 879052,
+    "base": 850158,
+    "optimistic": 817648
+   },
+   {
+    "iso": "2027-04",
+    "label": "أبريل 2027",
+    "conservative": 887480,
+    "base": 855102,
+    "optimistic": 818800
+   },
+   {
+    "iso": "2027-05",
+    "label": "مايو 2027",
+    "conservative": 896004,
+    "base": 860028,
+    "optimistic": 819952
+   },
+   {
+    "iso": "2027-06",
+    "label": "يونيو 2027",
+    "conservative": 904628,
+    "base": 865008,
+    "optimistic": 821788
+   }
+  ]
+ },
+ "compliance": {
+  "value": 81.6,
+  "unit": "٪",
+  "label": "معدل الامتثال في الجولات الرقابية",
+  "status": "pending_methodology",
+  "note": "قيمة مورّدة في ملف البيانات؛ يلزم اعتماد البسط والمقام ومعالجة تعدد المخالفات في الزيارة الواحدة قبل عرضها كمؤشر معتمد."
+ },
+ "coverage_target_indicative": {
+  "value": 60,
+  "unit": "٪",
+  "label": "هدف نسبة التغطية الاسترشادي",
+  "status": "indicative_not_approved",
+  "note": "قيمة استرشادية من الورقة؛ لا تُعرض كمستهدف إلزامي قبل اعتماد تعريفه وحوكمته."
+ },
+ "strategy": {
+  "status": "pending_source",
+  "required_pillars": 7,
+  "source_required": "خطة عمل المشروع V.1.0.0",
+  "note": "تعريفات الركائز والمبادرات والمؤشرات ملك للمصدر المعتمد غير المتوفر؛ النشر محجوب حتى وروده — لا تلفيق.",
+  "pillars": [],
+  "initiatives": [],
+  "kpis": [],
+  "weights_rule": null
+ },
+ "next_steps": {
+  "status": "pending_approval",
+  "note": "لا خطوات معتمدة بعد؛ تُدار من الإدارة ولا تُنشر خطوات ملفّقة.",
+  "items": []
+ },
+ "insights": {
+  "s03": {
+   "text": "لا تغطي الطاقة الاستيعابية المرخصة سوى 43.1٪ من الطلب التقديري الحالي",
+   "metric_ids": [
+    "coverage_pct"
+   ],
+   "status": "approved_brief"
+  },
+  "s04": {
+   "text": "يسجل قطاع الجنوب أعلى طلب على الأسرّة بواقع 368 ألف سرير، وأدنى نسبة لتغطية الطلب عند 34.8٪، بينما يسجل قطاع الشرق أعلى نسبة تغطية عند 52.1٪",
+   "metric_ids": [
+    "sector_derived.south.coverage_pct",
+    "sector_derived.east.coverage_pct"
+   ],
+   "status": "approved_brief"
+  },
+  "s05": {
+   "text": "ارتفع عدد رخص البناء 50.0٪ منذ خط الأساس، مقابل نمو 8.6٪ في الطاقة الاستيعابية المرخصة",
+   "metric_ids": [
+    "growth_building_pct",
+    "growth_beds_pct"
+   ],
+   "status": "approved_brief"
+  },
+  "s06": {
+   "text": "يتصدر قطاع الشرق رخص البناء (26 رخصة)، والرخص التشغيلية (34 رخصة)، والطاقة الاستيعابية المرخصة (172,400 سرير). ويسجل قطاع الوسط أدنى عدد من رخص البناء (12 رخصة)، بينما يسجل قطاع الغرب أدنى عدد من الرخص التشغيلية (22 رخصة) وأدنى طاقة استيعابية (88,000 سرير).",
+   "metric_ids": [
+    "rankings"
+   ],
+   "status": "approved_brief"
+  },
+  "s07": {
+   "text": "سجّل قطاع الجنوب 1,367 مخالفة خلال الفترة المرجعية، بما يمثل 37.8٪ من إجمالي مخالفات المدينة، ويبلغ عدد المراقبين فيه 3",
+   "metric_ids": [
+    "south_violations",
+    "south_violations_share_pct"
+   ],
+   "status": "approved_brief"
+  }
+ },
+ "quarantine": {
+  "inspector_level_records": {
+   "reason": "تعارض مع الإجماليات المعتمدة (R1) — لا تُعرض حتى ورود سجل رسمي مطابق"
+  },
+  "hotspots": {
+   "reason": "إحداثيات بلا مصدر موثق في ملف البيانات (R2)"
+  }
+ },
+ "validation": {
+  "gates_passed": 133,
+  "gates_total": 133,
+  "checked_at": "2026-08-16"
+ }
+}
