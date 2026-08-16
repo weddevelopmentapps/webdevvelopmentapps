@@ -1,0 +1,693 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   licensing.css — تخصيصات قسم «التراخيص» (s03-licensing.js)
+   ────────────────────────────────────────────────────────────────────────────
+   عقد V2_CONTRACTS §5: كل الأصناف مسبوقة بـ [data-section="licensing"] منعاً
+   للتسرب؛ الأصناف المشتركة (dash-*, kpi-*, rail-*, geomap-*, table-dense,
+   pending-card, detail-*) ملك dashboard.css ولا تُعاد كتابتها هنا.
+   هذا الملف يضيف فقط:
+     • هندسة الشبكة 12 عموداً × ثلاثة صفوف (بطل أعلى) + تمرير داخلي صادق
+     • تفاعلية بطاقات المؤشرات (كلها أزرار «الأصل والمنهجية») وبطاقة الأنواع
+     • أشرطة الرقاقات (مبدّل مقياس التكوين / طبقات الخريطة / ترتيب أعلى-5)
+     • مضيف الخريطة وقائمة أعلى-5 أحياء وعمود الرؤى الموسع
+     • بطاقة التفاصيل الزجاجية (lic-detail بمكوناتها كاملة)
+   كل المقاسات calc(var(--su) * n) — تتدرج مع مسرح 16:9 (عقد المحرك)،
+   والألوان من رموز tokens.css حصراً. prefers-reduced-motion يصفّر الانتقالات.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* ── جسم القسم: يملأ 16:9 دون تمرير عند 1920×1080؛ عند ضيق استثنائي يتمرر
+      رأسياً داخلياً فقط (المسرح لا يتمرر أفقياً أبداً — قاعدة صلبة) ── */
+[data-section="licensing"] .dash-body {
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(244, 241, 230, 0.18) transparent;
+}
+[data-section="licensing"] .dash-body::-webkit-scrollbar { width: 8px; }
+[data-section="licensing"] .dash-body::-webkit-scrollbar-thumb {
+  background: rgba(244, 241, 230, 0.16);
+  border-radius: 8px;
+}
+[data-section="licensing"] .dash-body::-webkit-scrollbar-track { background: transparent; }
+
+/* ── الشبكة: ثلاثة صفوف — البطل أعلى وأطول قليلاً، وحدود دنيا تحفظ
+      مقروئية الرسوم متعددة الشبكات عند الانضغاط ── */
+[data-section="licensing"] .lic-grid {
+  /* الصف الثالث أعلى قليلاً: صفوف «أعلى 5» الخمسة تظهر كاملة (المراجعة) */
+  grid-template-rows:
+    minmax(calc(var(--su) * 240), 1.08fr)
+    minmax(calc(var(--su) * 216), 0.96fr)
+    minmax(calc(var(--su) * 232), 1.04fr);
+  grid-auto-flow: row;
+}
+[data-section="licensing"] .lic-grid > .dash-cell { min-height: 0; }
+
+/* ── الملخص الناطق: مخفي بصرياً، حاضر لقارئات الشاشة ── */
+[data-section="licensing"] .lic-sr-summary {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   1) شريط المؤشرات الكبرى — كل بطاقة زر «الأصل والمنهجية»
+   ════════════════════════════════════════════════════════════════════════════ */
+[data-section="licensing"] .lic-kpi {
+  cursor: pointer;
+  transition: transform var(--dur-micro) var(--ease),
+    border-color var(--dur-micro) var(--ease),
+    background var(--dur-micro) var(--ease);
+}
+[data-section="licensing"] .lic-kpi:hover {
+  transform: translateY(calc(var(--su) * -2));
+  border-color: var(--hair-d);
+  background: rgba(22, 41, 31, 0.66);
+}
+[data-section="licensing"] .lic-kpi:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+[data-section="licensing"] .lic-kpi:active { transform: translateY(0); }
+
+/* بطاقة الأنواع: سلسلة «38 / 68 / 34» أعرض من رقم مفرد — درجة خط أدنى
+   مع الحفاظ على الأرقام الجدولية والعزل الاتجاهي الموروثين من .kpi-num */
+[data-section="licensing"] .lic-kpi-types .kpi-num {
+  font-size: calc(var(--su) * 33);
+  letter-spacing: calc(var(--su) * -0.6);
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   2) أشرطة الرقاقات المشتركة — مبدّل مقياس/طبقة/ترتيب (أزرار حقيقية
+      بحالة aria-pressed؛ الحالة الفعالة .on بلكنة خضراء دلالية)
+   ════════════════════════════════════════════════════════════════════════════ */
+[data-section="licensing"] .lic-chipbar {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--su) * 7);
+  padding: calc(var(--su) * 8) calc(var(--su) * 16) calc(var(--su) * 10);
+  flex-wrap: wrap;
+}
+[data-section="licensing"] .lic-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--su) * 7);
+  padding: calc(var(--su) * 4) calc(var(--su) * 12);
+  border: 1px solid var(--hair-d2);
+  border-radius: 999px;
+  background: rgba(11, 21, 18, 0.5);
+  color: var(--mut-d);
+  font-family: var(--f-body);
+  font-size: calc(var(--su) * 12.5);
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color var(--dur-micro) var(--ease),
+    border-color var(--dur-micro) var(--ease),
+    background var(--dur-micro) var(--ease);
+}
+[data-section="licensing"] .lic-chip:hover {
+  color: var(--ivory);
+  border-color: var(--hair-d);
+  background: rgba(22, 41, 31, 0.8);
+}
+[data-section="licensing"] .lic-chip:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+[data-section="licensing"] .lic-chip.on {
+  color: var(--green-hi);
+  border-color: rgba(49, 162, 109, 0.55);
+  background: rgba(49, 162, 109, 0.1);
+}
+[data-section="licensing"] .lic-chip-name { color: inherit; }
+[data-section="licensing"] .lic-chip-val {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  color: var(--ink2-d);
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+[data-section="licensing"] .lic-chip.on .lic-chip-val { color: var(--green-hi); }
+
+/* ── سطر القراءة الموجز في ذيل بطاقات الرسوم ── */
+[data-section="licensing"] .lic-cardfoot {
+  padding: calc(var(--su) * 7) calc(var(--su) * 18) calc(var(--su) * 11);
+  font-size: calc(var(--su) * 12.5);
+  color: var(--mut-d);
+  border-top: 1px solid var(--hair-d2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+[data-section="licensing"] .lic-cardfoot b {
+  color: var(--ivory);
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   3) بطاقة الخريطة — مبدّل الطبقات أعلى ومضيف الخريطة يملأ الباقي
+   ════════════════════════════════════════════════════════════════════════════ */
+[data-section="licensing"] .lic-geo-card .card-body {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+[data-section="licensing"] .lic-geo-chips {
+  padding-bottom: calc(var(--su) * 6);
+}
+[data-section="licensing"] .lic-map-host {
+  flex: 1;
+  min-height: calc(var(--su) * 120);
+  position: relative;
+  margin: 0 calc(var(--su) * 10) calc(var(--su) * 10);
+}
+/* وسيلة الإيضاح والإسناد أصغر داخل بطاقة القسم المدمجة (لا تطغى على الخريطة) */
+[data-section="licensing"] .lic-map-host .geomap-legend {
+  padding: calc(var(--su) * 6) calc(var(--su) * 10);
+  bottom: calc(var(--su) * 26);
+}
+[data-section="licensing"] .lic-map-host .geomap-legend-title {
+  font-size: calc(var(--su) * 11);
+  margin-bottom: calc(var(--su) * 4);
+}
+[data-section="licensing"] .lic-map-host .geomap-scale {
+  font-size: calc(var(--su) * 10);
+}
+[data-section="licensing"] .lic-map-host .geomap-attrib {
+  font-size: calc(var(--su) * 9.5);
+  bottom: calc(var(--su) * 6);
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   4) أعلى-5 أحياء — صفوف ترتيب زرّية بمسار امتلاء نسبي (زخرفة مكملة
+      للرقم الحقيقي المجاور — الأخضر لأن المقاييس ترخيصية كلها)
+   ════════════════════════════════════════════════════════════════════════════ */
+[data-section="licensing"] .lic-top5-card .card-body {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+[data-section="licensing"] .lic-top5-chips { padding-bottom: 0; flex: none; }
+/* السطر الثانوي سطر واحد هنا (النص الكامل في التلميح) — الصفوف الخمسة أولى */
+[data-section="licensing"] .lic-top5-card .card-sub { -webkit-line-clamp: 1; }
+[data-section="licensing"] .lic-rank {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  gap: calc(var(--su) * 2);
+  padding: 0 calc(var(--su) * 12);
+}
+[data-section="licensing"] .lic-rank-row {
+  display: grid;
+  grid-template-columns: calc(var(--su) * 20) minmax(calc(var(--su) * 110), auto)
+    calc(var(--su) * 44) 1fr calc(var(--su) * 60);
+  align-items: center;
+  /* صفوف مضغوطة: الخمسة كلها ظاهرة بلا تمرير (إصلاح المراجعة) */
+  gap: calc(var(--su) * 8);
+  padding: calc(var(--su) * 2) calc(var(--su) * 9);
+  border: 1px solid transparent;
+  border-radius: calc(var(--su) * 9);
+  background: transparent;
+  color: var(--ink2-d);
+  font-family: var(--f-body);
+  font-size: calc(var(--su) * 13);
+  line-height: 1.35;
+  text-align: start;
+  cursor: pointer;
+  transition: background var(--dur-micro) var(--ease),
+    border-color var(--dur-micro) var(--ease);
+}
+[data-section="licensing"] .lic-rank-row:hover,
+[data-section="licensing"] .lic-rank-row.hl {
+  background: rgba(22, 41, 31, 0.66);
+  border-color: var(--hair-d2);
+}
+[data-section="licensing"] .lic-rank-row:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 1px;
+}
+[data-section="licensing"] .lic-rank-idx {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-size: calc(var(--su) * 12.5);
+  font-weight: 700;
+  color: var(--faint-d);
+  text-align: center;
+}
+[data-section="licensing"] .lic-rank-name {
+  font-weight: 700;
+  color: var(--ivory);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+[data-section="licensing"] .lic-rank-sector {
+  font-size: calc(var(--su) * 11.5);
+  color: var(--mut-d);
+  white-space: nowrap;
+}
+[data-section="licensing"] .lic-rank-track {
+  height: calc(var(--su) * 7);
+  border-radius: 999px;
+  background: rgba(244, 241, 230, 0.07);
+  overflow: hidden;
+  min-width: calc(var(--su) * 40);
+}
+[data-section="licensing"] .lic-rank-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--green);
+  transition: width var(--dur-std) var(--ease);
+}
+[data-section="licensing"] .lic-rank-val {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-size: calc(var(--su) * 13);
+  line-height: 1.3;
+  font-weight: 700;
+  color: var(--green-hi);
+  text-align: end;
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+[data-section="licensing"] .lic-rank-note {
+  padding: calc(var(--su) * 6) calc(var(--su) * 16) calc(var(--su) * 10);
+  font-size: calc(var(--su) * 11.5);
+  line-height: 1.55;
+  color: var(--faint-d);
+  border-top: 1px solid var(--hair-d2);
+  /* سطر واحد — النص الكامل في تلميح العنصر (إصلاح المراجعة) */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   5) عمود الرؤى الموسع — الرؤى ثم صفوف النمو ثم الملحق ثم سطر الحداثة
+   ════════════════════════════════════════════════════════════════════════════ */
+[data-section="licensing"] .lic-rail-cell {
+  gap: calc(var(--su) * 10);
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(244, 241, 230, 0.18) transparent;
+}
+[data-section="licensing"] .lic-rail-cell::-webkit-scrollbar { width: 6px; }
+[data-section="licensing"] .lic-rail-cell::-webkit-scrollbar-thumb {
+  background: rgba(244, 241, 230, 0.16);
+  border-radius: 8px;
+}
+[data-section="licensing"] .lic-rail-cell .rail { flex: none; overflow: visible; }
+
+/* «النمو منذ خط الأساس» — بطاقة قياس مدمجة بثلاثة صفوف زرّية.
+   flex:none: لا انكماش يقص الصف الأخير (إصلاح المراجعة) */
+[data-section="licensing"] .lic-growth {
+  flex: none;
+  background: rgba(16, 32, 26, 0.58);
+  border: 1px solid var(--hair-d2);
+  border-radius: var(--r-sm);
+  padding: calc(var(--su) * 11) calc(var(--su) * 13) calc(var(--su) * 9);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 5);
+}
+[data-section="licensing"] .lic-growth-title {
+  font-size: calc(var(--su) * 14);
+  font-weight: 700;
+  color: var(--mut-d);
+  letter-spacing: 0.3px;
+}
+[data-section="licensing"] .lic-growth-sub {
+  font-size: calc(var(--su) * 11.5);
+  color: var(--faint-d);
+  line-height: 1.5;
+  margin-bottom: calc(var(--su) * 3);
+}
+[data-section="licensing"] .lic-growth-row {
+  display: grid;
+  grid-template-columns: minmax(calc(var(--su) * 86), auto) 1fr calc(var(--su) * 62);
+  align-items: center;
+  gap: calc(var(--su) * 8);
+  padding: calc(var(--su) * 6) calc(var(--su) * 9);
+  border: 1px solid transparent;
+  border-radius: calc(var(--su) * 9);
+  background: rgba(11, 21, 18, 0.4);
+  color: var(--ink2-d);
+  font-family: var(--f-body);
+  font-size: calc(var(--su) * 12.5);
+  text-align: start;
+  cursor: pointer;
+  transition: background var(--dur-micro) var(--ease),
+    border-color var(--dur-micro) var(--ease);
+}
+[data-section="licensing"] .lic-growth-row:hover {
+  background: rgba(22, 41, 31, 0.75);
+  border-color: var(--hair-d2);
+}
+[data-section="licensing"] .lic-growth-row:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 1px;
+}
+[data-section="licensing"] .lic-growth-k {
+  font-weight: 700;
+  color: var(--ivory);
+  white-space: nowrap;
+}
+[data-section="licensing"] .lic-growth-v {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-size: calc(var(--su) * 12);
+  color: var(--mut-d);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  direction: ltr;
+  unicode-bidi: isolate;
+  text-align: end;
+}
+[data-section="licensing"] .lic-growth-pct {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-size: calc(var(--su) * 13.5);
+  font-weight: 700;
+  color: var(--green-hi);
+  text-align: end;
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+/* زر الملحق التحليلي */
+[data-section="licensing"] .lic-appx {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(var(--su) * 8);
+  padding: calc(var(--su) * 10) calc(var(--su) * 14);
+  border: 1px solid var(--hair-d2);
+  border-radius: var(--r-sm);
+  background: rgba(16, 32, 26, 0.58);
+  color: var(--ink2-d);
+  font-family: var(--f-body);
+  font-size: calc(var(--su) * 13);
+  font-weight: 700;
+  text-align: start;
+  cursor: pointer;
+  transition: color var(--dur-micro) var(--ease),
+    border-color var(--dur-micro) var(--ease),
+    background var(--dur-micro) var(--ease);
+}
+[data-section="licensing"] .lic-appx:hover {
+  color: var(--ivory);
+  border-color: var(--hair-d);
+  background: rgba(22, 41, 31, 0.8);
+}
+[data-section="licensing"] .lic-appx:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* سطر حداثة البيانات */
+[data-section="licensing"] .lic-meta {
+  font-size: calc(var(--su) * 12);
+  color: var(--faint-d);
+  padding: 0 calc(var(--su) * 4);
+}
+[data-section="licensing"] .lic-meta b { color: var(--mut-d); font-weight: 700; }
+
+/* ════════════════════════════════════════════════════════════════════════════
+   6) بطاقة التفاصيل الزجاجية — هيكل lic-detail داخل detail-panel المشترك
+   ════════════════════════════════════════════════════════════════════════════ */
+[data-section="licensing"] .lic-detail {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 14);
+}
+
+/* البطولة: رقم ضخم + وحدة + تسمية */
+[data-section="licensing"] .lic-hero {
+  display: flex;
+  align-items: baseline;
+  gap: calc(var(--su) * 10);
+  flex-wrap: wrap;
+}
+[data-section="licensing"] .lic-hero-num {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-size: calc(var(--su) * 52);
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: calc(var(--su) * -1.4);
+  color: var(--ivory);
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+[data-section="licensing"] .lic-hero-num.pos { color: var(--green-hi); }
+[data-section="licensing"] .lic-hero-num.neg { color: var(--coral); }
+[data-section="licensing"] .lic-hero-num.gold { color: var(--gold); }
+[data-section="licensing"] .lic-hero-unit {
+  font-size: calc(var(--su) * 17);
+  font-weight: 600;
+  color: var(--mut-d);
+}
+[data-section="licensing"] .lic-hero-label {
+  flex-basis: 100%;
+  font-size: calc(var(--su) * 14.5);
+  font-weight: 600;
+  color: var(--ink2-d);
+}
+
+/* أوسمة الترتيب والاعتماد — الذهبي وسم اعتماد/عينة حصراً */
+[data-section="licensing"] .lic-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--su) * 7);
+}
+[data-section="licensing"] .lic-badge {
+  font-size: calc(var(--su) * 12);
+  font-weight: 700;
+  padding: calc(var(--su) * 3.5) calc(var(--su) * 11);
+  border-radius: 999px;
+  border: 1px solid var(--hair-d2);
+  color: var(--mut-d);
+  background: rgba(11, 21, 18, 0.5);
+}
+[data-section="licensing"] .lic-badge.pos {
+  color: var(--green-hi);
+  border-color: rgba(49, 162, 109, 0.5);
+  background: rgba(49, 162, 109, 0.08);
+}
+[data-section="licensing"] .lic-badge.neg {
+  color: var(--coral);
+  border-color: rgba(214, 106, 80, 0.5);
+  background: rgba(214, 106, 80, 0.08);
+}
+[data-section="licensing"] .lic-badge.gold {
+  color: var(--gold-hi);
+  border-color: rgba(214, 171, 76, 0.45);
+  background: rgba(214, 171, 76, 0.07);
+}
+
+/* الشرح الموجز */
+[data-section="licensing"] .lic-cap {
+  font-size: calc(var(--su) * 14);
+  line-height: 1.75;
+  color: var(--ink2-d);
+}
+
+/* أشرطة المقارنة — الامتلاء زخرفة مكملة للرقم (aria-hidden على المسار) */
+[data-section="licensing"] .lic-cbars {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 8);
+}
+[data-section="licensing"] .lic-cbar {
+  display: grid;
+  grid-template-columns: minmax(calc(var(--su) * 150), auto) 1fr
+    minmax(calc(var(--su) * 130), auto);
+  align-items: center;
+  gap: calc(var(--su) * 12);
+}
+[data-section="licensing"] .lic-cbar-k {
+  font-size: calc(var(--su) * 13);
+  font-weight: 600;
+  color: var(--mut-d);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+[data-section="licensing"] .lic-cbar-track {
+  height: calc(var(--su) * 10);
+  border-radius: 999px;
+  background: rgba(244, 241, 230, 0.07);
+  overflow: hidden;
+}
+[data-section="licensing"] .lic-cbar-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--green);
+  transition: width var(--dur-std) var(--ease);
+}
+[data-section="licensing"] .lic-cbar.demand .lic-cbar-fill { background: var(--demand); }
+[data-section="licensing"] .lic-cbar.deficit .lic-cbar-fill { background: var(--coral); }
+[data-section="licensing"] .lic-cbar.blue .lic-cbar-fill { background: var(--collar-blue); }
+[data-section="licensing"] .lic-cbar.gold .lic-cbar-fill { background: var(--gold); }
+[data-section="licensing"] .lic-cbar-v {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-size: calc(var(--su) * 13.5);
+  font-weight: 700;
+  color: var(--ivory);
+  text-align: end;
+  white-space: nowrap;
+}
+
+/* شبكة الصفوف مفتاح/قيمة */
+[data-section="licensing"] .lic-rows {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: calc(var(--su) * 6) calc(var(--su) * 18);
+}
+[data-section="licensing"] .lic-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: calc(var(--su) * 12);
+  padding: calc(var(--su) * 6) calc(var(--su) * 10);
+  border-radius: calc(var(--su) * 8);
+  background: rgba(11, 21, 18, 0.4);
+}
+[data-section="licensing"] .lic-row-k {
+  font-size: calc(var(--su) * 12.5);
+  color: var(--mut-d);
+}
+[data-section="licensing"] .lic-row-v {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-size: calc(var(--su) * 14);
+  font-weight: 700;
+  color: var(--ivory);
+  white-space: nowrap;
+}
+[data-section="licensing"] .lic-row.pos .lic-row-v { color: var(--green-hi); }
+[data-section="licensing"] .lic-row.neg .lic-row-v { color: var(--coral); }
+[data-section="licensing"] .lic-row.gold .lic-row-v { color: var(--gold); }
+
+/* جدول التفاصيل — تمرير داخلي كي لا تفيض البطاقة */
+[data-section="licensing"] .lic-table {
+  max-height: calc(var(--su) * 300);
+  overflow: auto;
+  border: 1px solid var(--hair-d2);
+  border-radius: calc(var(--su) * 10);
+}
+
+/* الملاحظات والمصادر */
+[data-section="licensing"] .lic-notes,
+[data-section="licensing"] .lic-sources {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 4);
+}
+[data-section="licensing"] .lic-note {
+  font-size: calc(var(--su) * 12);
+  line-height: 1.6;
+  color: var(--faint-d);
+  padding: calc(var(--su) * 4) calc(var(--su) * 2) 0;
+}
+[data-section="licensing"] .lic-src {
+  font-size: calc(var(--su) * 11.5);
+  line-height: 1.6;
+  color: var(--faint-d);
+  border-inline-start: 2px solid var(--hair-d2);
+  padding-inline-start: calc(var(--su) * 9);
+}
+
+/* أزرار الإجراءات داخل البطاقة */
+[data-section="licensing"] .lic-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--su) * 8);
+}
+[data-section="licensing"] .lic-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--su) * 8);
+  padding: calc(var(--su) * 8) calc(var(--su) * 15);
+  border: 1px solid var(--hair-d2);
+  border-radius: 999px;
+  background: rgba(16, 32, 26, 0.7);
+  color: var(--ink2-d);
+  font-family: var(--f-body);
+  font-size: calc(var(--su) * 13);
+  font-weight: 700;
+  cursor: pointer;
+  transition: color var(--dur-micro) var(--ease),
+    border-color var(--dur-micro) var(--ease),
+    background var(--dur-micro) var(--ease);
+}
+[data-section="licensing"] .lic-btn:hover {
+  color: var(--ivory);
+  border-color: var(--hair-d);
+  background: rgba(22, 41, 31, 0.9);
+}
+[data-section="licensing"] .lic-btn:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+[data-section="licensing"] .lic-btn-arrow { color: var(--mut-d); }
+[data-section="licensing"] .lic-btn:hover .lic-btn-arrow { color: var(--ivory); }
+
+/* ════════════════════════════════════════════════════════════════════════════
+   7) انضغاط استثنائي (أقل من 1200 نقطة مسرح) — الشبكة تتراص عمودين
+      والرؤى تنزل أسفل اللوحة؛ التمرير يبقى داخل جسم القسم حصراً
+   ════════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 1200px) {
+  [data-section="licensing"] .lic-grid {
+    grid-template-rows: none;
+    grid-auto-rows: minmax(calc(var(--su) * 230), auto);
+  }
+  [data-section="licensing"] .lic-cell-cum,
+  [data-section="licensing"] .lic-cell-bridge,
+  [data-section="licensing"] .lic-cell-sector,
+  [data-section="licensing"] .lic-cell-geo,
+  [data-section="licensing"] .lic-cell-monthly,
+  [data-section="licensing"] .lic-cell-facility,
+  [data-section="licensing"] .lic-cell-top5 {
+    grid-column: span 6;
+  }
+  [data-section="licensing"] .lic-cell-rail {
+    grid-column: span 12;
+    grid-row: auto;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   8) تقليل الحركة — تصفير الانتقالات الزخرفية (عقد prefers-reduced-motion)
+   ════════════════════════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  [data-section="licensing"] .lic-kpi,
+  [data-section="licensing"] .lic-chip,
+  [data-section="licensing"] .lic-rank-row,
+  [data-section="licensing"] .lic-rank-fill,
+  [data-section="licensing"] .lic-growth-row,
+  [data-section="licensing"] .lic-appx,
+  [data-section="licensing"] .lic-cbar-fill,
+  [data-section="licensing"] .lic-btn {
+    transition: none;
+  }
+  [data-section="licensing"] .lic-kpi:hover { transform: none; }
+}

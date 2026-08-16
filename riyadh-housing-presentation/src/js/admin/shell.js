@@ -17,6 +17,8 @@ RH.admin.shell = (function () {
     { id: "import", name: "استيراد الملف" },
     { id: "insights", name: "التحليلات" },
     { id: "strategy", name: "الاستراتيجية" },
+    { id: "kpis", name: "المؤشرات" },
+    { id: "panels", name: "لوحات الرؤى" },
     { id: "steps", name: "الخطوات القادمة" },
     { id: "publish", name: "التحقق والنشر" },
     { id: "preview", name: "المعاينة" },
@@ -135,7 +137,8 @@ RH.admin.shell = (function () {
     );
     RH.core.dom.clear(root).appendChild(shellEl);
 
-    const needDraft = ["meta", "import", "insights", "strategy", "steps", "publish"];
+    const needDraft = ["meta", "import", "insights", "strategy", "kpis", "panels",
+      "steps", "publish"];
     if (needDraft.includes(tab) && !draft) {
       content.appendChild(h("div", { class: "adm-card" },
         h("h3", {}, "لا مسودة مفتوحة"),
@@ -172,7 +175,10 @@ RH.admin.shell = (function () {
       case "meta": return RH.admin.editors.metadata(content, draft, save);
       case "import": return RH.admin.editors.importer(content, draft, save);
       case "insights": return RH.admin.editors.insights(content, draft, save);
-      case "strategy": return RH.admin.editors.strategy(content, draft, save);
+      // V2: عقد الاستراتيجية «مرآة المصدر» — المحررات الموسعة (editors-strategy/insights2)
+      case "strategy": return RH.admin.editors2.strategy(content, draft, save);
+      case "kpis": return RH.admin.editors2.kpis(content, draft, save);
+      case "panels": return RH.admin.editors2.panels(content, draft, save);
       case "steps": return RH.admin.editors.nextSteps(content, draft, save);
       case "publish":
         return RH.admin.publish.validation(content, draft, waivers, session,

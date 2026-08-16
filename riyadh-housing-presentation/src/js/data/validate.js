@@ -108,24 +108,60 @@ RH.data.validate = (function () {
       const names = rel.neighbourhoods.rows.map((n) => n.name);
       g("nbhd.unique", "block", new Set(names).size === names.length, "أسماء الأحياء فريدة");
 
-      // الاستراتيجية: قواعد النشر
+      // الاستراتيجية: مرآة المصدر المعتمد «خطة عمل V.1.0.0» (عقد V2_CONTRACTS §9)
       const st = rel.strategy;
-      if (st.status === "approved") {
-        g("strategy.pillars7", "block",
-          st.pillars.length === 7 && st.required_pillars === 7,
-          "عدد الركائز المعتمدة = 7 (ثابت التكليف)",
+      if (st.status === "approved_source_mirror") {
+        const pillarIds = st.pillars.map((p) => p.id);
+        const kinds = st.pillars.map((p) => p.kind);
+        g("strategy.pillars4", "block",
+          st.pillars.length === 4 && st.required_pillars === 4
+          && new Set(pillarIds).size === 4
+          && kinds.filter((k) => k === "ركيزة").length === 3
+          && kinds.filter((k) => k === "ممكن").length === 1,
+          "المحاور 4 بمعرفات فريدة: 3 ركائز + ممكن واحد",
           `الموجود: ${st.pillars.length}`);
+        const iniIds = st.initiatives.map((i) => i.id);
+        g("strategy.initiatives18", "block",
+          st.initiatives.length === 18 && new Set(iniIds).size === 18,
+          "18 مبادرة بمعرفات فريدة",
+          `الموجود: ${st.initiatives.length}`);
         g("strategy.membership", "block",
-          st.initiatives.every((i) => st.pillars.some((p) => p.id === i.pillar_id)),
-          "كل مبادرة منشورة تنتمي لركيزة معتمدة");
-        // إنذار يتطلب تنازلاً موقَّعاً عبر سجل النشر (لا حقل بيانات قابلاً للدسّ)
-        const missingKpi = st.kpis.filter((k) => k.priority && k.current_value == null);
-        g("kpi.priority_values", "warn", missingKpi.length === 0,
-          "لكل مؤشر أولوية قيمة حالية (وإلا فتنازل موقَّع مسجَّل عند النشر)",
-          missingKpi.length ? "مؤشرات بلا قيمة: " + missingKpi.map((k) => k.name).join("، ") : "");
-        g("kpi.sources", "block",
-          st.kpis.every((k) => k.source && k.as_of),
-          "لكل مؤشر منشور مصدر وتاريخ قياس");
+          st.initiatives.every((i) => pillarIds.includes(i.pillar_id)),
+          "كل مبادرة تنتمي لمحور معرَّف");
+        const isoOk = (s) => s == null
+          || (/^\d{4}-\d{2}-\d{2}$/.test(s) && !Number.isNaN(Date.parse(s)));
+        g("strategy.initiative_dates", "block",
+          st.initiatives.every((i) => isoOk(i.start) && isoOk(i.end)
+            && (!i.start || !i.end || i.start <= i.end)),
+          "تواريخ المبادرات ISO سليمة وتاريخ البدء ≤ النهاية حيث وُجدا");
+        const vocab = st.status_vocabulary || [];
+        g("strategy.initiative_status", "block",
+          st.initiatives.every((i) => i.status == null || vocab.includes(i.status)),
+          "حالة كل مبادرة من المفردات المعتمدة أو فارغة بصدق");
+        const kpiIds = st.kpis.map((k) => k.id);
+        g("strategy.kpis14", "block",
+          st.kpis.length === 14
+          && kpiIds.every((id, i) => id === i + 1),
+          "14 مؤشراً بمعرفات 1..14 بالضبط",
+          `الموجود: ${st.kpis.length}`);
+        const in01 = (v) => typeof v === "number" && v >= 0 && v <= 1;
+        g("kpi.pct_bounds", "block",
+          st.kpis.every((k) => !k.pct
+            || (in01(k.baseline) && in01(k.target)
+              && (k.current == null || in01(k.current)))),
+          "المؤشرات النسبية كسور ضمن [0,1] (الأساس والمستهدف والحالي إن وُجد)");
+        g("kpi.target_gt_baseline", "block",
+          st.kpis.every((k) => k.target > k.baseline),
+          "كل مستهدف أعلى من خط أساسه");
+        // القيم الحالية «تُسجَّل من المنصة» — غيابها إنذار يتطلب تنازلاً موقَّعاً
+        // عبر سجل النشر عند النشر (العقد القائم بلا تغيير — لا حقل بيانات قابلاً للدسّ)
+        const noCurrent = st.kpis.filter((k) => k.current == null);
+        g("kpi.current_values", "warn", noCurrent.length === 0,
+          "لكل مؤشر قيمة حالية (وإلا فتنازل موقَّع مسجَّل عند النشر)",
+          noCurrent.length
+            ? RH.core.fmt.noun(noCurrent.length, "indicator")
+              + " بلا قيمة حالية — تُعرض «غير متوفرة» بصدق"
+            : "");
       } else {
         g("strategy.pending", "warn", false,
           "وحدة المبادرات/المؤشرات بانتظار المصدر المعتمد",
@@ -146,6 +182,30 @@ RH.data.validate = (function () {
         if (ins.status === "needs_review") {
           g("insight.review." + key, "warn", false,
             "نص التحليل (" + key + ") يحتاج إعادة اعتماد بعد تغير البيانات");
+        }
+      }
+
+      // لوحات رؤى الأقسام (V2) تخضع لبوابة مجمع الحقائق ذاتها — لا رقم في نص
+      // معروض إلا وله أصل في الإصدار الحالي (تلتقط النصوص القديمة بعد أي استيراد)
+      const IP_CLS = ["pos", "neg", "warn", "neu"];
+      const ipSections = (rel.insight_panels && rel.insight_panels.sections) || {};
+      for (const [secKey, panels] of Object.entries(ipSections)) {
+        for (const p of panels) {
+          const ptokens = (p.text.match(/[0-9][0-9,\.]*/g) || [])
+            .map((t) => t.replace(/,/g, "").replace(/\.$/, ""));
+          const pstale = ptokens.filter((t) => !truthPool.has(t));
+          g("insight_panels.figures." + secKey + "." + p.id, "block",
+            pstale.length === 0,
+            "أرقام لوحة الرؤى (" + secKey + "/" + p.id + ") تطابق بيانات الإصدار",
+            pstale.length ? "أرقام لا تطابق أي حقيقة حالية: " + pstale.join("، ") : "");
+          g("insight_panels.cls." + secKey + "." + p.id, "block",
+            IP_CLS.includes(p.cls),
+            "تصنيف لوحة الرؤى (" + secKey + "/" + p.id + ") ضمن المفردات المقفلة");
+          if (p.status === "needs_review") {
+            g("insight_panels.review." + secKey + "." + p.id, "warn", false,
+              "نص لوحة الرؤى (" + secKey + "/" + p.id
+              + ") يحتاج إعادة اعتماد بعد تغير البيانات");
+          }
         }
       }
 
@@ -225,6 +285,34 @@ RH.data.validate = (function () {
       [sd.coverage_pct, sd.deficit_beds, sd.violations_share_pct, sd.demand_share_pct].forEach(add);
     }
     if (rel.compliance) add(rel.compliance.value);
+
+    // V2: حقائق الاستراتيجية — معرفات المبادرات (1.1…) وأعداد الوحدات وقيم
+    // المؤشرات بصيغتيها (كسر خام و×100 للنسبية) — توسيع للمجمع لا إضعاف للبوابة
+    const st = rel.strategy;
+    if (st) {
+      if (Array.isArray(st.pillars)) add(st.pillars.length);
+      if (Array.isArray(st.initiatives)) {
+        add(st.initiatives.length);
+        for (const ini of st.initiatives) {
+          if (ini.id != null) pool.add(String(ini.id));
+        }
+      }
+      if (Array.isArray(st.kpis)) {
+        add(st.kpis.length);
+        for (const k of st.kpis) {
+          [k.baseline, k.target, k.current].forEach(add);
+          if (k.pct) {
+            for (const v of [k.baseline, k.target, k.current]) {
+              if (typeof v === "number") add(D.roundHalfUp(v * 100, 1));
+            }
+          }
+        }
+      }
+    }
+    if (rel.monthly && Array.isArray(rel.monthly.licensing)) {
+      add(rel.monthly.licensing.length); // 12 — طول الفترة المرجعية بالأشهر
+    }
+    if (rel.coverage_target_indicative) add(rel.coverage_target_indicative.value);
     return pool;
   }
 

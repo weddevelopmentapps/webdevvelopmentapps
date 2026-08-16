@@ -1,0 +1,5 @@
+Leaflet 1.9.4 — https://leafletjs.com
+Copyright (c) 2010-2023 Vladimir Agafonkin, (c) 2010-2011 CloudMade
+BSD 2-Clause License. Obtained verbatim from the npm registry (npm pack leaflet@1.9.4,
+files: dist/leaflet.js, dist/leaflet.css). Vendored code is attributed to its source
+and is excluded from the project's declared line counts.

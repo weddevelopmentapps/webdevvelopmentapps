@@ -16,7 +16,11 @@ const argOf = (k, dflt) => {
 };
 const OUT = path.resolve(argOf("--out", path.join(ROOT, "tools", "qa", "shots")));
 const ROUTES = argOf("--routes",
-  "scene/00,scene/01,scene/02,scene/03,scene/03?step=1").split(",");
+  ["scene/00",
+    "section/summary", "section/demand", "section/licensing", "section/control",
+    "section/map", "section/initiatives", "section/kpis", "section/forecast",
+    "section/closing",
+    "appendix/demand", "appendix/monitoring"].join(",")).split(",");
 const SIZES = argOf("--sizes", "1920x1080,1366x768").split(",")
   .map((s) => s.split("x").map(Number));
 
@@ -32,9 +36,10 @@ for (const [w, hgt] of SIZES) {
   const page = await browser.newPage({ viewport: { width: w, height: hgt } });
   page.on("console", (msg) => {
     if (msg.type() !== "error") return;
-    // غياب وسائط الغلاف الاختيارية مسار بديل مقصود لا خطأ
-    if (/ERR_FILE_NOT_FOUND|ERR_NAME_NOT_RESOLVED/.test(msg.text())
-        && /assets\/media|cover-/.test(page.url() + msg.location().url)) return;
+    // غياب الوسائط الاختيارية (ملفات شقيقة/CloudFront/بلاطات OSM) مسار بديل
+    // مقصود بعقد التدهور الرشيق — أخطاء شبكتها فقط تُتجاهل، لا شيء غيرها.
+    if (/ERR_FILE_NOT_FOUND|ERR_NAME_NOT_RESOLVED|ERR_INTERNET_DISCONNECTED|ERR_ADDRESS_UNREACHABLE|ERR_CONNECTION|ERR_TUNNEL_CONNECTION|ERR_PROXY_CONNECTION|Failed to load resource/.test(msg.text())
+        && /assets\/media|cover-|cloudfront\.net|openstreetmap\.org/.test(page.url() + msg.location().url + msg.text())) return;
     consoleErrors.push(`[${w}x${hgt}] ${msg.text()}`);
   });
   page.on("pageerror", (err) => consoleErrors.push(`[${w}x${hgt}] PAGEERROR ${err.message}`));
@@ -43,14 +48,20 @@ for (const [w, hgt] of SIZES) {
     await page.waitForTimeout(1400); // استقرار الحركة والعد
     const name = route.replace(/[\/?=&]/g, "_") + `_${w}x${hgt}.png`;
     await page.screenshot({ path: path.join(OUT, name) });
-    // فحص التمرير الرأسي المحظور في مشاهد المقدِّم
+    // بوابة اللاتمرير على مستوى المسرح: لا تمرير في المضيف ولا في جذر
+    // المشهد/اللوحة (.sc للغلاف والملاحق، .dash لأقسام V2). جسم اللوحة
+    // .dash-body يجوز له التمرير الداخلي بعقد V2 (وضع اللوحة) — لا يُحتسب.
     const scrollable = await page.evaluate(() => {
       const host = document.querySelector(".scene-host:not([hidden])");
       if (!host) return false;
+      if (host.scrollHeight > host.clientHeight + 2) return "host";
       const sc = host.querySelector(".sc");
-      return sc ? sc.scrollHeight > sc.clientHeight + 2 : false;
+      if (sc && sc.scrollHeight > sc.clientHeight + 2) return "sc";
+      const dash = host.querySelector(".dash");
+      if (dash && dash.scrollHeight > dash.clientHeight + 2) return "dash";
+      return false;
     });
-    if (scrollable) consoleErrors.push(`[${w}x${hgt}] ${route}: تمرير رأسي داخل المشهد!`);
+    if (scrollable) consoleErrors.push(`[${w}x${hgt}] ${route}: تمرير رأسي على مستوى المسرح (${scrollable})!`);
   }
   await page.close();
 }

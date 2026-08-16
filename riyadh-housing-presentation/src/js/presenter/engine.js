@@ -8,9 +8,19 @@
 RH.presenter.engine = (function () {
   const { h } = RH.core.dom;
 
-  const LINEAR = ["00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11"];
+  // V2: التسلسل يبنيه RH.sections.boot() وقت الإقلاع (الغلاف ثم الأقسام التسعة)
+  // — المصفوفة ذاتها تبقى مرجعاً حياً لـ chrome/nav فتُعدل في مكانها لا تُستبدل.
+  const LINEAR = ["00"];
+  let MAJORS = new Set();       // أقسام دخولها للأمام انتقال مقطعي كبير
   const scenes = new Map();     // id → تعريف المشهد
   const appendices = new Map(); // id → تعريف الملحق
+
+  /** يستدعيهما سجل الأقسام: التسلسل الخطي النهائي وبوابات الانتقال الكبير */
+  function setLinear(ids) {
+    LINEAR.length = 0;
+    for (const id of ids) LINEAR.push(id);
+  }
+  function setMajors(ids) { MAJORS = new Set(ids); }
 
   let hostA = null, hostB = null, activeHost = null;
   let current = null;           // {kind, id, params}
@@ -156,8 +166,8 @@ RH.presenter.engine = (function () {
     if (route.kind === "appendix" || current.kind === "appendix") return "major";
     const a = idx(current.id), b = idx(route.id);
     if (a < 0 || b < 0) return "none";
-    // الانتقالات المقطعية الكبرى: دخول البوابات 02 و08 و11
-    if (b > a && (route.id === "02" || route.id === "08" || route.id === "11")) return "major";
+    // الانتقالات المقطعية الكبرى: الأقسام الموسومة major في سجل الأقسام
+    if (b > a && MAJORS.has(route.id)) return "major";
     return b > a ? "fwd" : b < a ? "back" : "none";
   }
 
@@ -208,7 +218,8 @@ RH.presenter.engine = (function () {
   }
   const home = () => goScene("00");
   const end = () => goScene(LINEAR[LINEAR.length - 1]);
-  const agenda = () => goScene("01");
+  // «العودة إلى المحاور» في V2 = أول لوحة (الملخص التنفيذي)
+  const agenda = () => goScene(LINEAR[1] || "00");
 
   /** فتح ملحق مع حفظ حالة المستدعي الدقيقة */
   function openAppendix(id, extraParams) {
@@ -231,7 +242,7 @@ RH.presenter.engine = (function () {
   }
 
   return {
-    LINEAR, registerScene, registerAppendix, init, show, layout,
+    LINEAR, setLinear, setMajors, registerScene, registerAppendix, init, show, layout,
     next, prev, home, end, agenda, goScene, openAppendix, returnFromAppendix,
     isLocked, current: () => current, updateParams, stepsOf, su,
   };

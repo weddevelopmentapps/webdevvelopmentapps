@@ -123,10 +123,13 @@ test("validateRelease على الإصدار المنشور: صفر بوابات 
   }
 });
 
-test("إنذارات الشرف الأربعة قائمة (استراتيجية/خطوات/امتثال/تاريخ العرض)", () => {
+test("إنذارات الشرف الأربعة قائمة (قيم المؤشرات/خطوات/امتثال/تاريخ العرض)", () => {
   const res = RH.data.validate.validateRelease(freshRelease());
   const ids = res.warnings.map((w) => w.id);
-  assert.ok(ids.includes("strategy.pending"), "وحدة الاستراتيجية بانتظار المصدر");
+  // V2: المصدر معتمد (approved_source_mirror) فلا «بانتظار المصدر» —
+  // يحل محله إنذار القيم الحالية الغائبة للمؤشرات (يتطلب تنازلاً موقَّعاً)
+  assert.ok(!ids.includes("strategy.pending"), "المصدر معتمد — لا إنذار انتظار");
+  assert.ok(ids.includes("kpi.current_values"), "قيم المؤشرات الحالية غائبة بصدق");
   assert.ok(ids.includes("next_steps.pending"), "لا خطوات معتمدة");
   assert.ok(ids.includes("compliance.methodology"), "منهجية الامتثال غير معتمدة");
   assert.ok(ids.includes("meta.presentation_date"), "تاريخ العرض يحتاج تأكيداً");

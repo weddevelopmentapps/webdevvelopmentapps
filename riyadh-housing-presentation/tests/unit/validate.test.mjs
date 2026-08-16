@@ -55,66 +55,107 @@ test("اسم حي مكرر → nbhd.unique تحجب", () => {
   assert.ok(blockerIds(rel).includes("nbhd.unique"));
 });
 
-test("strategy approved بركائز ناقصة → strategy.pillars7 تحجب", () => {
+/* ── عقد الاستراتيجية V2: مرآة المصدر المعتمد approved_source_mirror ── */
+
+test("حذف محور → strategy.pillars4 تحجب (4 محاور: 3 ركائز + ممكن)", () => {
   const rel = freshRelease();
-  rel.strategy.status = "approved"; // اعتماد مزعوم والركائز صفر من أصل 7
-  const res = V.validateRelease(rel);
-  assert.ok(res.blockers.some((b) => b.id === "strategy.pillars7"));
-  // مع الاعتماد لا يصدر إنذار «بانتظار المصدر» — الحجب صريح لا ضبابي
-  assert.ok(!res.warnings.some((w) => w.id === "strategy.pending"));
+  rel.strategy.pillars = rel.strategy.pillars.slice(0, 3);
+  rel.strategy.initiatives = rel.strategy.initiatives
+    .filter((i) => i.pillar_id !== "p4"); // عزل بوابة العدد عن بوابة الانتماء
+  assert.ok(blockerIds(rel).includes("strategy.pillars4"));
 });
 
-test("مبادرة خارج ركائزها المعتمدة → strategy.membership تحجب", () => {
+test("قلب نوع محور (ركيزتان + ممكنان) → strategy.pillars4 تحجب", () => {
   const rel = freshRelease();
-  rel.strategy.status = "approved";
-  rel.strategy.pillars = Array.from({ length: 7 }, (_x, i) => ({ id: "p" + (i + 1) }));
-  rel.strategy.initiatives = [{ id: "i1", pillar_id: "p-ghost", execution_status: "on_track" }];
+  rel.strategy.pillars[0].kind = "ممكن";
+  assert.ok(blockerIds(rel).includes("strategy.pillars4"));
+});
+
+test("مبادرة خارج محاورها → strategy.membership تحجب", () => {
+  const rel = freshRelease();
+  rel.strategy.initiatives[5].pillar_id = "p-ghost";
   assert.ok(blockerIds(rel).includes("strategy.membership"));
 });
 
-test("مؤشر أولوية بلا قيمة → إنذار kpi.priority_values (يُحجب النشر دون تنازل موقَّع)", () => {
+test("تكرار معرف مبادرة → strategy.initiatives18 تحجب", () => {
   const rel = freshRelease();
-  rel.strategy.status = "approved";
-  rel.strategy.required_pillars = 7;
-  rel.strategy.pillars = Array.from({ length: 7 }, (_x, i) => ({ id: "p" + (i + 1) }));
-  rel.strategy.initiatives = [];
-  rel.strategy.kpis = [{
-    id: "k1", name: "نسبة التغطية المستهدفة", priority: true,
-    current_value: null, source: "ورقة العمل", as_of: "2026-08",
-  }];
+  rel.strategy.initiatives[1].id = rel.strategy.initiatives[0].id;
+  assert.ok(blockerIds(rel).includes("strategy.initiatives18"));
+});
+
+test("مبادرة نهايتها قبل بدايتها → strategy.initiative_dates تحجب", () => {
+  const rel = freshRelease();
+  const withDates = rel.strategy.initiatives.find((i) => i.start && i.end);
+  withDates.end = "2020-01-01";
+  assert.ok(blockerIds(rel).includes("strategy.initiative_dates"));
+});
+
+test("تاريخ غير ISO → strategy.initiative_dates تحجب", () => {
+  const rel = freshRelease();
+  rel.strategy.initiatives[2].start = "01/04/2026";
+  assert.ok(blockerIds(rel).includes("strategy.initiative_dates"));
+});
+
+test("حالة مبادرة خارج المفردات → strategy.initiative_status تحجب", () => {
+  const rel = freshRelease();
+  rel.strategy.initiatives[0].status = "قيد الدراسة"; // ليست من المفردات الأربع
+  assert.ok(blockerIds(rel).includes("strategy.initiative_status"));
+});
+
+test("عبث بمعرفات المؤشرات → strategy.kpis14 تحجب (1..14 بالضبط)", () => {
+  const rel = freshRelease();
+  rel.strategy.kpis[13].id = 99;
+  assert.ok(blockerIds(rel).includes("strategy.kpis14"));
+});
+
+test("مؤشر نسبي بمستهدف خارج [0,1] → kpi.pct_bounds تحجب", () => {
+  const rel = freshRelease();
+  const pctKpi = rel.strategy.kpis.find((k) => k.pct);
+  pctKpi.target = 1.2;
+  assert.ok(blockerIds(rel).includes("kpi.pct_bounds"));
+});
+
+test("مستهدف لا يتجاوز خط أساسه → kpi.target_gt_baseline تحجب", () => {
+  const rel = freshRelease();
+  rel.strategy.kpis[4].target = rel.strategy.kpis[4].baseline;
+  assert.ok(blockerIds(rel).includes("kpi.target_gt_baseline"));
+});
+
+test("القيم الحالية الغائبة → إنذار kpi.current_values لا حاجب (تنازل موقَّع عند النشر)", () => {
+  const res = V.validateRelease(freshRelease()); // الإصدار الحقيقي: 14 قيمة غائبة بصدق
+  const gate = res.warnings.find((w) => w.id === "kpi.current_values");
+  assert.ok(gate, "الإنذار قائم على الإصدار المنشور");
+  assert.ok(!res.blockers.find((b) => b.id === "kpi.current_values"));
+  assert.ok(gate.detail.includes("مؤشراً"), "التفصيل يعدّ المؤشرات بتطابق العدد والمعدود");
+});
+
+test("حالة استراتيجية غير معتمدة → إنذار strategy.pending وغياب بوابات المرآة", () => {
+  const rel = freshRelease();
+  rel.strategy.status = "pending_source";
   const res = V.validateRelease(rel);
-  // بعد مراجعة الأمن: التنازل حصراً عبر سجل التنازلات الموقَّع الممرر للنشر —
-  // لا حقل waiver داخل البيانات. البوابة إنذار، وpublish يرفض إنذاراً بلا تنازل.
-  const gate = res.warnings.find((b) => b.id === "kpi.priority_values");
-  assert.ok(gate, "البوابة تنذر وتتطلب تنازلاً موقَّعاً");
-  assert.ok(gate.detail.includes("نسبة التغطية المستهدفة"), "التفصيل يسمي المؤشر الناقص");
-  assert.ok(!res.blockers.find((b) => b.id === "kpi.priority_values"));
+  assert.ok(res.warnings.some((w) => w.id === "strategy.pending"));
+  assert.ok(!res.gates.some((g) => g.id === "strategy.pillars4"));
 });
 
-test("المؤشر نفسه بقيمة حالية → البوابة تمر (حقل waiver داخل البيانات لا يتجاوزها)", () => {
-  for (const patch of [{ current_value: 43.1 }]) {
-    const rel = freshRelease();
-    rel.strategy.status = "approved";
-    rel.strategy.pillars = Array.from({ length: 7 }, (_x, i) => ({ id: "p" + (i + 1) }));
-    rel.strategy.initiatives = [];
-    rel.strategy.kpis = [Object.assign({
-      id: "k1", name: "نسبة التغطية المستهدفة", priority: true,
-      current_value: null, waiver: null, source: "ورقة العمل", as_of: "2026-08",
-    }, patch)];
-    assert.ok(!blockerIds(rel).includes("kpi.priority_values"));
-  }
-});
+/* ── لوحات رؤى الأقسام تخضع لمجمع الحقائق كالتحليلات تماماً ── */
 
-test("مؤشر منشور بلا مصدر أو تاريخ قياس → kpi.sources تحجب", () => {
+test("رقم دخيل في نص لوحة رؤى → insight_panels.figures تحجب", () => {
   const rel = freshRelease();
-  rel.strategy.status = "approved";
-  rel.strategy.pillars = Array.from({ length: 7 }, (_x, i) => ({ id: "p" + (i + 1) }));
-  rel.strategy.initiatives = [];
-  rel.strategy.kpis = [{
-    id: "k1", name: "مؤشر", priority: false,
-    current_value: 10, waiver: null, source: "", as_of: "2026-08",
-  }];
-  assert.ok(blockerIds(rel).includes("kpi.sources"));
+  rel.insight_panels.sections.supply[0].text = "الطلب يتجاوز العرض بنحو 999999 سرير.";
+  assert.ok(blockerIds(rel).includes("insight_panels.figures.supply.sd1"));
+});
+
+test("الصيغ المختصرة المشروعة (807.6/48.5/18.6) ومعرفات المبادرات (1.1) تمر", () => {
+  // نصوص الإصدار الحقيقي تحوي هذه الصيغ — يجب أن تمر بلا أي حاجب أرقام
+  const ids = blockerIds(freshRelease());
+  assert.ok(!ids.some((id) => id.startsWith("insight_panels.figures.")),
+    `حواجب أرقام غير متوقعة: ${ids.join("، ")}`);
+});
+
+test("تصنيف لوحة رؤى خارج المفردات → insight_panels.cls تحجب", () => {
+  const rel = freshRelease();
+  rel.insight_panels.sections.control[0].cls = "danger";
+  assert.ok(blockerIds(rel).includes("insight_panels.cls.control.cd1"));
 });
 
 test("خطوات قادمة معتمدة بعدد خارج 3–4 → next_steps.count تحجب", () => {

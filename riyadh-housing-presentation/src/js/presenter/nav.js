@@ -70,8 +70,11 @@ RH.presenter.nav = (function () {
     const cur = E().current();
     if (!cur || cur.kind !== "scene" || cur.id === "00") return;
     const t = e.target;
+    // خلفية المشهد ذاتها فقط: مضيف المشهد أو جذر المشهد/اللوحة أو جسمها —
+    // أي سليل (بطاقة/رسم/خريطة) لا يقلب الأقسام أبداً
     const isStageSelf = t.classList
-      && (t.classList.contains("scene-host") || t.classList.contains("sc"));
+      && (t.classList.contains("scene-host") || t.classList.contains("sc")
+        || t.classList.contains("dash") || t.classList.contains("dash-body"));
     if (!isStageSelf) return;
     E().next();
     wake();

@@ -110,8 +110,10 @@ test("kpiVariance: قيمة حالية أو مستهدف مفقود → null (ل
 });
 
 /* ── computeStrategy: عقيدة عدم التلفيق ── */
-test("الاستراتيجية المنشورة pending_source → غير قابلة للنشر بلا نسب", () => {
-  assert.deepStrictEqual(rel.strategy.status, "pending_source");
+test("مرآة المصدر approved_source_mirror بلا أوزان/تقدم → لا نسب ملفقة", () => {
+  // V2: المصدر معتمد نقلاً حرفياً، لكنه لا يحمل أوزاناً ولا نسب تقدم —
+  // فيبقى التقدم الموزون غير قابل للنشر بصدق (لا تحويل تعسفي لأي حالة إلى ٪)
+  assert.deepStrictEqual(rel.strategy.status, "approved_source_mirror");
   assert.deepStrictEqual(der.strategy.publishable, false);
   assert.deepStrictEqual(der.strategy.overall_pct, null);
   assert.deepStrictEqual(der.strategy.status_counts, null);

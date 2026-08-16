@@ -221,8 +221,10 @@
   transition: opacity var(--dur-std) var(--ease), color var(--dur-micro);
 }
 .hud-btn:hover, .hud-btn:focus-visible { color: var(--ivory); }
-.hud-next { inset-inline-end: auto; left: calc(var(--su) * 30); }
-.hud-prev { right: calc(var(--su) * 30); }
+/* V2: ترويسة اللوحة تشغل زاويتي الأعلى (عنوان يميناً ووسم يساراً)، فيتمركز
+   زرا التقليب حول منتصف الحافة العلوية الفارغ دوماً — لا تراكب مع الترويسة. */
+.hud-next { inset-inline-end: auto; left: calc(50% - var(--su) * 300); }
+.hud-prev { right: calc(50% - var(--su) * 300); }
 .hud-agenda {
   top: auto;
   bottom: calc(var(--su) * 24);

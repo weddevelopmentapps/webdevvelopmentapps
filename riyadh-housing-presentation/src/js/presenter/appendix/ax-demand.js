@@ -34,16 +34,56 @@
     return chartEl;
   }
 
-  /* ── الصفحة 1: الطلب حسب النشاط الاقتصادي ─────────────────────────── */
+  /* ── الصفحة 1: الطلب حسب النشاط الاقتصادي ───────────────────────────
+     بعد المراجعة: الصفحة لوحة كثيفة لا رسماً وحيداً — شريط ثلاثة أرقام
+     أعلى، ثم الرسم وإلى جانبه جدول ترتيب (النشاط/أسرّة/الحصة/التراكمي). */
   function pageEcon(el, ctx) {
     const rel = RH.data.store.release();
-    RH.viz.charts.econBars(chartArea(el), ctx.su);
-
-    // الإحصاءة المشتقة: النشاط الأعلى طلباً وحصته من الإجمالي (ترتيب على الخام)
-    const top = rel.economic_activities.slice()
-      .sort((a, b) => b.demand - a.demand)[0];
+    const rows = rel.economic_activities.slice()
+      .sort((a, b) => b.demand - a.demand);
+    const top = rows[0];
     const total = rel.metrics.total_demand.value;
     const share = RH.data.derive.pct(top.demand, total);
+
+    /* شريط الأرقام الثلاثة — كل قيمة من الإصدار عبر fmt حصراً */
+    el.appendChild(h("div", { class: "ax-strip" },
+      h("div", { class: "ax-stat" },
+        h("span", { class: "ax-stat-k" }, "إجمالي الطلب التقديري"),
+        h("b", { class: "ax-stat-v" }, fmt.compact(total) + " سرير"),
+      ),
+      h("div", { class: "ax-stat" },
+        h("span", { class: "ax-stat-k" }, "أعلى نشاط — " + top.name),
+        h("b", { class: "ax-stat-v" }, fmt.pct(share)),
+      ),
+      h("div", { class: "ax-stat" },
+        h("span", { class: "ax-stat-k" }, "عدد الأنشطة"),
+        h("b", { class: "ax-stat-v" }, fmt.int(rows.length)),
+      ),
+    ));
+
+    /* الرسم + جدول الترتيب جنباً إلى جنب */
+    const split = h("div", { class: "ax-split" });
+    const chartEl = h("div", { class: "chart" });
+    split.appendChild(h("div", { class: "chart-area" }, chartEl));
+
+    let cum = 0;
+    split.appendChild(h("table", { class: "ax-table ax-rank-table" },
+      h("thead", {}, h("tr", {},
+        ["النشاط", "أسرّة", "الحصة", "تراكمي"].map((t) =>
+          h("th", { scope: "col" }, t)),
+      )),
+      h("tbody", {}, rows.map((r) => {
+        cum += r.demand;
+        return h("tr", {},
+          h("td", {}, r.name),
+          h("td", { class: "num" }, fmt.int(r.demand)),
+          h("td", { class: "num" }, fmt.pct(RH.data.derive.pct(r.demand, total))),
+          h("td", { class: "num" }, fmt.pct(RH.data.derive.pct(cum, total))),
+        );
+      })),
+    ));
+    el.appendChild(split);
+    RH.viz.charts.econBars(chartEl, ctx.su);
 
     el.appendChild(h("div", { class: "ax-note" },
       "يتصدر نشاط «", top.name, "» الطلب على الأسرّة بواقع ",

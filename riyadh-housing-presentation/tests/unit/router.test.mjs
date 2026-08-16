@@ -43,16 +43,16 @@ test("التقابل يصمد عبر دورة العنوان كاملة (ترم�
 });
 
 /* ── serialize / parse ── */
-test("serialize→parse: تقابل على مسار مشهد بمعاملات متعددة", () => {
-  const route = { kind: "scene", id: "05", params: { step: "2", sector: "south" } };
+test("serialize→parse: تقابل على مسار قسم بمعاملات متعددة", () => {
+  const route = { kind: "scene", id: "licensing", params: { step: "2", sector: "south" } };
   const s = R.serialize(route);
-  assert.deepStrictEqual(s, "/scene/05?step=2&sector=south");
+  assert.deepStrictEqual(s, "/section/licensing?step=2&sector=south");
   win.location.hash = "#" + s;
   assert.deepStrictEqual(norm(R.parse()), route);
 });
 
 test("serialize→parse: معاملات عربية تُرمَّز وتعود حرفياً", () => {
-  const route = { kind: "scene", id: "04", params: { sector: "الجنوب", ملاحظة: "أ ب" } };
+  const route = { kind: "scene", id: "demand", params: { sector: "الجنوب", ملاحظة: "أ ب" } };
   const s = R.serialize(route);
   assert.match(s, /^[!-~]+$/, "المسار المتسلسل ASCII مطبوع بالكامل (ترميز URI)");
   win.location.hash = "#" + s;
@@ -87,15 +87,41 @@ test("parse: ملحق بمعرف مركّب وadmin بتبويب", () => {
   assert.deepStrictEqual(norm(R.parse()), { kind: "admin", id: "home", params: {} });
 });
 
-test("المسارات القديمة تُستبدل (لا إدخال في التاريخ) وتصل لهدفها", () => {
+test("المسارات القديمة تُستبدل (لا إدخال في التاريخ) وتصل لأقسام V2", () => {
   const before = historyCalls.length;
   win.location.hash = "#/licenses";
   const route = R.parse();
   assert.deepStrictEqual(route.kind, "scene");
-  assert.deepStrictEqual(route.id, "05");
+  assert.deepStrictEqual(route.id, "licensing");
   assert.deepStrictEqual(historyCalls.length, before + 1, "استبدال واحد بالضبط");
-  assert.deepStrictEqual(historyCalls[historyCalls.length - 1], "#/scene/05");
+  assert.deepStrictEqual(historyCalls[historyCalls.length - 1], "#/section/licensing");
   // الصيغة بلا شرطة مبدئية تُحوَّل أيضاً
   win.location.hash = "#summary";
-  assert.deepStrictEqual(R.parse().id, "02");
+  assert.deepStrictEqual(R.parse().id, "summary");
+});
+
+test("مشاهد V1 الرقمية تُحال إلى أقسام V2 والغلاف 00 يبقى", () => {
+  // خريطة الإحالة المعتمدة (V2_CONTRACTS §7)
+  const map = {
+    "01": "summary", "02": "summary", "03": "demand", "04": "demand",
+    "05": "licensing", "06": "licensing", "07": "control",
+    "08": "initiatives", "09": "initiatives", "10": "kpis", "11": "closing",
+  };
+  for (const [old, section] of Object.entries(map)) {
+    win.location.hash = "#/scene/" + old;
+    assert.deepStrictEqual(norm(R.parse()),
+      { kind: "scene", id: section, params: {} }, `scene/${old} → ${section}`);
+  }
+  win.location.hash = "#/scene/00";
+  assert.deepStrictEqual(norm(R.parse()), { kind: "scene", id: "00", params: {} });
+});
+
+test("serialize/parse للأقسام: /section/<id> ذهاباً وإياباً بمعاملات الخطوات", () => {
+  const route = { kind: "scene", id: "demand", params: { step: "1" } };
+  const s = R.serialize(route);
+  assert.deepStrictEqual(s, "/section/demand?step=1");
+  win.location.hash = "#" + s;
+  assert.deepStrictEqual(norm(R.parse()), route);
+  // الغلاف الرقمي يبقى على /scene/
+  assert.deepStrictEqual(R.serialize({ kind: "scene", id: "00", params: {} }), "/scene/00");
 });

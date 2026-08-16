@@ -1,0 +1,60 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   cover.css — تخصيصات الغلاف السينمائي V2 (s0-cover.js — مشهد «00»)
+   ────────────────────────────────────────────────────────────────────────────
+   طبقة الوسائط RH.presenter.mediaBg تُلحق داخل .cover-media فوق البديل الكودي
+   (سماء الغسق + صورة ظلية لأفق الرياض). خلفية .media-bg الافتراضية معتمة
+   بتدرجها الفني فتحجب البديل — هنا تُشفّف حصراً داخل الغلاف كي يبقى البديل
+   ظاهراً عند غياب الملصق/الفيديو، ويعلوه الملصق ثم الفيديو عند جاهزيتهما.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.sc-cover .cover-media .media-bg {
+  background: none;
+}
+
+/* زجاج الغلاف أخف: المقروئية يضمنها .cover-scrim النصي القائم أصلاً */
+.sc-cover .cover-media .media-glass {
+  background:
+    linear-gradient(180deg,
+      rgba(8, 16, 9, calc(var(--media-dim, 0.38) * 0.8)) 0%,
+      rgba(11, 21, 18, calc(var(--media-dim, 0.38) * 0.55)) 45%,
+      rgba(11, 21, 18, var(--media-dim, 0.38)) 100%);
+}
+
+/* ── شريط المعلومات السفلي (إصلاح فراغ الغلاف) ── */
+.sc-cover .cover-ticker {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 6;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: calc(var(--su) * 34);
+  padding: calc(var(--su) * 14) calc(var(--su) * 40) calc(var(--su) * 16);
+  background: linear-gradient(0deg, rgba(4, 12, 9, 0.86), rgba(4, 12, 9, 0.35) 78%, transparent);
+  border-top: 1px solid rgba(244, 241, 230, 0.08);
+  flex-wrap: wrap;
+}
+.sc-cover .cover-tick {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(var(--su) * 3);
+  min-width: calc(var(--su) * 90);
+}
+.sc-cover .cover-tick-k {
+  font-size: calc(var(--su) * 11.5);
+  letter-spacing: 0.04em;
+  color: var(--mut-d);
+}
+.sc-cover .cover-tick-v {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-size: calc(var(--su) * 16);
+  font-weight: 700;
+  color: var(--ivory);
+}
+.sc-cover .cover-tick:nth-child(2) .cover-tick-v { color: var(--gold); }
+@media (prefers-reduced-motion: reduce) {
+  .sc-cover .cover-ticker { transition: none; }
+}

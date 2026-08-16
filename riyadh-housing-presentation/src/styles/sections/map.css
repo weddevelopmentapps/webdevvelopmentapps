@@ -1,0 +1,935 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   map.css — تخصيصات قسم «خريطة الرياض التفاعلية» (s05-map.js)
+   ────────────────────────────────────────────────────────────────────────────
+   عقد V2_CONTRACTS §5: كل الأصناف مسبوقة بـ [data-section="map"] منعاً
+   للتسرب؛ الأصناف المشتركة (dash-*, kpi-*, geomap-*, detail-*) ملك
+   dashboard.css ولا تُعاد كتابتها هنا — هذا الملف يضيف فقط:
+     • هندسة الشبكة: الخريطة span 9 تملأ الارتفاع + العمود الجانبي span 3
+     • تفاعلية بطاقات المؤشرات الست (أزرار تفصيل حقيقية)
+     • شريط تحكم الخريطة: مفاتيح الطبقات السبع بألوانها الدلالية
+       (أخضر=طاقة/رخص/مراقبون/تغطية، رملي نحاسي=طلب، مرجاني=مخالفات حصراً)
+       + مفتاحا نقاط التركّز وإبراز العينة + مبدل الوضع + رقاقة الوضع الحية
+     • سطر قراءة الطبقة التنفيذية المتبدل مع الطبقة النشطة
+     • إبراز أحياء العينة العشرين في وضع SVG (تعتيم غير العينة + حد عاجي)
+     • رصيف بطاقة الحي (نقر/Enter على حي) بشبكة قيم العينة
+     • بطاقات الملخص القطاعية الخمس بأشرطة قياس متزامنة مع الطبقة
+     • سطرا الإسناد الإلزاميان + بطاقة التفاصيل الزجاجية
+   كل المقاسات calc(var(--su) * n) — تتدرج مع مسرح 16:9 (عقد المحرك)،
+   والألوان من رموز tokens.css حصراً. الذهبي لكنة كروم مقننة (حلقة تركيز،
+   وسم warn) لا لون قيمة بيانات. prefers-reduced-motion يصفّر الانتقالات.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* ── جسم القسم: يملأ 16:9 دون تمرير عند 1920×1080؛ عند ضيق استثنائي يتمرر
+      رأسياً داخلياً فقط (المسرح لا يتمرر أفقياً أبداً — قاعدة صلبة) ── */
+[data-section="map"] .dash-body {
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(244, 241, 230, 0.18) transparent;
+}
+[data-section="map"] .dash-body::-webkit-scrollbar { width: 8px; }
+[data-section="map"] .dash-body::-webkit-scrollbar-thumb {
+  background: rgba(244, 241, 230, 0.16);
+  border-radius: 8px;
+}
+[data-section="map"] .dash-body::-webkit-scrollbar-track { background: transparent; }
+
+/* ── الشبكة: صف واحد بارتفاع كامل — الخريطة هي البطل ── */
+[data-section="map"] .map-grid {
+  grid-template-rows: minmax(calc(var(--su) * 540), 1fr);
+}
+[data-section="map"] .map-cell { min-height: 0; }
+
+/* ── الملخص الناطق: مخفي بصرياً، حاضر لقارئات الشاشة ── */
+[data-section="map"] .map-sr-summary {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   1) شريط المؤشرات الكبرى — كل بطاقة زر تفصيل حقيقي
+   ════════════════════════════════════════════════════════════════════════════ */
+[data-section="map"] .map-kpi {
+  cursor: pointer;
+  transition: transform var(--dur-micro) var(--ease),
+    border-color var(--dur-micro) var(--ease),
+    background var(--dur-micro) var(--ease);
+}
+[data-section="map"] .map-kpi:hover {
+  transform: translateY(calc(var(--su) * -2));
+  border-color: var(--hair-d);
+  background: rgba(22, 41, 31, 0.66);
+}
+[data-section="map"] .map-kpi:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+[data-section="map"] .map-kpi:active { transform: translateY(0); }
+
+/* ════════════════════════════════════════════════════════════════════════════
+   2) بطاقة الخريطة: رقاقة الوضع + شريط التحكم + سطر القراءة + المضيف
+   ════════════════════════════════════════════════════════════════════════════ */
+[data-section="map"] .map-card .card-head {
+  flex: none;
+  padding-bottom: calc(var(--su) * 8);
+}
+
+/* رقاقة الوضع الحية (حالة لا زر): نبضة خضراء عند البلاطات الحية */
+[data-section="map"] .map-mode-chip {
+  margin-inline-start: auto;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--su) * 6);
+  font-size: calc(var(--su) * 12);
+  font-weight: 600;
+  color: var(--faint-d);
+  border: 1px solid var(--hair-d2);
+  border-radius: 999px;
+  padding: calc(var(--su) * 3) calc(var(--su) * 11);
+  white-space: nowrap;
+}
+[data-section="map"] .map-mode-chip.live {
+  color: var(--green-hi);
+  border-color: rgba(49, 162, 109, 0.45);
+  background: rgba(49, 162, 109, 0.08);
+}
+
+/* ── شريط التحكم: ثلاث مجموعات تلتف عند الضيق ── */
+[data-section="map"] .map-controls {
+  flex: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: calc(var(--su) * 8) calc(var(--su) * 14);
+  padding: calc(var(--su) * 4) calc(var(--su) * 18) calc(var(--su) * 8);
+}
+[data-section="map"] .map-ctl-group {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--su) * 6);
+}
+[data-section="map"] .map-ctl-group + .map-ctl-group {
+  border-inline-start: 1px solid var(--hair-d2);
+  padding-inline-start: calc(var(--su) * 14);
+}
+
+/* ── مفاتيح الطبقات السبع: نقطة دلالية + تسمية قصيرة ── */
+[data-section="map"] .map-lyr-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--su) * 6);
+  padding: calc(var(--su) * 5) calc(var(--su) * 12);
+  border: 1px solid var(--hair-d2);
+  border-radius: 999px;
+  background: rgba(11, 21, 18, 0.55);
+  color: var(--mut-d);
+  font-family: var(--f-body);
+  font-size: calc(var(--su) * 13);
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color var(--dur-micro) var(--ease),
+    border-color var(--dur-micro) var(--ease),
+    background var(--dur-micro) var(--ease);
+}
+[data-section="map"] .map-lyr-btn:hover {
+  color: var(--ivory);
+  border-color: var(--hair-d);
+  background: rgba(22, 41, 31, 0.8);
+}
+[data-section="map"] .map-lyr-btn:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+  color: var(--ivory);
+}
+[data-section="map"] .map-lyr-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+[data-section="map"] .map-lyr-dot {
+  width: calc(var(--su) * 9);
+  height: calc(var(--su) * 9);
+  border-radius: 50%;
+  flex: none;
+}
+/* الألوان الدلالية للنقاط — سلالم geomap الأحادية ذاتها */
+[data-section="map"] .map-lyr-btn.r-seq .map-lyr-dot { background: var(--green); }
+[data-section="map"] .map-lyr-btn.r-viol .map-lyr-dot { background: var(--coral); }
+[data-section="map"] .map-lyr-btn.r-demand .map-lyr-dot { background: var(--demand); }
+
+/* الطبقة النشطة: حد وخلفية بلون سلمها الدلالي */
+[data-section="map"] .map-lyr-btn.active { color: var(--ivory); }
+[data-section="map"] .map-lyr-btn.r-seq.active {
+  border-color: rgba(49, 162, 109, 0.55);
+  background: rgba(49, 162, 109, 0.14);
+}
+[data-section="map"] .map-lyr-btn.r-viol.active {
+  border-color: rgba(214, 106, 80, 0.55);
+  background: rgba(214, 106, 80, 0.13);
+}
+[data-section="map"] .map-lyr-btn.r-demand.active {
+  border-color: rgba(170, 138, 62, 0.6);
+  background: rgba(170, 138, 62, 0.14);
+}
+
+/* ── مفتاحا نقاط التركّز وإبراز العينة ── */
+[data-section="map"] .map-tgl {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--su) * 7);
+  padding: calc(var(--su) * 5) calc(var(--su) * 12);
+  border: 1px solid var(--hair-d2);
+  border-radius: 999px;
+  background: rgba(11, 21, 18, 0.55);
+  color: var(--mut-d);
+  font-family: var(--f-body);
+  font-size: calc(var(--su) * 13);
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color var(--dur-micro) var(--ease),
+    border-color var(--dur-micro) var(--ease),
+    background var(--dur-micro) var(--ease);
+}
+[data-section="map"] .map-tgl:hover {
+  color: var(--ivory);
+  border-color: var(--hair-d);
+}
+[data-section="map"] .map-tgl:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+  color: var(--ivory);
+}
+[data-section="map"] .map-tgl:disabled { opacity: 0.4; cursor: not-allowed; }
+[data-section="map"] .map-tgl-dot {
+  width: calc(var(--su) * 9);
+  height: calc(var(--su) * 9);
+  border-radius: 50%;
+  flex: none;
+}
+/* نقاط التركّز الرقابي: مرجاني حصراً (مواضع مخالفات) */
+[data-section="map"] .map-tgl.tgl-hs .map-tgl-dot {
+  background: rgba(214, 106, 80, 0.42);
+  border: 1px solid var(--coral);
+}
+[data-section="map"] .map-tgl.tgl-hs.active {
+  color: var(--ivory);
+  border-color: rgba(214, 106, 80, 0.55);
+  background: rgba(214, 106, 80, 0.13);
+}
+/* إبراز العينة: حد عاجي (وسم هوية لا قيمة بيانات) */
+[data-section="map"] .map-tgl.tgl-sm .map-tgl-dot {
+  background: transparent;
+  border: calc(var(--su) * 1.6) solid rgba(244, 241, 230, 0.8);
+}
+[data-section="map"] .map-tgl.tgl-sm.active {
+  color: var(--ivory);
+  border-color: rgba(244, 241, 230, 0.4);
+  background: rgba(244, 241, 230, 0.07);
+}
+[data-section="map"] .map-tgl-count {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-size: calc(var(--su) * 12);
+  color: var(--ink2-d);
+  border: 1px solid var(--hair-d2);
+  border-radius: 999px;
+  padding: 0 calc(var(--su) * 7);
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+/* ── مبدل الوضع اليدوي ── */
+[data-section="map"] .map-mode-btn {
+  padding: calc(var(--su) * 5) calc(var(--su) * 12);
+  border: 1px solid var(--hair-d2);
+  border-radius: 999px;
+  background: rgba(11, 21, 18, 0.55);
+  color: var(--mut-d);
+  font-family: var(--f-body);
+  font-size: calc(var(--su) * 12.5);
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color var(--dur-micro) var(--ease),
+    border-color var(--dur-micro) var(--ease),
+    background var(--dur-micro) var(--ease);
+}
+[data-section="map"] .map-mode-btn:hover {
+  color: var(--ivory);
+  border-color: var(--hair-d);
+}
+[data-section="map"] .map-mode-btn:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+  color: var(--ivory);
+}
+[data-section="map"] .map-mode-btn.active {
+  color: var(--ivory);
+  border-color: rgba(244, 241, 230, 0.35);
+  background: rgba(244, 241, 230, 0.08);
+}
+[data-section="map"] .map-mode-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* تنويه إبراز العينة في وضع البلاطات — إفصاح صادق لا مفتاح معطوب */
+[data-section="map"] .map-hint {
+  font-size: calc(var(--su) * 12);
+  color: var(--mut-d);
+  border: 1px dashed var(--hair-d);
+  border-radius: 999px;
+  padding: calc(var(--su) * 3) calc(var(--su) * 11);
+  white-space: nowrap;
+}
+
+/* ── سطر قراءة الطبقة التنفيذية (يتبدل مع الطبقة — قابل للنقر) ── */
+[data-section="map"] .map-reading {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: calc(var(--su) * 9);
+  margin: 0 calc(var(--su) * 18) calc(var(--su) * 8);
+  padding: calc(var(--su) * 7) calc(var(--su) * 13);
+  border: 1px solid var(--hair-d2);
+  border-inline-start: 3px solid var(--faint-d);
+  border-radius: var(--r-sm);
+  background: rgba(11, 21, 18, 0.5);
+  color: var(--ink2-d);
+  font-size: calc(var(--su) * 13.5);
+  line-height: 1.5;
+  cursor: pointer;
+  transition: background var(--dur-micro) var(--ease),
+    border-color var(--dur-micro) var(--ease);
+}
+[data-section="map"] .map-reading:hover { background: rgba(22, 41, 31, 0.72); }
+[data-section="map"] .map-reading:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+[data-section="map"] .map-reading.pos { border-inline-start-color: var(--green); }
+[data-section="map"] .map-reading.neg { border-inline-start-color: var(--coral); }
+[data-section="map"] .map-reading.warn { border-inline-start-color: var(--gold); }
+[data-section="map"] .map-reading.dem { border-inline-start-color: var(--demand); }
+[data-section="map"] .map-reading-dot {
+  width: calc(var(--su) * 8);
+  height: calc(var(--su) * 8);
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.55;
+  flex: none;
+}
+[data-section="map"] .map-reading-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+[data-section="map"] .map-reading-arrow {
+  flex: none;
+  color: var(--faint-d);
+  font-size: calc(var(--su) * 13);
+  transition: transform var(--dur-micro) var(--ease);
+}
+[data-section="map"] .map-reading:hover .map-reading-arrow {
+  transform: translateX(calc(var(--su) * -3));
+  color: var(--ivory);
+}
+
+/* ── مضيف الخريطة: يملأ ما تبقى من البطاقة ── */
+[data-section="map"] .map-stage {
+  flex: 1;
+  min-height: calc(var(--su) * 380);
+  margin: 0 calc(var(--su) * 10) calc(var(--su) * 10);
+}
+
+/* إبراز أحياء العينة (وضع SVG): تعتيم غير العينة + حد عاجي واضح.
+   العاجي هنا وسم هوية العينة (كروم) لا لون قيمة — منظومة المعنى مصانة. */
+[data-section="map"] .map-stage.sm-on .geomap-district {
+  opacity: 0.3;
+}
+[data-section="map"] .map-stage.sm-on .geomap-district.has-sample {
+  opacity: 1;
+  stroke: rgba(244, 241, 230, 0.85);
+  stroke-width: 1.5;
+}
+[data-section="map"] .map-stage.sm-on .geomap-district:hover,
+[data-section="map"] .map-stage.sm-on .geomap-district.kfocus {
+  opacity: 1;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   3) العمود الجانبي: رصيف بطاقة الحي + بطاقات القطاعات + الإسناد
+   ════════════════════════════════════════════════════════════════════════════ */
+[data-section="map"] .map-rail-cell { min-height: 0; }
+[data-section="map"] .map-rail {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 10);
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(244, 241, 230, 0.18) transparent;
+  padding-inline-end: calc(var(--su) * 2);
+}
+[data-section="map"] .map-rail::-webkit-scrollbar { width: 6px; }
+[data-section="map"] .map-rail::-webkit-scrollbar-thumb {
+  background: rgba(244, 241, 230, 0.16);
+  border-radius: 6px;
+}
+
+/* ── 3.1) رصيف بطاقة الحي ── */
+[data-section="map"] .map-dock-slot { flex: none; }
+[data-section="map"] .map-dock {
+  padding: calc(var(--su) * 12) calc(var(--su) * 15) calc(var(--su) * 12);
+  gap: calc(var(--su) * 8);
+}
+[data-section="map"] .map-dock-hint {
+  border-style: dashed;
+  background: rgba(16, 32, 26, 0.4);
+}
+[data-section="map"] .map-dock-hint-title {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--su) * 8);
+  font-size: calc(var(--su) * 14);
+  font-weight: 700;
+  color: var(--ink2-d);
+  margin-bottom: calc(var(--su) * 5);
+}
+[data-section="map"] .map-dock-hint-dot {
+  width: calc(var(--su) * 9);
+  height: calc(var(--su) * 9);
+  border-radius: 50%;
+  border: calc(var(--su) * 1.6) solid rgba(244, 241, 230, 0.7);
+  flex: none;
+}
+[data-section="map"] .map-dock-hint-text {
+  font-size: calc(var(--su) * 12.5);
+  line-height: 1.65;
+  color: var(--mut-d);
+}
+[data-section="map"] .map-dock-hint-text.sub {
+  margin-top: calc(var(--su) * 5);
+  color: var(--faint-d);
+}
+[data-section="map"] .map-dock-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(var(--su) * 8);
+}
+[data-section="map"] .map-dock-name {
+  font-family: var(--f-display);
+  font-size: calc(var(--su) * 18);
+  font-weight: 700;
+  color: var(--ivory);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+[data-section="map"] .map-dock-close {
+  flex: none;
+  width: calc(var(--su) * 28);
+  height: calc(var(--su) * 28);
+  border-radius: 50%;
+  border: 1px solid var(--hair-d2);
+  background: transparent;
+  color: var(--mut-d);
+  font-size: calc(var(--su) * 13);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: color var(--dur-micro) var(--ease),
+    border-color var(--dur-micro) var(--ease);
+}
+[data-section="map"] .map-dock-close:hover,
+[data-section="map"] .map-dock-close:focus-visible {
+  color: var(--ivory);
+  border-color: var(--ivory);
+}
+[data-section="map"] .map-dock-close:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+[data-section="map"] .map-dock-sub {
+  display: flex;
+  align-items: baseline;
+  gap: calc(var(--su) * 8);
+  font-size: calc(var(--su) * 12.5);
+  color: var(--mut-d);
+  margin-top: calc(var(--su) * 2);
+}
+[data-section="map"] .map-dock-en {
+  color: var(--faint-d);
+  font-size: calc(var(--su) * 11.5);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+[data-section="map"] .map-dock-rows {
+  display: flex;
+  flex-direction: column;
+  margin-top: calc(var(--su) * 8);
+}
+[data-section="map"] .map-dock-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: calc(var(--su) * 10);
+  padding: calc(var(--su) * 4.5) 0;
+  border-bottom: 1px solid var(--hair-d2);
+}
+[data-section="map"] .map-dock-row:last-child { border-bottom: none; }
+[data-section="map"] .map-dock-k {
+  font-size: calc(var(--su) * 12.5);
+  color: var(--mut-d);
+}
+[data-section="map"] .map-dock-v {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-size: calc(var(--su) * 13.5);
+  font-weight: 700;
+  color: var(--ivory);
+  white-space: nowrap;
+}
+[data-section="map"] .map-dock-row.neg .map-dock-v { color: var(--coral); }
+
+/* شبكة قيم العينة للحي: أربع خانات موثقة */
+[data-section="map"] .map-dock-sample { margin-top: calc(var(--su) * 9); }
+[data-section="map"] .map-dock-sample-title {
+  font-size: calc(var(--su) * 12);
+  font-weight: 700;
+  color: var(--ink2-d);
+  margin-bottom: calc(var(--su) * 6);
+}
+[data-section="map"] .map-dock-sample-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: calc(var(--su) * 6);
+}
+[data-section="map"] .map-dock-cellv {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 1);
+  background: rgba(11, 21, 18, 0.55);
+  border: 1px solid var(--hair-d2);
+  border-radius: calc(var(--su) * 9);
+  padding: calc(var(--su) * 7) calc(var(--su) * 10);
+  min-width: 0;
+}
+[data-section="map"] .map-dock-cellv b {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-size: calc(var(--su) * 17);
+  font-weight: 700;
+  color: var(--ivory);
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+[data-section="map"] .map-dock-cellv span {
+  font-size: calc(var(--su) * 11);
+  color: var(--mut-d);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+[data-section="map"] .map-dock-cellv.neg b { color: var(--coral); }
+[data-section="map"] .map-dock-note {
+  margin-top: calc(var(--su) * 7);
+  font-size: calc(var(--su) * 11);
+  line-height: 1.6;
+  color: var(--faint-d);
+}
+[data-section="map"] .map-dock-note.plain {
+  margin-top: calc(var(--su) * 8);
+  color: var(--mut-d);
+}
+[data-section="map"] .map-dock-actions {
+  display: flex;
+  gap: calc(var(--su) * 7);
+  margin-top: calc(var(--su) * 9);
+}
+[data-section="map"] .map-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: calc(var(--su) * 6) calc(var(--su) * 10);
+  border: 1px solid rgba(49, 162, 109, 0.45);
+  border-radius: 999px;
+  background: rgba(49, 162, 109, 0.12);
+  color: var(--ivory);
+  font-family: var(--f-body);
+  font-size: calc(var(--su) * 12.5);
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background var(--dur-micro) var(--ease),
+    border-color var(--dur-micro) var(--ease);
+}
+[data-section="map"] .map-btn:hover { background: rgba(49, 162, 109, 0.22); }
+[data-section="map"] .map-btn:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+[data-section="map"] .map-btn.ghost {
+  border-color: var(--hair-d2);
+  background: rgba(11, 21, 18, 0.5);
+  color: var(--ink2-d);
+}
+[data-section="map"] .map-btn.ghost:hover {
+  border-color: var(--hair-d);
+  background: rgba(22, 41, 31, 0.8);
+  color: var(--ivory);
+}
+
+/* ── 3.2) ترويسة الملخص القطاعي + رقاقة الطبقة ── */
+[data-section="map"] .map-rail-head {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(var(--su) * 8);
+  padding: 0 calc(var(--su) * 2);
+}
+[data-section="map"] .map-rail-title {
+  font-size: calc(var(--su) * 14);
+  font-weight: 700;
+  color: var(--mut-d);
+  letter-spacing: 0.3px;
+}
+[data-section="map"] .map-rail-layer {
+  font-size: calc(var(--su) * 11.5);
+  font-weight: 700;
+  color: var(--ink2-d);
+  border: 1px solid var(--hair-d2);
+  border-radius: 999px;
+  padding: calc(var(--su) * 2) calc(var(--su) * 9);
+  white-space: nowrap;
+}
+[data-section="map"] .map-rail[data-ramp="seq"] .map-rail-layer {
+  color: var(--green-hi);
+  border-color: rgba(49, 162, 109, 0.4);
+}
+[data-section="map"] .map-rail[data-ramp="viol"] .map-rail-layer {
+  color: var(--coral);
+  border-color: rgba(214, 106, 80, 0.4);
+}
+[data-section="map"] .map-rail[data-ramp="demand"] .map-rail-layer {
+  color: var(--demand);
+  border-color: rgba(170, 138, 62, 0.45);
+}
+
+/* ── 3.3) بطاقات الملخص القطاعية الخمس ── */
+[data-section="map"] .map-secs {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 8);
+  flex: none;
+}
+[data-section="map"] .map-sec {
+  /* حشوة مضغوطة: بطاقات القطاعات الخمس كلها داخل العمود (إصلاح المراجعة) */
+  padding: calc(var(--su) * 7) calc(var(--su) * 12) calc(var(--su) * 6);
+  gap: calc(var(--su) * 5);
+  cursor: pointer;
+  transition: transform var(--dur-micro) var(--ease),
+    border-color var(--dur-micro) var(--ease),
+    background var(--dur-micro) var(--ease);
+}
+[data-section="map"] .map-sec:hover {
+  transform: translateY(calc(var(--su) * -1));
+  border-color: var(--hair-d);
+  background: rgba(22, 41, 31, 0.72);
+}
+[data-section="map"] .map-sec:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+[data-section="map"] .map-sec:active { transform: translateY(0); }
+[data-section="map"] .map-sec-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: calc(var(--su) * 8);
+}
+[data-section="map"] .map-sec-id { min-width: 0; }
+[data-section="map"] .map-sec-name {
+  display: block;
+  font-size: calc(var(--su) * 14.5);
+  font-weight: 700;
+  color: var(--ivory);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+[data-section="map"] .map-sec-sub {
+  display: block;
+  font-size: calc(var(--su) * 11);
+  color: var(--faint-d);
+  margin-top: calc(var(--su) * 2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+[data-section="map"] .map-sec-cov {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: calc(var(--su) * 1);
+}
+[data-section="map"] .map-sec-cov b {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-size: calc(var(--su) * 19);
+  font-weight: 700;
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+[data-section="map"] .map-sec-cov span {
+  font-size: calc(var(--su) * 10.5);
+  color: var(--faint-d);
+}
+/* دلالة التغطية: دون تغطية المدينة = مرجاني (عجز)، فوقها = أخضر */
+[data-section="map"] .map-sec-cov.pos b { color: var(--green-hi); }
+[data-section="map"] .map-sec-cov.neg b { color: var(--coral); }
+
+/* شريط قياس الطبقة النشطة — اللون من سلمها الدلالي عبر dataset.ramp */
+[data-section="map"] .map-sec-meter {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--su) * 9);
+}
+[data-section="map"] .map-sec-bar {
+  flex: 1;
+  height: calc(var(--su) * 7);
+  border-radius: 999px;
+  background: rgba(244, 241, 230, 0.07);
+  overflow: hidden;
+  /* RTL: الشريط ينمو من اليمين (بداية القراءة) */
+  display: flex;
+  justify-content: flex-start;
+}
+[data-section="map"] .map-sec-bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--green);
+  transition: width var(--dur-std) var(--ease);
+}
+[data-section="map"] .map-rail[data-ramp="viol"] .map-sec-bar-fill {
+  background: var(--coral);
+}
+[data-section="map"] .map-rail[data-ramp="demand"] .map-sec-bar-fill {
+  background: var(--demand);
+}
+[data-section="map"] .map-sec-val {
+  flex: none;
+  min-width: calc(var(--su) * 64);
+  text-align: start;
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-size: calc(var(--su) * 13.5);
+  font-weight: 700;
+  color: var(--ivory);
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+/* الخانات الدقيقة الثلاث: عجز/مخالفات (مرجاني حصراً) + مراقبون */
+[data-section="map"] .map-sec-micro {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: calc(var(--su) * 6);
+}
+[data-section="map"] .map-sec-cellv {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+[data-section="map"] .map-sec-cellv b {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-size: calc(var(--su) * 13);
+  font-weight: 700;
+  color: var(--ink2-d);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+[data-section="map"] .map-sec-cellv span {
+  font-size: calc(var(--su) * 10.5);
+  color: var(--faint-d);
+  white-space: nowrap;
+}
+[data-section="map"] .map-sec-cellv.neg b { color: var(--coral); }
+
+/* ── 3.4) سطرا الإسناد الإلزاميان ── */
+[data-section="map"] .map-src {
+  flex: none;
+  margin-top: auto;
+  padding: calc(var(--su) * 8) calc(var(--su) * 4) 0;
+  border-top: 1px solid var(--hair-d2);
+}
+[data-section="map"] .map-src-line {
+  font-size: calc(var(--su) * 10.5);
+  line-height: 1.7;
+  color: var(--mut-d);
+}
+[data-section="map"] .map-src-line.faint { color: var(--faint-d); }
+
+/* ════════════════════════════════════════════════════════════════════════════
+   4) بطاقة التفاصيل الزجاجية (تفتح عبر ctx.openDetail فوق القسم)
+   ════════════════════════════════════════════════════════════════════════════ */
+[data-section="map"] .map-detail {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 12);
+}
+[data-section="map"] .map-detail-hero {
+  display: flex;
+  align-items: baseline;
+  gap: calc(var(--su) * 10);
+}
+[data-section="map"] .map-detail-num {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-size: calc(var(--su) * 46);
+  font-weight: 300;
+  line-height: 1.05;
+  letter-spacing: calc(var(--su) * -1.2);
+  color: var(--ivory);
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+[data-section="map"] .map-detail-num.pos { color: var(--green-hi); }
+[data-section="map"] .map-detail-num.neg { color: var(--coral); }
+[data-section="map"] .map-detail-unit {
+  font-size: calc(var(--su) * 15);
+  font-weight: 600;
+  color: var(--mut-d);
+}
+[data-section="map"] .map-detail-cap {
+  font-size: calc(var(--su) * 14);
+  line-height: 1.7;
+  color: var(--ink2-d);
+}
+[data-section="map"] .map-detail-rows {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 calc(var(--su) * 26);
+}
+[data-section="map"] .map-detail-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: calc(var(--su) * 12);
+  padding: calc(var(--su) * 6) 0;
+  border-bottom: 1px solid var(--hair-d2);
+}
+[data-section="map"] .map-detail-k {
+  font-size: calc(var(--su) * 13);
+  color: var(--mut-d);
+}
+[data-section="map"] .map-detail-v {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-size: calc(var(--su) * 14);
+  font-weight: 700;
+  color: var(--ivory);
+  white-space: nowrap;
+}
+[data-section="map"] .map-detail-row.pos .map-detail-v { color: var(--green-hi); }
+[data-section="map"] .map-detail-row.neg .map-detail-v { color: var(--coral); }
+[data-section="map"] .map-detail-table {
+  max-height: calc(var(--su) * 300);
+  overflow: auto;
+  border: 1px solid var(--hair-d2);
+  border-radius: var(--r-sm);
+}
+[data-section="map"] .map-detail-note {
+  display: flex;
+  align-items: flex-start;
+  gap: calc(var(--su) * 8);
+  font-size: calc(var(--su) * 12.5);
+  line-height: 1.65;
+  color: var(--mut-d);
+}
+[data-section="map"] .map-detail-note-dot {
+  flex: none;
+  width: calc(var(--su) * 7);
+  height: calc(var(--su) * 7);
+  border-radius: 50%;
+  background: var(--gold);
+  margin-top: calc(var(--su) * 6);
+}
+[data-section="map"] .map-detail-src {
+  font-size: calc(var(--su) * 11.5);
+  color: var(--faint-d);
+}
+[data-section="map"] .map-detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--su) * 8);
+  margin-top: calc(var(--su) * 2);
+}
+[data-section="map"] .map-detail-go {
+  display: inline-flex;
+  align-items: center;
+  padding: calc(var(--su) * 7) calc(var(--su) * 16);
+  border: 1px solid rgba(49, 162, 109, 0.45);
+  border-radius: 999px;
+  background: rgba(49, 162, 109, 0.12);
+  color: var(--ivory);
+  font-family: var(--f-body);
+  font-size: calc(var(--su) * 13);
+  font-weight: 700;
+  cursor: pointer;
+  transition: background var(--dur-micro) var(--ease),
+    border-color var(--dur-micro) var(--ease);
+}
+[data-section="map"] .map-detail-go:hover { background: rgba(49, 162, 109, 0.22); }
+[data-section="map"] .map-detail-go:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   5) الحركة المخفضة: تصفير كل الانتقالات التزييني (عقد إتاحة صارم)
+   ════════════════════════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  [data-section="map"] .map-kpi,
+  [data-section="map"] .map-sec,
+  [data-section="map"] .map-lyr-btn,
+  [data-section="map"] .map-tgl,
+  [data-section="map"] .map-mode-btn,
+  [data-section="map"] .map-btn,
+  [data-section="map"] .map-detail-go,
+  [data-section="map"] .map-reading,
+  [data-section="map"] .map-reading-arrow,
+  [data-section="map"] .map-dock-close,
+  [data-section="map"] .map-sec-bar-fill {
+    transition: none;
+  }
+  [data-section="map"] .map-kpi:hover,
+  [data-section="map"] .map-sec:hover {
+    transform: none;
+  }
+}
