@@ -1,0 +1,19 @@
+{
+  "note": "توليدات V2 — خلفيات الأقسام (nano_banana_2، 16:9، 1k). تُستكمل بـ jobs_wait ثم show_generation_by_ids، وتُرصد روابطها النهائية في MEDIA_MANIFEST.",
+  "existing_v1": {
+    "cover_still": "f122995e-72fe-48fa-9225-d6c537d9e4ed",
+    "night_grid": "2c265c88-cac4-4de1-8e48-1fdafee06237",
+    "heritage_murabba": "82901cd4-6f93-4a22-9442-7e8ecb3976a3",
+    "cover_video_10s": "4a8dedf7-b210-4dad-b0a3-a90d522b4ab5",
+    "cover_still_2k": "e2f472a4-4c11-41e0-a487-e2a735132ea1",
+    "cover_video_2k": "f04f1073-cbae-44c6-869a-62001517d5da"
+  },
+  "v2_backdrops": [
+    {"index": 10, "section": "demand", "job_id": "11750482-2f7b-491f-8e2e-1c0bac7c42f1"},
+    {"index": 11, "section": "licensing", "job_id": "a80061d3-96ec-498d-9d2e-408629ac4360"},
+    {"index": 12, "section": "control", "job_id": "8a852ee5-27a3-4ea2-b0b9-085da580f40e"},
+    {"index": 13, "section": "map", "job_id": "8b659b49-3754-4018-94af-51ecdc8bbf86"},
+    {"index": 14, "section": "initiatives", "job_id": "66f2c140-bdb1-4274-988b-f9d36c92b95a"},
+    {"index": 15, "section": "kpis_closing", "job_id": "14dd1bce-b711-4895-8e91-5248c4083048"}
+  ]
+}

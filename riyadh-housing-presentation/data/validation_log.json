@@ -205,6 +205,101 @@
   "detail": ""
  },
  {
+  "gate": "strategy.pillars_count",
+  "ok": true,
+  "detail": "4 محاور (3 ركائز + ممكن)"
+ },
+ {
+  "gate": "strategy.pillars_unique",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "gate": "strategy.pillars_kinds",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "gate": "strategy.initiatives_count",
+  "ok": true,
+  "detail": "18"
+ },
+ {
+  "gate": "strategy.initiatives_unique",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "gate": "strategy.initiatives_pillars_valid",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "gate": "strategy.initiatives_id_prefix",
+  "ok": true,
+  "detail": "رقم المبادرة يطابق رقم محورها"
+ },
+ {
+  "gate": "strategy.initiatives_dates_iso",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "gate": "strategy.initiatives_start_le_end",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "gate": "strategy.initiatives_status_vocab",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "gate": "strategy.status_counts",
+  "ok": true,
+  "detail": "{'منجزة': 2, 'متأخرة': 7, 'جاري العمل': 9} عند 2026-08-11"
+ },
+ {
+  "gate": "strategy.kpis_count",
+  "ok": true,
+  "detail": "14"
+ },
+ {
+  "gate": "strategy.kpis_ids",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "gate": "strategy.kpis_pct_bounds",
+  "ok": true,
+  "detail": "المؤشرات النسبية كسور ضمن [0,1]"
+ },
+ {
+  "gate": "strategy.kpis_target_progress",
+  "ok": true,
+  "detail": "كل مستهدف أعلى من خط أساسه"
+ },
+ {
+  "gate": "coverage.series_monotonic",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "gate": "coverage.series_final",
+  "ok": true,
+  "detail": "43.1"
+ },
+ {
+  "gate": "insight_panels.sections",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "gate": "insight_panels.cls_vocab",
+  "ok": true,
+  "detail": ""
+ },
+ {
   "gate": "wb.total_demand",
   "ok": true,
   "detail": "C4=1420000"
