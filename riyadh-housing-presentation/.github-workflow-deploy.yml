@@ -47,7 +47,7 @@ jobs:
       - name: Unit tests
         working-directory: riyadh-housing-presentation
         run: |
-          if [ -d tests/unit ]; then node --test tests/unit/; fi
+          if [ -d tests/unit ]; then node --test "tests/unit/*.test.mjs"; fi
 
       - name: Build self-contained app
         working-directory: riyadh-housing-presentation

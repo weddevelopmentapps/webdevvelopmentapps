@@ -133,3 +133,8 @@ export const RH = vm.runInContext("RH;", context);
 /* ── الحقيقة المرجعية: نسخة جديدة معزولة عند كل استدعاء ── */
 const releaseText = readFileSync(path.join(ROOT, "data", "release.json"), "utf8");
 export function freshRelease() { return JSON.parse(releaseText); }
+
+/** يطبّع كائن بيانات وُلد داخل سياق vm إلى عالم الاختبار:
+    البروتوتايب مختلف عبر العالمين فيفشل deepStrictEqual رغم تطابق البنية —
+    الاستنساخ البنيوي يعيد البناء بكائنات العالم الحالي دون مساس بالقيم. */
+export const norm = (x) => structuredClone(x);

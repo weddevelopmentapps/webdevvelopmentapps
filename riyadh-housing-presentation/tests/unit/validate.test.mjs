@@ -7,7 +7,7 @@ import assert from "node:assert/strict";
 import { RH, freshRelease } from "./load-app.mjs";
 
 const V = RH.data.validate;
-const blockerIds = (rel) => V.validateRelease(rel).blockers.map((b) => b.id);
+const blockerIds = (rel) => Array.from(V.validateRelease(rel).blockers, (b) => b.id);
 
 test("خط أساس: الإصدار السليم يمر بصفر حواجب", () => {
   assert.deepStrictEqual(blockerIds(freshRelease()), []);

@@ -13,7 +13,7 @@ HTML واحد مكتفٍ بذاته يعمل بالنقر المزدوج ودو�
 | الإدارة | افتح `index.html#/admin` (أول دخول يهيئ عبارة مرور الوضع المحلي) |
 | إعادة توليد البيانات من الورقة | `python3 generate_data.py && python3 build.py` |
 | استيراد ورقة جديدة (المسار الموثوق) | `python3 tools/import_workbook.py <الملف.xlsx>` |
-| الاختبارات | `node --test tests/unit/` · `node tests/e2e/navigation.spec.mjs` · `node tests/e2e/admin.spec.mjs` |
+| الاختبارات | `node --test "tests/unit/*.test.mjs"` · `node tests/e2e/navigation.spec.mjs` · `node tests/e2e/admin.spec.mjs` |
 | النشر المستضاف | انسخ `.github-workflow-deploy.yml` إلى `.github/workflows/` — ينشر `dist/` |
 
 ## مفاتيح العرض (جهاز التقديم)

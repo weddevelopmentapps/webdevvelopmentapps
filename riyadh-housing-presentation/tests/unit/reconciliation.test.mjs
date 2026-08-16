@@ -12,50 +12,50 @@ const sum = (arr, f) => arr.reduce((a, x) => a + f(x), 0);
 
 /* ── مجاميع القطاعات مقابل الإجماليات المعتمدة ── */
 test("مجموع طلب القطاعات = 1,420,000 = إجمالي الطلب", () => {
-  assert.strictEqual(sum(rel.sectors, (s) => s.demand), 1420000);
-  assert.strictEqual(sum(rel.sectors, (s) => s.demand), rel.metrics.total_demand.value);
+  assert.deepStrictEqual(sum(rel.sectors, (s) => s.demand), 1420000);
+  assert.deepStrictEqual(sum(rel.sectors, (s) => s.demand), rel.metrics.total_demand.value);
 });
 
 test("مجموع أسرّة القطاعات = 612,400 = الطاقة المرخصة", () => {
-  assert.strictEqual(sum(rel.sectors, (s) => s.beds), 612400);
-  assert.strictEqual(sum(rel.sectors, (s) => s.beds), rel.metrics.licensed_beds.value);
+  assert.deepStrictEqual(sum(rel.sectors, (s) => s.beds), 612400);
+  assert.deepStrictEqual(sum(rel.sectors, (s) => s.beds), rel.metrics.licensed_beds.value);
 });
 
 test("مجموع زيارات القطاعات = 19,651 = إجمالي الزيارات", () => {
-  assert.strictEqual(sum(rel.sectors, (s) => s.visits), 19651);
-  assert.strictEqual(sum(rel.sectors, (s) => s.visits), rel.metrics.total_visits.value);
+  assert.deepStrictEqual(sum(rel.sectors, (s) => s.visits), 19651);
+  assert.deepStrictEqual(sum(rel.sectors, (s) => s.visits), rel.metrics.total_visits.value);
 });
 
 test("المخالفات 3,617 قطاعياً ونوعياً وشهرياً", () => {
   const total = rel.metrics.total_violations.value;
-  assert.strictEqual(total, 3617);
-  assert.strictEqual(sum(rel.sectors, (s) => s.violations), total, "قطاعياً");
-  assert.strictEqual(sum(rel.violation_types, (t) => t.count), total, "نوعياً");
-  assert.strictEqual(sum(rel.monthly.monitoring, (m) => m.violations), total, "شهرياً");
+  assert.deepStrictEqual(total, 3617);
+  assert.deepStrictEqual(sum(rel.sectors, (s) => s.violations), total, "قطاعياً");
+  assert.deepStrictEqual(sum(rel.violation_types, (t) => t.count), total, "نوعياً");
+  assert.deepStrictEqual(sum(rel.monthly.monitoring, (m) => m.violations), total, "شهرياً");
 });
 
 test("الزيارات الشهرية = الإجمالي، ومخالفات الجنوب متسقة بين المقياس والقطاع", () => {
-  assert.strictEqual(sum(rel.monthly.monitoring, (m) => m.visits),
+  assert.deepStrictEqual(sum(rel.monthly.monitoring, (m) => m.visits),
     rel.metrics.total_visits.value);
-  assert.strictEqual(rel.metrics.south_violations.value,
+  assert.deepStrictEqual(rel.metrics.south_violations.value,
     rel.sectors.find((s) => s.id === "south").violations);
 });
 
 test("مجموع أنواع منشآت الإيواء = 140 = الرخص التشغيلية", () => {
-  assert.strictEqual(sum(rel.facility_types, (t) => t.count), 140);
-  assert.strictEqual(sum(rel.facility_types, (t) => t.count),
+  assert.deepStrictEqual(sum(rel.facility_types, (t) => t.count), 140);
+  assert.deepStrictEqual(sum(rel.facility_types, (t) => t.count),
     rel.metrics.current_operational.value);
 });
 
 /* ── الياقات والأنشطة الاقتصادية = إجمالي الطلب ── */
 test("زرقاء + بيضاء = إجمالي الطلب، ومقاييس الياقات مطابقة", () => {
-  assert.strictEqual(rel.collar.blue + rel.collar.white, rel.metrics.total_demand.value);
-  assert.strictEqual(rel.collar.blue, rel.metrics.blue_collar.value);
-  assert.strictEqual(rel.collar.white, rel.metrics.white_collar.value);
+  assert.deepStrictEqual(rel.collar.blue + rel.collar.white, rel.metrics.total_demand.value);
+  assert.deepStrictEqual(rel.collar.blue, rel.metrics.blue_collar.value);
+  assert.deepStrictEqual(rel.collar.white, rel.metrics.white_collar.value);
 });
 
 test("مجموع الأنشطة الاقتصادية = إجمالي الطلب", () => {
-  assert.strictEqual(sum(rel.economic_activities, (a) => a.demand),
+  assert.deepStrictEqual(sum(rel.economic_activities, (a) => a.demand),
     rel.metrics.total_demand.value);
 });
 
@@ -65,11 +65,11 @@ test("خط الأساس + الإضافات الشهرية = الحالي، وم�
     const cur = key === "beds"
       ? rel.metrics.licensed_beds.value
       : rel.metrics["current_" + key].value;
-    assert.strictEqual(rel.baseline[key], rel.metrics["baseline_" + key].value,
+    assert.deepStrictEqual(rel.baseline[key], rel.metrics["baseline_" + key].value,
       `تطابق خط الأساس (${key})`);
-    assert.strictEqual(rel.baseline[key] + sum(rel.monthly.licensing, (m) => m[key]),
+    assert.deepStrictEqual(rel.baseline[key] + sum(rel.monthly.licensing, (m) => m[key]),
       cur, `السلسلة الشهرية (${key})`);
-    assert.strictEqual(sum(rel.sectors, (s) => s[key]), cur, `القطاعات (${key})`);
+    assert.deepStrictEqual(sum(rel.sectors, (s) => s[key]), cur, `القطاعات (${key})`);
   }
 });
 
@@ -80,14 +80,14 @@ test("المشغول لا يتجاوز الطاقة المرخصة", () => {
 /* ── تتابع الأشهر وترتيب السيناريوهات ── */
 test("الأشهر متتابعة في الرقابة والترخيص والسيناريوهات (12/12/10 نقطة)", () => {
   const consec = RH.data.validate.isConsecutive;
-  assert.strictEqual(rel.monthly.monitoring.length, 12);
-  assert.strictEqual(rel.monthly.licensing.length, 12);
+  assert.deepStrictEqual(rel.monthly.monitoring.length, 12);
+  assert.deepStrictEqual(rel.monthly.licensing.length, 12);
   assert.ok(consec(rel.monthly.monitoring.map((r) => r.iso)));
   assert.ok(consec(rel.monthly.licensing.map((r) => r.iso)));
   assert.ok(consec(rel.scenarios.rows.map((r) => r.iso)));
   // سلامة الفاحص نفسه: عبور السنة صحيح والفجوة مكشوفة
   assert.ok(consec(["2025-12", "2026-01"]));
-  assert.strictEqual(consec(["2025-12", "2026-02"]), false);
+  assert.deepStrictEqual(consec(["2025-12", "2026-02"]), false);
 });
 
 test("سيناريوهات العجز: متحفظ ≥ أساسي ≥ متفائل في كل شهر", () => {
@@ -110,13 +110,13 @@ test("عينة الأحياء ≤ إجماليات قطاعها في المقا�
 
 test("أسماء الأحياء فريدة في العينة", () => {
   const names = rel.neighbourhoods.rows.map((n) => n.name);
-  assert.strictEqual(new Set(names).size, names.length);
+  assert.deepStrictEqual(new Set(names).size, names.length);
 });
 
 /* ── البوابة الجامعة: الإصدار المنشور يمر بصفر حواجب ── */
 test("validateRelease على الإصدار المنشور: صفر بوابات حاجبة", () => {
   const res = RH.data.validate.validateRelease(freshRelease());
-  assert.deepStrictEqual(res.blockers.map((b) => b.id), [],
+  assert.deepStrictEqual(Array.from(res.blockers, (b) => b.id), [],
     "لا يجوز وجود أي بوابة حاجبة فاشلة على الإصدار المنشور");
   for (const gate of res.gates.filter((g) => g.level === "block")) {
     assert.ok(gate.ok, `بوابة حاجبة فاشلة: ${gate.id}`);
