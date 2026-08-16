@@ -101,13 +101,25 @@ RH.admin.editors = (function () {
       const ta = h("textarea", {
         oninput: (e) => { ins.text = e.target.value.trim(); },
       }, ins.text);
+      const statusEl = h("span", { class: "st " + (ins.status === "needs_review" ? "warn" : "ok") },
+        ins.status === "needs_review" ? "يحتاج إعادة اعتماد بعد تغير البيانات"
+          : ins.status === "approved_brief" ? "معتمد من التكليف" : "معتمد");
       card.appendChild(h("div", { style: { marginBottom: "18px" } },
-        h("div", { style: { display: "flex", justifyContent: "space-between", marginBottom: "6px" } },
+        h("div", { style: { display: "flex", justifyContent: "space-between", marginBottom: "6px", alignItems: "center", gap: "10px" } },
           h("label", { style: { fontWeight: 700, fontSize: "12.5px" } }, SCENES[key] || key),
-          h("span", { class: "st " + (ins.status === "approved_brief" ? "ok" : "warn") },
-            ins.status === "approved_brief" ? "معتمد من التكليف" : ins.status)),
+          h("span", { style: { display: "flex", gap: "10px", alignItems: "center" } },
+            statusEl,
+            ins.status === "needs_review"
+              ? h("button", { class: "btn btn-line", onclick: () => {
+                ins.status = "approved";
+                RH.admin.shell.toast("اعتُمد نص التحليل بعد المراجعة");
+                insights(container, draft, save);
+              } }, "روجع — اعتماد")
+              : null),
+        ),
         ta,
-        h("div", { class: "hint" }, "المقاييس المرتبطة: " + ins.metric_ids.join("، ")),
+        h("div", { class: "hint" }, "المقاييس المرتبطة: " + ins.metric_ids.join("، ")
+          + " — أرقام النص تُفحص ضد بيانات الإصدار ببوابة حاجبة عند النشر"),
       ));
     }
     card.appendChild(h("button", { class: "btn btn-primary", onclick: save }, "حفظ المسودة"));
@@ -383,11 +395,16 @@ RH.admin.editors = (function () {
         h("div", { style: { maxHeight: "320px", overflowY: "auto" } }, table),
         h("div", { style: { marginTop: "14px", display: "flex", gap: "10px" } },
           h("button", { class: "btn btn-primary", onclick: async () => {
-            RH.data.importXlsx.applyToDraft(draft, res.extracted, {
-              name: file.name, size: file.size, sha256: null,
-            });
+            try {
+              RH.data.importXlsx.applyToDraft(draft, res.extracted, {
+                name: file.name, size: file.size, sha256: null,
+              });
+            } catch (ex) {
+              RH.admin.shell.toast(ex.message || "رُفض تطبيق الاستيراد");
+              return;
+            }
             await save();
-            RH.admin.shell.toast("طُبّق الاستيراد على المسودة — راجع فحوص الجودة ثم انشر");
+            RH.admin.shell.toast("طُبّق الاستيراد على المسودة — وُسمت نصوص التحليلات لإعادة الاعتماد؛ راجع فحوص الجودة ثم انشر");
           } }, "تطبيق على المسودة"),
           h("span", { class: "hint", style: { alignSelf: "center" } },
             "الملف الأصلي لا يُخزن في المتصفح ولا يُنشر — يُحفظ في المسار الخاص فقط"),

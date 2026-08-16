@@ -152,10 +152,12 @@ RH.viz.rings = (function () {
     root.appendChild(svg("circle", {
       cx: cx + r * Math.cos(tAng), cy: cy + r * Math.sin(tAng), r: 7, fill: "#D6AB4C",
     }));
+    const fmtVal = (v) => !Number.isFinite(v) ? "—"
+      : (Number.isInteger(v) ? fmt.int(v) : fmt.dec1(v));
     root.appendChild(svg("text", {
       x: cx, y: cy - 34, "text-anchor": "middle", fill: "#F4F1E6",
       "font-family": "IBM Plex Sans Arabic", "font-weight": 300, "font-size": 58,
-    }, kpi.current_value == null ? "—" : String(kpi.current_value)));
+    }, fmtVal(kpi.current_value)));
     root.appendChild(svg("text", {
       x: cx, y: cy + 2, "text-anchor": "middle", fill: "#93A096",
       "font-family": "Cairo", "font-size": 18,
@@ -167,10 +169,10 @@ RH.viz.rings = (function () {
     const variance = RH.data.derive.kpiVariance(kpi);
     const dirLabel = kpi.direction === "lower_better" ? "الانخفاض أفضل" : "الارتفاع أفضل";
     wrap.appendChild(h("div", { class: "kpi-meta" },
-      h("span", {}, "خط الأساس: ", h("b", {}, kpi.baseline == null ? "—" : String(kpi.baseline))),
-      h("span", {}, "المستهدف: ", h("b", {}, kpi.target == null ? "—" : String(kpi.target))),
+      h("span", {}, "خط الأساس: ", h("b", {}, fmtVal(kpi.baseline))),
+      h("span", {}, "المستهدف: ", h("b", {}, fmtVal(kpi.target))),
       h("span", {}, "الفجوة عن المستهدف: ",
-        h("b", {}, variance ? String(Math.abs(variance.gap)) : "—")),
+        h("b", {}, variance ? fmtVal(Math.abs(variance.gap)) : "—")),
       h("span", {}, "اتجاه التحسن: ", h("b", {}, dirLabel)),
       h("span", {}, "تاريخ القياس: ", h("b", {}, kpi.as_of ? fmt.date(kpi.as_of) : "—")),
     ));

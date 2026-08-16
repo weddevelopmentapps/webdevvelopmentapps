@@ -358,13 +358,12 @@ def derive():
     d["sector_derived"] = sectors
 
     # الترتيب على الخام دائماً (بوابة القسم 15)
-    by_cov = sorted(SECTOR_ORDER, key=lambda s: sectors[s]["coverage_raw"])
-    by_demand = sorted(SECTOR_ORDER, key=lambda s: SECTOR_DEMAND[s], reverse=True)
-    by_viol = sorted(SECTOR_ORDER, key=lambda s: SECTOR_MONITORING[s][1], reverse=True)
+    # كسر التعادل الموحد مع المتصفح: max/min تعيدان أول الأقصى/الأدنى بترتيب القطاعات
     d["rankings"] = {
-        "lowest_coverage": by_cov[0], "highest_coverage": by_cov[-1],
-        "highest_demand": by_demand[0],
-        "highest_violations": by_viol[0],
+        "lowest_coverage": min(SECTOR_ORDER, key=lambda s: sectors[s]["coverage_raw"]),
+        "highest_coverage": max(SECTOR_ORDER, key=lambda s: sectors[s]["coverage_raw"]),
+        "highest_demand": max(SECTOR_ORDER, key=lambda s: SECTOR_DEMAND[s]),
+        "highest_violations": max(SECTOR_ORDER, key=lambda s: SECTOR_MONITORING[s][1]),
         "highest_building": max(SECTOR_ORDER, key=lambda s: SECTOR_LICENSING[s][0]),
         "lowest_building": min(SECTOR_ORDER, key=lambda s: SECTOR_LICENSING[s][0]),
         "highest_operational": max(SECTOR_ORDER, key=lambda s: SECTOR_LICENSING[s][1]),

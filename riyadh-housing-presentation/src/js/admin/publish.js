@@ -33,7 +33,7 @@ RH.admin.publish = (function () {
         disabled: blocked || !RH.admin.auth.can.publish(session) ? "" : null,
       }, "نشر إصدار غير قابل للتغيير");
       btn.addEventListener("click", async () => {
-        if (!confirm("سيُنشأ إصدار منشور جديد يقرؤه المقدِّم فوراً. هل تريد المتابعة؟")) return;
+        if (!confirm("سيُنشر إصدار جديد يقرؤه المقدِّم فوراً. هل تريد المتابعة؟")) return;
         try {
           draft.release.notes = notes.value.trim();
           const rel = await RH.data.store.publish(draft, session.name, waivers);
@@ -96,7 +96,7 @@ RH.admin.publish = (function () {
               r.release.sha256.slice(0, 12) + "…") : null),
         !isCurrent && RH.admin.auth.can.publish(session)
           ? h("button", { class: "btn btn-line", onclick: async () => {
-            if (!confirm("سيُنشأ مسودة من هذا الإصدار للتراجع إليه عبر النشر. متابعة؟")) return;
+            if (!confirm("ستُنشأ مسودة من هذا الإصدار للتراجع إليه عبر النشر. هل تريد المتابعة؟")) return;
             await RH.data.store.rollback(r.release.id, session.name);
             RH.admin.shell.toast("أُنشئت مسودة تراجع — راجع الفحوص ثم انشر");
             onRollback();

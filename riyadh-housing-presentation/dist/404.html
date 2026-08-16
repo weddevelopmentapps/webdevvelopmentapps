@@ -89,11 +89,14 @@
    لغتان مقصودتان: مسرح المقدِّم «مجلس منتصف الليل» (داكن سينمائي)،
    والإدارة «حكومي تحريري» (ورقي فاتح). التباين بينهما جزء من حدود الأدوار.
 
-   انضباط اللون (غير قابل للتفاوض):
-     الأخضر  = الطاقة المرخصة وما نتحكم به (سلسلة البيانات الأولى)
-     العاجي  = الطلب والسلاسل المرجعية المحايدة
-     المرجاني = العجز وحالات الخلل حصراً
-     الذهبي  = المستهدفات وخط الأساس حصراً — لا زخرفة به أبداً
+   انضباط اللون (غير قابل للتفاوض) — دوران منفصلان:
+     داخل الرسوم والخرائط (علامات البيانات):
+       الأخضر  = الطاقة المرخصة وما نتحكم به · الرملي النحاسي = الطلب
+       المرجاني = العجز وحالات الخلل حصراً · الذهبي = المستهدف/خط الأساس حصراً
+       الأزرق  = فئة تصنيفية ثانوية (الياقات الزرقاء، أنواع الإيواء) — لا كمّي أبداً
+     في كروم الواجهة (خارج الرسوم):
+       الذهبي لكنة تحريرية مقننة: السؤال التنفيذي، أرقام المحاور، موضع التقدم،
+       حلقة التركيز، ووسوم «بانتظار الاعتماد» — ولا يلوّن قيمة بيانات إطلاقاً
    ════════════════════════════════════════════════════════════════════════════ */
 
 :root {
@@ -116,7 +119,7 @@
   --green: #31A26D;            /* الطاقة المرخصة / الفعل */
   --green-hi: #4CC18C;         /* درجة مضيئة للتأكيد على الداكن */
   --green-dim: #23594397;      /* مساحات خضراء خافتة */
-  --demand: #AA8A3E;           /* سلسلة الطلب (عاجي محايد) */
+  --demand: #AA8A3E;           /* سلسلة الطلب (رملي نحاسي صحراوي) */
   --coral: #D66A50;            /* العجز / الخلل حصراً */
   --coral-dim: #7A3A2D;
   --gold: #D6AB4C;             /* المستهدف / خط الأساس حصراً */
@@ -281,10 +284,10 @@ body.mode-admin :focus-visible { outline-color: var(--accent); }
 /* مؤشر الإصدار/الاتصال الرصين */
 .release-badge {
   position: fixed;
-  bottom: 14px;
-  inset-inline-start: 16px;
+  bottom: calc(var(--su) * 14);
+  inset-inline-end: calc(var(--su) * 16);   /* الطرف الأيسر في RTL — بعيداً عن زر المحاور */
   z-index: 60;
-  font-size: 11.5px;
+  font-size: max(10px, calc(var(--su) * 12));
   color: var(--faint-d);
   letter-spacing: 0.2px;
   pointer-events: none;
@@ -383,6 +386,7 @@ body.mode-admin :focus-visible { outline-color: var(--accent); }
   margin-bottom: calc(var(--su) * 14);
 }
 .sc-headline {
+  text-wrap: balance;
   font-family: var(--f-display);
   font-size: calc(var(--su) * 54);
   line-height: 1.35;
@@ -500,8 +504,8 @@ body.mode-admin :focus-visible { outline-color: var(--accent); }
   z-index: 50;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  font-size: 14px;
+  gap: calc(var(--su) * 8);
+  font-size: max(12px, calc(var(--su) * 14.5));
   font-weight: 600;
   color: var(--mut-d);
   background: rgba(8, 16, 9, 0.55);
@@ -509,7 +513,7 @@ body.mode-admin :focus-visible { outline-color: var(--accent); }
   -webkit-backdrop-filter: blur(14px);
   border: 1px solid var(--hair-d2);
   border-radius: 999px;
-  padding: 9px 18px;
+  padding: calc(var(--su) * 9) calc(var(--su) * 18);
   opacity: 1;
   transition: opacity var(--dur-std) var(--ease), color var(--dur-micro);
 }
@@ -520,8 +524,8 @@ body.mode-admin :focus-visible { outline-color: var(--accent); }
   top: auto;
   bottom: calc(var(--su) * 24);
   right: calc(var(--su) * 30);
-  font-size: 12.5px;
-  padding: 7px 15px;
+  font-size: max(11px, calc(var(--su) * 13));
+  padding: calc(var(--su) * 7) calc(var(--su) * 15);
 }
 .hud-progress {
   position: fixed;
@@ -774,7 +778,7 @@ body.transitioning .stage { pointer-events: none; }
 /* ═══ مقياس التغطية العلائقي (المشهد 03) — بديل العدادات الدائرية ═══ */
 .coverage-meter { position: relative; }
 .coverage-meter .track {
-  height: calc(var(--su) * 96);
+  height: calc(var(--su) * 116);
   border-radius: calc(var(--su) * 18);
   background: var(--coral-dim);
   position: relative;
@@ -837,14 +841,14 @@ body.transitioning .stage { pointer-events: none; }
 .sector-map .slabel .svalue { font-weight: 300; }
 .sector-map .wadi { fill: none; stroke: var(--hair-d); stroke-width: 2; stroke-dasharray: 3 7; }
 .map-disclaimer {
-  font-size: calc(var(--su) * 13.5);
-  color: var(--faint-d);
+  font-size: calc(var(--su) * 15);
+  color: var(--mut-d);
 }
 .map-legend {
   display: flex;
   align-items: center;
   gap: calc(var(--su) * 10);
-  font-size: calc(var(--su) * 14.5);
+  font-size: calc(var(--su) * 16.5);
   color: var(--mut-d);
 }
 .map-legend .ramp {
@@ -942,12 +946,13 @@ body.transitioning .stage { pointer-events: none; }
   color: var(--ink2-d);
 }
 .badge-pending {
-  font-size: calc(var(--su) * 12.5);
-  font-weight: 600;
-  color: var(--gold);
-  border: 1px solid rgba(201, 162, 75, 0.4);
+  display: inline-block;
+  font-size: calc(var(--su) * 15);
+  font-weight: 700;
+  color: var(--gold-hi);
+  border: 1px solid rgba(214, 171, 76, 0.55);
   border-radius: 999px;
-  padding: calc(var(--su) * 3) calc(var(--su) * 12);
+  padding: calc(var(--su) * 4) calc(var(--su) * 14);
   vertical-align: middle;
 }
 
@@ -1123,6 +1128,27 @@ body.transitioning .stage { pointer-events: none; }
   padding-top: calc(var(--su) * 12);
 }
 .kpi-card .kpi-meta b { color: var(--ink2-d); font-weight: 600; }
+
+/* إشارة نقر ساكنة رصينة للوحات القابلة للنقر (بوابات ومحاور) */
+.agenda-panel::before, .hub-panel::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: calc(var(--su) * 40);
+  bottom: calc(var(--su) * 34);
+  width: calc(var(--su) * 30);
+  height: calc(var(--su) * 30);
+  border-radius: 50%;
+  border: 1px solid var(--hair-d);
+  background:
+    no-repeat center / 55% url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2393A096' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 6l-6 6 6 6'/%3E%3C/svg%3E");
+  opacity: 0.85;
+  transition: border-color var(--dur-micro), opacity var(--dur-micro);
+}
+.agenda-panel:hover::before, .agenda-panel:focus-visible::before,
+.hub-panel:hover::before, .hub-panel:focus-visible::before {
+  border-color: var(--gold);
+  opacity: 1;
+}
 
 /* ════════════════════════════════════════════════════════════════════════════
    appendix.css — الملاحق: صفحات فرعية بحجم الإطار مع عودة سياقية دقيقة
@@ -1823,20 +1849,21 @@ RH.core.fmt = (function () {
     if (n === 1) return forms.one;
     if (n === 2) return forms.two;
     const tail = n % 100;
+    if (tail === 0) return int(n) + NBSP + (forms.hundred || forms.many); // مضاعفات المئة: مفرد مجرور
     if (tail >= 3 && tail <= 10) return int(n) + NBSP + forms.few;
     return int(n) + NBSP + forms.many;
   }
 
   const NOUNS = {
-    bed: { one: "سرير واحد", two: "سريران", few: "أسرّة", many: "سريراً", zero: "لا أسرّة" },
-    licence: { one: "رخصة واحدة", two: "رخصتان", few: "رخص", many: "رخصة" },
-    visit: { one: "زيارة واحدة", two: "زيارتان", few: "زيارات", many: "زيارة" },
-    violation: { one: "مخالفة واحدة", two: "مخالفتان", few: "مخالفات", many: "مخالفة" },
-    monitor: { one: "مراقب واحد", two: "مراقبان", few: "مراقبين", many: "مراقباً" },
-    decision: { one: "قرار واحد", two: "قراران", few: "قرارات", many: "قراراً" },
-    initiative: { one: "مبادرة واحدة", two: "مبادرتان", few: "مبادرات", many: "مبادرة" },
-    pillar: { one: "ركيزة واحدة", two: "ركيزتان", few: "ركائز", many: "ركيزة" },
-    indicator: { one: "مؤشر واحد", two: "مؤشران", few: "مؤشرات", many: "مؤشراً" },
+    bed: { one: "سرير واحد", two: "سريران", few: "أسرّة", many: "سريراً", hundred: "سرير", zero: "لا أسرّة" },
+    licence: { one: "رخصة واحدة", two: "رخصتان", few: "رخص", many: "رخصة", hundred: "رخصة" },
+    visit: { one: "زيارة واحدة", two: "زيارتان", few: "زيارات", many: "زيارة", hundred: "زيارة" },
+    violation: { one: "مخالفة واحدة", two: "مخالفتان", few: "مخالفات", many: "مخالفة", hundred: "مخالفة" },
+    monitor: { one: "مراقب واحد", two: "مراقبان", few: "مراقبين", many: "مراقباً", hundred: "مراقب" },
+    decision: { one: "قرار واحد", two: "قراران", few: "قرارات", many: "قراراً", hundred: "قرار" },
+    initiative: { one: "مبادرة واحدة", two: "مبادرتان", few: "مبادرات", many: "مبادرة", hundred: "مبادرة" },
+    pillar: { one: "ركيزة واحدة", two: "ركيزتان", few: "ركائز", many: "ركيزة", hundred: "ركيزة" },
+    indicator: { one: "مؤشر واحد", two: "مؤشران", few: "مؤشرات", many: "مؤشراً", hundred: "مؤشر" },
   };
   function noun(n, key) { return countNoun(n, NOUNS[key]); }
 
@@ -1951,8 +1978,14 @@ RH.data.derive = (function () {
       };
     }
 
-    const byRaw = (arr, keyFn, desc) =>
-      arr.slice().sort((a, b) => (desc ? keyFn(b) - keyFn(a) : keyFn(a) - keyFn(b)))[0].id;
+    // قاعدة كسر التعادل الموحدة (مرآة بايثون max/min): أول الأقصى/الأدنى بترتيب القطاعات
+    const byRaw = (arr, keyFn, desc) => {
+      let best = arr[0];
+      for (const s of arr) {
+        if (desc ? keyFn(s) > keyFn(best) : keyFn(s) < keyFn(best)) best = s;
+      }
+      return best.id;
+    };
     const S = release.sectors;
     d.rankings = {
       lowest_coverage: byRaw(S, (s) => d.sector[s.id].coverage_raw, false),
@@ -2020,7 +2053,7 @@ RH.data.derive = (function () {
 
   /** فجوة مؤشر عن مستهدفه وفق اتجاه التحسن (أعلى/أدنى أفضل) */
   function kpiVariance(kpi) {
-    if (kpi.current_value == null || kpi.target == null) return null;
+    if (!Number.isFinite(kpi.current_value) || !Number.isFinite(kpi.target)) return null;
     const diff = kpi.direction === "lower_better"
       ? kpi.target - kpi.current_value
       : kpi.current_value - kpi.target;
@@ -2050,7 +2083,8 @@ RH.data.validate = (function () {
       const der = D.compute(rel);
       const sum = (arr, f) => arr.reduce((a, x) => a + f(x), 0);
 
-      g("demand.sectors", "block", sum(rel.sectors, (s) => s.demand) === 1_420_000,
+      g("demand.sectors", "block",
+        sum(rel.sectors, (s) => s.demand) === rel.metrics.total_demand.value,
         "مجموع طلب القطاعات = إجمالي الطلب");
       g("beds.sectors", "block", sum(rel.sectors, (s) => s.beds) === rel.metrics.licensed_beds.value,
         "مجموع أسرّة القطاعات = الطاقة المرخصة");
@@ -2087,6 +2121,34 @@ RH.data.validate = (function () {
           sum(rel.sectors, (s) => s[key]) === cur, `مجموع القطاعات = الحالي (${key})`);
       }
 
+      g("monitoring.monitors_sum", "block",
+        sum(rel.sectors, (s) => s.monitors) === rel.metrics.total_monitors.value,
+        "مجموع مراقبي القطاعات = الإجمالي");
+      g("monitoring.closures_sum", "block",
+        sum(rel.sectors, (s) => s.closures) === rel.metrics.total_closures.value,
+        "مجموع قرارات إغلاق القطاعات = الإجمالي");
+      g("monitoring.south_metric", "block",
+        rel.metrics.south_violations.value
+          === rel.sectors.find((s) => s.id === "south").violations,
+        "مقياس مخالفات الجنوب يطابق سجل القطاع");
+      g("series.lengths", "block",
+        rel.monthly.licensing.length === 12 && rel.monthly.monitoring.length === 12
+        && rel.scenarios.rows.length === 10,
+        "أطوال السلاسل: 12 شهر ترخيص ورقابة، 10 أشهر سيناريوهات");
+      const allCounts = []
+        .concat(rel.sectors.flatMap((s) =>
+          [s.demand, s.building, s.operational, s.beds, s.monitors, s.violations, s.visits, s.closures]))
+        .concat(rel.violation_types.map((t) => t.count))
+        .concat(rel.facility_types.map((t) => t.count))
+        .concat(rel.economic_activities.map((a) => a.demand))
+        .concat(rel.monthly.licensing.flatMap((m) => [m.building, m.operational, m.beds]))
+        .concat(rel.monthly.monitoring.flatMap((m) => [m.visits, m.violations]))
+        .concat(rel.scenarios.rows.flatMap((r) => [r.conservative, r.base, r.optimistic]))
+        .concat(rel.neighbourhoods.rows.flatMap((n) => [n.building, n.operational, n.beds, n.violations]));
+      g("counts.nonnegative_integers", "block",
+        allCounts.every((x) => Number.isInteger(x) && x >= 0),
+        "كل الأعداد صحيحة غير سالبة");
+
       g("occupancy.bound", "block",
         rel.metrics.occupied_beds.value <= rel.metrics.licensed_beds.value,
         "المشغول لا يتجاوز الطاقة");
@@ -2116,16 +2178,17 @@ RH.data.validate = (function () {
       const st = rel.strategy;
       if (st.status === "approved") {
         g("strategy.pillars7", "block",
-          st.pillars.length === st.required_pillars,
-          `عدد الركائز المعتمدة = ${st.required_pillars}`,
+          st.pillars.length === 7 && st.required_pillars === 7,
+          "عدد الركائز المعتمدة = 7 (ثابت التكليف)",
           `الموجود: ${st.pillars.length}`);
         g("strategy.membership", "block",
           st.initiatives.every((i) => st.pillars.some((p) => p.id === i.pillar_id)),
           "كل مبادرة منشورة تنتمي لركيزة معتمدة");
-        const missingKpi = st.kpis.filter((k) => k.priority && k.current_value == null && !k.waiver);
-        g("kpi.priority_values", "block", missingKpi.length === 0,
-          "لكل مؤشر أولوية قيمة حالية أو تنازل موقَّع",
-          missingKpi.length ? "مؤشرات ناقصة: " + missingKpi.map((k) => k.name).join("، ") : "");
+        // إنذار يتطلب تنازلاً موقَّعاً عبر سجل النشر (لا حقل بيانات قابلاً للدسّ)
+        const missingKpi = st.kpis.filter((k) => k.priority && k.current_value == null);
+        g("kpi.priority_values", "warn", missingKpi.length === 0,
+          "لكل مؤشر أولوية قيمة حالية (وإلا فتنازل موقَّع مسجَّل عند النشر)",
+          missingKpi.length ? "مؤشرات بلا قيمة: " + missingKpi.map((k) => k.name).join("، ") : "");
         g("kpi.sources", "block",
           st.kpis.every((k) => k.source && k.as_of),
           "لكل مؤشر منشور مصدر وتاريخ قياس");
@@ -2134,6 +2197,22 @@ RH.data.validate = (function () {
           "وحدة المبادرات/المؤشرات بانتظار المصدر المعتمد",
           "المطلوب: " + (st.source_required || "خطة عمل المشروع V.1.0.0")
           + " — مشاهد الاستراتيجية تعرض حالة الاعتماد الشريفة، والنشر الكامل محجوب.");
+      }
+
+      // أرقام نصوص التحليلات المعتمدة يجب أن تطابق حقائق الإصدار الحالي —
+      // تلتقط عناوين قديمة بعد أي استيراد ببيانات جديدة (بوابة حاجبة)
+      const truthPool = buildTruthPool(rel, der);
+      for (const [key, ins] of Object.entries(rel.insights || {})) {
+        const tokens = (ins.text.match(/[0-9][0-9,\.]*/g) || [])
+          .map((t) => t.replace(/,/g, "").replace(/\.$/, ""));
+        const stale = tokens.filter((t) => !truthPool.has(t));
+        g("insight.figures." + key, "block", stale.length === 0,
+          "أرقام التحليل المعتمد (" + key + ") تطابق بيانات الإصدار",
+          stale.length ? "أرقام لا تطابق أي حقيقة حالية: " + stale.join("، ") : "");
+        if (ins.status === "needs_review") {
+          g("insight.review." + key, "warn", false,
+            "نص التحليل (" + key + ") يحتاج إعادة اعتماد بعد تغير البيانات");
+        }
       }
 
       const ns = rel.next_steps;
@@ -2155,11 +2234,26 @@ RH.data.validate = (function () {
           "تاريخ العرض التقديمي يحتاج تأكيداً من الإدارة قبل يوم العرض");
       }
 
-      g("derived.consistency", "block",
-        der.coverage_pct === rel.derived.coverage_pct.value
-        && der.occupancy_pct === rel.derived.occupancy_pct.value
-        && der.vacant_beds === rel.derived.vacant_beds.value,
-        "إعادة حساب المتصفح تطابق مشتقات الإصدار المنشور");
+      const scalarIds = ["deficit_beds", "coverage_pct", "uncovered_pct", "occupancy_pct",
+        "vacant_beds", "blue_share_pct", "white_share_pct", "growth_building_abs",
+        "growth_building_pct", "growth_operational_abs", "growth_operational_pct",
+        "growth_beds_abs", "growth_beds_pct", "avg_monthly_visits",
+        "south_violations_share_pct"];
+      const scalarOk = scalarIds.every((id) =>
+        !rel.derived[id] || der[id] === rel.derived[id].value);
+      const sectorOk = rel.derived.sector_derived
+        ? rel.sectors.every((s) => {
+          const a = der.sector[s.id], b = rel.derived.sector_derived[s.id];
+          return b == null || (a.coverage_pct === b.coverage_pct
+            && a.deficit_beds === b.deficit_beds
+            && a.violations_share_pct === b.violations_share_pct
+            && a.demand_share_pct === b.demand_share_pct);
+        }) : true;
+      const rankOk = rel.derived.rankings
+        ? Object.entries(rel.derived.rankings)
+          .every(([k, v]) => der.rankings[k] === v) : true;
+      g("derived.consistency", "block", scalarOk && sectorOk && rankOk,
+        "إعادة حساب المتصفح تطابق كامل مشتقات الإصدار المنشور (قيم وقطاعات وترتيبات)");
     } catch (e) {
       gates.push({ id: "validate.crash", level: "block", ok: false,
         label: "تعذر إكمال الفحص", detail: String(e && e.message || e) });
@@ -2170,6 +2264,34 @@ RH.data.validate = (function () {
       blockers: gates.filter((x) => x.level === "block" && !x.ok),
       warnings: gates.filter((x) => x.level === "warn" && !x.ok),
     };
+  }
+
+  /** بركة الحقيقة: كل صيغة عرض شرعية لكل قيمة في الإصدار (خام، مختصرة، نسب، آلاف) */
+  function buildTruthPool(rel, der) {
+    const pool = new Set();
+    const add = (v) => {
+      if (v == null || !Number.isFinite(v)) return;
+      pool.add(String(v));
+      pool.add(v.toFixed(1));                                     // 50 → "50.0" أيضاً
+      if (Number.isInteger(v)) {
+        if (v % 1000 === 0) pool.add(String(v / 1000));           // 368000 → 368 (ألف)
+        if (v >= 10_000) pool.add(String(Math.round(v / 100) / 10));  // 612400 → 612.4
+        if (v >= 1_000_000) pool.add(String(Math.round(v / 10_000) / 100)); // 1.42
+      }
+    };
+    for (let y = 2020; y <= 2035; y++) pool.add(String(y));       // سنوات مشروعة في النصوص
+    for (const m of Object.values(rel.metrics)) add(m.value);
+    for (const id of Object.keys(der)) {
+      if (typeof der[id] === "number") add(der[id]);
+    }
+    for (const s of rel.sectors) {
+      [s.demand, s.building, s.operational, s.beds, s.monitors, s.violations,
+        s.visits, s.closures].forEach(add);
+      const sd = der.sector[s.id];
+      [sd.coverage_pct, sd.deficit_beds, sd.violations_share_pct, sd.demand_share_pct].forEach(add);
+    }
+    if (rel.compliance) add(rel.compliance.value);
+    return pool;
   }
 
   function isConsecutive(isos) {
@@ -2324,10 +2446,15 @@ RH.data.store = (function () {
     if (previewMode && db) {
       const d = await idbGet("kv", "draft");
       if (d) {
-        currentRelease = d;
-        derived = RH.data.derive.compute(currentRelease);
-        mode = "preview-draft";
-        return currentRelease;
+        try {
+          derived = RH.data.derive.compute(d);
+          currentRelease = d;
+          mode = "preview-draft";
+          return currentRelease;
+        } catch (e) {
+          // مسودة غير قابلة للاشتقاق: نسقط للإصدار المنشور بدل شاشة فارغة
+          console.warn("تعذر اشتقاق المسودة للمعاينة:", e.message);
+        }
       }
     }
     if (db) {
@@ -2348,7 +2475,11 @@ RH.data.store = (function () {
         await tx("releases", true, (s) => s.put(embedded)).catch(() => {});
       }
     }
-    derived = RH.data.derive.compute(currentRelease);
+    try {
+      derived = RH.data.derive.compute(currentRelease);
+    } catch (e) {
+      throw new Error("تعذر اشتقاق قيم الإصدار — " + (e.message || e));
+    }
     return currentRelease;
   }
 
@@ -2515,14 +2646,30 @@ RH.data.importXlsx = (function () {
   const M = () => window.WORKBOOK_MANIFEST;
 
   // ── طبقة ZIP ──
+  const MAX_INFLATED = 40 * 1024 * 1024; // حارس قنبلة فك الضغط لكل مدخل
+
   async function inflateRaw(bytes) {
     if (typeof DecompressionStream === "undefined") {
       throw new Error("متصفحك لا يدعم فك الضغط المدمج (DecompressionStream) — استخدم Chrome أو Edge أو Safari حديثاً");
     }
     const ds = new DecompressionStream("deflate-raw");
-    const stream = new Blob([bytes]).stream().pipeThrough(ds);
-    const buf = await new Response(stream).arrayBuffer();
-    return new Uint8Array(buf);
+    const reader = new Blob([bytes]).stream().pipeThrough(ds).getReader();
+    const chunks = [];
+    let total = 0;
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      total += value.byteLength;
+      if (total > MAX_INFLATED) {
+        reader.cancel();
+        throw new Error("رُفض: حجم غير مضغوط مفرط داخل الأرشيف (حارس قنابل الضغط)");
+      }
+      chunks.push(value);
+    }
+    const out = new Uint8Array(total);
+    let o = 0;
+    for (const c of chunks) { out.set(c, o); o += c.byteLength; }
+    return out;
   }
 
   async function readZip(buffer) {
@@ -2633,7 +2780,7 @@ RH.data.importXlsx = (function () {
       return null;
     }
     if (!Number.isInteger(n)) {
-      errors.push(`قيمة غير صحيحة العدد في ${sheet}!${addr}: ${cell.v}`);
+      errors.push(`القيمة في ${sheet}!${addr} ليست عدداً صحيحاً: ${cell.v}`);
       return null;
     }
     if (n < 0) {
@@ -2647,6 +2794,12 @@ RH.data.importXlsx = (function () {
   async function importFile(file) {
     const errors = [];
     const warnings = [];
+    // فحص الحجم والامتداد قبل أي تحليل (أرخص حارس أولاً)
+    if (file.size > M().limits.max_bytes) {
+      return { ok: false, warnings,
+        errors: [`حجم الملف يتجاوز الحد (${Math.round(M().limits.max_bytes / 1e6)} م.ب)`],
+        extracted: null };
+    }
     let zip;
     try {
       zip = await readZip(await file.arrayBuffer());
@@ -2870,8 +3023,11 @@ RH.data.importXlsx = (function () {
     return { rows, changed: rows.filter((r) => r.changed).length };
   }
 
-  /** تطبيق المستخرج على مسودة (لا يمس الوحدات المملوكة لمصادر أخرى) */
-  function applyToDraft(draft, X, fileMeta) {
+  /** تطبيق المستخرج على مسودة (لا يمس الوحدات المملوكة لمصادر أخرى).
+      يعمل على نسخة عميقة ويتحقق قبل الاستبدال — فشل الاشتقاق/الفحص لا يترك
+      مسودة نصف-محوّرة أبداً. */
+  function applyToDraft(target, X, fileMeta) {
+    const draft = JSON.parse(JSON.stringify(target));
     const S_ORDER = ["north", "east", "center", "west", "south"];
     draft.metrics.total_demand.value = X.total_demand;
     draft.metrics.occupied_beds.value = X.occupied_beds;
@@ -2914,6 +3070,7 @@ RH.data.importXlsx = (function () {
     if (draft.compliance) draft.compliance.value = X.compliance;
     draft.meta.data_as_of = X.data_as_of || draft.meta.data_as_of;
     draft.meta.calculation_date = X.calculation_date || draft.meta.calculation_date;
+    // فشل الاشتقاق هنا (مثل طلب قطاع صفري) يُرمى قبل أي مساس بالمسودة الأصلية
     // إعادة توليد المشتقات المخزنة من الخام الجديد (تبقى مرآة derive.js)
     const der = RH.data.derive.compute(draft);
     for (const [k, v] of Object.entries(der)) {
@@ -2928,6 +3085,10 @@ RH.data.importXlsx = (function () {
         visits_share_pct: sv.visits_share_pct, demand_share_pct: sv.demand_share_pct,
       }])) : draft.derived.sector_derived;
     draft.derived.rankings = der.rankings;
+    // نصوص التحليلات المعتمدة لم يمسها الاستيراد — تُوسم لإعادة الاعتماد
+    for (const ins of Object.values(draft.insights || {})) {
+      ins.status = "needs_review";
+    }
     // سجل المصدر الجديد — الملف الأصلي يبقى خاصاً (لا يُضمَّن في الإصدار)
     draft.sources = [{
       id: "src-workbook-" + Date.now().toString(36),
@@ -2938,7 +3099,18 @@ RH.data.importXlsx = (function () {
       imported_at: new Date().toISOString(),
       private: true,
     }];
-    return draft;
+    // بوابة أخيرة: أي خلل حاجب في النسخة يمنع الاستبدال كلياً
+    const v = RH.data.validate.validateRelease(draft);
+    const hard = v.blockers.filter((b) => !b.id.startsWith("insight."));
+    if (hard.length) {
+      const err = new Error("رُفض تطبيق الاستيراد: " + hard.map((b) => b.label).join("؛ "));
+      err.gates = hard;
+      throw err;
+    }
+    // استبدال ذري لمحتوى المسودة الأصلية
+    for (const k of Object.keys(target)) delete target[k];
+    Object.assign(target, draft);
+    return target;
   }
 
   return { importFile, applyToDraft };
@@ -3150,12 +3322,19 @@ RH.viz.theme = (function () {
       confine: true,
     };
   }
+  /** تعقيم إلزامي: تسميات الأشهر والأسماء تمر من ورقة مستوردة إلى HTML التلميح */
+  function esc(x) {
+    return String(x).replace(/&/g, "&amp;").replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+
   function ttRow(k, v, color) {
+    k = esc(k); v = esc(v);
     return `<div style="display:flex;justify-content:space-between;gap:18px;align-items:center;margin:2px 0">
       <span style="color:#A9B6AE">${color ? `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${color};margin-left:6px"></span>` : ""}${k}</span>
       <b style="font-family:'IBM Plex Sans Arabic';color:#FFF">${v}</b></div>`;
   }
-  const ttTitle = (t) => `<div style="font-weight:700;margin-bottom:5px">${t}</div>`;
+  const ttTitle = (t) => `<div style="font-weight:700;margin-bottom:5px">${esc(t)}</div>`;
 
   /** خط مستهدف ذهبي (لون تعليق حصراً) */
   function targetLine(su, value, label) {
@@ -3202,7 +3381,7 @@ RH.viz.theme = (function () {
 
   return {
     C, REDUCED, fs, base, catXAxis, valAxis, hValAxis, hCatAxis,
-    tooltip, ttRow, ttTitle, targetLine, chart, disposeAll, resizeAll,
+    tooltip, ttRow, ttTitle, esc, targetLine, chart, disposeAll, resizeAll,
   };
 })();
 
@@ -3230,12 +3409,20 @@ RH.viz.charts = (function () {
     const curVal = key === "beds"
       ? rel.metrics.licensed_beds.value
       : rel.metrics["current_" + key].value;
-    const labels = [rel.meta.baseline_label]
+    // تسميتا الطرفين قصيرتان عمداً (تمنعان القص عند حافتي الشبكة)؛
+    // النص الكامل في المؤهل أسفل المشهد وفي التلميح
+    const edgeStart = "خط الأساس";
+    const edgeEnd = "الإجمالي الحالي";
+    const labels = [edgeStart]
+      .concat(monthly.map((m) => m.label))
+      .concat([edgeEnd]);
+    const fullLabels = [rel.meta.baseline_label]
       .concat(monthly.map((m) => m.label))
       .concat(["الإجمالي حتى " + rel.meta.data_as_of]);
 
     const support = [0];
-    const bars = [{ value: baseVal, itemStyle: { color: T.C.demand } }];
+    // خط الأساس ذهبي — عقد الذهبي داخل الرسوم: المستهدف/خط الأساس حصراً
+    const bars = [{ value: baseVal, itemStyle: { color: T.C.gold } }];
     let acc = baseVal;
     for (const m of monthly) {
       support.push(acc);
@@ -3249,7 +3436,7 @@ RH.viz.charts = (function () {
     const c = T.chart("bridge-" + key, el);
     c.setOption(Object.assign(T.base(su), {
       animation: animate !== false && !T.REDUCED,
-      grid: { top: T.fs(su, 34), bottom: T.fs(su, 52), left: T.fs(su, 16), right: T.fs(su, 70) },
+      grid: { top: T.fs(su, 34), bottom: T.fs(su, 56), left: T.fs(su, 46), right: T.fs(su, 76) },
       xAxis: T.catXAxis(su, labels, {
         axisLabel: {
           color: T.C.mut, fontFamily: "Cairo", fontSize: T.fs(su, 12),
@@ -3262,7 +3449,7 @@ RH.viz.charts = (function () {
           if (p.seriesIndex === 0) return "";
           const i = p.dataIndex;
           const isEdge = i === 0 || i === labels.length - 1;
-          return T.ttTitle(labels[i]) + T.ttRow(
+          return T.ttTitle(fullLabels[i]) + T.ttRow(
             isEdge ? "الإجمالي" : "صافي الإضافة",
             fmt.unitAfter(bars[i].value, unit),
             bars[i].itemStyle.color);
@@ -3475,7 +3662,7 @@ RH.viz.charts = (function () {
     const unit = key === "beds" ? "سرير" : "رخصة";
     const c = T.chart("net-" + key, el);
     c.setOption(Object.assign(T.base(su), {
-      grid: { top: T.fs(su, 22), bottom: T.fs(su, 42), left: T.fs(su, 12), right: T.fs(su, 62) },
+      grid: { top: T.fs(su, 22), bottom: T.fs(su, 46), left: T.fs(su, 42), right: T.fs(su, 68) },
       xAxis: T.catXAxis(su, rows.map((r) => r.label), {
         axisLabel: { color: T.C.mut, fontFamily: "Cairo", fontSize: T.fs(su, 11.5), rotate: 34 },
       }),
@@ -3603,7 +3790,7 @@ RH.viz.map = (function () {
   const METRICS = {
     demand: { label: "الطلب على الأسرّة", unit: "سرير", ramp: "seq",
       value: (s, der) => s.demand, format: (v) => fmt.int(v) },
-    coverage: { label: "نسبة تغطية الطلب", unit: "٪", ramp: "seq",
+    coverage: { label: "نسبة تغطية الطلب", unit: "", ramp: "seq",
       value: (s, der) => der.sector[s.id].coverage_pct, format: (v) => fmt.pct(v) },
     building: { label: "رخص البناء", unit: "رخصة", ramp: "seq",
       value: (s) => s.building, format: (v) => fmt.int(v) },
@@ -3613,8 +3800,9 @@ RH.viz.map = (function () {
       value: (s) => s.beds, format: (v) => fmt.int(v) },
     violations: { label: "المخالفات المسجلة", unit: "مخالفة", ramp: "viol",
       value: (s) => s.violations, format: (v) => fmt.int(v) },
-    monitors: { label: "عدد المراقبين", unit: "مراقب", ramp: "seq",
-      value: (s) => s.monitors, format: (v) => fmt.int(v) },
+    monitors: { label: "عدد المراقبين", short_label: "المراقبون", unit: "", ramp: "seq",
+      value: (s) => s.monitors, format: (v) => fmt.int(v),
+      aria: (v) => fmt.noun(v, "monitor") },
   };
 
   /**
@@ -3642,6 +3830,7 @@ RH.viz.map = (function () {
 
     // وادي حنيفة الرمزي خلف القطاعات
     root.appendChild(svg("path", { class: "wadi", d: WADI, "aria-hidden": "true" }));
+    const labelsGroup = svg("g", {}); // تُلحق بعد النقاط كي لا تحجبها العينة
 
     for (const s of rel.sectors) {
       const g = GEO[s.id];
@@ -3656,7 +3845,8 @@ RH.viz.map = (function () {
         tabindex: "0",
         role: "button",
         "data-interactive": "1",
-        "aria-label": `${s.name} — ${metric.label}: ${metric.format(v)} ${metric.unit}`,
+        "aria-label": `${s.name} — ${metric.label}: `
+          + (metric.aria ? metric.aria(v) : (metric.format(v) + (metric.unit ? " " + metric.unit : ""))),
         onclick: () => opts.onSelect && opts.onSelect(s.id),
         onkeydown: (e) => {
           if ((e.key === "Enter" || e.key === " ") && opts.onSelect) {
@@ -3669,36 +3859,38 @@ RH.viz.map = (function () {
       root.appendChild(path);
 
       const [lx, ly] = g.label;
+      const scaleDown = s.id === "center" ? 0.82 : 1; // قطاع الوسط أضيق من جيرانه
       const label = svg("g", { class: "slabel", "aria-hidden": "true" });
       label.appendChild(svg("text", {
-        x: lx, y: ly - 14, class: "sname",
-        "font-size": 30, fill: "#F4F1E6",
+        x: lx, y: ly - 16, class: "sname",
+        "font-size": Math.round(33 * scaleDown), fill: "#F4F1E6",
       }, s.short));
       label.appendChild(svg("text", {
-        x: lx, y: ly + 30, class: "svalue",
-        "font-size": 40, fill: "#F4F1E6",
+        x: lx, y: ly + 32, class: "svalue",
+        "font-size": Math.round(46 * scaleDown), fill: "#F4F1E6",
       }, metric.format(v)));
       if (opts.secondary && METRICS[opts.secondary]) {
         const m2 = METRICS[opts.secondary];
         label.appendChild(svg("text", {
-          x: lx, y: ly + 66, "font-size": 24, fill: "#C9CFC4",
-        }, m2.label.replace("عدد ", "") + ": " + m2.format(m2.value(s, der))));
+          x: lx, y: ly + 72, "font-size": Math.round(27 * scaleDown), fill: "#C9CFC4",
+        }, (m2.short_label || m2.label) + ": " + m2.format(m2.value(s, der))));
       }
-      root.appendChild(label);
+      labelsGroup.appendChild(label);
     }
 
-    // نقاط عينة الأحياء (اختيارية — ملحق التراخيص)
+    // نقاط عينة الأحياء (اختيارية — ملحق التراخيص) — تحت التسميات دائماً
     if (opts.showNbhd) {
       for (const n of rel.neighbourhoods.rows) {
         const pos = NBHD_POS[n.name];
         if (!pos) continue;
-        const r = 6 + Math.sqrt(n.beds) / 14;
+        const r = 5 + Math.sqrt(n.beds) / 18;
         root.appendChild(svg("circle", {
           cx: pos[0], cy: pos[1], r: r.toFixed(1),
-          fill: "rgba(214,171,76,.75)", stroke: "#0B1512", "stroke-width": 1.5,
+          fill: "rgba(244,241,230,.5)", stroke: "#0B1512", "stroke-width": 1.5,
         }, svg("title", {}, `${n.name} — ${fmt.unitAfter(n.beds, "سرير")} (${rel.neighbourhoods.label})`)));
       }
     }
+    root.appendChild(labelsGroup);
 
     RH.core.dom.clear(container).appendChild(root);
     return {
@@ -3878,10 +4070,12 @@ RH.viz.rings = (function () {
     root.appendChild(svg("circle", {
       cx: cx + r * Math.cos(tAng), cy: cy + r * Math.sin(tAng), r: 7, fill: "#D6AB4C",
     }));
+    const fmtVal = (v) => !Number.isFinite(v) ? "—"
+      : (Number.isInteger(v) ? fmt.int(v) : fmt.dec1(v));
     root.appendChild(svg("text", {
       x: cx, y: cy - 34, "text-anchor": "middle", fill: "#F4F1E6",
       "font-family": "IBM Plex Sans Arabic", "font-weight": 300, "font-size": 58,
-    }, kpi.current_value == null ? "—" : String(kpi.current_value)));
+    }, fmtVal(kpi.current_value)));
     root.appendChild(svg("text", {
       x: cx, y: cy + 2, "text-anchor": "middle", fill: "#93A096",
       "font-family": "Cairo", "font-size": 18,
@@ -3893,10 +4087,10 @@ RH.viz.rings = (function () {
     const variance = RH.data.derive.kpiVariance(kpi);
     const dirLabel = kpi.direction === "lower_better" ? "الانخفاض أفضل" : "الارتفاع أفضل";
     wrap.appendChild(h("div", { class: "kpi-meta" },
-      h("span", {}, "خط الأساس: ", h("b", {}, kpi.baseline == null ? "—" : String(kpi.baseline))),
-      h("span", {}, "المستهدف: ", h("b", {}, kpi.target == null ? "—" : String(kpi.target))),
+      h("span", {}, "خط الأساس: ", h("b", {}, fmtVal(kpi.baseline))),
+      h("span", {}, "المستهدف: ", h("b", {}, fmtVal(kpi.target))),
       h("span", {}, "الفجوة عن المستهدف: ",
-        h("b", {}, variance ? String(Math.abs(variance.gap)) : "—")),
+        h("b", {}, variance ? fmtVal(Math.abs(variance.gap)) : "—")),
       h("span", {}, "اتجاه التحسن: ", h("b", {}, dirLabel)),
       h("span", {}, "تاريخ القياس: ", h("b", {}, kpi.as_of ? fmt.date(kpi.as_of) : "—")),
     ));
@@ -4300,6 +4494,7 @@ RH.presenter.nav = (function () {
     document.addEventListener("touchstart", onTouchStart, { passive: true });
     document.addEventListener("touchend", onTouchEnd, { passive: true });
     document.addEventListener("mousemove", wake, { passive: true });
+    document.addEventListener("touchstart", wake, { passive: true });
     document.addEventListener("focusin", wake);
     // عجلة الفأرة: لا تقدّم إطلاقاً (يمنع القفز العرضي للوح اللمس)
     wake();
@@ -4606,7 +4801,8 @@ RH.presenter.chrome = (function () {
       {
         name: "التراخيص", target: "05", d: GLYPHS.licenses,
         fact: [h("b", {}, fmt.noun(rel.metrics.current_operational.value, "licence")),
-          " تشغيلية بطاقة ", h("b", {}, fmt.compact(rel.metrics.licensed_beds.value) + " سرير"),
+          " تشغيلية، وطاقتها الاستيعابية ",
+          h("b", {}, fmt.compact(rel.metrics.licensed_beds.value) + " سرير"),
           " حتى " + rel.meta.data_as_of],
       },
       {
@@ -4980,9 +5176,11 @@ RH.presenter.chrome = (function () {
       class: "sc", role: "region", "aria-label": "التوزيع الجغرافي للتراخيص",
     },
       h("div", { class: "sc-question rise" }, "كيف تتوزع التراخيص والطاقة الاستيعابية جغرافياً؟"),
-      h("h2", { class: "sc-headline rise", style: { fontSize: "calc(var(--su)*36)", lineHeight: "1.6" } },
+      h("h2", { class: "sc-headline rise" },
+        "يتصدر قطاع الشرق رخص البناء والرخص التشغيلية والطاقة الاستيعابية المرخصة"),
+      h("div", { class: "sc-implication rise", style: { marginTop: "calc(var(--su)*10)" } },
         rel.insights.s06.text),
-      h("div", { class: "sc-body rise" }, mapBox),
+      h("div", { class: "sc-body rise", style: { marginTop: "calc(var(--su)*24)" } }, mapBox),
       h("div", { class: "sc-foot rise" },
         h("div", { style: { display: "flex", alignItems: "center", gap: "calc(var(--su)*28)" } },
           h("div", { class: "layer-steps", role: "tablist", "aria-label": "طبقة الخريطة" },
@@ -5195,7 +5393,7 @@ RH.presenter.chrome = (function () {
       host.appendChild(h("section", {
         class: "sc", role: "region", "aria-label": "محفظة الاستراتيجية",
       },
-        h("div", { class: "sc-question rise" }, "ما مستوى إنجاز الاستراتيجية، وأي الركائز تتطلب التدخل؟"),
+        h("div", { class: "sc-question rise" }, "محفظة الاستراتيجية"),
         h("div", { class: "pending-scene rise" },
           h("div", { class: "glyph" }, pendingGlyph()),
           h("h2", {}, "تُستكمل محفظة الركائز والمبادرات فور اعتماد مصدرها الرسمي"),
@@ -5266,7 +5464,7 @@ RH.presenter.chrome = (function () {
       host.appendChild(h("section", {
         class: "sc", role: "region", "aria-label": "مؤشرات الأداء ذات الأولوية",
       },
-        h("div", { class: "sc-question rise" }, "ما المؤشرات ذات الأولوية، وأين تتركز الفجوة عن المستهدف؟"),
+        h("div", { class: "sc-question rise" }, "مؤشرات الأداء ذات الأولوية"),
         h("div", { class: "pending-scene rise" },
           h("div", { class: "glyph" },
             svg("svg", { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor",
@@ -5330,23 +5528,35 @@ RH.presenter.chrome = (function () {
     const ns = rel.next_steps;
 
     if (ns.status !== "approved" || !ns.items.length) {
+      // خاتمة كريمة بلا تلفيق: خلاصة الحقائق الثلاث الموثقة التي تستدعي القرار،
+      // وسطر صريح بموضع الخطوات المعتمدة عند ورودها
+      const der = RH.data.store.der();
+      const fact = (label, valueEls, foot) => h("div", { class: "cell", style: { padding: "calc(var(--su)*34) calc(var(--su)*40)" } },
+        h("div", { class: "slabel", style: { fontSize: "calc(var(--su)*19)" } }, label),
+        h("div", { class: "svalue", style: { fontSize: "calc(var(--su)*66)", fontWeight: "300", marginTop: "calc(var(--su)*10)" } }, valueEls),
+        foot ? h("div", { class: "slabel", style: { marginTop: "calc(var(--su)*10)", fontWeight: "400", fontSize: "calc(var(--su)*16)" } }, foot) : null,
+      );
       host.appendChild(h("section", {
-        class: "sc", role: "region", "aria-label": "الخطوات القادمة",
+        class: "sc", role: "region", "aria-label": "خلاصة العرض والخطوات القادمة",
       },
-        h("h2", { class: "agenda-title rise" }, "الخطوات القادمة والقرارات المطلوبة"),
-        h("div", { class: "pending-scene rise" },
-          h("div", { class: "glyph" },
-            svg("svg", { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor",
-              "stroke-width": 1.1, "stroke-linecap": "round", "stroke-linejoin": "round",
-              "aria-hidden": "true" },
-              svg("path", { d: "M9 6h11 M9 12h11 M9 18h11 M4 6h.01 M4 12h.01 M4 18h.01",
-                "stroke-dasharray": "2 3" })),
+        h("h2", { class: "agenda-title rise" }, "خلاصة الصورة الراهنة"),
+        h("div", { class: "rise", style: { flex: "1", display: "flex", flexDirection: "column", justifyContent: "center", gap: "calc(var(--su)*44)" } },
+          h("div", { class: "stat-strip", style: { borderBlockWidth: "1px" } },
+            fact("نسبة تغطية الطلب التقديري",
+              [h("b", { style: { color: "var(--green-hi)", fontWeight: 400 } }, fmt.pct(der.coverage_pct))],
+              "عجز قائم قدره " + fmt.unitAfter(der.deficit_beds, "سرير")),
+            fact("نمو رخص البناء منذ خط الأساس",
+              [h("b", { style: { fontWeight: 400 } }, fmt.pct(der.growth_building_pct))],
+              "مقابل " + fmt.pct(der.growth_beds_pct) + " نمواً في الطاقة المرخصة"),
+            fact("تركز الضغط الرقابي",
+              [h("b", { style: { color: "var(--coral)", fontWeight: 400 } },
+                fmt.pct(der.south_violations_share_pct))],
+              "من مخالفات المدينة في قطاع الجنوب"),
           ),
-          h("h2", {}, "تُعتمد الخطوات القادمة قبل يوم العرض من الجهة المخوَّلة"),
-          h("p", {},
-            "تُدخل الخطوات والقرارات المطلوبة من الإدارة المخوَّلة (الإجراء، الجهة المسؤولة، ",
-            "تاريخ الاستحقاق، حالة التنفيذ، القرار المطلوب) وتُعتمد ثم تُنشر. ",
-            "لا تعرض هذه الشاشة أي خطوات غير معتمدة."),
+          h("p", { style: { fontSize: "calc(var(--su)*20)", color: "var(--mut-d)", lineHeight: "1.9", maxWidth: "calc(var(--su)*1250)" } },
+            "تُعرض في هذه الشاشة الخطوات القادمة والقرارات المطلوبة (الإجراء، الجهة المسؤولة، ",
+            "تاريخ الاستحقاق، حالة التنفيذ، القرار المطلوب) فور اعتمادها من الجهة المخوَّلة — ",
+            "ولا تعرض المنصة أي خطوات غير معتمدة."),
         ),
       ));
       return;
@@ -5576,10 +5786,12 @@ RH.presenter.ax = (function () {
     // عقيدة عدم التلفيق: الوسم الذهبي البارز يُعرض ما دام النموذج غير معتمد
     // في الإصدار؛ العنوان والتحفظ يُعرضان حرفياً من ملف البيانات دائماً.
     const approved = sc.status === "approved";
+    // إزالة تكرار عبارة التوريد: الوسم الذهبي يحملها، والتحفظ يُعرض من بعدها
+    const caveatTail = sc.caveat.replace(/^سيناريوهات العجز المورّدة في ملف البيانات\s*—\s*/, "");
     el.appendChild(h("div", { class: "ax-note" },
       approved ? null : h("b", {}, "سيناريوهات مورّدة في ملف البيانات — نموذج غير معتمد"),
       approved ? null : " · ",
-      sc.title, ". ", sc.caveat,
+      sc.title, ". ", approved ? sc.caveat : caveatTail,
     ));
   }
 
@@ -6454,7 +6666,14 @@ RH.admin.auth = (function () {
     if (passphrase.length < 10) {
       throw new Error("عبارة المرور يجب ألا تقل عن 10 محارف");
     }
-    const salt = Math.random().toString(36).slice(2) + Date.now().toString(36);
+    let salt;
+    if (window.crypto && crypto.getRandomValues) {
+      const b = new Uint8Array(16);
+      crypto.getRandomValues(b);
+      salt = Array.from(b).map((x) => x.toString(16).padStart(2, "0")).join("");
+    } else {
+      salt = Math.random().toString(36).slice(2) + Date.now().toString(36);
+    }
     const digest = await hashPassphrase(passphrase, salt);
     await kvSet("admin_credential", { salt, digest, name: displayName || "مدير المنصة",
       role: "publisher", created_at: new Date().toISOString() });
@@ -6942,13 +7161,25 @@ RH.admin.editors = (function () {
       const ta = h("textarea", {
         oninput: (e) => { ins.text = e.target.value.trim(); },
       }, ins.text);
+      const statusEl = h("span", { class: "st " + (ins.status === "needs_review" ? "warn" : "ok") },
+        ins.status === "needs_review" ? "يحتاج إعادة اعتماد بعد تغير البيانات"
+          : ins.status === "approved_brief" ? "معتمد من التكليف" : "معتمد");
       card.appendChild(h("div", { style: { marginBottom: "18px" } },
-        h("div", { style: { display: "flex", justifyContent: "space-between", marginBottom: "6px" } },
+        h("div", { style: { display: "flex", justifyContent: "space-between", marginBottom: "6px", alignItems: "center", gap: "10px" } },
           h("label", { style: { fontWeight: 700, fontSize: "12.5px" } }, SCENES[key] || key),
-          h("span", { class: "st " + (ins.status === "approved_brief" ? "ok" : "warn") },
-            ins.status === "approved_brief" ? "معتمد من التكليف" : ins.status)),
+          h("span", { style: { display: "flex", gap: "10px", alignItems: "center" } },
+            statusEl,
+            ins.status === "needs_review"
+              ? h("button", { class: "btn btn-line", onclick: () => {
+                ins.status = "approved";
+                RH.admin.shell.toast("اعتُمد نص التحليل بعد المراجعة");
+                insights(container, draft, save);
+              } }, "روجع — اعتماد")
+              : null),
+        ),
         ta,
-        h("div", { class: "hint" }, "المقاييس المرتبطة: " + ins.metric_ids.join("، ")),
+        h("div", { class: "hint" }, "المقاييس المرتبطة: " + ins.metric_ids.join("، ")
+          + " — أرقام النص تُفحص ضد بيانات الإصدار ببوابة حاجبة عند النشر"),
       ));
     }
     card.appendChild(h("button", { class: "btn btn-primary", onclick: save }, "حفظ المسودة"));
@@ -7224,11 +7455,16 @@ RH.admin.editors = (function () {
         h("div", { style: { maxHeight: "320px", overflowY: "auto" } }, table),
         h("div", { style: { marginTop: "14px", display: "flex", gap: "10px" } },
           h("button", { class: "btn btn-primary", onclick: async () => {
-            RH.data.importXlsx.applyToDraft(draft, res.extracted, {
-              name: file.name, size: file.size, sha256: null,
-            });
+            try {
+              RH.data.importXlsx.applyToDraft(draft, res.extracted, {
+                name: file.name, size: file.size, sha256: null,
+              });
+            } catch (ex) {
+              RH.admin.shell.toast(ex.message || "رُفض تطبيق الاستيراد");
+              return;
+            }
             await save();
-            RH.admin.shell.toast("طُبّق الاستيراد على المسودة — راجع فحوص الجودة ثم انشر");
+            RH.admin.shell.toast("طُبّق الاستيراد على المسودة — وُسمت نصوص التحليلات لإعادة الاعتماد؛ راجع فحوص الجودة ثم انشر");
           } }, "تطبيق على المسودة"),
           h("span", { class: "hint", style: { alignSelf: "center" } },
             "الملف الأصلي لا يُخزن في المتصفح ولا يُنشر — يُحفظ في المسار الخاص فقط"),
@@ -7278,7 +7514,7 @@ RH.admin.publish = (function () {
         disabled: blocked || !RH.admin.auth.can.publish(session) ? "" : null,
       }, "نشر إصدار غير قابل للتغيير");
       btn.addEventListener("click", async () => {
-        if (!confirm("سيُنشأ إصدار منشور جديد يقرؤه المقدِّم فوراً. هل تريد المتابعة؟")) return;
+        if (!confirm("سيُنشر إصدار جديد يقرؤه المقدِّم فوراً. هل تريد المتابعة؟")) return;
         try {
           draft.release.notes = notes.value.trim();
           const rel = await RH.data.store.publish(draft, session.name, waivers);
@@ -7341,7 +7577,7 @@ RH.admin.publish = (function () {
               r.release.sha256.slice(0, 12) + "…") : null),
         !isCurrent && RH.admin.auth.can.publish(session)
           ? h("button", { class: "btn btn-line", onclick: async () => {
-            if (!confirm("سيُنشأ مسودة من هذا الإصدار للتراجع إليه عبر النشر. متابعة؟")) return;
+            if (!confirm("ستُنشأ مسودة من هذا الإصدار للتراجع إليه عبر النشر. هل تريد المتابعة؟")) return;
             await RH.data.store.rollback(r.release.id, session.name);
             RH.admin.shell.toast("أُنشئت مسودة تراجع — راجع الفحوص ثم انشر");
             onRollback();

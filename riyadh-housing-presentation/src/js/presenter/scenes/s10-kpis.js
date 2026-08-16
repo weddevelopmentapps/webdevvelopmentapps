@@ -16,7 +16,7 @@
       host.appendChild(h("section", {
         class: "sc", role: "region", "aria-label": "مؤشرات الأداء ذات الأولوية",
       },
-        h("div", { class: "sc-question rise" }, "ما المؤشرات ذات الأولوية، وأين تتركز الفجوة عن المستهدف؟"),
+        h("div", { class: "sc-question rise" }, "مؤشرات الأداء ذات الأولوية"),
         h("div", { class: "pending-scene rise" },
           h("div", { class: "glyph" },
             svg("svg", { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor",

@@ -110,6 +110,7 @@ RH.presenter.nav = (function () {
     document.addEventListener("touchstart", onTouchStart, { passive: true });
     document.addEventListener("touchend", onTouchEnd, { passive: true });
     document.addEventListener("mousemove", wake, { passive: true });
+    document.addEventListener("touchstart", wake, { passive: true });
     document.addEventListener("focusin", wake);
     // عجلة الفأرة: لا تقدّم إطلاقاً (يمنع القفز العرضي للوح اللمس)
     wake();

@@ -82,10 +82,12 @@
     // عقيدة عدم التلفيق: الوسم الذهبي البارز يُعرض ما دام النموذج غير معتمد
     // في الإصدار؛ العنوان والتحفظ يُعرضان حرفياً من ملف البيانات دائماً.
     const approved = sc.status === "approved";
+    // إزالة تكرار عبارة التوريد: الوسم الذهبي يحملها، والتحفظ يُعرض من بعدها
+    const caveatTail = sc.caveat.replace(/^سيناريوهات العجز المورّدة في ملف البيانات\s*—\s*/, "");
     el.appendChild(h("div", { class: "ax-note" },
       approved ? null : h("b", {}, "سيناريوهات مورّدة في ملف البيانات — نموذج غير معتمد"),
       approved ? null : " · ",
-      sc.title, ". ", sc.caveat,
+      sc.title, ". ", approved ? sc.caveat : caveatTail,
     ));
   }
 

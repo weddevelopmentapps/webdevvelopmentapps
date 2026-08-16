@@ -58,20 +58,21 @@ RH.core.fmt = (function () {
     if (n === 1) return forms.one;
     if (n === 2) return forms.two;
     const tail = n % 100;
+    if (tail === 0) return int(n) + NBSP + (forms.hundred || forms.many); // مضاعفات المئة: مفرد مجرور
     if (tail >= 3 && tail <= 10) return int(n) + NBSP + forms.few;
     return int(n) + NBSP + forms.many;
   }
 
   const NOUNS = {
-    bed: { one: "سرير واحد", two: "سريران", few: "أسرّة", many: "سريراً", zero: "لا أسرّة" },
-    licence: { one: "رخصة واحدة", two: "رخصتان", few: "رخص", many: "رخصة" },
-    visit: { one: "زيارة واحدة", two: "زيارتان", few: "زيارات", many: "زيارة" },
-    violation: { one: "مخالفة واحدة", two: "مخالفتان", few: "مخالفات", many: "مخالفة" },
-    monitor: { one: "مراقب واحد", two: "مراقبان", few: "مراقبين", many: "مراقباً" },
-    decision: { one: "قرار واحد", two: "قراران", few: "قرارات", many: "قراراً" },
-    initiative: { one: "مبادرة واحدة", two: "مبادرتان", few: "مبادرات", many: "مبادرة" },
-    pillar: { one: "ركيزة واحدة", two: "ركيزتان", few: "ركائز", many: "ركيزة" },
-    indicator: { one: "مؤشر واحد", two: "مؤشران", few: "مؤشرات", many: "مؤشراً" },
+    bed: { one: "سرير واحد", two: "سريران", few: "أسرّة", many: "سريراً", hundred: "سرير", zero: "لا أسرّة" },
+    licence: { one: "رخصة واحدة", two: "رخصتان", few: "رخص", many: "رخصة", hundred: "رخصة" },
+    visit: { one: "زيارة واحدة", two: "زيارتان", few: "زيارات", many: "زيارة", hundred: "زيارة" },
+    violation: { one: "مخالفة واحدة", two: "مخالفتان", few: "مخالفات", many: "مخالفة", hundred: "مخالفة" },
+    monitor: { one: "مراقب واحد", two: "مراقبان", few: "مراقبين", many: "مراقباً", hundred: "مراقب" },
+    decision: { one: "قرار واحد", two: "قراران", few: "قرارات", many: "قراراً", hundred: "قرار" },
+    initiative: { one: "مبادرة واحدة", two: "مبادرتان", few: "مبادرات", many: "مبادرة", hundred: "مبادرة" },
+    pillar: { one: "ركيزة واحدة", two: "ركيزتان", few: "ركائز", many: "ركيزة", hundred: "ركيزة" },
+    indicator: { one: "مؤشر واحد", two: "مؤشران", few: "مؤشرات", many: "مؤشراً", hundred: "مؤشر" },
   };
   function noun(n, key) { return countNoun(n, NOUNS[key]); }
 

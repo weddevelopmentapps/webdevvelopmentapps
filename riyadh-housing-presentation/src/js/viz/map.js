@@ -68,7 +68,7 @@ RH.viz.map = (function () {
   const METRICS = {
     demand: { label: "الطلب على الأسرّة", unit: "سرير", ramp: "seq",
       value: (s, der) => s.demand, format: (v) => fmt.int(v) },
-    coverage: { label: "نسبة تغطية الطلب", unit: "٪", ramp: "seq",
+    coverage: { label: "نسبة تغطية الطلب", unit: "", ramp: "seq",
       value: (s, der) => der.sector[s.id].coverage_pct, format: (v) => fmt.pct(v) },
     building: { label: "رخص البناء", unit: "رخصة", ramp: "seq",
       value: (s) => s.building, format: (v) => fmt.int(v) },
@@ -78,8 +78,9 @@ RH.viz.map = (function () {
       value: (s) => s.beds, format: (v) => fmt.int(v) },
     violations: { label: "المخالفات المسجلة", unit: "مخالفة", ramp: "viol",
       value: (s) => s.violations, format: (v) => fmt.int(v) },
-    monitors: { label: "عدد المراقبين", unit: "مراقب", ramp: "seq",
-      value: (s) => s.monitors, format: (v) => fmt.int(v) },
+    monitors: { label: "عدد المراقبين", short_label: "المراقبون", unit: "", ramp: "seq",
+      value: (s) => s.monitors, format: (v) => fmt.int(v),
+      aria: (v) => fmt.noun(v, "monitor") },
   };
 
   /**
@@ -107,6 +108,7 @@ RH.viz.map = (function () {
 
     // وادي حنيفة الرمزي خلف القطاعات
     root.appendChild(svg("path", { class: "wadi", d: WADI, "aria-hidden": "true" }));
+    const labelsGroup = svg("g", {}); // تُلحق بعد النقاط كي لا تحجبها العينة
 
     for (const s of rel.sectors) {
       const g = GEO[s.id];
@@ -121,7 +123,8 @@ RH.viz.map = (function () {
         tabindex: "0",
         role: "button",
         "data-interactive": "1",
-        "aria-label": `${s.name} — ${metric.label}: ${metric.format(v)} ${metric.unit}`,
+        "aria-label": `${s.name} — ${metric.label}: `
+          + (metric.aria ? metric.aria(v) : (metric.format(v) + (metric.unit ? " " + metric.unit : ""))),
         onclick: () => opts.onSelect && opts.onSelect(s.id),
         onkeydown: (e) => {
           if ((e.key === "Enter" || e.key === " ") && opts.onSelect) {
@@ -134,36 +137,38 @@ RH.viz.map = (function () {
       root.appendChild(path);
 
       const [lx, ly] = g.label;
+      const scaleDown = s.id === "center" ? 0.82 : 1; // قطاع الوسط أضيق من جيرانه
       const label = svg("g", { class: "slabel", "aria-hidden": "true" });
       label.appendChild(svg("text", {
-        x: lx, y: ly - 14, class: "sname",
-        "font-size": 30, fill: "#F4F1E6",
+        x: lx, y: ly - 16, class: "sname",
+        "font-size": Math.round(33 * scaleDown), fill: "#F4F1E6",
       }, s.short));
       label.appendChild(svg("text", {
-        x: lx, y: ly + 30, class: "svalue",
-        "font-size": 40, fill: "#F4F1E6",
+        x: lx, y: ly + 32, class: "svalue",
+        "font-size": Math.round(46 * scaleDown), fill: "#F4F1E6",
       }, metric.format(v)));
       if (opts.secondary && METRICS[opts.secondary]) {
         const m2 = METRICS[opts.secondary];
         label.appendChild(svg("text", {
-          x: lx, y: ly + 66, "font-size": 24, fill: "#C9CFC4",
-        }, m2.label.replace("عدد ", "") + ": " + m2.format(m2.value(s, der))));
+          x: lx, y: ly + 72, "font-size": Math.round(27 * scaleDown), fill: "#C9CFC4",
+        }, (m2.short_label || m2.label) + ": " + m2.format(m2.value(s, der))));
       }
-      root.appendChild(label);
+      labelsGroup.appendChild(label);
     }
 
-    // نقاط عينة الأحياء (اختيارية — ملحق التراخيص)
+    // نقاط عينة الأحياء (اختيارية — ملحق التراخيص) — تحت التسميات دائماً
     if (opts.showNbhd) {
       for (const n of rel.neighbourhoods.rows) {
         const pos = NBHD_POS[n.name];
         if (!pos) continue;
-        const r = 6 + Math.sqrt(n.beds) / 14;
+        const r = 5 + Math.sqrt(n.beds) / 18;
         root.appendChild(svg("circle", {
           cx: pos[0], cy: pos[1], r: r.toFixed(1),
-          fill: "rgba(214,171,76,.75)", stroke: "#0B1512", "stroke-width": 1.5,
+          fill: "rgba(244,241,230,.5)", stroke: "#0B1512", "stroke-width": 1.5,
         }, svg("title", {}, `${n.name} — ${fmt.unitAfter(n.beds, "سرير")} (${rel.neighbourhoods.label})`)));
       }
     }
+    root.appendChild(labelsGroup);
 
     RH.core.dom.clear(container).appendChild(root);
     return {

@@ -58,8 +58,14 @@ RH.data.derive = (function () {
       };
     }
 
-    const byRaw = (arr, keyFn, desc) =>
-      arr.slice().sort((a, b) => (desc ? keyFn(b) - keyFn(a) : keyFn(a) - keyFn(b)))[0].id;
+    // قاعدة كسر التعادل الموحدة (مرآة بايثون max/min): أول الأقصى/الأدنى بترتيب القطاعات
+    const byRaw = (arr, keyFn, desc) => {
+      let best = arr[0];
+      for (const s of arr) {
+        if (desc ? keyFn(s) > keyFn(best) : keyFn(s) < keyFn(best)) best = s;
+      }
+      return best.id;
+    };
     const S = release.sectors;
     d.rankings = {
       lowest_coverage: byRaw(S, (s) => d.sector[s.id].coverage_raw, false),
@@ -127,7 +133,7 @@ RH.data.derive = (function () {
 
   /** فجوة مؤشر عن مستهدفه وفق اتجاه التحسن (أعلى/أدنى أفضل) */
   function kpiVariance(kpi) {
-    if (kpi.current_value == null || kpi.target == null) return null;
+    if (!Number.isFinite(kpi.current_value) || !Number.isFinite(kpi.target)) return null;
     const diff = kpi.direction === "lower_better"
       ? kpi.target - kpi.current_value
       : kpi.current_value - kpi.target;

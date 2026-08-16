@@ -213,7 +213,7 @@
 /* ═══ مقياس التغطية العلائقي (المشهد 03) — بديل العدادات الدائرية ═══ */
 .coverage-meter { position: relative; }
 .coverage-meter .track {
-  height: calc(var(--su) * 96);
+  height: calc(var(--su) * 116);
   border-radius: calc(var(--su) * 18);
   background: var(--coral-dim);
   position: relative;
@@ -276,14 +276,14 @@
 .sector-map .slabel .svalue { font-weight: 300; }
 .sector-map .wadi { fill: none; stroke: var(--hair-d); stroke-width: 2; stroke-dasharray: 3 7; }
 .map-disclaimer {
-  font-size: calc(var(--su) * 13.5);
-  color: var(--faint-d);
+  font-size: calc(var(--su) * 15);
+  color: var(--mut-d);
 }
 .map-legend {
   display: flex;
   align-items: center;
   gap: calc(var(--su) * 10);
-  font-size: calc(var(--su) * 14.5);
+  font-size: calc(var(--su) * 16.5);
   color: var(--mut-d);
 }
 .map-legend .ramp {
@@ -381,12 +381,13 @@
   color: var(--ink2-d);
 }
 .badge-pending {
-  font-size: calc(var(--su) * 12.5);
-  font-weight: 600;
-  color: var(--gold);
-  border: 1px solid rgba(201, 162, 75, 0.4);
+  display: inline-block;
+  font-size: calc(var(--su) * 15);
+  font-weight: 700;
+  color: var(--gold-hi);
+  border: 1px solid rgba(214, 171, 76, 0.55);
   border-radius: 999px;
-  padding: calc(var(--su) * 3) calc(var(--su) * 12);
+  padding: calc(var(--su) * 4) calc(var(--su) * 14);
   vertical-align: middle;
 }
 
@@ -562,3 +563,24 @@
   padding-top: calc(var(--su) * 12);
 }
 .kpi-card .kpi-meta b { color: var(--ink2-d); font-weight: 600; }
+
+/* إشارة نقر ساكنة رصينة للوحات القابلة للنقر (بوابات ومحاور) */
+.agenda-panel::before, .hub-panel::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: calc(var(--su) * 40);
+  bottom: calc(var(--su) * 34);
+  width: calc(var(--su) * 30);
+  height: calc(var(--su) * 30);
+  border-radius: 50%;
+  border: 1px solid var(--hair-d);
+  background:
+    no-repeat center / 55% url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2393A096' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 6l-6 6 6 6'/%3E%3C/svg%3E");
+  opacity: 0.85;
+  transition: border-color var(--dur-micro), opacity var(--dur-micro);
+}
+.agenda-panel:hover::before, .agenda-panel:focus-visible::before,
+.hub-panel:hover::before, .hub-panel:focus-visible::before {
+  border-color: var(--gold);
+  opacity: 1;
+}

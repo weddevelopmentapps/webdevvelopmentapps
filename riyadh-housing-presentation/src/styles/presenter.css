@@ -89,6 +89,7 @@
   margin-bottom: calc(var(--su) * 14);
 }
 .sc-headline {
+  text-wrap: balance;
   font-family: var(--f-display);
   font-size: calc(var(--su) * 54);
   line-height: 1.35;
@@ -206,8 +207,8 @@
   z-index: 50;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  font-size: 14px;
+  gap: calc(var(--su) * 8);
+  font-size: max(12px, calc(var(--su) * 14.5));
   font-weight: 600;
   color: var(--mut-d);
   background: rgba(8, 16, 9, 0.55);
@@ -215,7 +216,7 @@
   -webkit-backdrop-filter: blur(14px);
   border: 1px solid var(--hair-d2);
   border-radius: 999px;
-  padding: 9px 18px;
+  padding: calc(var(--su) * 9) calc(var(--su) * 18);
   opacity: 1;
   transition: opacity var(--dur-std) var(--ease), color var(--dur-micro);
 }
@@ -226,8 +227,8 @@
   top: auto;
   bottom: calc(var(--su) * 24);
   right: calc(var(--su) * 30);
-  font-size: 12.5px;
-  padding: 7px 15px;
+  font-size: max(11px, calc(var(--su) * 13));
+  padding: calc(var(--su) * 7) calc(var(--su) * 15);
 }
 .hud-progress {
   position: fixed;

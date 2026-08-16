@@ -72,24 +72,27 @@ test("مبادرة خارج ركائزها المعتمدة → strategy.members
   assert.ok(blockerIds(rel).includes("strategy.membership"));
 });
 
-test("مؤشر أولوية بلا قيمة وبلا تنازل → kpi.priority_values تحجب", () => {
+test("مؤشر أولوية بلا قيمة → إنذار kpi.priority_values (يُحجب النشر دون تنازل موقَّع)", () => {
   const rel = freshRelease();
   rel.strategy.status = "approved";
+  rel.strategy.required_pillars = 7;
   rel.strategy.pillars = Array.from({ length: 7 }, (_x, i) => ({ id: "p" + (i + 1) }));
   rel.strategy.initiatives = [];
   rel.strategy.kpis = [{
     id: "k1", name: "نسبة التغطية المستهدفة", priority: true,
-    current_value: null, waiver: null, source: "ورقة العمل", as_of: "2026-08",
+    current_value: null, source: "ورقة العمل", as_of: "2026-08",
   }];
   const res = V.validateRelease(rel);
-  const gate = res.blockers.find((b) => b.id === "kpi.priority_values");
-  assert.ok(gate, "البوابة تحجب");
+  // بعد مراجعة الأمن: التنازل حصراً عبر سجل التنازلات الموقَّع الممرر للنشر —
+  // لا حقل waiver داخل البيانات. البوابة إنذار، وpublish يرفض إنذاراً بلا تنازل.
+  const gate = res.warnings.find((b) => b.id === "kpi.priority_values");
+  assert.ok(gate, "البوابة تنذر وتتطلب تنازلاً موقَّعاً");
   assert.ok(gate.detail.includes("نسبة التغطية المستهدفة"), "التفصيل يسمي المؤشر الناقص");
+  assert.ok(!res.blockers.find((b) => b.id === "kpi.priority_values"));
 });
 
-test("المؤشر نفسه بتنازل موقَّع أو بقيمة حالية → البوابة تمر", () => {
-  for (const patch of [{ waiver: { by: "أمين المنطقة", at: "2026-08-16" } },
-                       { current_value: 43.1 }]) {
+test("المؤشر نفسه بقيمة حالية → البوابة تمر (حقل waiver داخل البيانات لا يتجاوزها)", () => {
+  for (const patch of [{ current_value: 43.1 }]) {
     const rel = freshRelease();
     rel.strategy.status = "approved";
     rel.strategy.pillars = Array.from({ length: 7 }, (_x, i) => ({ id: "p" + (i + 1) }));

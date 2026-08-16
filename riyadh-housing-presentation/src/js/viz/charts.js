@@ -21,12 +21,20 @@ RH.viz.charts = (function () {
     const curVal = key === "beds"
       ? rel.metrics.licensed_beds.value
       : rel.metrics["current_" + key].value;
-    const labels = [rel.meta.baseline_label]
+    // تسميتا الطرفين قصيرتان عمداً (تمنعان القص عند حافتي الشبكة)؛
+    // النص الكامل في المؤهل أسفل المشهد وفي التلميح
+    const edgeStart = "خط الأساس";
+    const edgeEnd = "الإجمالي الحالي";
+    const labels = [edgeStart]
+      .concat(monthly.map((m) => m.label))
+      .concat([edgeEnd]);
+    const fullLabels = [rel.meta.baseline_label]
       .concat(monthly.map((m) => m.label))
       .concat(["الإجمالي حتى " + rel.meta.data_as_of]);
 
     const support = [0];
-    const bars = [{ value: baseVal, itemStyle: { color: T.C.demand } }];
+    // خط الأساس ذهبي — عقد الذهبي داخل الرسوم: المستهدف/خط الأساس حصراً
+    const bars = [{ value: baseVal, itemStyle: { color: T.C.gold } }];
     let acc = baseVal;
     for (const m of monthly) {
       support.push(acc);
@@ -40,7 +48,7 @@ RH.viz.charts = (function () {
     const c = T.chart("bridge-" + key, el);
     c.setOption(Object.assign(T.base(su), {
       animation: animate !== false && !T.REDUCED,
-      grid: { top: T.fs(su, 34), bottom: T.fs(su, 52), left: T.fs(su, 16), right: T.fs(su, 70) },
+      grid: { top: T.fs(su, 34), bottom: T.fs(su, 56), left: T.fs(su, 46), right: T.fs(su, 76) },
       xAxis: T.catXAxis(su, labels, {
         axisLabel: {
           color: T.C.mut, fontFamily: "Cairo", fontSize: T.fs(su, 12),
@@ -53,7 +61,7 @@ RH.viz.charts = (function () {
           if (p.seriesIndex === 0) return "";
           const i = p.dataIndex;
           const isEdge = i === 0 || i === labels.length - 1;
-          return T.ttTitle(labels[i]) + T.ttRow(
+          return T.ttTitle(fullLabels[i]) + T.ttRow(
             isEdge ? "الإجمالي" : "صافي الإضافة",
             fmt.unitAfter(bars[i].value, unit),
             bars[i].itemStyle.color);
@@ -266,7 +274,7 @@ RH.viz.charts = (function () {
     const unit = key === "beds" ? "سرير" : "رخصة";
     const c = T.chart("net-" + key, el);
     c.setOption(Object.assign(T.base(su), {
-      grid: { top: T.fs(su, 22), bottom: T.fs(su, 42), left: T.fs(su, 12), right: T.fs(su, 62) },
+      grid: { top: T.fs(su, 22), bottom: T.fs(su, 46), left: T.fs(su, 42), right: T.fs(su, 68) },
       xAxis: T.catXAxis(su, rows.map((r) => r.label), {
         axisLabel: { color: T.C.mut, fontFamily: "Cairo", fontSize: T.fs(su, 11.5), rotate: 34 },
       }),

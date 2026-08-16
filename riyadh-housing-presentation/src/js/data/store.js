@@ -137,10 +137,15 @@ RH.data.store = (function () {
     if (previewMode && db) {
       const d = await idbGet("kv", "draft");
       if (d) {
-        currentRelease = d;
-        derived = RH.data.derive.compute(currentRelease);
-        mode = "preview-draft";
-        return currentRelease;
+        try {
+          derived = RH.data.derive.compute(d);
+          currentRelease = d;
+          mode = "preview-draft";
+          return currentRelease;
+        } catch (e) {
+          // مسودة غير قابلة للاشتقاق: نسقط للإصدار المنشور بدل شاشة فارغة
+          console.warn("تعذر اشتقاق المسودة للمعاينة:", e.message);
+        }
       }
     }
     if (db) {
@@ -161,7 +166,11 @@ RH.data.store = (function () {
         await tx("releases", true, (s) => s.put(embedded)).catch(() => {});
       }
     }
-    derived = RH.data.derive.compute(currentRelease);
+    try {
+      derived = RH.data.derive.compute(currentRelease);
+    } catch (e) {
+      throw new Error("تعذر اشتقاق قيم الإصدار — " + (e.message || e));
+    }
     return currentRelease;
   }
 

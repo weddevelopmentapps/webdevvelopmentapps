@@ -13,14 +13,30 @@ RH.data.importXlsx = (function () {
   const M = () => window.WORKBOOK_MANIFEST;
 
   // ── طبقة ZIP ──
+  const MAX_INFLATED = 40 * 1024 * 1024; // حارس قنبلة فك الضغط لكل مدخل
+
   async function inflateRaw(bytes) {
     if (typeof DecompressionStream === "undefined") {
       throw new Error("متصفحك لا يدعم فك الضغط المدمج (DecompressionStream) — استخدم Chrome أو Edge أو Safari حديثاً");
     }
     const ds = new DecompressionStream("deflate-raw");
-    const stream = new Blob([bytes]).stream().pipeThrough(ds);
-    const buf = await new Response(stream).arrayBuffer();
-    return new Uint8Array(buf);
+    const reader = new Blob([bytes]).stream().pipeThrough(ds).getReader();
+    const chunks = [];
+    let total = 0;
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      total += value.byteLength;
+      if (total > MAX_INFLATED) {
+        reader.cancel();
+        throw new Error("رُفض: حجم غير مضغوط مفرط داخل الأرشيف (حارس قنابل الضغط)");
+      }
+      chunks.push(value);
+    }
+    const out = new Uint8Array(total);
+    let o = 0;
+    for (const c of chunks) { out.set(c, o); o += c.byteLength; }
+    return out;
   }
 
   async function readZip(buffer) {
@@ -131,7 +147,7 @@ RH.data.importXlsx = (function () {
       return null;
     }
     if (!Number.isInteger(n)) {
-      errors.push(`قيمة غير صحيحة العدد في ${sheet}!${addr}: ${cell.v}`);
+      errors.push(`القيمة في ${sheet}!${addr} ليست عدداً صحيحاً: ${cell.v}`);
       return null;
     }
     if (n < 0) {
@@ -145,6 +161,12 @@ RH.data.importXlsx = (function () {
   async function importFile(file) {
     const errors = [];
     const warnings = [];
+    // فحص الحجم والامتداد قبل أي تحليل (أرخص حارس أولاً)
+    if (file.size > M().limits.max_bytes) {
+      return { ok: false, warnings,
+        errors: [`حجم الملف يتجاوز الحد (${Math.round(M().limits.max_bytes / 1e6)} م.ب)`],
+        extracted: null };
+    }
     let zip;
     try {
       zip = await readZip(await file.arrayBuffer());
@@ -368,8 +390,11 @@ RH.data.importXlsx = (function () {
     return { rows, changed: rows.filter((r) => r.changed).length };
   }
 
-  /** تطبيق المستخرج على مسودة (لا يمس الوحدات المملوكة لمصادر أخرى) */
-  function applyToDraft(draft, X, fileMeta) {
+  /** تطبيق المستخرج على مسودة (لا يمس الوحدات المملوكة لمصادر أخرى).
+      يعمل على نسخة عميقة ويتحقق قبل الاستبدال — فشل الاشتقاق/الفحص لا يترك
+      مسودة نصف-محوّرة أبداً. */
+  function applyToDraft(target, X, fileMeta) {
+    const draft = JSON.parse(JSON.stringify(target));
     const S_ORDER = ["north", "east", "center", "west", "south"];
     draft.metrics.total_demand.value = X.total_demand;
     draft.metrics.occupied_beds.value = X.occupied_beds;
@@ -412,6 +437,7 @@ RH.data.importXlsx = (function () {
     if (draft.compliance) draft.compliance.value = X.compliance;
     draft.meta.data_as_of = X.data_as_of || draft.meta.data_as_of;
     draft.meta.calculation_date = X.calculation_date || draft.meta.calculation_date;
+    // فشل الاشتقاق هنا (مثل طلب قطاع صفري) يُرمى قبل أي مساس بالمسودة الأصلية
     // إعادة توليد المشتقات المخزنة من الخام الجديد (تبقى مرآة derive.js)
     const der = RH.data.derive.compute(draft);
     for (const [k, v] of Object.entries(der)) {
@@ -426,6 +452,10 @@ RH.data.importXlsx = (function () {
         visits_share_pct: sv.visits_share_pct, demand_share_pct: sv.demand_share_pct,
       }])) : draft.derived.sector_derived;
     draft.derived.rankings = der.rankings;
+    // نصوص التحليلات المعتمدة لم يمسها الاستيراد — تُوسم لإعادة الاعتماد
+    for (const ins of Object.values(draft.insights || {})) {
+      ins.status = "needs_review";
+    }
     // سجل المصدر الجديد — الملف الأصلي يبقى خاصاً (لا يُضمَّن في الإصدار)
     draft.sources = [{
       id: "src-workbook-" + Date.now().toString(36),
@@ -436,7 +466,18 @@ RH.data.importXlsx = (function () {
       imported_at: new Date().toISOString(),
       private: true,
     }];
-    return draft;
+    // بوابة أخيرة: أي خلل حاجب في النسخة يمنع الاستبدال كلياً
+    const v = RH.data.validate.validateRelease(draft);
+    const hard = v.blockers.filter((b) => !b.id.startsWith("insight."));
+    if (hard.length) {
+      const err = new Error("رُفض تطبيق الاستيراد: " + hard.map((b) => b.label).join("؛ "));
+      err.gates = hard;
+      throw err;
+    }
+    // استبدال ذري لمحتوى المسودة الأصلية
+    for (const k of Object.keys(target)) delete target[k];
+    Object.assign(target, draft);
+    return target;
   }
 
   return { importFile, applyToDraft };

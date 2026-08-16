@@ -66,7 +66,14 @@ RH.admin.auth = (function () {
     if (passphrase.length < 10) {
       throw new Error("عبارة المرور يجب ألا تقل عن 10 محارف");
     }
-    const salt = Math.random().toString(36).slice(2) + Date.now().toString(36);
+    let salt;
+    if (window.crypto && crypto.getRandomValues) {
+      const b = new Uint8Array(16);
+      crypto.getRandomValues(b);
+      salt = Array.from(b).map((x) => x.toString(16).padStart(2, "0")).join("");
+    } else {
+      salt = Math.random().toString(36).slice(2) + Date.now().toString(36);
+    }
     const digest = await hashPassphrase(passphrase, salt);
     await kvSet("admin_credential", { salt, digest, name: displayName || "مدير المنصة",
       role: "publisher", created_at: new Date().toISOString() });

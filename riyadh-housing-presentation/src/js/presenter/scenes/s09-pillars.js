@@ -28,7 +28,7 @@
       host.appendChild(h("section", {
         class: "sc", role: "region", "aria-label": "محفظة الاستراتيجية",
       },
-        h("div", { class: "sc-question rise" }, "ما مستوى إنجاز الاستراتيجية، وأي الركائز تتطلب التدخل؟"),
+        h("div", { class: "sc-question rise" }, "محفظة الاستراتيجية"),
         h("div", { class: "pending-scene rise" },
           h("div", { class: "glyph" }, pendingGlyph()),
           h("h2", {}, "تُستكمل محفظة الركائز والمبادرات فور اعتماد مصدرها الرسمي"),

@@ -84,12 +84,19 @@ RH.viz.theme = (function () {
       confine: true,
     };
   }
+  /** تعقيم إلزامي: تسميات الأشهر والأسماء تمر من ورقة مستوردة إلى HTML التلميح */
+  function esc(x) {
+    return String(x).replace(/&/g, "&amp;").replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+
   function ttRow(k, v, color) {
+    k = esc(k); v = esc(v);
     return `<div style="display:flex;justify-content:space-between;gap:18px;align-items:center;margin:2px 0">
       <span style="color:#A9B6AE">${color ? `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${color};margin-left:6px"></span>` : ""}${k}</span>
       <b style="font-family:'IBM Plex Sans Arabic';color:#FFF">${v}</b></div>`;
   }
-  const ttTitle = (t) => `<div style="font-weight:700;margin-bottom:5px">${t}</div>`;
+  const ttTitle = (t) => `<div style="font-weight:700;margin-bottom:5px">${esc(t)}</div>`;
 
   /** خط مستهدف ذهبي (لون تعليق حصراً) */
   function targetLine(su, value, label) {
@@ -136,6 +143,6 @@ RH.viz.theme = (function () {
 
   return {
     C, REDUCED, fs, base, catXAxis, valAxis, hValAxis, hCatAxis,
-    tooltip, ttRow, ttTitle, targetLine, chart, disposeAll, resizeAll,
+    tooltip, ttRow, ttTitle, esc, targetLine, chart, disposeAll, resizeAll,
   };
 })();

@@ -35,7 +35,8 @@
       {
         name: "التراخيص", target: "05", d: GLYPHS.licenses,
         fact: [h("b", {}, fmt.noun(rel.metrics.current_operational.value, "licence")),
-          " تشغيلية بطاقة ", h("b", {}, fmt.compact(rel.metrics.licensed_beds.value) + " سرير"),
+          " تشغيلية، وطاقتها الاستيعابية ",
+          h("b", {}, fmt.compact(rel.metrics.licensed_beds.value) + " سرير"),
           " حتى " + rel.meta.data_as_of],
       },
       {
