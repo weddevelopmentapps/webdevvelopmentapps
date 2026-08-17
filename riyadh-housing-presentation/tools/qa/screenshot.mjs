@@ -1,7 +1,27 @@
 #!/usr/bin/env node
-/* screenshot.mjs — لقطات المشاهد للمراجعة البصرية وفحص الكونسول
-   الاستخدام: node tools/qa/screenshot.mjs [--out DIR] [--routes r1,r2] [--sizes 1920x1080,1366x768]
-   يفشل (exit 1) عند أي خطأ كونسول. */
+/* screenshot.mjs — لقطات المراجعة البصرية وبوابات التخطيط (V3)
+   ════════════════════════════════════════════════════════════
+   الاستخدام:
+     node tools/qa/screenshot.mjs [--out DIR] [--routes r1,r2]
+                                  [--sizes 1920x1080,1366x768]
+                                  [--themes light,dark]
+
+   ما تغيّر عن V2 (وهو سبب الإخفاقات الكاذبة السابقة): البنية صارت **خمسة
+   تبويبات** ‎#/tab/*‎ وكل ما عداها ملحق (V3_SPEC §4). مسارات ‎#/section/*‎
+   تقاعدت وصارت إحالات صامتة — فكان التقاطها يصوّر التبويب المحال إليه ثم
+   يفحصه ببوابات أقسام V2 (‎.dash-card‎ · ‎.rail-item‎ · شارة الإصدار) التي لا
+   وجود لها في قشرة التبويبات، فيُبلَّغ عن «صفوف مقصوصة» لا وجود لها.
+
+   البوابات التي يفرضها هذا الملف الآن:
+     • **الكونسول نظيف** في كل مسار وكل مقاس وكل سمة.
+     • **صفر تمرير أفقي** (V3_SPEC §3): لا على الجذر ولا في لوح التبويب ولا
+       في أي بطاقة/شبكة داخله.
+     • **التلميح لا يغطي الرسم** (V3_SPEC §7): تحويم حقيقي بالفأرة على كل رسم
+       رئيس، ثم إثبات أن صندوق التلميح لا يتقاطع مع **مركز منطقة الرسم** ولا
+       مع النقطة المحوَّم عليها.
+     • **اللوح مبني بمحتوى**: لا ‎.tab-missing‎ ولا لوح فارغ.
+     • **الملاحق بلا تمرير على مستوى المسرح** (عقد V2 الباقي للملاحق).
+   يفشل (exit 1) عند أي إخفاق. */
 import { chromium } from "playwright";
 import { fileURLToPath } from "url";
 import path from "path";
@@ -15,43 +35,38 @@ const argOf = (k, dflt) => {
   return i >= 0 ? args[i + 1] : dflt;
 };
 const OUT = path.resolve(argOf("--out", path.join(ROOT, "tools", "qa", "shots")));
-const ROUTES = argOf("--routes",
-  ["scene/00",
-    "section/summary", "section/demand", "section/licensing", "section/control",
-    "section/map", "section/initiatives", "section/kpis",
-    "section/kpis?step=1", "section/kpis?step=2",
-    "section/forecast", "section/closing",
-    "appendix/demand", "appendix/monitoring", "appendix/kpi",
-    "appendix/pillar", "appendix/licensing",
-    // ── حزمة التوسعة: ملاحقها الأربعة الجديدة ──
-    "appendix/atlas", "appendix/scenarios",
-    "appendix/methodology", "appendix/decisions",
-    // ── مركز المقارنة القطاعية: صفحاته الخمس (المصفوفة، بطاقة القطاع،
-    //    الفجوة والتركّز، مطابقة المجاميع، الصيغ والمصادر) ──
-    "appendix/compare", "appendix/compare?page=1", "appendix/compare?page=2",
-    "appendix/compare?page=3", "appendix/compare?page=4",
-    // ── حالات لا يبلغها العنوان وحده (تفاعل لازم) — أسماء زائفة يحلّها
-    //    جدول PSEUDO أدناه: وضع الموجز، لوحة الأوامر مفتوحة، خطوة جولة،
-    //    درج ملاحظات المقدِّم (N)، وتبويبا الإدارة الجديدان (خلف بوابة دخول) ──
-    "state/report", "state/report-print",
-    "state/palette", "state/tour", "state/notes",
-    "state/admin-report", "state/admin-diff"].join(",")).split(",");
+
+/** المحاور الخمسة القانونية — أساس كل لقطة ومقياس */
+const TAB_IDS = ["demand", "licensing", "control", "initiatives", "kpis"];
+
+const ROUTES = argOf("--routes", [
+  // ١) التبويبات الخمسة — البنية الأساسية
+  ...TAB_IDS.map((id) => "tab/" + id),
+  // ٢) الملاحق المفتاحية: ملحق كل تبويب + الملاحق المستعرضة
+  "appendix/demand", "appendix/licensing", "appendix/monitoring",
+  "appendix/pillar", "appendix/kpi",
+  "appendix/atlas", "appendix/scenarios",
+  "appendix/methodology", "appendix/decisions", "appendix/compare",
+  // ٣) حالات لا يبلغها العنوان وحده (تفاعل لازم) — تُلتقط في السمة الأولى فقط
+  "state/report", "state/report-print", "state/palette",
+  "state/present", "state/notes",
+  "state/admin-report", "state/admin-diff",
+].join(",")).split(",");
+
 const SIZES = argOf("--sizes", "1920x1080,1366x768").split(",")
   .map((s) => s.split("x").map(Number));
+const THEMES = argOf("--themes", "light,dark").split(",");
 
 fs.mkdirSync(OUT, { recursive: true });
 const indexUrl = "file://" + path.join(ROOT, "index.html");
 
 /* ════════════════════════════════════════════════════════════════════════════
-   المسارات الزائفة (state/*) — حالات حزمة التوسعة التي لا يبلغها الهاش وحده
-   ────────────────────────────────────────────────────────────────────────────
-   كلٌّ منها: هاش انطلاق + تهيئة تفاعلية + تأكيدات خاصة بالحالة. تُشغَّل داخل
-   حلقة المقاسات ذاتها فتخضع لفحص الكونسول نفسه، وتنتج لقطة مسمّاة كبقية
-   المسارات. تخرج التأكيدات بقائمة نصوص أخطاء (فارغة = خضراء).
+   المسارات الزائفة (state/*) — حالات لا يبلغها الهاش وحده
+   ──────────────────────────────────────────────────────────────────────────
+   كلٌّ منها: هاش انطلاق + تهيئة تفاعلية + تأكيدات خاصة بالحالة. تخرج التأكيدات
+   بقائمة نصوص أخطاء (فارغة = خضراء). تُلتقط في **السمة الأولى وحدها**: كلفتها
+   عالية (بوابة دخول الإدارة، مستند الموجز الطويل) وما تفحصه سلوكيّ لا لوني.
    ══════════════════════════════════════════════════════════════════════════ */
-/* دخول الإدارة (وضع محلي تجريبي): البوابة تطلب اسماً وعبارة مرور عند أول
-   تهيئة في سياق متصفح جديد، والعبارة وحدها إن سبقت التهيئة — فنتعامل مع
-   الحالتين. لا جلسة قائمة = لا بوابة، فنمرّ بلا عمل. */
 async function adminSignIn(page) {
   const errs = [];
   const gate = page.locator(".adm-gate-card");
@@ -68,7 +83,7 @@ async function adminSignIn(page) {
 }
 
 const PSEUDO = {
-  /* وضع الموجز التنفيذي: مستند A4 يتجاوز المسرح كلياً */
+  /* وضع الموجز التنفيذي: مستند A4 يتجاوز قشرة التبويبات كلياً */
   "state/report": {
     hash: "#/report",
     settle: 5000,
@@ -82,10 +97,8 @@ const PSEUDO = {
         if (!root || root.hidden) errs.push("جذر الموجز غائب أو مخفي");
         const pages = document.querySelectorAll(".rpt-page");
         if (pages.length < 3) errs.push("صفحات الموجز " + pages.length + " (<3)");
-        const stage = document.getElementById("stage");
-        if (stage && !stage.hidden) errs.push("المسرح ظاهر في وضع الموجز");
-        const hud = document.getElementById("hud");
-        if (hud && !hud.hidden) errs.push("شريط HUD ظاهر في وضع الموجز");
+        const tabs = document.getElementById("tabs-root");
+        if (tabs && !tabs.hidden) errs.push("قشرة التبويبات تتعايش مع الموجز");
         const admin = document.getElementById("admin-root");
         if (admin && !admin.hidden) errs.push("جذر الإدارة يتعايش مع الموجز");
         return errs;
@@ -93,8 +106,7 @@ const PSEUDO = {
     },
   },
 
-  /* بوابة الطباعة (البند 5): محاكاة media:print على مسار الموجز — لا شيء
-     غير المستند مرئي، ولا شريط أدوات، ولا كروم مقدِّم. */
+  /* بوابة الطباعة: محاكاة media:print على مسار الموجز */
   "state/report-print": {
     hash: "#/report",
     settle: 5000,
@@ -110,21 +122,20 @@ const PSEUDO = {
           if (cs.display === "none" || cs.visibility === "hidden") return false;
           return el.getBoundingClientRect().height > 1;
         };
-        // (أ) كل ما ليس الموجز مخفيٌّ فعلياً عند الطباعة
-        for (const id of ["stage", "hud", "release-badge", "admin-root"]) {
+        for (const id of ["stage", "hud", "release-badge", "admin-root",
+          "tabs-root"]) {
           if (vis(document.getElementById(id))) errs.push("ظاهر عند الطباعة: #" + id);
         }
-        for (const sel of [".rpt-toolbar", ".hudx-palette", ".hudx-report",
-          ".tour-bar", ".tour-notes", ".pal-root"]) {
-          const el = document.querySelector(sel);
-          if (vis(el)) errs.push("ظاهر عند الطباعة: " + sel);
+        for (const sel of [".rpt-toolbar", ".tour-bar", ".tour-notes",
+          ".pal-root", ".hl-overlay"]) {
+          if (vis(document.querySelector(sel))) {
+            errs.push("ظاهر عند الطباعة: " + sel);
+          }
         }
-        // (ب) المستند نفسه ظاهر بصفحاته
         const root = document.getElementById("report-root");
         if (!vis(root)) errs.push("مستند الموجز غير مرئي عند الطباعة");
         const pages = Array.from(document.querySelectorAll(".rpt-page")).filter(vis);
         if (pages.length < 3) errs.push("صفحات مرئية عند الطباعة " + pages.length + " (<3)");
-        // (ج) لا صفحة تفيض عرضياً عن ورقتها (كسر تخطيط الطباعة)
         for (const p of pages) {
           if (p.scrollWidth > p.clientWidth + 2) {
             errs.push("صفحة موجز تفيض عرضياً: " + (p.className || ""));
@@ -135,15 +146,16 @@ const PSEUDO = {
     },
   },
 
-  /* لوحة الأوامر مفتوحة فوق لوحة حية (Ctrl+K) */
+  /* لوحة الأوامر مفتوحة فوق تبويب حي (Ctrl+K) */
   "state/palette": {
-    hash: "#/section/demand",
+    hash: "#/tab/demand",
     settle: 2600,
     async prepare(page) {
       await page.keyboard.press("Control+KeyK");
       await page.waitForTimeout(700);
       await page.keyboard.type("الرياض");
       await page.waitForTimeout(700);
+      return [];
     },
     async check(page) {
       return page.evaluate(() => {
@@ -172,62 +184,63 @@ const PSEUDO = {
     },
   },
 
-  /* خطوة من الجولة الموجهة: تنطلق من زر الغلاف ثم تتقدم خطوتين */
-  "state/tour": {
-    hash: "#/scene/00",
-    settle: 3000,
-    /* التهيئة تُرجع أخطاءها بنفسها: زر الإطلاق يعيش على الغلاف وحده، وبدء
-       الجولة يغادر الغلاف فيُفكَّك مضيفه — فالتأكيد على وجود الزر يجب أن يقع
-       قبل النقر لا بعده (وإلا ظُنّ الغياب المشروع خللاً). */
+  /* وضع العرض الاختياري بالكليكر (V3_SPEC §6): طبقة فوق التبويبات لا بنية */
+  "state/present": {
+    hash: "#/tab/control",
+    settle: 2600,
     async prepare(page) {
       const errs = [];
-      const launch = page.locator(".tour-launch");
-      if (await launch.count() === 0) {
-        errs.push("زر إطلاق الجولة غير مركَّب على الغلاف");
+      const btn = page.locator("#tabx-present");
+      if (await btn.count() === 0) {
+        errs.push("زر وضع العرض غائب عن الرأس");
         return errs;
       }
-      if (!await launch.first().isVisible()) {
-        errs.push("زر إطلاق الجولة مركَّب لكنه غير مرئي على الغلاف");
-      }
-      await launch.first().click();
-      await page.waitForTimeout(1600);
-      await page.keyboard.press("ArrowRight");
-      await page.waitForTimeout(1600);
+      await btn.first().click();
+      await page.waitForTimeout(2600);
       return errs;
     },
     async check(page) {
       return page.evaluate(() => {
         const errs = [];
-        if (!document.body.classList.contains("tour-active")) {
-          errs.push("الجولة لم تُفعّل (tour-active غائب عن body)");
+        if (!document.body.classList.contains("mode-present")) {
+          errs.push("وضع العرض لم يُفعّل على body");
           return errs;
         }
-        const bar = document.querySelector(".tour-bar");
-        if (!bar) { errs.push("شريط الجولة غائب"); return errs; }
-        const r = bar.getBoundingClientRect();
-        if (r.bottom > window.innerHeight + 1) errs.push("شريط الجولة مقصوص أسفل الإطار");
-        if (r.left < -1 || r.right > window.innerWidth + 1) {
-          errs.push("شريط الجولة مقصوص أفقياً");
+        const tabs = document.getElementById("tabs-root");
+        if (tabs && getComputedStyle(tabs).display !== "none") {
+          errs.push("قشرة التبويبات ما زالت مرسومة في وضع العرض");
         }
-        // الجولة قادت المحرك فعلاً: لم نعد على الغلاف
-        if (/scene\/00/.test(location.hash)) errs.push("الجولة لم تغادر الغلاف بعد خطوة");
+        const stage = document.getElementById("stage");
+        if (!stage || stage.hidden) errs.push("المسرح غائب في وضع العرض");
+        const exit = document.getElementById("tabx-exit-present");
+        if (!exit || exit.getBoundingClientRect().height < 4) {
+          errs.push("مخرج وضع العرض غير ظاهر");
+        }
         return errs;
       });
     },
     async after(page) {
       await page.keyboard.press("Escape");
-      await page.waitForTimeout(400);
+      await page.waitForTimeout(1200);
     },
   },
 
-  /* درج ملاحظات المقدِّم (مفتاح N) فوق لوحة حية — يعمل دون جولة نشطة */
+  /* درج ملاحظات المتحدث (N) داخل وضع العرض — أداته الطبيعية */
   "state/notes": {
-    hash: "#/section/control",
-    settle: 3400,
+    hash: "#/tab/control",
+    settle: 2600,
     async prepare(page) {
+      const errs = [];
+      const btn = page.locator("#tabx-present");
+      if (await btn.count() === 0) {
+        errs.push("زر وضع العرض غائب — تعذّر بلوغ درج الملاحظات");
+        return errs;
+      }
+      await btn.first().click();
+      await page.waitForTimeout(2600);
       await page.keyboard.press("KeyN");
       await page.waitForTimeout(1000);
-      return [];
+      return errs;
     },
     async check(page) {
       return page.evaluate(() => {
@@ -259,10 +272,12 @@ const PSEUDO = {
     async after(page) {
       await page.keyboard.press("KeyN");
       await page.waitForTimeout(300);
+      await page.keyboard.press("Escape");
+      await page.waitForTimeout(1000);
     },
   },
 
-  /* منشئ الموجز في الإدارة (تبويب #/admin/report) — خلف بوابة الدخول */
+  /* منشئ الموجز في الإدارة — خلف بوابة الدخول */
   "state/admin-report": {
     hash: "#/admin",
     settle: 1700,
@@ -289,17 +304,14 @@ const PSEUDO = {
         if (content.scrollWidth > content.clientWidth + 2) {
           errs.push("جسم منشئ الموجز يفيض عرضياً");
         }
-        const stage = document.getElementById("stage");
-        if (stage && !stage.hidden) errs.push("المسرح ظاهر داخل الإدارة");
+        const tabs = document.getElementById("tabs-root");
+        if (tabs && !tabs.hidden) errs.push("قشرة التبويبات ظاهرة داخل الإدارة");
         return errs;
       });
     },
   },
 
-  /* مقارن الإصدارات (تبويب #/admin/diff): يتطلب مسودة مفتوحة — نفتحها من
-     الإصدار المنشور بمسار الواجهة نفسه ونجري تعديلاً واحداً موثّقاً على حقل
-     تاريخ العرض كي تُرى المقارنة عاملة لا فارغة. المسودة محلية زائلة في سياق
-     متصفح اللقطات، ولا تمسّ الإصدار المنشور بحال. */
+  /* مقارن الإصدارات: يتطلب مسودة مفتوحة — تُفتح ويُعدَّل حقل واحد موثّق */
   "state/admin-diff": {
     hash: "#/admin",
     settle: 1700,
@@ -354,181 +366,273 @@ const PSEUDO = {
   },
 };
 
+/* ════════════════════════════════════════════════════════════════════════════
+   بوابة «صفر تمرير أفقي» (V3_SPEC §3)
+   ══════════════════════════════════════════════════════════════════════════ */
+async function horizontalScrollErrors(page) {
+  return page.evaluate(() => {
+    const errs = [];
+    const de = document.documentElement;
+    if (de.scrollWidth > window.innerWidth + 2) {
+      errs.push("تمرير أفقي على الجذر: " + de.scrollWidth + " > " + window.innerWidth);
+    }
+    if (document.body.scrollWidth > window.innerWidth + 2) {
+      errs.push("تمرير أفقي على body: " + document.body.scrollWidth);
+    }
+    // أي وعاء تخطيط يفيض عرضياً بلا تمرير معلن = كسر شبكة لا تمرير مقصود
+    const SEL = ".tab-panel, .tabgrid, .tabcard, .tabcard-body, .tabfigs, "
+      + ".tabtrack, .brand-lock-inner, .sc, .ax-body, .ax-page";
+    for (const el of document.querySelectorAll(SEL)) {
+      const cs = getComputedStyle(el);
+      if (cs.overflowX === "auto" || cs.overflowX === "scroll") continue;
+      if (el.scrollWidth > el.clientWidth + 2) {
+        errs.push("فيضان أفقي بلا تمرير معلن: " + (el.className || el.tagName)
+          + " (" + el.scrollWidth + " > " + el.clientWidth + ")");
+      }
+    }
+    return errs;
+  });
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   بوابة «التلميح لا يغطي الرسم» (V3_SPEC §3 و§7)
+   ──────────────────────────────────────────────────────────────────────────
+   الشكوى الحرفية للعميل: «حين أحوّم على رسم تظهر التفاصيل فتغطي الرسم كله».
+   العلاج المتعاقَد عليه: ‎confine:true‎ + ‎ttPosition‎ التي تُلصق الصندوق
+   بالحافة **المقابلة** للمؤشر. هذه البوابة تحوّم بفأرة حقيقية على كل رسم رئيس
+   ثم تقيس صندوق التلميح الظاهر فعلاً وتثبت أنه:
+     (أ) لا يبتلع **مركز منطقة الرسم**،
+     (ب) لا يغطي النقطة المحوَّم عليها نفسها،
+     (ج) لا يتجاوز العرض الأقصى المتعاقد عليه (260px)،
+     (د) لا يخرج عن حدود الرسم (‎confine‎).
+   غياب التلميح ليس إخفاقاً: بعض الأسطح (خرائط، حلقات) لا تلميح لها.
+   ══════════════════════════════════════════════════════════════════════════ */
+const TT_MAX_W = 260;
+
+/** مواضع التحويم النسبية داخل كل رسم — مسح لا نقطة واحدة، فالسلسلة قد تكون
+    خالية عند موضع بعينه فيمرّ الفحص بلا أن يرى تلميحاً قط. */
+const HOVER_POINTS = [
+  [0.26, 0.42], [0.42, 0.62], [0.62, 0.38], [0.78, 0.58],
+];
+
+async function tooltipOverlapErrors(page) {
+  const errs = [];
+  const seen = { charts: 0, tips: 0 };
+  const count = await page.evaluate(() => {
+    let n = 0;
+    document.querySelectorAll(".tabchart").forEach((el, i) => {
+      el.dataset.qaChart = String(i);
+      n++;
+    });
+    return n;
+  });
+
+  for (let i = 0; i < count; i++) {
+    // التبويب يتمرر رأسياً بحق، فكل رسم يُجلب إلى الإطار قبل تحويمه — وإلا
+    // فُحص الطي الأول وحده وبقيت رسوم أسفل الصفحة بلا بوابة.
+    const b = await page.evaluate((idx) => {
+      const el = document.querySelector('[data-qa-chart="' + idx + '"]');
+      if (!el) return null;
+      el.scrollIntoView({ block: "center", behavior: "instant" });
+      const r = el.getBoundingClientRect();
+      if (r.width < 80 || r.height < 80) return null;
+      return { x: r.left, y: r.top, w: r.width, h: r.height };
+    }, i);
+    if (!b) continue;
+    await page.waitForTimeout(140);
+    seen.charts++;
+
+    for (const [fx, fy] of HOVER_POINTS) {
+      const hx = b.x + b.w * fx;
+      const hy = b.y + b.h * fy;
+      if (hy < 1 || hy > 1e5) continue;
+      await page.mouse.move(hx, hy, { steps: 3 });
+      await page.waitForTimeout(260);
+      const tip = await page.evaluate(([idx, px, py]) => {
+        const el = document.querySelector('[data-qa-chart="' + idx + '"]');
+        if (!el) return null;
+        const cand = Array.from(el.querySelectorAll("div")).filter((d) => {
+          const st = d.getAttribute("style") || "";
+          if (!/position:\s*absolute/i.test(st)) return false;
+          const cs = getComputedStyle(d);
+          if (cs.display === "none" || cs.visibility === "hidden") return false;
+          if (parseFloat(cs.opacity || "1") < 0.05) return false;
+          const rr = d.getBoundingClientRect();
+          if (rr.width < 20 || rr.height < 12) return false;
+          return !!String(d.textContent || "").trim();
+        });
+        if (!cand.length) return null;
+        const t = cand[cand.length - 1].getBoundingClientRect();
+        const c = el.getBoundingClientRect();
+        return {
+          t: { l: t.left, r: t.right, tp: t.top, b: t.bottom, w: t.width },
+          c: { l: c.left, r: c.right, tp: c.top, b: c.bottom,
+            cx: c.left + c.width / 2, cy: c.top + c.height / 2 },
+          px, py,
+        };
+      }, [i, hx, hy]);
+
+      // لا تلميح عند هذا الموضع — مشروع (سلسلة خالية أو سطح بلا تحويم)
+      if (!tip) continue;
+      seen.tips++;
+
+      const where = "(رسم #" + i + " @" + fx + "," + fy + ")";
+      const inBox = (x, y, r) => x >= r.l - 1 && x <= r.r + 1
+        && y >= r.tp - 1 && y <= r.b + 1;
+      if (inBox(tip.c.cx, tip.c.cy, tip.t)) {
+        errs.push("صندوق التلميح يبتلع مركز منطقة الرسم " + where);
+      }
+      if (inBox(tip.px, tip.py, tip.t)) {
+        errs.push("صندوق التلميح يغطي النقطة المحوَّم عليها " + where);
+      }
+      if (tip.t.w > TT_MAX_W + 2) {
+        errs.push("عرض التلميح " + Math.round(tip.t.w)
+          + "px > الحد " + TT_MAX_W + " " + where);
+      }
+      if (tip.t.l < tip.c.l - 2 || tip.t.r > tip.c.r + 2
+        || tip.t.tp < tip.c.tp - 2 || tip.t.b > tip.c.b + 2) {
+        errs.push("التلميح يخرج عن حدود الرسم رغم confine " + where);
+      }
+    }
+  }
+  // إبعاد الفأرة وإعادة التمرير إلى الأعلى كي لا يتسرب أثر إلى اللقطة التالية
+  await page.mouse.move(2, 2);
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.waitForTimeout(140);
+  if (process.env.QA_TOOLTIP_TRACE) {
+    console.log("    · تلميح: " + seen.tips + " ظهور على " + seen.charts + " رسماً");
+  }
+  return errs;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   التنفيذ
+   ══════════════════════════════════════════════════════════════════════════ */
 const browser = await chromium.launch({
   executablePath: process.env.CHROMIUM_PATH || undefined,
 });
-let consoleErrors = [];
+const problems = [];
 
 for (const [w, hgt] of SIZES) {
-  const page = await browser.newPage({ viewport: { width: w, height: hgt } });
-  page.on("console", (msg) => {
-    if (msg.type() !== "error") return;
-    // غياب الوسائط الاختيارية (ملفات شقيقة/CloudFront/بلاطات OSM) مسار بديل
-    // مقصود بعقد التدهور الرشيق — أخطاء شبكتها فقط تُتجاهل، لا شيء غيرها.
-    if (/ERR_FILE_NOT_FOUND|ERR_NAME_NOT_RESOLVED|ERR_INTERNET_DISCONNECTED|ERR_ADDRESS_UNREACHABLE|ERR_CONNECTION|ERR_TUNNEL_CONNECTION|ERR_PROXY_CONNECTION|Failed to load resource/.test(msg.text())
+  for (const theme of THEMES) {
+    const page = await browser.newPage({ viewport: { width: w, height: hgt } });
+    const tag = `[${w}x${hgt}/${theme}]`;
+    // السمة تُثبَّت قبل أول طلاء بمفتاح ‎themeMode‎ نفسه — لا نقر ولا ومضة
+    await page.addInitScript((t) => {
+      try { window.localStorage.setItem("rh:theme", t); } catch (_e) { /* بلا تخزين */ }
+    }, theme);
+
+    page.on("console", (msg) => {
+      if (msg.type() !== "error") return;
+      // غياب الوسائط الاختيارية (ملفات شقيقة/CloudFront/بلاطات OSM) مسار بديل
+      // مقصود بعقد التدهور الرشيق — أخطاء شبكتها فقط تُتجاهل، لا شيء غيرها.
+      if (/ERR_FILE_NOT_FOUND|ERR_NAME_NOT_RESOLVED|ERR_INTERNET_DISCONNECTED|ERR_ADDRESS_UNREACHABLE|ERR_CONNECTION|ERR_TUNNEL_CONNECTION|ERR_PROXY_CONNECTION|Failed to load resource/.test(msg.text())
         && /assets\/media|cover-|cloudfront\.net|openstreetmap\.org/.test(page.url() + msg.location().url + msg.text())) return;
-    consoleErrors.push(`[${w}x${hgt}] ${msg.text()}`);
-  });
-  page.on("pageerror", (err) => consoleErrors.push(`[${w}x${hgt}] PAGEERROR ${err.message}`));
-  for (const route of ROUTES) {
-    const pseudo = PSEUDO[route];
-    if (pseudo) {
-      // ── مسار زائف: هاش انطلاق + تهيئة تفاعلية + تأكيدات حالة ──
-      if (pseudo.before) await pseudo.before(page);
-      await page.goto(indexUrl + pseudo.hash, { waitUntil: "load" });
-      await page.waitForTimeout(pseudo.settle || 3000);
-      const prepErrs = pseudo.prepare ? (await pseudo.prepare(page)) || [] : [];
-      await page.waitForTimeout(600);
-      const pname = route.replace(/[\/?=&]/g, "_") + `_${w}x${hgt}.png`;
-      // الموجز مستند طويل، وتبويبا الإدارة صفحتا أداة تتمرران بحق (لا مسرح
-      // مقدِّم) — لقطة كاملة الصفحة في الحالتين كي يرى المجلس السطح كله لا
-      // رأسه وحده. أما درج الملاحظات ولوحة الأوامر والجولة فطبقات فوق مسرح
-      // بلا تمرير، فلقطة الإطار هي تمثيلها الصادق.
-      const full = route.startsWith("state/report")
-        || route.startsWith("state/admin-");
-      await page.screenshot({ path: path.join(OUT, pname), fullPage: full });
-      const errs = prepErrs.concat(pseudo.check ? await pseudo.check(page) : []);
-      for (const e of errs) consoleErrors.push(`[${w}x${hgt}] ${route}: ${e}`);
-      if (pseudo.after) await pseudo.after(page);
-      continue;
-    }
+      problems.push(`${tag} ${msg.text()}`);
+    });
+    page.on("pageerror", (err) => problems.push(`${tag} PAGEERROR ${err.message}`));
 
-    await page.goto(indexUrl + "#/" + route, { waitUntil: "load" });
-    // استقرار كامل: حركات الدخول والعد التصاعدي + مهلة سقوط بلاطات الخريطة
-    // إلى SVG (3 ثوانٍ) — فلا تُلتقط اللوحة في حالة انتقالية أبداً
-    await page.waitForTimeout(4000);
-    const name = route.replace(/[\/?=&]/g, "_") + `_${w}x${hgt}.png`;
-    await page.screenshot({ path: path.join(OUT, name) });
+    for (const route of ROUTES) {
+      const pseudo = PSEUDO[route];
+      // الحالات التفاعلية تُلتقط في السمة الأولى وحدها (سلوك لا لون)
+      if (pseudo && theme !== THEMES[0]) continue;
 
-    // بوابات «لا صف بيانات مقصوص»: عناصر معدودة يجب أن تكون كاملة داخل
-    // إطار العرض (مراجعة الجولة 1 — صف الجنوب وصف المتفائل المقصوصان)
-    const VISIBLE_COUNTS = {
-      "section/summary": [[".sum-gates", 1]],
-      "section/demand": [[".dmd-rank-row", 5], [".dmd-appx", 1], [".dmd-meta", 1]],
-      "section/control": [[".ctl-mon-row", 5], [".rail-item", 3], [".ctl-meta", 1]],
-      "section/forecast": [[".fct-rank-row", 3], [".fct-sc", 3]],
-      // الجولة 3: القطاعات الخمسة كلها ظاهرة كاملة (كانت 1 = المتصدر فقط)
-      "section/map": [[".map-sec", 5], [".map-src", 1]],
-      "section/initiatives": [[".rail-item", 3], [".ini-source", 1], [".ini-meta", 1]],
-      "section/kpis": [[".kpi7-src-bar", 1], [".rail-item", 3]],
-      "section/kpis?step=2": [[".kpi7-src-bar", 1], [".rail-item", 3]],
-      "section/closing": [[".cls-home", 1]],
-    };
-    const checks = VISIBLE_COUNTS[route];
-    if (checks) {
-      for (const [sel, wanted] of checks) {
-        const fullyVisible = await page.evaluate(([s, n]) => {
-          const els = Array.from(document.querySelectorAll(s));
-          const vh = window.innerHeight, vw = window.innerWidth;
-          const ok = els.filter((el) => {
-            const r = el.getBoundingClientRect();
-            if (r.width < 2 || r.height < 8) return false; // منهار = مقصوص فعلياً
-            if (r.top < -1 || r.bottom > vh + 1) return false;
-            if (r.left < -1 || r.right > vw + 1) return false;
-            // غير مقصوص بأسلاف overflow: نقطة مركزه تصله فعلاً
-            const cx = (r.left + r.right) / 2, cy = (r.top + r.bottom) / 2;
-            const hit = document.elementFromPoint(cx, cy);
-            return !!hit && (el === hit || el.contains(hit) || hit.contains(el));
-          });
-          return ok.length;
-        }, [sel, wanted]);
-        if (fullyVisible < wanted) {
-          consoleErrors.push(`[${w}x${hgt}] ${route}: ${sel} — الظاهر كاملاً ${fullyVisible} من ${wanted} (صف بيانات مقصوص!)`);
+      const shot = (extra) => path.join(OUT,
+        route.replace(/[\/?=&]/g, "_") + `_${theme}_${w}x${hgt}${extra || ""}.png`);
+
+      if (pseudo) {
+        if (pseudo.before) await pseudo.before(page);
+        await page.goto(indexUrl + pseudo.hash, { waitUntil: "load" });
+        await page.waitForTimeout(pseudo.settle || 3000);
+        const prepErrs = pseudo.prepare ? (await pseudo.prepare(page)) || [] : [];
+        await page.waitForTimeout(600);
+        // الموجز مستند طويل وتبويبا الإدارة صفحتا أداة تتمرران بحق — لقطة
+        // كاملة الصفحة فيهما كي يُرى السطح كله لا رأسه وحده.
+        const full = route.startsWith("state/report")
+          || route.startsWith("state/admin-");
+        await page.screenshot({ path: shot(), fullPage: full });
+        const errs = prepErrs.concat(pseudo.check ? await pseudo.check(page) : []);
+        for (const e of errs) problems.push(`${tag} ${route}: ${e}`);
+        if (pseudo.after) await pseudo.after(page);
+        continue;
+      }
+
+      await page.goto(indexUrl + "#/" + route, { waitUntil: "load" });
+      // استقرار كامل: حركات الدخول والعد التصاعدي + مهلة سقوط بلاطات الخريطة
+      // إلى SVG — فلا تُلتقط اللوحة في حالة انتقالية أبداً
+      await page.waitForTimeout(4000);
+
+      const isTab = route.startsWith("tab/");
+      // التبويب يتمرر رأسياً بحق (V3_SPEC §3) فلقطته كاملة الصفحة، وإلى جانبها
+      // لقطة الإطار الأول التي يراها العميل عند الفتح.
+      await page.screenshot({ path: shot(), fullPage: isTab });
+      if (isTab) await page.screenshot({ path: shot("_fold") });
+
+      // ── بوابة العنوان: المسار وصل حيث يجب ──
+      const landed = await page.evaluate(() => location.hash);
+      if (isTab) {
+        const want = "#/" + route.split("?")[0];
+        if (!landed.startsWith(want)) {
+          problems.push(`${tag} ${route}: العنوان انزلق إلى ${landed}`);
+        }
+      }
+
+      // ── بوابة «اللوح مبني بمحتوى» ──
+      if (isTab) {
+        const panel = await page.evaluate(() => {
+          const p = document.querySelector(".tab-panel");
+          return {
+            missing: !!document.querySelector(".tab-missing"),
+            empty: !p || String(p.textContent || "").trim().length < 40,
+            charts: document.querySelectorAll(".tabchart").length,
+            tracker: document.querySelectorAll(".tabtrack-item").length,
+            logo: !!document.querySelector(".brand-lock-logo *"),
+          };
+        });
+        if (panel.missing) problems.push(`${tag} ${route}: لوح «التبويب غير مُسجَّل»`);
+        if (panel.empty) problems.push(`${tag} ${route}: لوح التبويب فارغ`);
+        if (panel.tracker !== TAB_IDS.length) {
+          problems.push(`${tag} ${route}: المتتبّع يعرض ${panel.tracker} محاور لا ${TAB_IDS.length}`);
+        }
+        if (!panel.logo) problems.push(`${tag} ${route}: شعار الرأس لم يُبنَ`);
+      }
+
+      // ── بوابة صفر تمرير أفقي ──
+      for (const e of await horizontalScrollErrors(page)) {
+        problems.push(`${tag} ${route}: ${e}`);
+      }
+
+      // ── بوابة التلميح لا يغطي الرسم ──
+      if (isTab) {
+        for (const e of await tooltipOverlapErrors(page)) {
+          problems.push(`${tag} ${route}: ${e}`);
+        }
+      }
+
+      // ── الملاحق: لا تمرير رأسي على مستوى المسرح (عقد V2 الباقي) ──
+      if (route.startsWith("appendix/")) {
+        const scrollable = await page.evaluate(() => {
+          const host = document.querySelector(".scene-host:not([hidden])");
+          if (!host) return "لا مضيف مشهد";
+          if (host.scrollHeight > host.clientHeight + 2) return "host";
+          const sc = host.querySelector(".sc");
+          if (sc && sc.scrollHeight > sc.clientHeight + 2) return "sc";
+          return false;
+        });
+        if (scrollable) {
+          problems.push(`${tag} ${route}: تمرير رأسي على مستوى المسرح (${scrollable})`);
         }
       }
     }
-    // بوابة اللاتمرير على مستوى المسرح: لا تمرير في المضيف ولا في جذر
-    // المشهد/اللوحة (.sc للغلاف والملاحق، .dash لأقسام V2). جسم اللوحة
-    // .dash-body يجوز له التمرير الداخلي بعقد V2 (وضع اللوحة) — لا يُحتسب.
-    const scrollable = await page.evaluate(() => {
-      const host = document.querySelector(".scene-host:not([hidden])");
-      if (!host) return false;
-      if (host.scrollHeight > host.clientHeight + 2) return "host";
-      const sc = host.querySelector(".sc");
-      if (sc && sc.scrollHeight > sc.clientHeight + 2) return "sc";
-      const dash = host.querySelector(".dash");
-      if (dash && dash.scrollHeight > dash.clientHeight + 2) return "dash";
-      return false;
-    });
-    if (scrollable) consoleErrors.push(`[${w}x${hgt}] ${route}: تمرير رأسي على مستوى المسرح (${scrollable})!`);
-
-    // بوابة الجولة 3 (وعد الجولة 2 المؤتمت): على كل شاشات الأقسام وبكلا
-    // المقاسين — (أ) لا محتوى يُرسم تحت شارة الإصدار الثابتة، (ب) لا بطاقة/
-    // صف يُقص عند طية العرض خارج متمرر داخلي معلن، (ج) لا نص رؤية يفيض
-    // بلا قصّ line-clamp معلن (بتر عند حافة البطاقة).
-    if (route.startsWith("section/")) {
-      const layoutErrs = await page.evaluate(() => {
-        const errs = [];
-        const CONTENT = ".dash-card, .rail-item, .stat-card, .pending-card, .kpi, "
-          + ".dmd-rank-row, .dmd-appx, .dmd-meta, .dmd-chip, .dmd-cardfoot, "
-          + ".ctl-mon-row, .ctl-appx, .ctl-meta, .ini-source, .ini-meta, "
-          + ".map-sec, .map-src, .sum-gates, .kpi7-src-bar, .kpi7-truth, "
-          + ".cls-footer, .cls-linkbtn, .table-dense, button";
-
-        // (أ) عيّنة نقاط عبر مستطيل الشارة: elementFromPoint يتجاهل الشارة
-        // (pointer-events:none) فيصيب ما يُرسم تحتها فعلاً — أي إصابة لعنصر
-        // محتوى تعني تصادماً بصرياً حقيقياً لا تقاطع مستطيلات نظرياً.
-        const badge = document.getElementById("release-badge");
-        if (badge && !badge.hidden) {
-          const br = badge.getBoundingClientRect();
-          let hitCls = null;
-          outer:
-          for (let fx = 0.06; fx <= 0.95; fx += 0.22) {
-            for (let fy = 0.15; fy <= 0.85; fy += 0.35) {
-              const el = document.elementFromPoint(
-                br.left + br.width * fx, br.top + br.height * fy);
-              const c = el && el.closest ? el.closest(CONTENT) : null;
-              if (c) { hitCls = c.className || c.tagName; break outer; }
-            }
-          }
-          if (hitCls) errs.push("محتوى يُرسم تحت شارة الإصدار: " + hitCls);
-        }
-
-        // (ب) القص عند الطية: عنصر بطاقي ظاهرُ الأعلى مقصوصُ الأسفل خارج
-        // أي متمرر داخلي (المتمرر المعلن بشريطه يقصّ مشروعاً — سواه لا).
-        const CARDS = document.querySelectorAll(
-          ".rail-item, .stat-card, .pending-card, .map-sec, .dmd-rank-row, "
-          + ".ctl-mon-row, .dmd-appx, .ctl-appx, .ini-source, .kpi7-src-bar, "
-          + ".dash-card");
-        const vh = window.innerHeight;
-        for (const el of CARDS) {
-          const r = el.getBoundingClientRect();
-          if (r.height < 8 || r.top >= vh || r.bottom <= vh + 1) continue;
-          let anc = el.parentElement, scrollableAnc = false;
-          while (anc) {
-            const oy = getComputedStyle(anc).overflowY;
-            if ((oy === "auto" || oy === "scroll")
-              && anc.scrollHeight > anc.clientHeight + 2) { scrollableAnc = true; break; }
-            anc = anc.parentElement;
-          }
-          if (!scrollableAnc) {
-            errs.push("عنصر مقصوص عند الطية بلا متمرر: " + (el.className || el.tagName));
-          }
-        }
-
-        // (ج) نص رؤية يفيض عن صندوقه بلا line-clamp معلن = بتر منتصف جملة
-        for (const t of document.querySelectorAll(".rail-item-text")) {
-          const cs = getComputedStyle(t);
-          const clamped = cs.webkitLineClamp && cs.webkitLineClamp !== "none";
-          const oneLine = cs.whiteSpace === "nowrap" && cs.textOverflow === "ellipsis";
-          if (t.scrollHeight > t.clientHeight + 3 && !clamped && !oneLine) {
-            errs.push("نص رؤية مبتور بلا قصّ معلن: "
-              + String(t.textContent || "").slice(0, 40));
-          }
-        }
-        return errs;
-      });
-      for (const e of layoutErrs) consoleErrors.push(`[${w}x${hgt}] ${route}: ${e}`);
-    }
+    await page.close();
   }
-  await page.close();
 }
 await browser.close();
 
 console.log(`✓ لقطات في ${OUT}`);
-if (consoleErrors.length) {
+if (problems.length) {
   console.error("✗ أخطاء كونسول/تخطيط:");
-  for (const e of consoleErrors) console.error("  •", e);
+  for (const e of problems) console.error("  •", e);
   process.exit(1);
 }
-console.log("✓ الكونسول نظيف ولا تمرير رأسياً");
+console.log("✓ الكونسول نظيف · صفر تمرير أفقي · التلميح لا يغطي الرسم");

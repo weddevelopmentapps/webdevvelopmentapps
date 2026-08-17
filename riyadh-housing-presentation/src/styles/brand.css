@@ -38,6 +38,13 @@
   gap: 12px;
 }
 .brand-lock-mark, .brand-lock-word { flex: 0 0 auto; }
+/* صحن الشعار: يملأ الفراغ الشفاف داخل القلعة والسماء فلا ينقلب سواداً على
+   السمة الداكنة. أبيض ثابت في السمتين — انظر ‎--brand-plate‎ في tokens.css. */
+.brand-lock-mark {
+  border-radius: 50%;
+  background-color: var(--brand-plate);
+  box-shadow: 0 0 0 2.5px var(--brand-plate);
+}
 /* الشاشات الأضيق: الرمز وحده يحمل الهوية، وكتلة الاسم تنسحب قبل أن تزاحم
    عنوان المنصة أو أزرار الرأس (لا قصّ ولا تصغير إلى ما دون القراءة). */
 @media (max-width: 1180px) {

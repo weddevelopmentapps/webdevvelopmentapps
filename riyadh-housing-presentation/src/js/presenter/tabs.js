@@ -185,6 +185,12 @@ RH.tabs = (function () {
   /** المتتبّع ١…٥ */
   function renderTracker() {
     if (!trackEl) return;
+    // المتتبّع يُعاد بناؤه كاملاً عند كل ‎show‎، فيُتلف الزر الذي يحمل التركيز
+    // ويسقط التركيز إلى ‎<body>‎ — وعندها تموت ملاحة لوحة المفاتيح بعد خطوة
+    // واحدة. نلتقط الحالة قبل الهدم ونعيدها إلى الزر الراهن بعد البناء، فيبقى
+    // الـ‎tabindex‎ المتجوّل حياً ويصح تسلسل الأسهم/Home/End بلا انقطاع.
+    const hadFocus = !!(document.activeElement
+      && trackEl.contains(document.activeElement));
     clear(trackEl);
     // المتتبّع يعرض المحاور الخمسة **دائماً** بترتيبها القانوني، مسجَّلةً كانت
     // أم لا: بنيةُ المنصة ثابتة أمام العميل، والتبويب غير المبني يُعلن غيابه
@@ -223,6 +229,10 @@ RH.tabs = (function () {
       class: "tabtrack-fill",
       style: { inlineSize: pct.toFixed(1) + "%" },
     })));
+    if (hadFocus) {
+      const cur = document.getElementById("tabtrack-" + currentId);
+      if (cur) cur.focus();
+    }
   }
 
   /** أسهم لوحة المفاتيح داخل المتتبّع (RTL: اليسار = التالي) */

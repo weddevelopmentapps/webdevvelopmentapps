@@ -26,7 +26,7 @@
 
    الوحدة تُحمَّل بملفها الحقيقي: ‎load-app.mjs‎ يبني RH كاملة (core + derive
    + geoutils + highlight) في سياق vm، ثم يُنفَّذ ملف التبويب بوسم RH ذاته —
-   فالنموذج النقي يُعرَّف دون DOM، والتسجيل يتخطى نفسه بغياب ‎RH.tabs‎.
+   فالنموذج النقي يُعرَّف دون DOM، والتسجيل يقف في طابور ‎RH.tabs._pending‎.
    لم يُعدَّل ‎load-app.mjs‎ (ملف المعمار) ولا أي ملف خارج عقد هذا التبويب.
    ════════════════════════════════════════════════════════════════════════════ */
 "use strict";
@@ -81,9 +81,14 @@ test("الوحدة تُعرَّف على RH.presenter.tabModels دون لمس DO
     "districtHighlight", "hotspotHighlight", "allHighlightSpecs"]) {
     assert.equal(typeof M[fn], "function", "الدالة الناقصة: " + fn);
   }
-  /* قشرة التبويبات غائبة في بيئة الوحدة فلا يجوز أن يكون التسجيل قد وقع */
-  assert.equal(RH.tabs, undefined,
-    "تسجيل التبويب يجب أن يتخطى نفسه بغياب القشرة");
+  /* قشرة التبويبات غائبة في بيئة الوحدة: التسجيل يقف في الطابور المؤجَّل
+     الذي يعرّفه ‎ns.js‎ ولا يبني شيئاً — لا ‎show‎ ولا ‎boot‎ ولا لمسة DOM. */
+  assert.ok(RH.tabs && Array.isArray(RH.tabs._pending),
+    "طابور التسجيل المؤجَّل (ns.js) غائب");
+  assert.equal(typeof RH.tabs.show, "undefined",
+    "قشرة التبويبات يجب أن تظل غائبة في بيئة الوحدة");
+  assert.ok(RH.tabs._pending.some((d) => d && d.id === "control"),
+    "تسجيل التبويب لم يدخل الطابور المؤجَّل");
 });
 
 test("ثوابت العقد: ملحق monitoring وصفحاته الخمس ومنظورا الخريطة", () => {

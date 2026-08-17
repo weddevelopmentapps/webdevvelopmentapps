@@ -153,12 +153,19 @@ RH.brand = (function () {
 
   /* ── صبغ كتلة الاسم للأسطح الداكنة ──────────────────────────────────────
      نسخة ‎logo-white.png‎ المسلَّمة مشتقة بعتبة إضاءة، فحروفها العربية ملتحمة
-     ومقطّعة والسطر اللاتيني غير مقروء — استعمالها على السطح الداكن يشوّه اسم
-     الجهة. الأصل الملوّن يحمل الشكل الصحيح في **قناة ألفا** (الحروف مصمتة
-     والخلفية شفافة)، فيُعاد صبغه هنا بلون الرمز الحي ‎--on-invert‎ عبر
-     ‎source-in‎: الشكل الرسمي حرفياً، بلون السمة، بلا تلفيق ولا لون مكتوب.
-     الرمز الدائري يبقى **ملوَّناً** في السمتين — تفاصيله الفاتحة (القلعة
-     والسماء) تقرأ على الداكن، وتسطيحه إلى قرص أبيض يمحوها. */
+     والسطر اللاتيني غير مقروء. والأصل الملوّن **لا تصلح قناة ألفا فيه مصدراً
+     للشكل** أيضاً: نزع الخلفية البيضاء ترك ألفا مشوّشة (قياس: 45٪ من بكسلات
+     كتلة الاسم صفر و37٪ صلبة والباقي ضجيج)، فالصبغ عبر ‎source-in‎ يعيد
+     التشويه نفسه — جُرِّب فسقط.
+
+     الشكل الصحيح محفوظ في **قنوات اللون**: حبر أخضر على أبيض. فتُشتق التغطية
+     من الإضاءة بعد التركيب على الصحن الأبيض ‎--brand-plate‎:
+         coverage = (255 − luminance) ÷ (255 − أغمق حبر)
+     ثم تُكتب لوناً من رمز حي بألفا التغطية. النتيجة: الشكل الرسمي حرفياً،
+     بحدّة كاملة، بلون السمة — بلا ملف جديد وبلا لون مكتوب في الكود.
+
+     الرمز الدائري يبقى **ملوَّناً** في السمتين على صحنه الفاتح: تسطيحه إلى
+     قرص أبيض يمحو القلعة والسماء والسيفين. */
   const tintCache = new Map();   // src|color|box → data URI
 
   /** يقرأ قيمة رمز CSS حياً (لا لون مكتوب في هذا الملف) */
@@ -170,24 +177,59 @@ RH.brand = (function () {
     } catch (_e) { return fallback; }
   }
 
+  /** يحل أي صيغة لون CSS إلى ‎[r,g,b]‎ عبر تطبيع ‎fillStyle‎ في القماش */
+  function rgbOf(color, fallback) {
+    try {
+      const cx = document.createElement("canvas").getContext("2d");
+      cx.fillStyle = "#000000";
+      cx.fillStyle = color;
+      const s = String(cx.fillStyle);
+      let m = /^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(s);
+      if (m) return [parseInt(m[1], 16), parseInt(m[2], 16), parseInt(m[3], 16)];
+      m = /rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i.exec(s);
+      if (m) return [+m[1], +m[2], +m[3]];
+    } catch (_e) { /* لا قماش: البديل */ }
+    return fallback;
+  }
+
   function tintCrop(geom, box, color) {
-    const key = geom.img.src.slice(-64) + "|" + color
+    const key = String(geom.img.src).slice(-48) + "|" + color
       + "|" + box.x + "," + box.y + "," + box.w + "," + box.h;
     if (tintCache.has(key)) return tintCache.get(key);
     let uri = null;
     try {
+      const rgb = rgbOf(color, [255, 255, 255]);
+      const plate = rgbOf(tokenColor("--brand-plate", "#FFFFFF"), [255, 255, 255]);
       const sc = geom.natural.w / geom.full.w;   // فضاء القياس → بكسل أصلي
       const sx = Math.round(box.x * sc), sy = Math.round(box.y * sc);
       const sw = Math.max(1, Math.round(box.w * sc));
       const sh = Math.max(1, Math.round(box.h * sc));
       const cv = document.createElement("canvas");
       cv.width = sw; cv.height = sh;
-      const cx = cv.getContext("2d");
+      const cx = cv.getContext("2d", { willReadFrequently: true });
       if (cx) {
-        cx.drawImage(geom.img, sx, sy, sw, sh, 0, 0, sw, sh);
-        cx.globalCompositeOperation = "source-in";
-        cx.fillStyle = color;
+        // 1) التركيب على الصحن: يعيد بناء «الحبر على الأبيض» الأصلي
+        cx.fillStyle = "rgb(" + plate[0] + "," + plate[1] + "," + plate[2] + ")";
         cx.fillRect(0, 0, sw, sh);
+        cx.drawImage(geom.img, sx, sy, sw, sh, 0, 0, sw, sh);
+        const id = cx.getImageData(0, 0, sw, sh);
+        const d = id.data;
+        // 2) التغطية من الإضاءة + أغمق حبر (تطبيع القوة الكاملة)
+        const lum = new Uint8ClampedArray(sw * sh);
+        let darkest = 255;
+        for (let i = 0, p = 0; i < d.length; i += 4, p++) {
+          const L = (d[i] * 299 + d[i + 1] * 587 + d[i + 2] * 114) / 1000;
+          lum[p] = L;
+          if (L < darkest) darkest = L;
+        }
+        const span = Math.max(255 - darkest, 60);
+        // 3) الكتابة بلون الرمز الحي وألفا التغطية
+        for (let i = 0, p = 0; i < d.length; i += 4, p++) {
+          let a = ((255 - lum[p]) * 255) / span;
+          if (a < 0) a = 0; else if (a > 255) a = 255;
+          d[i] = rgb[0]; d[i + 1] = rgb[1]; d[i + 2] = rgb[2]; d[i + 3] = a;
+        }
+        cx.putImageData(id, 0, 0);
         uri = cv.toDataURL("image/png");
       }
     } catch (_e) { uri = null; }
@@ -394,8 +436,11 @@ RH.brand = (function () {
     // ألوانه رموز حيّة تتبع السمة بنفسها.
     const dark = RH.core.themeMode
       && RH.core.themeMode.effective() === "dark";
-    const src = (variant === "full" && dark && asset("white"))
-      || asset(variant);
+    // القفل الأفقي يُركَّب دائماً من الأصل **الملوَّن**؛ ملاءمة السطح الداكن
+    // تتم بصبغ كتلة الاسم لا باستبدال الملف (انظر ‎tintCrop‎ أعلاه).
+    const src = wantRow
+      ? (asset(variant === "white" ? "white" : "full") || asset(variant))
+      : ((variant === "full" && dark && asset("white")) || asset(variant));
     let node;
     const geom = src && wantRow ? (geomValue.has(src)
       ? geomValue.get(src) : measureAsset(src)) : null;
@@ -403,14 +448,26 @@ RH.brand = (function () {
       // القفل الأفقي المعاد تركيبه من الأصل الرسمي نفسه: الرمز بحجمه الكامل،
       // وكتلة الاسم إلى جانبه — تُخفى وحدها على الشاشات الضيقة (CSS) فيبقى
       // الرمز شاهداً على الهوية بلا ازدحام.
+      const wordH = markH * (WORD_H / MARK_H);
+      // لون كتلة الاسم على السطح الداكن = حبر السمة نفسه ‎--ink‎ (وهو فاتح
+      // هناك) فيتوحّد وزن الاسم مع عنوان المنصة بجواره. لا لون مكتوب.
+      const tint = (dark && variant === "full")
+        ? tintCrop(geom, geom.word, tokenColor("--ink", "#F4F1E6"))
+        : null;
+      const wordEl = tint
+        ? h("img", {
+          class: "brand-lock-word", src: tint, alt: "",
+          "aria-hidden": "true", draggable: "false",
+          style: { height: wordH.toFixed(2) + "px", width: "auto" },
+        })
+        : cropSpan(src, geom.word, geom.full, wordH, "brand-lock-word");
       node = h("span", {
         class: "brand-logo brand-logo--asset brand-logo--row is-" + variant,
         role: "img", "aria-label": label,
         dataset: { brandSource: "asset", brandLayout: "row" },
       },
         cropSpan(src, geom.mark, geom.full, markH, "brand-lock-mark"),
-        cropSpan(src, geom.word, geom.full,
-          markH * (WORD_H / MARK_H), "brand-lock-word"));
+        wordEl);
     } else if (src) {
       // الأصل الرسمي المضمَّن كما هو — لم يُقس بعد (أو ليس قفلاً رأسياً)
       node = h("span", {
