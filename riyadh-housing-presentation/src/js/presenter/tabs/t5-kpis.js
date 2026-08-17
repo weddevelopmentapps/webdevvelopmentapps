@@ -1,25 +1,28 @@
 /* ════════════════════════════════════════════════════════════════════════════
    t5-kpis.js — التبويب ٥: «مؤشرات الأداء» (V3_SPEC §4 و§4-ب · V3_CONTRACTS §4)
    ────────────────────────────────────────────────────────────────────────────
-   الموجز الملزم لهذا التبويب — العميل طلب **عدّادات نصف دائرية (gauges)**
-   صراحةً بدل الأشرطة:
+   الموجز الملزم لهذا التبويب — العميل طلب حرفياً «another tab for KPIs where
+   we show **guages** not bars of the strategic KPIs»: أي **شبكة عدّادات** تعرض
+   المؤشرات الاستراتيجية الأربعة عشر **معاً**، لا عدّاداً واحداً مكبَّراً بلوح
+   تفاصيل مرساة وترقيم «1 من 14». البنية إذن ثلاث طبقات لا رابعة:
 
-     ▸ **صف الأرقام الكبرى** أعلى اللوح: تكوين المحفظة المؤشرية (14 مؤشراً ·
-       النسبية · العددية · **القيم الحالية المسجَّلة ‎0 من 14‎ بصدق**). كل رقم
-       زر حقيقي: نقرة واحدة تفتح نافذة الإبراز.
+     ▸ **شريط الموجز** أعلى اللوح في سطر واحد مضغوط: ‎14 مؤشراً · 11 نسبي ·
+       3 عددي · 0 من 14 قيمة حالية مسجّلة‎ — كل رقم زر حقيقي يفتح إبرازه،
+       ويلازمه وسم الصدق الحرفي «القيمة الحالية غير مسجّلة — تُدخل من الإدارة».
 
-     ▸ **العدّاد المكبَّر** للمؤشر المختار (رسم رئيس ‎.tabchart‎ من ECharts):
-       قوس نصف دائري يقرأ من اليمين (الصفر) إلى اليسار (أعلى المقياس) على سنّة
-       الاتجاه العربي، وفيه **علامتان واضحتان**: شريحة ذهبية عند خط الأساس
-       وشريحة أغمق عند المستهدف، وبينهما **نطاق التحسن المطلوب** بصبغة ذهبية
-       شفافة. بجانبه بطاقة حقائق المؤشر وزر الإبراز.
+     ▸ **شبكة العدّادات**: أربعة عشر بطاقة في شبكة متجاوبة **ثلاثة في الصف
+       على 1920 واثنان على 1366** (وواحد على الشاشات الضيقة). كل بطاقة عدّاد
+       نصف دائري مضغوط مرسوم SVG كوداً: قوس يقرأ من اليمين (الصفر) إلى اليسار
+       (أعلى المقياس) على سنّة الاتجاه العربي، وفيه **علامتان واضحتان**
+       (شاخص خط الأساس المجوف وعارضة المستهدف) وبينهما **نطاق التحسن المطلوب**
+       بصبغة ذهبية شفافة؛ فوقه اسم المؤشر **مقصوصاً في سطرين** واسمه الكامل في
+       ‎title‎، و**رقاقة نوع المؤشر (نسبي/عددي)**؛ وفي مركزه **الحالة الصريحة**
+       «القيمة الحالية · غير مسجّلة» بلا إبرة وهمية إطلاقاً.
 
-     ▸ **لوح العدّادات الأربعة عشر**: شبكة مريحة **ثلاثة في الصف كحد أقصى**،
-       كل عدّاد رسم SVG كودي بالهندسة ذاتها (‎arcSegments‎ نفسها التي تُغذّي
-       العدّاد المكبَّر) — فالعدّاد الصغير والعدّاد الكبير لغة بصرية واحدة.
-       لكل عدّاد **رقاقة نوع المؤشر (نسبي/عددي)** كما نصّ الموجز.
+     ▸ **مصفوفة المؤشرات** أسفل الشبكة: الأربعة عشر صفاً بكل حقول المصدر.
 
-     ▸ **مصفوفة المؤشرات** أسفل اللوح: الأربعة عشر صفاً بكل حقول المصدر.
+   **لا ECharts في هذا التبويب**: العدّادات كلها SVG كودي بالهندسة ذاتها،
+   فلا مثيل رسم واحد يحتكر الشاشة، ولا تلميح تحويم يحتاج قانون ‎T.tooltip‎.
 
    ══ صدق البيانات (V3_SPEC §4-ب — يُنفَّذ حرفياً، ولا استثناء) ══
      • **لا توجد قيم حالية للمؤشرات في المصدر (14/14 فارغة).** لذلك يعرض
@@ -37,16 +40,16 @@
        وموضع خط الأساس على المقياس) بمرآة تقريب بايثون ‎roundHalfUp‎.
 
    طبقات النقر الثلاث (V3_SPEC §5) — لا رابعة:
-     ١) تحويم على العدّاد المكبَّر → ‎T.ttMicro‎: سطران (عنوان + قيمة واحدة).
-     ٢) نقرة أولى (رقم كبير · عدّاد صغير · صف المصفوفة · زر بطاقة الحقائق)
+     ١) تحويم على بطاقة العدّاد → تلميح المتصفح الأصلي: سطران (اسم المؤشر +
+        قيمة المستهدف). لا يغطي الرسم ولا يعترض النقر.
+     ٢) نقرة أولى (رقم في شريط الموجز · بطاقة عدّاد · صف المصفوفة)
         → ‎ctx.highlight‎: جملة واحدة + ≤3 أرقام + زر واحد، بحدّ ‎320‎ حرفاً
         يحرسه اختبار الوحدة ‎tests/unit/tab-kpis.test.mjs‎.
-     ٣) الزر → ملحق ‎kpi‎ بصفحته المناسبة وبحالة عودة يرمّزها المحرك.
-     • زر «تكبير» داخل بطاقة العدّاد **تصفية/تركيز** لا نافذة: يكتب ‎?kpi=‎
-       في العنوان فيتبدّل العدّاد المكبَّر — فلا تنبثق طبقة مشروطة مع كل تركيز.
+     ٣) زر النافذة → ملحق ‎kpi‎ بصفحته المناسبة وبحالة عودة يرمّزها المحرك.
+     **لا لوح تفاصيل مرسى في التبويب**: التفصيل كله خلف النقرتين لا مرافقاً
+     دائماً للشبكة — فالشاشة تبقى للعدّادات الأربعة عشر.
 
-   اللون: **صفر لون مكتوب**. ألوان العدّاد المكبَّر من ‎RH.viz.theme.C‎ (رموز
-   حيّة تُقرأ وقت البناء لا وقت التحميل)، وألوان العدّادات الصغيرة والواجهة
+   اللون: **صفر لون مكتوب**، ولا لون في JS أصلاً: كل ألوان العدّادات والواجهة
    ‎var(--…)‎ في ‎src/styles/tabs/kpis.css‎ — فتتبع السمتين بلا سطر JS.
    تبديل السمة يعيد بناء التبويب كاملاً عبر خطاف ‎onRetheme‎ في القشرة.
    ════════════════════════════════════════════════════════════════════════════ */
@@ -85,6 +88,8 @@
   /** الملحق الوحيد لهذا التبويب ونص زره */
   const AX_ID = "kpi";
   const AX_LABEL = "التفاصيل الكاملة في الملحق";
+  /** ما تَعِد به بطاقة العدّاد عند النقر — نافذة الإبراز لا الملحق مباشرةً */
+  const CARD_HINT = "انقر: إبراز المؤشر";
   /** حجم صفحة جدول الملحق — مرآة ‎ROWS_PER_PAGE‎ في ‎ax-kpi.js‎ */
   const AX_ROWS_PER_PAGE = 8;
 
@@ -305,7 +310,7 @@
       numCount: numList.length,
       recordedCount: recorded.length,
       missingCount: list.length - recorded.length,
-      recordedLabel: fmt.iso(fmt.int(recorded.length) + " من " + fmt.int(list.length)),
+      recordedLabel: fmt.ofTotal(recorded.length, list.length),
       widest,
       fullTargets: fullTargets.length,
       minPctTarget,
@@ -522,16 +527,16 @@
   }
 
   /** رقاقة نوع المؤشر (نسبي/عددي) — نص + لون، والنص هو حامل المعنى */
-  function typeBadge(r, extra) {
+  function typeBadge(r) {
     return h("span", {
-      class: "kpi5-type is-" + (r.pct ? "pct" : "num") + (extra ? " " + extra : ""),
+      class: "kpi5-type is-" + (r.pct ? "pct" : "num"),
       title: r.typeLong,
     }, r.typeChip);
   }
 
   /**
-   * **العدّاد نصف الدائري المرسوم كوداً** (SVG) — بالهندسة ذاتها التي تُغذّي
-   * العدّاد المكبَّر. لا إبرة إلا حين تُسجَّل قيمة حالية: ‎recorded === false‎
+   * **العدّاد نصف الدائري المرسوم كوداً** (SVG) — هندسة واحدة لكل بطاقات
+   * الشبكة الأربع عشرة. لا إبرة إلا حين تُسجَّل قيمة حالية: ‎recorded === false‎
    * يعني قوساً بعلامتيه ومركزاً يعلن الغياب صراحةً — لا إبرة وهمية أبداً.
    */
   function gaugeSvg(r) {
@@ -586,9 +591,16 @@
     }, parts);
   }
 
-  /** مركز العدّاد: القيمة المسجَّلة أو **الحالة الصريحة** بلا إبرة */
+  /**
+   * مركز العدّاد: القيمة المسجَّلة أو **الحالة الصريحة** بلا إبرة.
+   * العنوان + الرقاقة يقرآن معاً «القيمة الحالية · غير مسجّلة»، والجملة
+   * الكاملة من المواصفة في ‎title‎ فلا تُقرأ الرقاقة قيمةً بحال.
+   */
   function gaugeCenter(r) {
-    return h("span", { class: "kpi5-g-center" },
+    return h("span", {
+      class: "kpi5-g-center",
+      title: r.recorded ? CURRENT_LABEL + ": " + r.currentText : NOT_RECORDED,
+    },
       h("span", { class: "kpi5-g-cap" }, CURRENT_LABEL),
       h("b", {
         class: "kpi5-g-val" + (r.recorded ? " is-recorded" : " is-pending"),
@@ -596,8 +608,8 @@
   }
 
   /** سطر العلامتين تحت أي عدّاد — الشكل واللون والنص معاً */
-  function markRow(r, cls) {
-    return h("span", { class: "kpi5-marks" + (cls ? " " + cls : "") },
+  function markRow(r) {
+    return h("span", { class: "kpi5-marks" },
       h("span", { class: "kpi5-mark is-base" },
         h("i", { class: "kpi5-mark-glyph is-base", "aria-hidden": "true" }),
         h("span", { class: "kpi5-mark-lab" }, MARK_BASE),
@@ -616,33 +628,33 @@
       h("i", { class: "kpi5-scale-end tnum" }, r.maxText));
   }
 
-  /** توصيل نقر مثيل ECharts بفصل مضمون عند مغادرة التبويب */
-  function onChartClick(ctx, chart, handler) {
-    chart.on("click", handler);
-    ctx.onTeardown(() => {
-      try {
-        if (!chart.isDisposed()) chart.off("click", handler);
-      } catch (_e) { /* أُتلف سلفاً */ }
-    });
-  }
-
   /**
-   * صبغة مشتقة من قناة رمز حيّ ‎--x-rgb‎ (المسلك ذاته الذي يعتمده
-   * ‎viz/theme.js‎ في ‎computeAxisTints‎): لا قيمة لونية مكتوبة، والشفافية
-   * تتبع السمة لأن القناة نفسها معرَّفة في ‎tokens.css‎ لكل سمة.
-   * تعيد ‎null‎ حين لا يتوفر ‎getComputedStyle‎ (سياق اختبار) فيسقط النداء
-   * على لون رمزي صريح.
+   * **بطاقة عدّاد واحدة في الشبكة** — البطاقة كلها زر واحد: نقرة = إبراز.
+   * ترتيبها الرأسي: سطر المعرف والرقاقة · اسم المؤشر مقصوصاً في سطرين واسمه
+   * الكامل في ‎title‎ · العدّاد بمركزه المعلن · طرفا المقياس · العلامتان.
    */
-  function tint(name, alpha) {
-    let rgb = "";
-    try {
-      if (typeof getComputedStyle === "function" && document.documentElement) {
-        rgb = String(getComputedStyle(document.documentElement)
-          .getPropertyValue(name) || "").trim();
-      }
-    } catch (_e) { rgb = ""; }
-    if (!rgb) return null;
-    return "rgba(" + rgb + ", " + alpha + ")";
+  function gaugeCard(r, onOpen) {
+    return h("button", {
+      class: "kpi5-g-card", type: "button", "data-interactive": "",
+      dataset: { kpi: String(r.id) },
+      /* الطبقة الأولى: تلميح مصغّر **سطران** (عنوان + قيمة واحدة) بالتلميح
+         الأصلي للمتصفح — لا يغطي الرسم ولا يعترض النقر */
+      title: r.name + "\n" + MARK_TARGET + ": " + r.targetText,
+      "aria-label": "المؤشر " + r.id + ": " + r.name + " — " + r.typeLong
+        + "؛ " + MARK_BASE + " " + r.baseText
+        + "؛ " + MARK_TARGET + " " + r.targetText
+        + "؛ " + NOT_RECORDED + "؛ افتح الإبراز",
+      onclick: (ev) => onOpen(r, ev.currentTarget),
+    },
+      h("span", { class: "kpi5-g-meta" },
+        h("span", { class: "kpi5-g-id tnum" }, r.idText),
+        typeBadge(r)),
+      /* الاسم الكامل في ‎title‎ فالقصّ في سطرين لا يخفي معنى */
+      h("span", { class: "kpi5-g-name", title: r.name }, r.name),
+      h("span", { class: "kpi5-g-wrap" }, gaugeSvg(r), gaugeCenter(r)),
+      scaleRow(r),
+      markRow(r),
+      h("span", { class: "kpi5-g-more" }, CARD_HINT));
   }
 
   /* ══════════════════════════════════════════════════════════════════════════
@@ -650,16 +662,13 @@
      ══════════════════════════════════════════════════════════════════════════ */
 
   function build(el, ctx) {
-    const T = RH.viz.theme;
     const rel = ctx.release;
-    const su = ctx.su;
 
     const sum = summary(rel);
     const all = sum.list;
     const mix = mixOf(ctx.params);
     const sort = sortOf(ctx.params);
     const board = applySort(applyMix(all, mix), sort);
-    const focus = focusOf(all, (ctx.params && ctx.params.kpi) || "");
 
     guard("build", {
       "14 مؤشراً بالضبط (بوابة strategy.kpis14)": all.length === 14,
@@ -677,19 +686,24 @@
       "كل عدّاد له علامتان على قوسه":
         all.every((r) => r.segments.some((s) => s.role === "base")
           && r.segments.some((s) => s.role === "target")),
-      "لوح العدّادات غير فارغ بعد الترشيح": board.length > 0,
+      "شبكة العدّادات غير فارغة بعد الترشيح": board.length > 0,
     });
 
     const root = h("div", { class: "kpi5" });
     el.appendChild(root);
+
+    /** فاتح نافذة الإبراز لمؤشر — نقطة الدخول الوحيدة للطبقة الثانية */
+    const openKpi = (r, anchor) =>
+      ctx.highlight(Object.assign(kpiSpec(rel, r.id), { anchor }));
 
     /* ── ٤-أ) لافتة التبويب بالنمط الهندسي للهوية ───────────────────────── */
     const banner = h("div", { class: "kpi5-banner" },
       h("div", { class: "kpi5-banner-main" },
         h("h1", { class: "kpi5-title" }, "مؤشرات الأداء"),
         h("p", { class: "kpi5-lede" },
-          "عدّاد نصف دائري لكل مؤشر استراتيجي: قوسه من خط الأساس إلى "
-          + "المستهدف بعلامتين واضحتين، والقيمة الحالية معلنة كما هي في المصدر.")),
+          "عدّاد نصف دائري لكل مؤشر استراتيجي، والأربعة عشر معاً في شبكة "
+          + "واحدة: قوس كلٍّ من خط الأساس إلى المستهدف بعلامتين واضحتين، "
+          + "والقيمة الحالية معلنة كما هي في المصدر.")),
       h("p", { class: "kpi5-asof" }, "البيانات حتى ", sum.asOf));
     root.appendChild(banner);
     if (RH.brand && typeof RH.brand.pattern === "function") {
@@ -698,262 +712,64 @@
       }));
     }
 
-    /* ── ٤-ب) الأرقام الكبرى: تكوين المحفظة المؤشرية ────────────────────── */
-    const figs = h("div", {
-      class: "tabfigs kpi5-figs", role: "group",
-      "aria-label": "تكوين المؤشرات الاستراتيجية — كل رقم يفتح إبرازه",
+    /* ── ٤-ب) شريط الموجز: سطر واحد مضغوط، كل رقم فيه زر إبراز ──────────── */
+    const strip = h("div", {
+      class: "kpi5-strip", role: "group",
+      "aria-label": "موجز المحفظة المؤشرية — كل رقم يفتح إبرازه",
     });
     const pAll = nounParts(sum.total, "indicator");
-    const pPct = nounParts(sum.pctCount, "indicator");
-    const pNum = nounParts(sum.numCount, "indicator");
-    const figures = [
+    const stripItems = [
       {
-        key: "all", label: "المؤشرات الاستراتيجية",
-        value: pAll.num, unit: pAll.word,
-        foot: "من خطة عمل المشروع",
+        key: "all", value: pAll.num, unit: pAll.word,
+        label: "المؤشرات الاستراتيجية",
         spec: () => overviewSpec(rel),
       },
       {
-        key: "pct", label: "بصيغة " + TYPE_PCT_LONG,
-        value: pPct.num, unit: pPct.word,
-        foot: "المستهدفات بين " + sum.minPctTargetText + " و" + sum.maxPctTargetText,
+        key: "pct", value: fmt.int(sum.pctCount), unit: TYPE_PCT,
+        label: TYPE_PCT_LONG,
         spec: () => typeSpec(rel, "pct"),
       },
       {
-        key: "num", label: "بصيغة " + TYPE_NUM_LONG,
-        value: pNum.num, unit: pNum.word,
-        foot: "المقياس ينتهي عند المستهدف",
+        key: "num", value: fmt.int(sum.numCount), unit: TYPE_NUM,
+        label: TYPE_NUM_LONG,
         spec: () => typeSpec(rel, "num"),
       },
       {
-        key: "current", label: "القيم الحالية المسجَّلة",
-        value: sum.recordedLabel, unit: null, tone: "pending",
-        foot: NOT_RECORDED,
+        key: "current", value: sum.recordedLabel, unit: "قيمة حالية مسجّلة",
+        label: "القيم الحالية المسجَّلة", tone: "pending",
         spec: () => currentSpec(rel),
       },
     ];
-    for (const f of figures) {
+    for (const s of stripItems) {
       const btn = h("button", {
-        class: "tabfig kpi5-fig" + (f.tone ? " is-" + f.tone : ""),
+        class: "kpi5-stat" + (s.tone ? " is-" + s.tone : ""),
         type: "button", "data-interactive": "",
-        dataset: { fig: f.key },
-        "aria-label": f.label + ": " + f.value + (f.unit ? " " + f.unit : "")
-          + "؛ " + f.foot + "؛ افتح الإبراز",
+        dataset: { stat: s.key },
+        "aria-label": s.label + ": " + s.value + " " + s.unit + "؛ افتح الإبراز",
       },
-        h("span", { class: "tabfig-label" }, f.label),
-        h("span", { class: "tabfig-value" },
-          h("span", { class: "num tnum" }, f.value),
-          f.unit ? h("span", { class: "unit" }, f.unit) : null),
-        h("span", { class: "tabfig-foot" }, f.foot));
+        h("b", { class: "kpi5-stat-num tnum" }, s.value),
+        h("span", { class: "kpi5-stat-unit" }, s.unit));
       btn.addEventListener("click", () => {
-        ctx.highlight(Object.assign(f.spec(), { anchor: btn }));
+        ctx.highlight(Object.assign(s.spec(), { anchor: btn }));
       });
-      figs.appendChild(btn);
+      strip.appendChild(btn);
     }
-    root.appendChild(figs);
+    /* وسم الصدق الحرفي ملازم للشريط — لا يُقرأ العدّاد بلا هذه الجملة */
+    strip.appendChild(h("p", { class: "kpi5-strip-note" }, NOT_RECORDED));
+    root.appendChild(strip);
 
-    /* ── ٤-ج) الشبكة العليا: العدّاد المكبَّر + بطاقة حقائق المؤشر ────────── */
-    const topGrid = h("div", { class: "tabgrid is-3 kpi5-top" });
-    root.appendChild(topGrid);
-
-    const pos = all.indexOf(focus);
-    const stepper = h("div", {
-      class: "kpi5-step", role: "group", "aria-label": "تبديل المؤشر المكبَّر",
-    },
-      h("button", {
-        class: "kpi5-step-btn", type: "button", "data-interactive": "",
-        disabled: pos <= 0,
-        "aria-label": "المؤشر السابق في العدّاد المكبَّر",
-        onclick: () => ctx.update({ kpi: String(all[Math.max(0, pos - 1)].id) }),
-      }, "→"),
-      h("span", { class: "kpi5-step-pos tnum" },
-        fmt.iso(fmt.int(pos + 1) + " من " + fmt.int(all.length))),
-      h("button", {
-        class: "kpi5-step-btn", type: "button", "data-interactive": "",
-        disabled: pos >= all.length - 1,
-        "aria-label": "المؤشر التالي في العدّاد المكبَّر",
-        onclick: () => ctx.update({
-          kpi: String(all[Math.min(all.length - 1, pos + 1)].id) }),
-      }, "←"));
-
-    const focusCard = panelCard({
-      title: "العدّاد المكبَّر — المؤشر " + focus.idText,
-      note: focus.scaleNote + " · " + NOT_RECORDED,
-      cls: "kpi5-focus-card",
-    });
-    focusCard.head.appendChild(stepper);
-    topGrid.appendChild(focusCard.card);
-
-    focusCard.body.appendChild(h("h3", { class: "kpi5-focus-name" },
-      typeBadge(focus, "kpi5-focus-type"), focus.name));
-
-    const chartEl = h("div", { class: "tabchart kpi5-focus-chart" });
-    focusCard.body.appendChild(chartEl);
-    focusCard.body.appendChild(markRow(focus, "is-lg"));
-    focusCard.body.appendChild(scaleRow(focus));
-
-    /* ألوان العدّاد المكبَّر من الرموز الحية وقت البناء (لا وقت التحميل) */
-    const ROLE = {
-      /* المسار المحايد بلون الشعيرة المعايَرة: يبقى مقروءاً على السمتين معاً
-         (‎--surface-3‎ الداكن يكاد يذوب في سطح البطاقة فيبدو القوس مبتوراً) */
-      track: T.C.line,
-      /* نطاق التحسن: صبغة ذهبية شفافة من قناة الرمز الحيّة، وبديلها الرمز نفسه */
-      band: tint("--gold-rgb", 0.28) || T.C.gold,
-      base: T.C.gold,
-      target: T.C.goldHi,
-    };
-    const axisColor = focus.segments.map((s) => [s.stop, ROLE[s.role] || ROLE.track]);
-    const bandWidth = Math.max(16, Math.round(28 * su));
-    const gauge = ctx.chart("focus", chartEl);
-
-    /** مركز القوس رأسياً ككسر من ارتفاع القماش — نصف الدائرة كله فوقه */
-    const CY_FRAC = 0.82;
-    /**
-     * نصف قطر القوس بالبكسل من مقاس القماش الفعلي: ‎radius‎ النسبي في ECharts
-     * يُحسب من ‎min(العرض, الارتفاع) ÷ 2‎ فيهدر نصف دائرةٍ عرضُها ضعف ارتفاعها.
-     * يُعاد حسابه عند تغيّر المقاس (المستمع مسجَّل في تنظيف التبويب).
-     */
-    function fitRadius() {
-      const cw = gauge.getWidth() || chartEl.clientWidth || 600;
-      const ch = gauge.getHeight() || chartEl.clientHeight || 400;
-      const pad = Math.round(30 * su) + 10;   /* فسحة تسميتَي طرفَي المقياس */
-      return Math.max(60, Math.min(cw / 2 - pad, ch * CY_FRAC - pad));
-    }
-
-    const opt = Object.assign(T.base(su), {
-      tooltip: Object.assign(T.tooltip(su), {
-        formatter: () => T.ttMicro(
-          "المؤشر " + focus.idText + " · " + MARK_TARGET, focus.targetText),
-      }),
-      series: [{
-        type: "gauge",
-        /* نصف دائرة علوية من ‎0°‎ (يمين) إلى ‎180°‎ (يسار): الصفر عند بداية
-           السطر العربي وأعلى المقياس عند نهايته. ‎clockwise: false‎ إلزامي —
-           بدونه يمسح ECharts النصف السفلي المخفي ولا يظهر قوس. */
-        startAngle: 0,
-        endAngle: 180,
-        clockwise: false,
-        center: ["50%", Math.round(CY_FRAC * 100) + "%"],
-        radius: fitRadius(),
-        min: 0,
-        max: focus.max || 1,
-        splitNumber: 1,
-        axisLine: { lineStyle: { width: bandWidth, color: axisColor } },
-        axisTick: { show: false },
-        splitLine: { show: false },
-        axisLabel: {
-          show: true,
-          distance: Math.round(bandWidth * 0.62) + 6,
-          color: T.C.faint,
-          fontFamily: "IBM Plex Sans Arabic",
-          fontSize: T.fs(su, 12.5),
-          formatter: (v) => kpiVal(focus, v),
-        },
-        /* **لا إبرة ولا قوس تقدم ما لم تُسجَّل قيمة حالية** (V3_SPEC §4-ب) */
-        pointer: focus.recorded
-          ? {
-            show: true, icon: "rect", width: Math.max(4, Math.round(5 * su)),
-            length: "62%", offsetCenter: [0, "-4%"],
-            itemStyle: { color: T.C.green },
-          }
-          : { show: false },
-        progress: focus.recorded
-          ? { show: true, width: bandWidth, itemStyle: { color: T.C.green } }
-          : { show: false },
-        anchor: { show: false },
-        title: {
-          show: true, offsetCenter: [0, "-44%"],
-          color: T.C.mut, fontFamily: "Cairo", fontSize: T.fs(su, 13.5),
-        },
-        detail: {
-          show: true, offsetCenter: [0, "-20%"],
-          color: focus.recorded ? T.C.ivory : T.C.gold,
-          fontFamily: "IBM Plex Sans Arabic",
-          fontWeight: focus.recorded ? 700 : 600,
-          fontSize: T.fs(su, focus.recorded ? 30 : 21),
-          formatter: () => focus.currentText,
-        },
-        data: [{ value: focus.recorded ? focus.current : 0, name: CURRENT_LABEL }],
-        animation: !T.REDUCED,
-      }],
-    });
-    gauge.setOption(opt, true);
-
-    /* إعادة ملاءمة نصف القطر عند تغيّر المقاس — تُمرَّر **شجرة الخيارات كاملة**
-       كي يبقى ما يلتقطه سجل الثيم مكتملاً فلا تفقد إعادةُ الصبغة خياراتها. */
-    let fitTimer = null;
-    function onWinResize() {
-      clearTimeout(fitTimer);
-      fitTimer = setTimeout(() => {
-        if (gauge.isDisposed()) return;
-        const r = fitRadius();
-        if (Math.abs(r - opt.series[0].radius) < 2) return;
-        opt.series[0].radius = r;
-        gauge.setOption(opt, true);
-      }, 180);
-    }
-    window.addEventListener("resize", onWinResize, { passive: true });
-    ctx.onTeardown(() => {
-      clearTimeout(fitTimer);
-      window.removeEventListener("resize", onWinResize);
-    });
-
-    onChartClick(ctx, gauge, () => {
-      ctx.highlight(Object.assign(kpiSpec(rel, focus.id), { anchor: chartEl }));
-    });
-
-    /* بطاقة حقائق المؤشر المختار — نصٌّ بديل كامل للعدّاد وزر الإبراز */
-    const facts = panelCard({
-      title: "حقائق المؤشر",
-      note: "كل قيمة من المصدر حرفياً",
-      cls: "kpi5-facts-card",
-    });
-    topGrid.appendChild(facts.card);
-
-    const dl = h("dl", { class: "kpi5-dl" });
-    const factRows = [
-      { k: "المعرف", v: focus.idText },
-      { k: "النوع", v: focus.type },
-      { k: "الصيغة", v: focus.typeLong },
-      { k: MARK_BASE, v: focus.baseText, cls: "is-gold" },
-      { k: MARK_TARGET, v: focus.targetText, cls: "is-gold" },
-      { k: SPAN_LABEL, v: focus.spanText },
-      { k: "موضع خط الأساس على المقياس", v: focus.basePosText },
-      {
-        k: CURRENT_LABEL,
-        v: focus.recorded ? focus.currentText : NOT_RECORDED_SHORT,
-        cls: focus.recorded ? null : "is-pending",
-      },
-    ];
-    for (const row of factRows) {
-      dl.appendChild(h("div", {
-        class: "kpi5-dl-row" + (row.cls ? " " + row.cls : ""),
-      },
-        h("dt", {}, row.k),
-        h("dd", { class: "tnum" }, row.v)));
-    }
-    facts.body.appendChild(dl);
-    facts.body.appendChild(h("p", { class: "kpi5-facts-note" }, focus.note));
-    facts.body.appendChild(h("div", { class: "kpi5-facts-act" },
-      h("button", {
-        class: "kpi5-btn", type: "button", "data-interactive": "",
-        "aria-label": "إبراز المؤشر " + focus.id + ": " + focus.name,
-        onclick: (ev) => ctx.highlight(Object.assign(
-          kpiSpec(rel, focus.id), { anchor: ev.currentTarget })),
-      }, "إبراز المؤشر")));
-
-    /* ── ٤-د) لوح العدّادات الأربعة عشر (ثلاثة في الصف كحد أقصى) ─────────── */
+    /* ── ٤-ج) شبكة العدّادات الأربعة عشر (٣ في الصف على 1920 · ٢ على 1366) ── */
     const boardGrid = h("div", { class: "tabgrid is-1 kpi5-board-grid" });
     const boardCard = panelCard({
       title: "عدّادات المؤشرات الاستراتيجية",
-      note: "قوس من خط الأساس إلى المستهدف · بلا إبرة ما دامت القيمة الحالية "
-        + "غير مسجّلة",
+      note: "قوس كل عدّاد من خط الأساس إلى المستهدف · بلا إبرة ما دامت القيمة "
+        + "الحالية غير مسجّلة · نقرة واحدة على أي عدّاد تفتح إبرازه",
       cls: "kpi5-board-card",
     });
     boardGrid.appendChild(boardCard.card);
     root.appendChild(boardGrid);
 
-    /* أدوات اللوح: ترشيح بالصيغة + ترتيب — تكتب حالتها في العنوان */
+    /* أدوات الشبكة: ترشيح بالصيغة + ترتيب — تكتب حالتها في العنوان */
     const tools = h("div", { class: "kpi5-tools" });
     const chipGroup = (label, opts, current, param) => {
       const grp = h("div", {
@@ -989,65 +805,29 @@
     });
     boardCard.body.appendChild(boardEl);
 
-    for (const r of board) {
-      const on = r.id === focus.id;
-      const gbtn = h("button", {
-        class: "kpi5-g-btn", type: "button", "data-interactive": "",
-        dataset: { kpi: String(r.id) },
-        /* الطبقة الأولى على العدّاد الصغير: تلميح مصغّر **سطران** (عنوان +
-           قيمة واحدة) بالتلميح الأصلي للمتصفح — لا يغطي الرسم ولا يعترض النقر */
-        title: r.name + "\n" + MARK_TARGET + ": " + r.targetText,
-        "aria-label": "المؤشر " + r.id + ": " + r.name + " — " + r.typeLong
-          + "؛ " + MARK_BASE + " " + r.baseText
-          + "؛ " + MARK_TARGET + " " + r.targetText
-          + "؛ " + NOT_RECORDED + "؛ افتح الإبراز",
-        onclick: (ev) => ctx.highlight(Object.assign(
-          kpiSpec(rel, r.id), { anchor: ev.currentTarget })),
-      },
-        h("span", { class: "kpi5-g-head" },
-          h("span", { class: "kpi5-g-id tnum" }, r.idText),
-          h("span", { class: "kpi5-g-name" }, r.name),
-          typeBadge(r)),
-        h("span", { class: "kpi5-g-wrap" }, gaugeSvg(r), gaugeCenter(r)),
-        scaleRow(r),
-        markRow(r));
+    for (const r of board) boardEl.appendChild(gaugeCard(r, openKpi));
 
-      const zoom = h("button", {
-        class: "kpi5-g-zoom", type: "button", "data-interactive": "",
-        "aria-pressed": on ? "true" : "false",
-        "aria-label": on
-          ? "المؤشر " + r.id + " معروض في العدّاد المكبَّر"
-          : "اعرض المؤشر " + r.id + " في العدّاد المكبَّر",
-        onclick: () => ctx.update({ kpi: String(r.id) }),
-      }, on ? "معروض" : "تكبير");
-
-      boardEl.appendChild(h("article", {
-        class: "kpi5-g-card" + (on ? " is-on" : ""),
-        dataset: { kpi: String(r.id) },
-      }, gbtn, zoom));
-    }
-
-    /* ملاحة الأسهم داخل اللوح — تنقّل مفاتيحي بين العدّادات */
+    /* ملاحة الأسهم داخل الشبكة — تنقّل مفاتيحي بين العدّادات */
     function onBoardKey(ev) {
       if (ev.key !== "ArrowLeft" && ev.key !== "ArrowRight") return;
-      const btns = Array.prototype.slice.call(
-        boardEl.querySelectorAll(".kpi5-g-btn"));
-      const i = btns.indexOf(document.activeElement);
+      const cards = Array.prototype.slice.call(
+        boardEl.querySelectorAll(".kpi5-g-card"));
+      const i = cards.indexOf(document.activeElement);
       if (i < 0) return;
       /* RTL: السهم الأيسر يتقدّم في القراءة */
       const next = ev.key === "ArrowLeft" ? i + 1 : i - 1;
-      if (next < 0 || next >= btns.length) return;
+      if (next < 0 || next >= cards.length) return;
       ev.preventDefault();
-      btns[next].focus();
+      cards[next].focus();
     }
     boardEl.addEventListener("keydown", onBoardKey);
     ctx.onTeardown(() => boardEl.removeEventListener("keydown", onBoardKey));
 
-    /* ── ٤-هـ) مصفوفة المؤشرات ──────────────────────────────────────────── */
+    /* ── ٤-د) مصفوفة المؤشرات ───────────────────────────────────────────── */
     const matrixGrid = h("div", { class: "tabgrid is-1 kpi5-matrix-grid" });
     const matrixCard = panelCard({
       title: "مصفوفة المؤشرات",
-      note: "ترتيب الجدول يتبع أدوات اللوح أعلاه",
+      note: "ترتيب الجدول يتبع أدوات الشبكة أعلاه",
       cls: "kpi5-matrix-card",
     });
     matrixGrid.appendChild(matrixCard.card);
@@ -1061,7 +841,7 @@
     const tbody = h("tbody", {});
     for (const r of board) {
       tbody.appendChild(h("tr", {
-        class: "kpi5-row" + (r.id === focus.id ? " is-on" : ""),
+        class: "kpi5-row",
         dataset: { kpi: String(r.id) },
       },
         h("th", { scope: "row", class: "tnum" }, r.idText),
@@ -1069,8 +849,7 @@
           h("button", {
             class: "kpi5-row-btn", type: "button", "data-interactive": "",
             "aria-label": "إبراز المؤشر " + r.id + ": " + r.name,
-            onclick: (ev) => ctx.highlight(Object.assign(
-              kpiSpec(rel, r.id), { anchor: ev.currentTarget })),
+            onclick: (ev) => openKpi(r, ev.currentTarget),
           }, r.name)),
         h("td", {}, typeBadge(r)),
         h("td", { class: "tnum is-gold" }, r.baseText),
@@ -1091,7 +870,7 @@
           + " · القيم الحالية تُدخل من الإدارة ولا تُحوَّل إلى صفر"),
         thead, tbody)));
 
-    /* ── ٤-و) سطر الصدق أسفل اللوح ──────────────────────────────────────── */
+    /* ── ٤-هـ) سطر الصدق أسفل اللوح ─────────────────────────────────────── */
     root.appendChild(h("p", { class: "kpi5-foot" },
       "المصدر: ", h("span", { class: "kpi5-foot-src" }, sum.source),
       " · ", sum.note,
@@ -1099,17 +878,15 @@
   }
 
   /* ══════════════════════════════════════════════════════════════════════════
-     ٥) التسجيل — يتخطى نفسه بغياب القشرة (بيئة اختبار الوحدة)
+     ٥) التسجيل — طابور ‎RH.tabs‎ المؤجَّل (‎ns.js‎) يستقبله في أي ترتيب
      ══════════════════════════════════════════════════════════════════════════ */
 
-  if (RH.tabs && typeof RH.tabs.register === "function") {
-    RH.tabs.register({
-      id: "kpis",
-      order: 5,
-      title: "مؤشرات الأداء",
-      /** النموذج النقي مكشوف للاختبار ولوحة الأوامر — لا حالة فيه ولا DOM */
-      model: MODEL,
-      build,
-    });
-  }
+  RH.tabs.register({
+    id: "kpis",
+    order: 5,
+    title: "مؤشرات الأداء",
+    /** النموذج النقي مكشوف للاختبار ولوحة الأوامر — لا حالة فيه ولا DOM */
+    model: MODEL,
+    build,
+  });
 })();

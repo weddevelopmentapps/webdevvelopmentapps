@@ -120,7 +120,10 @@ CSS_ORDER = [
     "src/styles/chrome-ext.css",     # أزرار HUD الجديدة (بادئة hudx-)
     "src/styles/tabs.css",           # قشرة التبويبات (tabs-/tabtrack-/tabx-/tab-)
     "src/styles/highlight.css",      # نافذة الإبراز (hl-)
-] + _globbed("src/styles/sections/*.css") + [
+] + _globbed("src/styles/sections/*.css") \
+  + _globbed("src/styles/tabs/*.css") + [
+    # أنماط التبويبات الخمسة (dem-/lic-/mon-/int-/kpi-) — بعد قشرة التبويبات
+    # ‎tabs.css‎ كي تتقدم قواعد كل تبويب على قواعد القشرة العامة.
     "src/styles/admin.css",
     "src/styles/admin-ext.css",      # تبويبا الإدارة الجديدان (بادئة adf-)
     "src/styles/print.css",

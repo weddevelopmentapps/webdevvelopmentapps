@@ -42,7 +42,8 @@
 
    النموذج النقي معرَّف على ‎RH.presenter.tabModels.monitoring‎ بلا لمس DOM،
    فيُختبر بالملف الحقيقي في ‎tests/unit/tab-monitoring.test.mjs‎؛ والتسجيل
-   يتخطى نفسه بغياب ‎RH.tabs‎ (بيئة اختبار الوحدة).
+   يمر بطابور ‎RH.tabs‎ المؤجَّل المُعرَّف في ‎ns.js‎، فلا يعتمد على موضع الملف
+   في ‎JS_ORDER‎ ولا يسقط صامتاً في بيئة اختبار الوحدة.
    ملاحظة معرّف: المحور اسمه «الرقابة» ومعرّفه القانوني في القائمة الخماسية
    ‎control‎ (V3_CONTRACTS §4-أ) بينما ملحقه ومَلَفّه يحملان اسم ‎monitoring‎ —
    يُسجَّل بالمعرف القانوني ولا يُخترع سادس.
@@ -420,7 +421,7 @@
         + fmt.int(V.total) + " مخالفة مسجلة.",
       stats: [
         { label: "الحصة", value: fmt.pct(row.share), tone: "neg" },
-        { label: "الترتيب", value: fmt.iso(fmt.int(row.rank) + " من " + fmt.int(V.rows.length)) },
+        { label: "الترتيب", value: fmt.ofTotal(row.rank, V.rows.length) },
         { label: "الإجمالي", value: fmt.int(V.total), tone: "neg" },
       ],
       note: rel.meta.comparison_qualifier,
@@ -1157,17 +1158,15 @@
   }
 
   /* ══════════════════════════════════════════════════════════════════════════
-     6) التسجيل — يتخطى نفسه بغياب القشرة (بيئة اختبار الوحدة)
+     6) التسجيل — طابور ‎RH.tabs‎ المؤجَّل (‎ns.js‎) يستقبله في أي ترتيب
      ══════════════════════════════════════════════════════════════════════════ */
 
-  if (RH.tabs && typeof RH.tabs.register === "function") {
-    RH.tabs.register({
-      id: "control",
-      order: 3,
-      title: "الرقابة",
-      /** النموذج النقي مكشوف للاختبار ولوحة الأوامر — لا حالة فيه ولا DOM */
-      model: MODEL,
-      build,
-    });
-  }
+  RH.tabs.register({
+    id: "control",
+    order: 3,
+    title: "الرقابة",
+    /** النموذج النقي مكشوف للاختبار ولوحة الأوامر — لا حالة فيه ولا DOM */
+    model: MODEL,
+    build,
+  });
 })();

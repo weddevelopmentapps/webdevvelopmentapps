@@ -333,10 +333,7 @@
       stats: [
         { label: "الطلب", value: fmt.unitAfter(a.demand, "سرير") },
         { label: "الحصة من الإجمالي", value: fmt.pct(pctOf(a.demand, total)) },
-        {
-          label: "الترتيب",
-          value: fmt.iso(fmt.int(rank) + " من " + fmt.int(model.top.length)),
-        },
+        { label: "الترتيب", value: fmt.ofTotal(rank, model.top.length) },
       ],
       appendix: { id: "demand", params: { activity: a.id }, label: AX_LABEL },
       note: asOf(release),
@@ -514,9 +511,14 @@
       collarLegend.appendChild(chip({
         cls: "is-tone-" + (r.id === "blue" ? "blue" : "demand"),
         label: r.name,
-        value: fmt.unitAfter(r.value, "سرير") + " · " + fmt.pct(r.share),
-        aria: r.label + ": " + fmt.unitAfter(r.value, "سرير")
-          + "، " + fmt.pct(r.share) + " من إجمالي الطلب — اعرض الإبراز",
+        /* عبارة مركّبة (رقم + وحدة + نسبة) تُبنى بمقاطع fmt.caption وحدها:
+           الفواصل صريحة والرقم معزول، فلا يلتصق العدد بالكلمة ولا ينقلب
+           ترتيب المقاطع مهما كان اتجاه الوعاء. */
+        value: fmt.caption([{ value: fmt.int(r.value), unit: "سرير" }, fmt.pct(r.share)]),
+        aria: fmt.caption([
+          r.label + ":",
+          { value: fmt.int(r.value), unit: "سرير" },
+        ], " ") + "، " + fmt.pct(r.share) + " من إجمالي الطلب — اعرض الإبراز",
         onclick: (ev) => ctx.highlight(Object.assign(
           collarSpec(rel, der, r.id), { anchor: ev.currentTarget })),
       }));

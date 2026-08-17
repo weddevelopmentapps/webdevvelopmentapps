@@ -100,9 +100,66 @@ RH.core.fmt = (function () {
     return { num: int(n), word: "" };
   }
 
-  /** عزل اتجاهي حتمي للرموز المختلطة (أرقام + ٪) داخل نص عربي —
-      LRI/PDI محارف تحكم صفرية العرض تعمل في DOM وCanvas معاً */
-  const iso = (s) => "\u2066" + s + "\u2069";
+  /* ── العزل الاتجاهي ومقاطع العنونة المركّبة ──────────────────────────────
+     خطأ جذري صُحّح هنا (بلاغ «مسافات مفقودة بين الأرقام والكلمات العربية»):
+     العزل كان LRI دائماً — وLRI يفرض أساساً **يسارياً** على ما بداخله. فإن
+     حوى المقطع كلمةً عربية («0 من 14») انقلب ترتيب مقاطعه بصرياً («من 14 0»)
+     فبدت الأرقام ملتصقة بالكلمات بلا مسافة وبلا معنى. القاعدة الصحيحة:
+       • مقطع رقمي/لاتيني محض      → LRI (\u2066): يبقى الرقم يسارياً داخل RTL.
+       • عبارة مختلطة فيها حرف عربي → FSI (\u2068): «أول قوي» يستنبط الأساس من
+         الحرف العربي فيبقى ترتيب العبارة عربياً سليماً مهما كان اتجاه الوعاء.
+     FSI مطابق لـLRI تماماً حين لا حرف قوي داخله، فالتبديل آمن على كل نداء
+     قائم. PDI (\u2069) يغلق الاثنين، وكلها محارف تحكم صفرية العرض تعمل في
+     DOM وCanvas معاً. */
+
+  /** حرف عربي (الأبجدية + الصور العرضية) — يميّز العبارة المختلطة عن الرقم */
+  const RE_AR_LETTER =
+    /[\u0620-\u064A\u066E-\u06D3\u06FA-\u06FF\uFB50-\uFDFF\uFE70-\uFEFC]/;
+
+  /** معزول أصلاً؟ (يبدأ بـLRI/RLI/FSI وينتهي بـPDI) — فلا يُعزل مرتين */
+  const isIsolated = (s) => /^[\u2066-\u2068][\s\S]*\u2069$/.test(String(s));
+
+  function iso(s) {
+    const t = String(s);
+    if (t === "") return t;
+    if (isIsolated(t)) return t;
+    return (RE_AR_LETTER.test(t) ? "\u2068" : "\u2066") + t + "\u2069";
+  }
+
+  /**
+   * مقطع عنونة موحّد «تسمية + قيمة + وحدة» — الفواصل **صريحة** والقيمة معزولة.
+   * هذا هو المسلك الوحيد لتركيب أي وسم يجمع رقماً بكلمة عربية، فلا يتكرر
+   * اللصق الذي أنتج «الياقات الزرقاء1,164,400 سرير».
+   *   seg({ label: "الياقات الزرقاء", value: int(1164400), unit: "سرير" })
+   *     → «الياقات الزرقاء 1,164,400 سرير» (بفراغ غير فاصل وعزل حول الرقم)
+   * ويقبل نصاً جاهزاً (مثل ناتج pct) فيمرّره كما هو بعد قصّ الفراغ.
+   */
+  function seg(spec) {
+    if (spec == null || spec === false || spec === "") return "";
+    if (typeof spec === "string" || typeof spec === "number") {
+      return String(spec).trim();
+    }
+    const label = spec.label == null ? "" : String(spec.label).trim();
+    const unit = spec.unit == null ? "" : String(spec.unit).trim();
+    const raw = spec.value == null ? "" : String(spec.value).trim();
+    const value = raw === "" ? "" : iso(raw);
+    return [label, value, unit].filter((p) => p !== "").join(NBSP);
+  }
+
+  /** عبارة من مقاطع بفاصل ظاهر — يتخطى الفارغ ولا يلصق مقطعين أبداً */
+  function caption(parts, sep) {
+    const s = sep == null ? " \u00B7 " : sep;
+    return (Array.isArray(parts) ? parts : [parts])
+      .map(seg).filter((t) => t !== "").join(s);
+  }
+
+  /** «n من N» — النمط المتكرر عبر التبويبات الخمسة، معزولاً كعبارة **واحدة**.
+      العزل يلف العبارة كلها لا كل رقم على حدة: عزل الأرقام منفردةً يترك «من»
+      خارج أي عزل فينقلب ترتيب العبارة داخل أي وعاء يساري. الفاصل فراغ عادي
+      (الأوعية الثلاثة التي تعرضها ‎white-space: nowrap‎ فلا تنكسر). */
+  function ofTotal(n, total) {
+    return iso(int(n) + " \u0645\u0646 " + int(total));
+  }
 
   /** ضم تسميات أشهر متعددة بإفصاح كامل — لتسميات الذروة عند التعادل
       (إصلاح مراجعة الجولة 4): «ذروة المخالفات 317 في يوليو 2026» وحدها
@@ -121,5 +178,8 @@ RH.core.fmt = (function () {
     return labels.map(String).join(" و");
   }
 
-  return { int, dec1, pct, compact, compactParts, unitAfter, countNoun, noun, date, iso, monthsList, AR_MONTHS, NBSP };
+  return {
+    int, dec1, pct, compact, compactParts, unitAfter, countNoun, noun, date,
+    iso, isIsolated, seg, caption, ofTotal, monthsList, AR_MONTHS, NBSP,
+  };
 })();

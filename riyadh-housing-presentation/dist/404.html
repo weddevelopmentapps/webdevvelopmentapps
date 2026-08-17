@@ -1313,12 +1313,26 @@ body.mode-admin :focus-visible { outline-color: var(--accent); }
 }
 .brand-logo-img {
   display: block;
-  height: 44px;
+  height: 48px;
   width: auto;
   max-width: 260px;
   object-fit: contain;
 }
-.brand-logo--asset.is-mark .brand-logo-img { height: 38px; }
+.brand-logo--asset.is-mark .brand-logo-img { height: 44px; }
+
+/* القفل الأفقي المعاد تركيبه من الأصل الرسمي (brand.js §0):
+   الرمز بارتفاعه الكامل وإلى جانبه كتلة الاسم. الأبعاد كلها inline من القياس
+   الحي — هنا التموضع والإخفاء المتجاوب فقط. */
+.brand-logo--row {
+  align-items: center;
+  gap: 12px;
+}
+.brand-lock-mark, .brand-lock-word { flex: 0 0 auto; }
+/* الشاشات الأضيق: الرمز وحده يحمل الهوية، وكتلة الاسم تنسحب قبل أن تزاحم
+   عنوان المنصة أو أزرار الرأس (لا قصّ ولا تصغير إلى ما دون القراءة). */
+@media (max-width: 1180px) {
+  .brand-lock-word { display: none; }
+}
 
 .brand-mark {
   display: inline-flex;
@@ -1379,6 +1393,8 @@ body.mode-admin :focus-visible { outline-color: var(--accent); }
   border-bottom: 1px solid var(--line);
   box-shadow: 0 1px 0 rgba(var(--ink-rgb), 0.02);
 }
+/* التوازن المطلوب: كتلة الهوية في طرف الشريط، وعنوان المنصة مع أزرارها في
+   الطرف المقابل — والفراغ بينهما يفصل السلطتين بدل أن يحشرهما في زاوية. */
 .brand-lock-inner {
   position: relative;
   z-index: 1;
@@ -1386,7 +1402,12 @@ body.mode-admin :focus-visible { outline-color: var(--accent); }
   align-items: center;
   gap: 16px;
   padding: 12px clamp(16px, 2.2vw, 34px);
-  min-height: 68px;
+  min-height: 76px;
+}
+.brand-lock-logo {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
 }
 .brand-lock-rule {
   flex: 0 0 auto;
@@ -1396,10 +1417,13 @@ body.mode-admin :focus-visible { outline-color: var(--accent); }
 }
 .brand-lock-titles {
   min-width: 0;
-  flex: 1 1 auto;
+  flex: 0 1 auto;
+  margin-inline-start: auto;   /* يدفع العنوان إلى الطرف المقابل للهوية */
   display: flex;
   flex-direction: column;
+  align-items: flex-end;
   gap: 2px;
+  text-align: end;
 }
 .brand-lock-title {
   font-family: var(--f-display);
@@ -11303,6 +11327,2136 @@ body.mode-present .tabs-exit-present { display: inline-flex; }
    الشريط السفلي لشارة الإصدار محجوز مركزياً في .dash-body لكل الأقسام
    والمقاسات، والسطر ذاته صار سطراً واحداً لا يلتف ── */
 
+/* ═══ src/styles/tabs/demand.css ═══ */
+/* ════════════════════════════════════════════════════════════════════════════
+   tabs/demand.css — أنماط التبويب ١ «الطلب» (بادئة ‎dmt-‎ حصراً)
+   ────────────────────────────────────────────────────────────────────────────
+   يُقرأ مع ‎src/styles/tabs.css‎ الذي يوفّر الأصناف الجاهزة
+   (‎.tabfigs‎ ‎.tabfig‎ ‎.tabgrid‎ ‎.tabcard‎ ‎.tabchart‎) — هذا الملف **يزيّنها
+   ولا يعيد اختراعها**، ويضيف مكوّنين خاصين بالتبويب فقط:
+     ‎.dmt-fig‎    بطاقة رقم كبير قابلة للنقر (زر حقيقي)
+     ‎.dmt-chip‎   رقاقة تفاعلية = المسار المفاتيحي إلى نافذة الإبراز
+
+   القاعدة الحاكمة (V3_SPEC §1 · V3_CONTRACTS §1-د):
+     **صفر لون مكتوب هنا.** كل لون ‎var(--…)‎ من ‎tokens.css‎، وكل شفافية
+     ‎rgba(var(--x-rgb), a)‎ — فتتبع السمتان تلقائياً بلا كتلة داكنة خاصة.
+   التمرير الأفقي ممنوع: ‎min-width: 0‎ موروث من ‎.tabgrid > *‎، ولا عرض ثابت
+   في أي قاعدة هنا.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.dmt {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 1.3vw, 22px);
+  min-width: 0;
+}
+
+/* ── ١) شريط الأرقام الكبرى ─────────────────────────────────────────────────
+   البطل يأخذ عرضاً مضاعفاً على الشاشات الواسعة، والثلاثة الباقية تتساوى. */
+.dmt-figs {
+  grid-template-columns:
+    minmax(0, 1.7fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
+}
+@media (max-width: 1180px) {
+  .dmt-figs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dmt-fig-hero { grid-column: 1 / -1; }
+}
+@media (max-width: 620px) {
+  .dmt-figs { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* بطاقة الرقم زرٌّ حقيقي: تُقرأ كبطاقة وتُفعَّل بالنقر وبلوحة المفاتيح */
+.dmt-fig {
+  position: relative;
+  display: block;
+  text-align: start;
+  overflow: hidden;
+  transition: border-color var(--dur-micro) var(--ease),
+              box-shadow var(--dur-micro) var(--ease),
+              transform var(--dur-micro) var(--ease);
+}
+.dmt-fig::after {
+  /* شعيرة سفلية بلون الهوية تنمو عند التحويم — إشارة «قابل للنقر» بلا أيقونة */
+  content: "";
+  position: absolute;
+  inset-block-end: 0;
+  inset-inline-start: 0;
+  inline-size: 0;
+  block-size: 2px;
+  background: linear-gradient(90deg, var(--brand-teal), var(--brand-deep));
+  transition: inline-size var(--dur-std) var(--ease);
+}
+.dmt-fig:hover,
+.dmt-fig:focus-visible {
+  border-color: var(--brand);
+  box-shadow: 0 6px 22px rgba(var(--ink-rgb), 0.07);
+  transform: translateY(-1px);
+}
+.dmt-fig:hover::after,
+.dmt-fig:focus-visible::after { inline-size: 100%; }
+.dmt-fig:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+.dmt-fig .tabfig-label { white-space: normal; }
+.dmt-fig .tabfig-foot { line-height: 1.65; }
+
+/* الرقم الدقيق (الياقات) أضيق من الصيغة التنفيذية فيُصغَّر مقاسه كي لا يفيض */
+.dmt-fig.is-exact .tabfig-value { font-size: clamp(21px, 1.75vw, 31px); }
+.dmt-fig.is-pct .tabfig-value { font-size: clamp(24px, 2.1vw, 36px); }
+
+/* النغمة الدلالية على الرقم وحده — لا على السطح (لا كتل ملونة كبيرة) */
+.dmt-fig.is-tone-blue .tabfig-value { color: var(--collar-blue); }
+.dmt-fig.is-tone-demand .tabfig-value { color: var(--demand); }
+.dmt-fig.is-tone-green .tabfig-value { color: var(--green); }
+
+/* بطاقة البطل: نمط متوازيات الأضلاع (يحقنه ‎RH.brand.pattern‎) خلف النص */
+.dmt-fig-hero {
+  background:
+    linear-gradient(135deg,
+      rgba(var(--brand-rgb), 0.05),
+      rgba(var(--surf-1-rgb), 0) 62%),
+    var(--surface);
+  border-color: rgba(var(--brand-rgb), 0.28);
+}
+/* النصّ فوق النمط — ‎> span‎ لا ‎> *‎: طبقة ‎.brand-pattern‎ المحقونة مطلقة
+   الموضع بحكم ‎brand.css‎، ومحدِّد ‎> *‎ بالوزن نفسه كان يُلغي إطلاقها فيتضخم
+   ارتفاع البطاقة بارتفاع الـSVG (خلل رُصد في فحص المتصفح وأُصلح هنا). */
+.dmt-fig-hero > span { position: relative; z-index: 1; }
+.dmt-fig-hero .tabfig-label { color: var(--ink-2); }
+.dmt-fig-hero .tabfig-value { color: var(--brand-ink); }
+.dmt-fig-hero .tabfig-value .word { color: var(--brand); }
+
+/* ── ٢) بطاقات الرسوم ───────────────────────────────────────────────────── */
+.dmt-card .tabcard-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.dmt-card .tabcard-note { max-inline-size: 24ch; }
+
+/* الشريط المكدس شريط واحد عريض: لا يحتاج ارتفاع الرسم البطل كاملاً ليقرأ،
+   لكنه يبقى ‎.tabchart‎ (الحد الأدنى الملزم) كي لا ينكمش على الشاشات القصيرة. */
+.dmt-collar-chart { min-block-size: min(40vh, 340px); block-size: min(40vh, 340px); }
+
+/* ── ٣) الرقاقات: المسار المفاتيحي إلى نافذة الإبراز ────────────────────── */
+.dmt-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-inline: 8px;
+  min-inline-size: 0;
+}
+.dmt-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-inline-size: 100%;
+  padding: 6px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--ink-2);
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.5;
+  transition: border-color var(--dur-micro) var(--ease),
+              background var(--dur-micro) var(--ease),
+              color var(--dur-micro) var(--ease);
+}
+.dmt-chip:hover,
+.dmt-chip:focus-visible {
+  background: var(--surface-3);
+  border-color: var(--brand);
+  color: var(--ink);
+}
+.dmt-chip:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.dmt-chip.is-on {
+  border-color: var(--brand);
+  background: var(--accent-soft);
+  color: var(--ink);
+}
+
+.dmt-chip-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* قيمة الرقاقة عبارة **مركّبة** (رقم + وحدة عربية + نسبة) لا رقم مجرد، فلا
+   يجوز فرض ‎direction: ltr‎ عليها: الفرض كان يقلب ترتيب مقاطعها بصرياً
+   («82.0٪ · سرير 1,164,400») فتبدو الأرقام ملتصقة بالكلمات. العزل وحده هو
+   المطلوب — يفصلها عن جارتها ويُبقي أساسها عربياً، والرقم بداخلها معزول
+   من ‎fmt.caption‎ فيقرأ يسارياً كما يجب. */
+.dmt-chip-value {
+  font-family: var(--f-display);
+  font-weight: 700;
+  color: var(--ink);
+  white-space: nowrap;
+  unicode-bidi: isolate;
+}
+
+/* عيّنة اللون: تربط الرقاقة بعلامتها في الرسم دون الاعتماد على اللون وحده
+   (النص كامل داخل الرقاقة، والعينة تعزيز بصري لا حامل معنى). */
+.dmt-chip-swatch {
+  flex: 0 0 auto;
+  inline-size: 9px;
+  block-size: 9px;
+  border-radius: 3px;
+  background: var(--ink-4);
+}
+.dmt-chip.is-tone-blue .dmt-chip-swatch { background: var(--collar-blue); }
+.dmt-chip.is-tone-demand .dmt-chip-swatch { background: var(--demand); }
+.dmt-chip.is-tone-neutral .dmt-chip-swatch { background: var(--ink-4); }
+
+/* رقاقات مفاتيح الياقات: أبرز قليلاً لأنها تحمل القيم الدقيقة */
+.dmt-legend { gap: 10px; padding-block-start: 2px; }
+.dmt-legend .dmt-chip {
+  padding: 8px 14px;
+  font-size: 13px;
+  background: var(--surface);
+}
+.dmt-legend .dmt-chip:hover,
+.dmt-legend .dmt-chip:focus-visible { background: var(--surface-2); }
+
+/* رقاقات هادئة (الأنشطة): تسمية فقط، حضور بصري أخف */
+.dmt-chips.is-quiet .dmt-chip {
+  padding: 5px 10px;
+  font-size: 11.5px;
+  background: transparent;
+  color: var(--ink-3);
+}
+.dmt-chips.is-quiet .dmt-chip:hover,
+.dmt-chips.is-quiet .dmt-chip:focus-visible {
+  background: var(--surface-2);
+  color: var(--ink);
+}
+
+/* ── ٤) سطر الصدق أسفل اللوح ────────────────────────────────────────────── */
+.dmt-foot {
+  margin-block-start: 2px;
+  font-size: 11.5px;
+  line-height: 1.9;
+  color: var(--ink-3);
+}
+.dmt-foot .ltr { color: var(--ink-2); }
+
+/* ── ٥) احترام تقليل الحركة ─────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .dmt-fig,
+  .dmt-fig::after,
+  .dmt-chip { transition: none; }
+  .dmt-fig:hover,
+  .dmt-fig:focus-visible { transform: none; }
+}
+
+/* ── ٦) الطباعة: البطاقات تُسطَّح والرقاقات تُخفى (كروم تفاعلي لا محتوى) ── */
+@media print {
+  .dmt-fig { box-shadow: none; transform: none; }
+  .dmt-fig::after { display: none; }
+  .dmt-chips { display: none; }
+}
+
+/* ═══ src/styles/tabs/initiatives.css ═══ */
+/* ════════════════════════════════════════════════════════════════════════════
+   tabs/initiatives.css — أنماط التبويب ٤ «المبادرات» (بادئة ‎int-‎ حصراً)
+   ────────────────────────────────────────────────────────────────────────────
+   يُقرأ مع ‎src/styles/tabs.css‎ الذي يوفّر الأصناف الجاهزة
+   (‎.tabfigs‎ ‎.tabgrid‎ ‎.tabcard‎ ‎.tabchart‎) — هذا الملف **يزيّنها ولا يعيد
+   اختراعها**، ويضيف مكوّنات هذا التبويب وحدها:
+     ‎.int-ring-card‎  بطاقة الركيزة بحلقة تقدم دائرية كبيرة (SVG كودي)
+     ‎.int-chip‎       رقاقة حالة/نطاق = المسار المفاتيحي إلى نافذة الإبراز
+     ‎.int-ini‎        صف مبادرة: معرف + اسم + حالة + شريط «مضي المدة الزمنية»
+     ‎.int-bar‎        الشريط الزمني المسمّى حرفياً (لا يدّعي إنجازاً)
+
+   القاعدة الحاكمة (V3_SPEC §1 · V3_CONTRACTS §1-د):
+     **صفر لون مكتوب هنا.** كل لون ‎var(--…)‎ من ‎tokens.css‎، وكل شفافية
+     ‎rgba(var(--x-rgb), a)‎ — فتتبع الحلقات والأشرطة السمتين تلقائياً بلا
+     كتلة داكنة خاصة وبلا سطر JS واحد.
+
+   الصدق البصري (V3_SPEC §4-ب):
+     • الحلقة تعبّر عن **عدد** المنجز لا عن نسبة إنجاز مزعومة؛ ولذلك يرافقها
+       دائماً العدّ الظاهر والتسمية الحرفية ‎.int-ring-cap‎.
+     • الشريط ‎.int-bar‎ لا يُرسم مساره إطلاقاً في الحالة ‎.is-none‎ (لا تواريخ
+       في المصدر) — الغياب يُعلن نصاً ولا يُملأ بصفر مضلِّل.
+     • كل حالة مكتوبة نصاً بجانب نقطتها: اللون تعزيز لا حامل معنى وحيد.
+
+   التمرير الأفقي ممنوع: ‎min-width: 0‎ موروث من ‎.tabgrid > *‎، ولا عرض ثابت
+   في أي قاعدة هنا، والنصوص الطويلة تُقصّ بـ‎text-overflow‎ لا بالفيض.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.int {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 1.3vw, 22px);
+  min-width: 0;
+}
+
+/* ══ ١) شريط الركائز: أربع حلقات تقدم دائرية كبيرة ══════════════════════════
+   الشريط حاضنٌ للنمط الهندسي (متوازيات الأضلاع) الذي يحقنه ‎RH.brand.pattern‎
+   طبقةً مطلقة الموضع — فيلزمه ‎position: relative‎ و‎overflow: hidden‎، وترتفع
+   البطاقات فوقه بـ‎z-index‎. */
+.int-rings {
+  position: relative;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  padding: clamp(10px, 1vw, 16px);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background:
+    linear-gradient(135deg,
+      rgba(var(--brand-rgb), 0.05),
+      rgba(var(--surf-1-rgb), 0) 64%),
+    var(--surface-2);
+  overflow: hidden;
+}
+@media (max-width: 1180px) {
+  .int-rings { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 560px) {
+  .int-rings { grid-template-columns: minmax(0, 1fr); }
+}
+
+.int-ring-card {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  overflow: hidden;
+  transition: border-color var(--dur-micro) var(--ease),
+              box-shadow var(--dur-micro) var(--ease);
+}
+.int-ring-card:hover { border-color: rgba(var(--brand-rgb), 0.45); }
+/* الركيزة المختارة: إطار الهوية + شعيرة علوية — إشارتان لا لون وحده،
+   ويكمّلهما ‎aria-pressed‎ على الزر نفسه. */
+.int-ring-card.is-on {
+  border-color: var(--brand);
+  /* قاعدة الظل الموحدة ‎--shadow-rgb‎ داكنة في السمتين — لا هالة فاتحة في الداكن */
+  box-shadow: 0 6px 22px rgba(var(--shadow-rgb), 0.16);
+}
+.int-ring-card.is-on::before {
+  content: "";
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: 0;
+  block-size: 3px;
+  background: linear-gradient(90deg, var(--brand-teal), var(--brand-deep));
+}
+
+.int-ring-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  padding: clamp(12px, 1.1vw, 18px) 12px 10px;
+  min-width: 0;
+  text-align: center;
+  color: var(--ink-2);
+}
+.int-ring-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: -3px; }
+
+.int-ring-kicker {
+  font-family: var(--f-display);
+  font-size: clamp(12px, 0.78vw, 14px);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--brand);
+  text-transform: none;
+}
+.int-ring-card.is-enabler .int-ring-kicker { color: var(--brand-teal); }
+
+/* الحلقة: مربع مرن يحمل SVG والمركز النصي فوقه */
+.int-ring-wrap {
+  position: relative;
+  inline-size: clamp(116px, 9.4vw, 168px);
+  block-size: clamp(116px, 9.4vw, 168px);
+  flex: 0 0 auto;
+}
+.int-ring {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  overflow: visible;
+}
+/* ‏**‎fill: none‎ ملزم على دائرتي الحلقة**: القيمة الابتدائية لخاصية ‎fill‎ في
+   ‎SVG‎ هي الأسود، فلو سقط هذا الملف من حزمة البناء أو سقطت القاعدة تحوّلت
+   الحلقتان إلى قرصين أسودين صلبين. لذلك تُكتب ‎fill‎ صراحةً على الصنفين، ولا
+   يُعتمد على الوراثة ولا على قاعدة عامة أخرى. سماكة ‎12‎ من ‎120‎ في نظام
+   إحداثيات ‎viewBox‎ ⇒ نحو ‎17px‎ فعلية عند أكبر مقاس: تُقرأ من أربعة أمتار. */
+.int-ring-track {
+  fill: none;
+  stroke: var(--surface-3);
+  stroke-width: 12;
+}
+.int-ring-fill {
+  fill: none;
+  stroke: var(--green);
+  stroke-width: 12;
+  stroke-linecap: round;
+  transition: stroke-dashoffset var(--dur-major) var(--ease);
+}
+/* صفر منجز: القوس معدوم أصلاً، والمسار وحده يبقى — لا قوس كامل مضلِّل */
+.int-ring.is-zero .int-ring-track { stroke: var(--surface-3); }
+
+.int-ring-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  pointer-events: none;
+}
+/* رقم المركز: أثقل وزناً وأكبر مقاساً من الافتراضي — العرض من مسافة القاعة */
+.int-ring-pct {
+  font-family: var(--f-display);
+  font-size: clamp(25px, 2.1vw, 38px);
+  font-weight: 600;
+  line-height: 1.02;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+/* العدّ الظاهر الملزم («1 من 6») — لا يُخفى على أي مقاس.
+   الجملة عربية الاتجاه؛ والأرقام معزولة داخلها من ‎JS‎ رقماً رقماً. */
+.int-ring-count {
+  font-size: clamp(13px, 1vw, 17px);
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--ink-2);
+  direction: rtl;
+  unicode-bidi: isolate;
+  white-space: nowrap;
+}
+
+.int-ring-title {
+  font-family: var(--f-display);
+  font-size: clamp(14px, 1.05vw, 18px);
+  font-weight: 700;
+  line-height: 1.45;
+  color: var(--ink);
+  min-width: 0;
+}
+/* التسمية الحرفية الملزمة: «المنجز من مبادرات الركيزة» */
+.int-ring-cap {
+  font-size: clamp(11.5px, 0.72vw, 13px);
+  line-height: 1.6;
+  color: var(--ink-3);
+}
+
+.int-ring-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 8px 11px 10px;
+  border-block-start: 1px solid var(--line);
+  background: var(--surface-2);
+  min-width: 0;
+}
+
+/* خليط حالات الركيزة: نقطة + نص + عدد لكل حالة ذات رصيد */
+.int-mix {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 9px;
+  min-width: 0;
+}
+.int-mix-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10.5px;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+.int-mix-num {
+  font-family: var(--f-display);
+  font-weight: 700;
+  color: var(--ink-2);
+}
+
+.int-ring-more {
+  flex: 0 0 auto;
+  padding: 4px 11px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink-2);
+  font-size: 11.5px;
+  font-weight: 600;
+  transition: color var(--dur-micro) var(--ease),
+              border-color var(--dur-micro) var(--ease),
+              background var(--dur-micro) var(--ease);
+}
+.int-ring-more:hover,
+.int-ring-more:focus-visible {
+  color: var(--brand);
+  border-color: var(--brand);
+  background: var(--accent-softer);
+}
+.int-ring-more:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+/* ══ ٢) سطر النطاق ومفتاح الحالات ═════════════════════════════════════════ */
+.int-scope {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+.int-scope-txt {
+  font-size: 12.5px;
+  color: var(--ink-2);
+  min-width: 0;
+}
+.int-legend {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+}
+/* تصريح نطاق الأعداد: المفتاح يعدّ المحفظة كاملة حتى مع التصفية */
+.int-legend-cap {
+  font-size: 11.5px;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
+.int-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  max-inline-size: 100%;
+  padding: 5px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink-2);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+  transition: border-color var(--dur-micro) var(--ease),
+              background var(--dur-micro) var(--ease),
+              color var(--dur-micro) var(--ease);
+}
+.int-chip:hover,
+.int-chip:focus-visible {
+  background: var(--surface-2);
+  border-color: var(--brand);
+  color: var(--ink);
+}
+.int-chip:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.int-chip-num {
+  font-family: var(--f-display);
+  font-weight: 700;
+  color: var(--ink);
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+.int-chip.is-clear { border-color: var(--brand); background: var(--accent-soft); }
+.int-chip.is-quiet { background: none; color: var(--ink-3); }
+
+/* ══ ٣) نقاط الحالة الدلالية — تخدم الرقاقة والخليط وصف المبادرة معاً ════
+   اللون تعزيز: النص ملازم للنقطة في كل موضع (‎.int-chip-txt‎/‎.int-mix-txt‎/
+   ‎.int-st-txt‎) فلا يُحمل المعنى على اللون وحده. */
+.int-st-dot {
+  flex: 0 0 auto;
+  inline-size: 9px;
+  block-size: 9px;
+  border-radius: 3px;
+  background: var(--ink-4);
+}
+.int-st.is-done .int-st-dot,
+.int-chip.is-done .int-st-dot,
+.int-mix-item.is-done .int-st-dot { background: var(--green); }
+.int-st.is-run .int-st-dot,
+.int-chip.is-run .int-st-dot,
+.int-mix-item.is-run .int-st-dot { background: var(--collar-blue); }
+.int-st.is-late .int-st-dot,
+.int-chip.is-late .int-st-dot,
+.int-mix-item.is-late .int-st-dot { background: var(--coral); }
+.int-st.is-idle .int-st-dot,
+.int-chip.is-idle .int-st-dot,
+.int-mix-item.is-idle .int-st-dot { background: var(--ink-4); }
+
+.int-st {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+.int-st.is-late .int-st-txt { color: var(--coral); }
+.int-st.is-done .int-st-txt { color: var(--green); }
+
+/* ══ ٤) بطاقتا الخط الزمني والقوائم ═══════════════════════════════════════ */
+.int-card .tabcard-note { max-inline-size: 46ch; }
+.int-card .tabcard-body { display: flex; flex-direction: column; gap: 10px; }
+
+.int-empty {
+  padding: 34px 18px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--ink-3);
+}
+
+/* ══ ٥) قوائم مبادرات الركائز ═════════════════════════════════════════════
+   عمودان على الشاشات الواسعة كي لا يطول اللوح بأربع قوائم متتالية؛ وعمود
+   واحد عند التصفية على ركيزة (‎.is-single‎) فتأخذ القائمة عرضها كاملاً. */
+.int-groups {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(10px, 1.1vw, 18px);
+  padding-inline: 8px;
+  padding-block-end: 6px;
+}
+.int-groups.is-single { grid-template-columns: minmax(0, 1fr); }
+@media (max-width: 1100px) {
+  .int-groups { grid-template-columns: minmax(0, 1fr); }
+}
+.int-groups > * { min-width: 0; }
+
+.int-group {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  overflow: hidden;
+}
+.int-group-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px 12px;
+  flex-wrap: wrap;
+  padding: 10px 13px;
+  border-block-end: 1px solid var(--line);
+  background: var(--surface-2);
+  min-width: 0;
+}
+.int-group-title {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-width: 0;
+  font-family: var(--f-display);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.int-group-kicker {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--brand);
+  white-space: nowrap;
+}
+.int-group.is-enabler .int-group-kicker { color: var(--brand-teal); }
+.int-group-name { min-width: 0; }
+/* «n من N» عبارة مركّبة فيها كلمة عربية — العزل يكفي، وفرض الاتجاه اليساري
+   كان يقلب ترتيبها فتُقرأ «6 من 1». */
+.int-group-count {
+  margin-inline-start: auto;
+  font-family: var(--f-display);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+  unicode-bidi: isolate;
+  white-space: nowrap;
+}
+.int-group-cap {
+  flex: 1 0 100%;
+  font-size: 10.5px;
+  color: var(--ink-3);
+}
+
+.int-inis { display: flex; flex-direction: column; }
+.int-ini-li { min-width: 0; }
+.int-ini-li + .int-ini-li { border-block-start: 1px solid var(--line); }
+
+/* صف المبادرة زرٌّ حقيقي: يُقرأ كصف ويُفعَّل بالنقر وبلوحة المفاتيح */
+.int-ini {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) minmax(120px, 0.72fr);
+  align-items: center;
+  gap: 6px 12px;
+  inline-size: 100%;
+  padding: 9px 13px;
+  text-align: start;
+  color: var(--ink-2);
+  /* شعيرة الحالة على الحافة الداخلية — الإشارة الثالثة بعد النقطة والنص */
+  border-inline-start: 3px solid var(--surface);
+  transition: background var(--dur-micro) var(--ease);
+}
+.int-ini:hover { background: var(--surface-2); }
+.int-ini:focus-visible { outline: 2px solid var(--gold); outline-offset: -2px; }
+.int-ini.is-done { border-inline-start-color: var(--green); }
+.int-ini.is-run { border-inline-start-color: var(--collar-blue); }
+.int-ini.is-late { border-inline-start-color: var(--coral); }
+.int-ini.is-idle { border-inline-start-color: var(--ink-4); }
+
+.int-ini-id {
+  flex: 0 0 auto;
+  font-family: var(--f-display);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-3);
+  direction: ltr;
+  unicode-bidi: isolate;
+  white-space: nowrap;
+}
+.int-ini-main { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.int-ini-name {
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.55;
+  color: var(--ink);
+  min-width: 0;
+}
+.int-ini-st { align-self: flex-start; }
+
+/* ── الشريط الزمني المسمّى حرفياً ───────────────────────────────────────── */
+.int-bar { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.int-bar-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+}
+.int-bar-cap {
+  font-size: 10.5px;
+  color: var(--ink-3);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.int-bar-val {
+  font-family: var(--f-display);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-2);
+  direction: ltr;
+  unicode-bidi: isolate;
+  white-space: nowrap;
+}
+.int-bar-track {
+  display: block;
+  inline-size: 100%;
+  block-size: 7px;
+  border-radius: 999px;
+  background: var(--surface-3);
+  overflow: hidden;
+}
+.int-bar-fill {
+  display: block;
+  block-size: 100%;
+  border-radius: 999px;
+  background: var(--ink-4);
+  transition: inline-size var(--dur-std) var(--ease);
+}
+/* المنجزة وحدها يجوز أن تُصبغ بلون الإنجاز (أخضر) بامتلاء كامل */
+.int-bar.is-done .int-bar-fill { background: var(--green); }
+.int-bar.is-done .int-bar-val { color: var(--green); }
+/* «مضي المدة الزمنية»: لون محايد لا يوحي بإنجاز، ومرجاني عند التأخر */
+.int-ini.is-run .int-bar.is-elapsed .int-bar-fill { background: var(--collar-blue); }
+.int-ini.is-late .int-bar.is-elapsed .int-bar-fill { background: var(--coral); }
+.int-ini.is-late .int-bar.is-elapsed .int-bar-val { color: var(--coral); }
+/* بلا تواريخ: لا مسار ولا امتلاء — الغياب مُعلن نصاً وحده */
+.int-bar.is-none .int-bar-cap { font-style: italic; }
+.int-bar.is-none .int-bar-val { color: var(--ink-4); }
+
+@media (max-width: 620px) {
+  .int-ini { grid-template-columns: auto minmax(0, 1fr); }
+  .int-bar { grid-column: 1 / -1; }
+}
+
+/* ══ ٦) سطر الصدق أسفل اللوح ══════════════════════════════════════════════ */
+.int-foot {
+  margin-block-start: 2px;
+  font-size: 11.5px;
+  line-height: 1.9;
+  color: var(--ink-3);
+}
+.int-foot-src { color: var(--ink-2); }
+
+/* ══ ٧) احترام تقليل الحركة ═══════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  .int-ring-fill,
+  .int-bar-fill,
+  .int-ring-card,
+  .int-ring-more,
+  .int-chip,
+  .int-ini { transition: none; }
+}
+
+/* ══ ٨) الطباعة: الكروم التفاعلي يُخفى والمحتوى يُسطَّح ═══════════════════ */
+@media print {
+  .int-rings { background: none; }
+  .int-ring-card { box-shadow: none; }
+  .int-legend,
+  .int-ring-more { display: none; }
+  .int-group,
+  .int-ring-card { break-inside: avoid; }
+}
+
+/* ═══ src/styles/tabs/kpis.css ═══ */
+/* ════════════════════════════════════════════════════════════════════════════
+   tabs/kpis.css — أنماط التبويب ٥ «مؤشرات الأداء» (بادئة ‎kpi5-‎ حصراً)
+   ────────────────────────────────────────────────────────────────────────────
+   يُقرأ مع ‎src/styles/tabs.css‎ الذي يوفّر الأصناف الجاهزة
+   (‎.tabgrid‎ ‎.tabcard‎) — هذا الملف **يزيّنها ولا يعيد اختراعها**، ويضيف
+   مكوّنات هذا التبويب وحدها:
+     ‎.kpi5-strip‎    شريط الموجز في سطر واحد (كل رقم فيه زر إبراز)
+     ‎.kpi5-board‎    **شبكة العدّادات الأربعة عشر** ٣/الصف على 1920 · ٢ على 1366
+     ‎.kpi5-g-card‎   بطاقة العدّاد نصف الدائري (SVG كودي) — البطاقة نفسها زر
+     ‎.kpi5-arc‎      شرائح القوس الأربع: مسار · نطاق تحسن · علامة أساس · علامة مستهدف
+     ‎.kpi5-g-val‎    مركز العدّاد: القيمة المسجَّلة أو **حالة الغياب الصريحة**
+     ‎.kpi5-chip‎     رقاقات ترشيح الشبكة وترتيبها (تكتب حالتها في العنوان)
+     ‎.kpi5-matrix‎   مصفوفة المؤشرات الأربعة عشر
+
+   **لا عدّاد مكبَّر ولا لوح تفاصيل مرسى**: الشاشة كلها للعدّادات الأربعة عشر،
+   والتفصيل خلف نافذة الإبراز (نقرة) ثم الملحق (نقرة ثانية).
+
+   القاعدة الحاكمة (V3_SPEC §1 · V3_CONTRACTS §1-د):
+     **صفر لون مكتوب هنا.** كل لون ‎var(--…)‎ من ‎tokens.css‎، وكل شفافية
+     ‎rgba(var(--x-rgb), a)‎ — فتتبع العدّادات السمتين تلقائياً بلا كتلة داكنة
+     خاصة وبلا سطر JS واحد.
+
+   الصدق البصري (V3_SPEC §4-ب):
+     • **لا إبرة بلا قيمة**: ‎.kpi5-needle‎ لا تُرسم أصلاً في الحالة المعلّقة —
+       الغياب يُعلن نصاً في ‎.kpi5-g-val.is-pending‎ برقاقة متقطعة الحد لا
+       يمكن أن تُقرأ قيمةً.
+     • العلامتان مختلفتا **الشكل** لا اللون وحده: دائرة مجوفة لخط الأساس
+       وعارضة صلبة للمستهدف، ولكل منهما نصّه في ‎.kpi5-marks‎.
+     • الذهبي محجوز هنا لخط الأساس والمستهدف ونطاق التحسن بينهما — ولا يلوّن
+       أي قيمة أخرى.
+
+   التمرير الأفقي ممنوع على الصفحة: ‎min-width: 0‎ موروث من ‎.tabgrid > *‎،
+   والمصفوفة وحدها تُمرَّر داخل حاويتها ‎.kpi5-matrix-scroll‎ فلا تفيض اللوح.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.kpi5 {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 1.3vw, 22px);
+  min-width: 0;
+}
+
+/* ══ ١) اللافتة (حاضنة النمط الهندسي للهوية) ═══════════════════════════════ */
+.kpi5-banner {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px 22px;
+  flex-wrap: wrap;
+  padding: clamp(12px, 1.2vw, 20px) clamp(14px, 1.4vw, 24px);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background:
+    linear-gradient(135deg,
+      rgba(var(--brand-rgb), 0.06),
+      rgba(var(--surf-1-rgb), 0) 62%),
+    var(--surface-2);
+  min-width: 0;
+}
+.kpi5-banner-main { position: relative; z-index: 1; min-width: 0; }
+.kpi5-title {
+  font-family: var(--f-display);
+  font-size: clamp(20px, 1.9vw, 30px);
+  font-weight: 300;
+  line-height: 1.25;
+  color: var(--ink);
+}
+.kpi5-lede {
+  margin-block-start: 5px;
+  max-inline-size: 78ch;
+  font-size: clamp(12px, 0.95vw, 14px);
+  line-height: 1.75;
+  color: var(--ink-2);
+}
+.kpi5-asof {
+  position: relative;
+  z-index: 1;
+  flex: 0 0 auto;
+  font-size: 11.5px;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
+/* ══ ٢) شريط الموجز — سطر واحد مضغوط فوق الشبكة ════════════════════════════
+   ‎14 مؤشراً · 11 نسبي · 3 عددي · 0 من 14 قيمة حالية مسجّلة‎ — كل رقم زر،
+   والفاصل ‎·‎ يرسمه ‎::before‎ فلا عنصر فارغ في الشجرة. الشريط بديل صفّ
+   البطاقات الأربع الضخم: يوفّر الطية كلها لعدّادات المؤشرات. */
+.kpi5-strip {
+  display: flex;
+  align-items: center;
+  gap: 4px 14px;
+  flex-wrap: wrap;
+  padding: 9px clamp(12px, 1.2vw, 18px);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--surface);
+  min-width: 0;
+}
+.kpi5-stat {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 3px 4px;
+  border-radius: var(--r-sm);
+  color: var(--ink-2);
+  white-space: nowrap;
+  transition: color var(--dur-micro) var(--ease),
+              background var(--dur-micro) var(--ease);
+}
+.kpi5-stat + .kpi5-stat::before {
+  content: "·";
+  margin-inline-end: 10px;
+  color: var(--ink-4);
+}
+.kpi5-stat:hover { color: var(--ink); background: var(--surface-2); }
+.kpi5-stat:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.kpi5-stat-num {
+  font-family: var(--f-display);
+  font-size: clamp(17px, 1.35vw, 23px);
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--ink);
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+.kpi5-stat-unit { font-size: 12px; }
+/* الرقم المعلّق (‎0 من 14‎) بلكنة ذهبية تحريرية — لا قيمة بيانات */
+.kpi5-stat.is-pending .kpi5-stat-num { color: var(--gold); }
+.kpi5-stat.is-pending .kpi5-stat-unit { color: var(--ink-2); }
+/* وسم الصدق الحرفي يُدفع إلى طرف السطر فيلازم الأرقام ولا يزاحمها */
+.kpi5-strip-note {
+  margin-inline-start: auto;
+  padding-inline-start: 12px;
+  font-size: 11.5px;
+  line-height: 1.7;
+  color: var(--ink-3);
+}
+
+/* ══ ٣) أدوات الشبكة: الترشيح والترتيب ═════════════════════════════════════ */
+.kpi5-tools {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 18px;
+  flex-wrap: wrap;
+  padding: 2px 8px 8px;
+  min-width: 0;
+}
+.kpi5-chips {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+.kpi5-chips-cap {
+  font-size: 11.5px;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+.kpi5-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink-2);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+  white-space: nowrap;
+  transition: border-color var(--dur-micro) var(--ease),
+              background var(--dur-micro) var(--ease),
+              color var(--dur-micro) var(--ease);
+}
+.kpi5-chip:hover { background: var(--surface-2); color: var(--ink); }
+.kpi5-chip:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+/* الحالة المختارة بثلاث إشارات: لون + خلفية + ‎aria-pressed‎ على الزر نفسه */
+.kpi5-chip.is-on {
+  border-color: var(--brand);
+  background: var(--accent-soft);
+  color: var(--brand);
+}
+.kpi5-chip-num {
+  font-family: var(--f-display);
+  font-weight: 700;
+  color: var(--ink);
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+.kpi5-chip.is-on .kpi5-chip-num { color: var(--brand); }
+
+/* ══ ٤) شبكة العدّادات — ثلاثة في الصف على 1920 · اثنان على 1366 ════════════
+   البطاقة نفسها زر: نقرة واحدة = إبراز المؤشر. لا زر «تكبير» ولا حالة
+   «معروض» — فلا عدّاد يحتكر الشاشة على حساب الثلاثة عشر الباقية. */
+.kpi5-board {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(10px, 1.1vw, 18px);
+  padding: 0 8px 6px;
+  min-width: 0;
+}
+.kpi5-board > * { min-width: 0; }
+/* عتبة 1366: عمودان — فيبقى العدّاد مقروءاً لا مسحوقاً */
+@media (max-width: 1500px) {
+  .kpi5-board { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 760px) {
+  .kpi5-board { grid-template-columns: minmax(0, 1fr); }
+}
+
+.kpi5-g-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 11px 12px 10px;
+  min-width: 0;
+  inline-size: 100%;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  text-align: start;
+  color: var(--ink-2);
+  transition: border-color var(--dur-micro) var(--ease),
+              box-shadow var(--dur-micro) var(--ease);
+}
+.kpi5-g-card:hover {
+  border-color: rgba(var(--brand-rgb), 0.45);
+  box-shadow: 0 6px 22px rgba(var(--shadow-rgb), 0.14);
+}
+.kpi5-g-card:focus-visible { outline: 2px solid var(--gold); outline-offset: -3px; }
+
+/* سطر المعرف والرقاقة فوق الاسم — ارتفاع ثابت فتتحاذى البطاقات في صفها */
+.kpi5-g-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+}
+.kpi5-g-id {
+  flex: 0 0 auto;
+  font-family: var(--f-display);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-3);
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+/* اسم المؤشر **مقصوص في سطرين** والاسم الكامل في ‎title‎ — لا بتر خفي */
+.kpi5-g-name {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-width: 0;
+  min-block-size: calc(2 * 1.5em);
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+/* رقاقة نوع المؤشر (نسبي/عددي) — النص هو حامل المعنى واللون تعزيز */
+.kpi5-type {
+  flex: 0 0 auto;
+  padding: 2px 9px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 700;
+  line-height: 1.7;
+  white-space: nowrap;
+}
+.kpi5-type.is-pct {
+  color: var(--collar-blue);
+  border-color: rgba(var(--blue-rgb), 0.42);
+  background: rgba(var(--blue-rgb), 0.10);
+}
+.kpi5-type.is-num {
+  color: var(--ink-2);
+  background: var(--surface-2);
+}
+
+/* وعد النقرة الأولى — يظهر باهتاً ويشتد عند التحويم/التركيز */
+.kpi5-g-more {
+  align-self: flex-start;
+  font-size: 10.5px;
+  color: var(--ink-4);
+  opacity: 0.85;
+  transition: color var(--dur-micro) var(--ease);
+}
+.kpi5-g-card:hover .kpi5-g-more,
+.kpi5-g-card:focus-visible .kpi5-g-more { color: var(--brand); opacity: 1; }
+
+/* ══ ٥) العدّاد نصف الدائري نفسه ═══════════════════════════════════════════ */
+/* العدّاد **مضغوط**: سقف عرضه ثابت ويتوسط بطاقته مهما اتسع العمود، فلا
+   ينتفخ قوس واحد إلى ملء الصف كما كان يفعل العدّاد المكبَّر. */
+.kpi5-g-wrap {
+  position: relative;
+  display: block;
+  inline-size: 100%;
+  max-inline-size: 300px;
+  margin-inline: auto;
+  margin-block-start: 2px;
+  min-width: 0;
+}
+.kpi5-g {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+  overflow: visible;
+}
+
+/* شرائح القوس الأربع — ‎butt‎ كي تتلاصق الشرائح بلا تراكب يزيح العلامات */
+.kpi5-arc {
+  fill: none;
+  stroke-linecap: butt;
+}
+/* المسار المحايد بلون الشعيرة المعايَرة — يبقى مقروءاً على السمتين معاً */
+.kpi5-arc.is-track { stroke: var(--line); }
+/* نطاق التحسن المطلوب بين العلامتين — صبغة ذهبية شفافة تتبع السمة */
+.kpi5-arc.is-band { stroke: rgba(var(--gold-rgb), 0.28); }
+.kpi5-arc.is-base { stroke: var(--gold); }
+.kpi5-arc.is-target { stroke: var(--gold-hi); }
+
+/* العلامتان مختلفتا الشكل: دائرة مجوفة لخط الأساس · عارضة صلبة للمستهدف */
+.kpi5-mark-base {
+  fill: var(--surface);
+  stroke: var(--gold);
+  stroke-width: 2.6;
+}
+.kpi5-mark-target {
+  stroke: var(--gold-hi);
+  stroke-width: 3.4;
+  stroke-linecap: round;
+}
+
+/* الإبرة وقلبها — لا يُرسمان إلا حين تُسجَّل قيمة حالية (V3_SPEC §4-ب) */
+.kpi5-needle {
+  stroke: var(--green);
+  stroke-width: 3.4;
+  stroke-linecap: round;
+}
+.kpi5-needle-hub { fill: var(--green); }
+
+/* مركز العدّاد */
+.kpi5-g-center {
+  position: absolute;
+  inset-inline: 12%;
+  inset-block-end: 12%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  pointer-events: none;
+  text-align: center;
+}
+.kpi5-g-cap {
+  font-size: 10.5px;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+.kpi5-g-val {
+  font-family: var(--f-display);
+  font-size: clamp(15px, 1.3vw, 21px);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--ink);
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+/* **حالة الغياب الصريحة**: رقاقة متقطعة الحد لا تُقرأ قيمةً بحال */
+.kpi5-g-val.is-pending {
+  padding: 2px 10px;
+  border: 1px dashed rgba(var(--gold-rgb), 0.62);
+  border-radius: 999px;
+  background: rgba(var(--gold-rgb), 0.08);
+  color: var(--gold);
+  font-size: clamp(11px, 0.9vw, 13px);
+  font-weight: 600;
+  direction: rtl;
+}
+
+/* طرفا المقياس تحت القوس: الصفر أولاً (يمين) وأعلى المقياس آخراً (يسار).
+   يشارك العدّاد سقف عرضه ذاته فيقع كل طرف تحت طرف القوس المقابل له —
+   وإلا انزاح «0» إلى حافة البطاقة فقُرئ على غير موضعه من المقياس. */
+.kpi5-scale {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  inline-size: 100%;
+  max-inline-size: 300px;
+  margin-inline: auto;
+  min-width: 0;
+  font-size: 10.5px;
+  color: var(--ink-3);
+}
+.kpi5-scale-end {
+  flex: 0 0 auto;
+  font-family: var(--f-display);
+  font-style: normal;
+  font-weight: 600;
+  color: var(--ink-2);
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+.kpi5-scale-cap {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* سطر العلامتين: شكل + نص + قيمة */
+.kpi5-marks {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px 14px;
+  flex-wrap: wrap;
+  padding-block-start: 6px;
+  border-block-start: 1px solid var(--line);
+  min-width: 0;
+}
+.kpi5-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  font-size: 11px;
+  white-space: nowrap;
+}
+.kpi5-mark-lab { color: var(--ink-3); }
+.kpi5-mark-val {
+  font-family: var(--f-display);
+  font-weight: 700;
+  color: var(--gold);
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+.kpi5-mark.is-target .kpi5-mark-val { color: var(--gold-hi); }
+/* الشكلان مرآة للعلامتين على القوس: حلقة مجوفة · عارضة صلبة */
+.kpi5-mark-glyph {
+  flex: 0 0 auto;
+  display: inline-block;
+}
+.kpi5-mark-glyph.is-base {
+  inline-size: 11px;
+  block-size: 11px;
+  border: 2.5px solid var(--gold);
+  border-radius: 50%;
+  background: var(--surface);
+}
+.kpi5-mark-glyph.is-target {
+  inline-size: 4px;
+  block-size: 13px;
+  border-radius: 2px;
+  background: var(--gold-hi);
+}
+
+/* ══ ٦) مصفوفة المؤشرات ════════════════════════════════════════════════════ */
+.kpi5-matrix-scroll {
+  overflow-x: auto;
+  padding-inline: 8px;
+  padding-block-end: 6px;
+  min-width: 0;
+}
+.kpi5-matrix {
+  inline-size: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.kpi5-matrix-cap {
+  caption-side: bottom;
+  padding-block-start: 9px;
+  font-size: 11px;
+  line-height: 1.8;
+  color: var(--ink-3);
+  text-align: start;
+}
+.kpi5-matrix th,
+.kpi5-matrix td {
+  padding: 8px 10px;
+  text-align: start;
+  vertical-align: middle;
+  border-block-end: 1px solid var(--line);
+}
+.kpi5-matrix thead th {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 1;
+  background: var(--surface-2);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+.kpi5-matrix tbody th {
+  font-family: var(--f-display);
+  font-weight: 700;
+  color: var(--ink-3);
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+.kpi5-matrix td.tnum {
+  font-family: var(--f-display);
+  font-weight: 600;
+  color: var(--ink);
+  direction: ltr;
+  unicode-bidi: isolate;
+  white-space: nowrap;
+}
+.kpi5-matrix td.is-gold { color: var(--gold); }
+.kpi5-row { transition: background var(--dur-micro) var(--ease); }
+.kpi5-row:hover { background: var(--surface-2); }
+.kpi5-row-name { min-inline-size: 24ch; }
+.kpi5-row-btn {
+  text-align: start;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.55;
+  color: var(--ink);
+  border-block-end: 1px dotted var(--line);
+}
+.kpi5-row-btn:hover { color: var(--brand); border-block-end-color: var(--brand); }
+.kpi5-row-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+/* وسم الغياب داخل المصفوفة — يُقرأ نصاً ولا يتحول صفراً */
+.kpi5-na {
+  display: inline-block;
+  padding: 2px 9px;
+  border: 1px dashed rgba(var(--gold-rgb), 0.55);
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--gold);
+  white-space: nowrap;
+}
+
+/* ══ ٧) سطر الصدق أسفل اللوح ═══════════════════════════════════════════════ */
+.kpi5-foot {
+  margin-block-start: 2px;
+  font-size: 11.5px;
+  line-height: 1.9;
+  color: var(--ink-3);
+}
+.kpi5-foot-src { color: var(--ink-2); }
+
+/* ══ ٨) احترام تقليل الحركة ═══════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  .kpi5-stat,
+  .kpi5-chip,
+  .kpi5-g-card,
+  .kpi5-g-more,
+  .kpi5-row { transition: none; }
+}
+
+/* ══ ٩) الطباعة: الكروم التفاعلي يُخفى والمحتوى يُسطَّح ═══════════════════ */
+@media print {
+  .kpi5-banner { background: none; }
+  .kpi5-g-card { box-shadow: none; break-inside: avoid; }
+  .kpi5-tools,
+  .kpi5-g-more { display: none; }
+  .kpi5-board { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .kpi5-matrix-scroll { overflow: visible; }
+  .kpi5-matrix tr { break-inside: avoid; }
+}
+
+/* ═══ src/styles/tabs/licensing.css ═══ */
+/* ════════════════════════════════════════════════════════════════════════════
+   licensing.css — أنماط التبويب ٢ «التراخيص» (بادئة ‎lict-‎ حصراً)
+   ────────────────────────────────────────────────────────────────────────────
+   قواعد ملزمة مطبقة هنا حرفياً:
+     • **صفر لون مكتوب**: كل لون ‎var(--…)‎ من ‎tokens.css‎، وكل شفافية
+       ‎rgba(var(--x-rgb), a)‎ — فتتبع السمتين (الفاتحة الافتراضية والداكنة)
+       بلا سطر واحد خاص بسمة.
+     • التخطيط يتكئ على أصناف ‎tabs.css‎ الجاهزة (‎.tabfigs‎/‎.tabgrid‎/‎.tabcard‎/
+       ‎.tabchart‎) ولا يعيد اختراعها؛ ما هنا هو **الكسوة** فقط.
+     • **لا تمرير أفقي**: ‎min-width: 0‎ على كل خلية، والمفاتيح تلتف عند الضيق.
+     • ‎prefers-reduced-motion‎ يصفّر كل انتقال.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.lict {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 1.3vw, 22px);
+  min-width: 0;
+}
+
+/* ── الترويسة الهوياتية (النمط الهندسي يُحقن كوداً من RH.brand.pattern) ──── */
+.lict-banner {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+  flex-wrap: wrap;
+  padding: clamp(14px, 1.4vw, 22px) clamp(16px, 1.6vw, 26px);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--surface);
+  min-width: 0;
+}
+/* خيط الهوية العلوي: فيروزي → أخضر عميق (متوازيات الأضلاع نفسها) */
+.lict-banner::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--brand-teal), var(--brand-deep));
+}
+.lict-banner-main { position: relative; min-width: 0; }
+
+.lict-title {
+  font-family: var(--f-display);
+  font-size: clamp(20px, 1.9vw, 30px);
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--ink);
+}
+.lict-lede {
+  margin-top: 6px;
+  max-width: 70ch;
+  font-size: clamp(12.5px, 0.95vw, 14.5px);
+  line-height: 1.8;
+  color: var(--ink-2);
+}
+.lict-asof {
+  position: relative;
+  flex: 0 0 auto;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
+/* ── الإجماليات الثلاثة: بطاقة الرقم زر حقيقي (نقرة = إبراز) ─────────────── */
+.lict-figs { min-width: 0; }
+
+.lict-fig {
+  display: block;
+  width: 100%;
+  text-align: start;
+  cursor: pointer;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  transition: border-color var(--dur-micro) var(--ease),
+              box-shadow var(--dur-micro) var(--ease),
+              transform var(--dur-micro) var(--ease);
+}
+.lict-fig:hover,
+.lict-fig:focus-visible {
+  border-color: var(--brand);
+  box-shadow: 0 6px 22px rgba(var(--brand-rgb), 0.12);
+  transform: translateY(-1px);
+}
+/* شعيرة الهوية على حافة البداية — إشارة «قابل للنقر» غير محمولة باللون وحده */
+.lict-fig {
+  position: relative;
+  overflow: hidden;
+}
+.lict-fig::before {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: 3px;
+  background: linear-gradient(180deg, var(--brand-teal), var(--brand-deep));
+  opacity: 0.45;
+  transition: opacity var(--dur-micro) var(--ease);
+}
+.lict-fig:hover::before,
+.lict-fig:focus-visible::before { opacity: 1; }
+
+.lict-fig .tabfig-value { margin-top: 2px; }
+
+.lict-fig-delta {
+  display: block;
+  margin-top: 5px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--green);
+}
+
+/* ── الشبكة والبطاقات ────────────────────────────────────────────────────── */
+.lict-grid > * { min-width: 0; }
+
+.lict-card .tabcard-head {
+  align-items: flex-start;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.lict-head-main { min-width: 0; }
+.lict-sub {
+  margin-top: 3px;
+  font-size: 11.5px;
+  line-height: 1.6;
+  color: var(--ink-3);
+}
+.lict-card .tabcard-note { white-space: nowrap; }
+
+/* الرسم نفسه: أرضية السطح كي يقرأ التلميح المُلصق بالحافة على السمتين */
+.lict-card .tabchart { background: var(--surface); }
+
+/* ── مفاتيح طبقات الخريطة (أسرّة · تشغيلية · بناء) ───────────────────────── */
+.lict-layers {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-2);
+}
+.lict-layer {
+  padding: 5px 14px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-3);
+  white-space: nowrap;
+  transition: color var(--dur-micro) var(--ease),
+              background var(--dur-micro) var(--ease);
+}
+.lict-layer:hover { color: var(--ink); background: var(--surface-3); }
+/* الحالة المختارة معلنة بثلاث إشارات: التعبئة، والحبر المقلوب، و‎aria-pressed‎ */
+.lict-layer.is-on {
+  background: var(--brand);
+  color: var(--on-accent);
+  box-shadow: 0 2px 8px rgba(var(--brand-rgb), 0.28);
+}
+.lict-layer.is-on:hover { background: var(--brand-deep); color: var(--on-accent); }
+
+/* ── ملاحظات الصدق أسفل الخريطة ─────────────────────────────────────────── */
+.lict-note {
+  margin: 8px 8px 2px;
+  font-size: 11.5px;
+  line-height: 1.75;
+  color: var(--ink-3);
+}
+
+.lict-missing {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 8px;
+  padding: 28px 22px;
+  border: 1px dashed var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface-2);
+  text-align: center;
+  color: var(--ink-2);
+  font-size: 13px;
+  line-height: 1.8;
+}
+.lict-missing b { font-family: var(--f-display); color: var(--ink); }
+
+/* ── ذيل التبويب: التحفظ المرجعي + المسار الصريح إلى الملحق ─────────────── */
+.lict-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 14px 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--surface);
+  min-width: 0;
+}
+.lict-foot-note {
+  min-width: 0;
+  font-size: 12px;
+  line-height: 1.75;
+  color: var(--ink-3);
+}
+.lict-ax {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  flex: 0 0 auto;
+  padding: 9px 18px;
+  border-radius: 999px;
+  background: var(--brand);
+  color: var(--on-accent);
+  font-size: 13px;
+  font-weight: 700;
+  transition: background var(--dur-micro) var(--ease),
+              transform var(--dur-micro) var(--ease);
+}
+.lict-ax:hover,
+.lict-ax:focus-visible {
+  background: var(--brand-deep);
+  transform: translateX(-2px);
+}
+.lict-ax-arrow { font-size: 15px; line-height: 1; }
+
+/* ── الضيق: 1366 وما دونه — لا تمرير أفقي ولا تصادم تسميات ──────────────── */
+@media (max-width: 1100px) {
+  .lict-banner { align-items: flex-start; }
+  .lict-card .tabcard-note { white-space: normal; }
+}
+@media (max-width: 640px) {
+  .lict-layers { width: 100%; justify-content: space-between; }
+  .lict-layer { flex: 1 1 auto; text-align: center; }
+  .lict-foot { flex-direction: column; align-items: stretch; }
+  .lict-ax { justify-content: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lict-fig,
+  .lict-fig::before,
+  .lict-layer,
+  .lict-ax { transition: none; }
+  .lict-fig:hover,
+  .lict-fig:focus-visible,
+  .lict-ax:hover,
+  .lict-ax:focus-visible { transform: none; }
+}
+
+/* ═══ src/styles/tabs/monitoring.css ═══ */
+/* ════════════════════════════════════════════════════════════════════════════
+   monitoring.css — أنماط التبويب ٣ «الرقابة» (بادئة ‎mont-‎ حصراً)
+   ────────────────────────────────────────────────────────────────────────────
+   قواعد ملزمة مطبقة هنا حرفياً (V3_SPEC §1 و§3 · V3_CONTRACTS §1-د و§4-د):
+     • **صفر لون مكتوب**: كل لون ‎var(--…)‎ من ‎tokens.css‎، وكل شفافية
+       ‎rgba(var(--x-rgb), a)‎ — فتتبع السمتين (الفاتحة الافتراضية والداكنة)
+       بلا سطر واحد خاص بسمة، وبلا ‎@media (prefers-color-scheme)‎ هنا إطلاقاً.
+     • التخطيط يتكئ على أصناف ‎tabs.css‎ الجاهزة (‎.tabfigs‎/‎.tabgrid‎/‎.tabcard‎/
+       ‎.tabchart‎) ولا يعيد اختراعها؛ ما هنا **كسوة** ومكوّنات خاصة بالمحور
+       (وسيلة إيضاح الخريطة · وسم «بانتظار اعتماد المنهجية» · شرائح الفئات).
+     • **لا تمرير أفقي**: ‎min-width: 0‎ على كل خلية، والمفاتيح والشرائح تلتف.
+     • كل حالة مُعلَنة بأكثر من اللون (وسم نصي · ‎aria-pressed‎ · شكل).
+     • ‎prefers-reduced-motion‎ يصفّر كل انتقال.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.mont {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 1.3vw, 22px);
+  min-width: 0;
+}
+
+/* ── الترويسة الهوياتية (النمط الهندسي يُحقن كوداً من RH.brand.pattern) ──── */
+.mont-banner {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+  flex-wrap: wrap;
+  padding: clamp(14px, 1.4vw, 22px) clamp(16px, 1.6vw, 26px);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--surface);
+  min-width: 0;
+}
+/* خيط الهوية العلوي: فيروزي → أخضر عميق (تدرّج متوازيات الأضلاع نفسه) */
+.mont-banner::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--brand-teal), var(--brand-deep));
+}
+.mont-banner-main { position: relative; min-width: 0; }
+
+.mont-title {
+  font-family: var(--f-display);
+  font-size: clamp(20px, 1.9vw, 30px);
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--ink);
+}
+.mont-lede {
+  margin-top: 6px;
+  max-width: 70ch;
+  font-size: clamp(12.5px, 0.95vw, 14.5px);
+  line-height: 1.8;
+  color: var(--ink-2);
+}
+.mont-asof {
+  position: relative;
+  flex: 0 0 auto;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
+/* ── الأرقام المفتاحية: بطاقة الرقم زر حقيقي (نقرة = إبراز) ──────────────── */
+.mont-figs { min-width: 0; }
+
+.mont-fig {
+  position: relative;
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  text-align: start;
+  cursor: pointer;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  transition: border-color var(--dur-micro) var(--ease),
+              box-shadow var(--dur-micro) var(--ease),
+              transform var(--dur-micro) var(--ease);
+}
+.mont-fig:hover,
+.mont-fig:focus-visible {
+  border-color: var(--brand);
+  box-shadow: 0 6px 22px rgba(var(--brand-rgb), 0.12);
+  transform: translateY(-1px);
+}
+/* شعيرة الهوية على حافة البداية — إشارة «قابل للنقر» غير محمولة باللون وحده */
+.mont-fig::before {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: 3px;
+  background: linear-gradient(180deg, var(--brand-teal), var(--brand-deep));
+  opacity: 0.45;
+  transition: opacity var(--dur-micro) var(--ease);
+}
+.mont-fig:hover::before,
+.mont-fig:focus-visible::before { opacity: 1; }
+
+.mont-fig .tabfig-value { margin-top: 2px; }
+/* الحاشية سطر مستقل: الوسم قبلها ‎inline-flex‎ فكانا يتزاحمان في سطر واحد */
+.mont-fig .tabfig-foot { display: block; }
+/* المرجاني للمخالفات حصراً (منظومة المعنى المقفلة) */
+.mont-fig.is-deficit .tabfig-value { color: var(--coral); }
+.mont-fig.is-plain .tabfig-value { color: var(--ink); }
+/* «بانتظار الاعتماد» لكنة ذهبية في الكروم — لا لون بيانات لقيمة غير معتمدة */
+.mont-fig.is-pending .tabfig-value { color: var(--ink-2); }
+.mont-fig.is-pending::before {
+  background: linear-gradient(180deg, var(--gold), var(--gold-hi));
+}
+
+/* ── وسم الصدق الملزم: «بانتظار اعتماد المنهجية» ─────────────────────────── */
+.mont-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 7px;
+  padding: 3px 10px;
+  border: 1px dashed var(--gold);
+  border-radius: 999px;
+  background: rgba(var(--gold-rgb), 0.08);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.5;
+  color: var(--gold);
+  white-space: normal;
+}
+/* نقطة الوسم: إشارة شكلية ثانية فلا تُحمل الحالة على اللون وحده */
+.mont-badge-dot {
+  inline-size: 6px;
+  block-size: 6px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--gold);
+}
+
+/* ── الشبكة والبطاقات ────────────────────────────────────────────────────── */
+.mont-grid > * { min-width: 0; }
+
+.mont-card .tabcard-head {
+  align-items: flex-start;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.mont-head-main { min-width: 0; }
+.mont-sub {
+  margin-top: 3px;
+  font-size: 11.5px;
+  line-height: 1.6;
+  color: var(--ink-3);
+}
+.mont-card .tabcard-note { white-space: nowrap; }
+/* الرسم على أرضية السطح كي يقرأ التلميح المُلصق بالحافة على السمتين */
+.mont-card .tabchart { background: var(--surface); }
+/* الخريطة أطول من الحد الأدنى الملزم: شكل الرياض طولاني، فالارتفاع هو ما
+   يكبّرها فعلاً (الحد في tabs.css أرضية لا سقف). */
+.mont-map .tabchart.is-tall {
+  min-height: min(64vh, 620px);
+  height: min(64vh, 620px);
+}
+
+/* ── مفاتيح منظور نقاط التركّز (فقاعات · طبقة حرارية) ─────────────────────── */
+.mont-views {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-2);
+}
+.mont-view {
+  padding: 5px 14px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-3);
+  white-space: nowrap;
+  transition: color var(--dur-micro) var(--ease),
+              background var(--dur-micro) var(--ease);
+}
+.mont-view:hover { color: var(--ink); background: var(--surface-3); }
+/* الحالة المختارة معلنة بثلاث إشارات: التعبئة، الحبر المقلوب، ‎aria-pressed‎ */
+.mont-view.is-on {
+  background: var(--brand);
+  color: var(--on-accent);
+  box-shadow: 0 2px 8px rgba(var(--brand-rgb), 0.28);
+}
+.mont-view.is-on:hover { background: var(--brand-deep); color: var(--on-accent); }
+
+/* ── مفتاح طبقة نقاط التركّز: في DOM لا في الرسم (يُقرأ بلوحة المفاتيح) ───── */
+.mont-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 14px;
+  margin: 10px 8px 0;
+  padding: 9px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface-2);
+  min-width: 0;
+}
+.mont-legend-cap {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+.mont-legend-note {
+  margin-inline-start: auto;
+  font-size: 11px;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
+/* مفتاح الحجم: أقراص مرجعية بالقياس نفسه الذي يرسمه ‎bubbleDiameter‎ */
+.mont-size {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+}
+.mont-dot {
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: rgba(var(--ink-rgb), 0.5);
+  border: 1px solid var(--surface);
+}
+.mont-size-val { font-size: 11px; color: var(--ink-3); }
+
+/* شريط التدرّج الحراري: الدرجات الخمس نفسها التي يمررها الرسم */
+.mont-heatbar {
+  inline-size: 120px;
+  block-size: 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(var(--ink-rgb), 0.14);
+  background: linear-gradient(90deg,
+    var(--seq-viol-1), var(--seq-viol-2), var(--seq-viol-3),
+    var(--seq-viol-4), var(--seq-viol-5));
+}
+
+/* ── لوح ترتيب القطاعات: مفتاح ألوان الخريطة وجدولها المرتّب في آن ───────── */
+.mont-side { min-width: 0; }
+.mont-side-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 4px 14px 14px;
+  min-width: 0;
+}
+.mont-rank {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 8px;
+  list-style: none;
+  min-width: 0;
+}
+/* الصفوف تتقاسم ارتفاع اللوح بالتساوي فيحاذي أسفلُه أسفلَ الخريطة بلا فجوة */
+.mont-rank > li {
+  display: flex;
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 0;
+}
+
+.mont-rank-row {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  padding: 9px 11px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  text-align: start;
+  cursor: pointer;
+  min-width: 0;
+  transition: border-color var(--dur-micro) var(--ease),
+              background var(--dur-micro) var(--ease);
+}
+.mont-rank-row:hover,
+.mont-rank-row:focus-visible { border-color: var(--brand); background: var(--surface-2); }
+
+.mont-rank-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 24px;
+  block-size: 24px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  border: 1.5px solid var(--line);
+  font-family: var(--f-display);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-3);
+}
+.mont-rank-main {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+.mont-rank-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
+}
+.mont-rank-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mont-rank-val {
+  flex: 0 0 auto;
+  font-family: var(--f-display);
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--coral);
+}
+
+/* الشريط بلون درجة الخريطة نفسها — فهو مفتاح اللون لا زخرفة */
+.mont-rank-bar {
+  display: block;
+  block-size: 8px;
+  border-radius: 999px;
+  background: var(--surface-3);
+  overflow: hidden;
+}
+.mont-rank-fill {
+  display: block;
+  block-size: 100%;
+  border-radius: 999px;
+  background: var(--seq-viol-1);
+  transition: inline-size var(--dur-std) var(--ease);
+}
+.mont-rank-fill[data-step="1"] { background: var(--seq-viol-1); }
+.mont-rank-fill[data-step="2"] { background: var(--seq-viol-2); }
+.mont-rank-fill[data-step="3"] { background: var(--seq-viol-3); }
+.mont-rank-fill[data-step="4"] { background: var(--seq-viol-4); }
+.mont-rank-fill[data-step="5"] { background: var(--seq-viol-5); }
+/* في المنظور الحراري لا لون على الأرضية: يُخفت الشريط ولا يدّعي مفتاحاً */
+.mont-rank-fill.is-muted { opacity: 0.4; }
+
+.mont-rank-foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  font-size: 11px;
+  color: var(--ink-3);
+  min-width: 0;
+}
+
+/* ── شرائح فئات المخالفات (حصص مقروءة + مسار نقر بلوحة المفاتيح) ─────────── */
+.mont-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 10px 8px 0;
+  min-width: 0;
+}
+.mont-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+  padding: 5px 11px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-2);
+  cursor: pointer;
+  transition: border-color var(--dur-micro) var(--ease),
+              background var(--dur-micro) var(--ease);
+}
+.mont-chip::before {
+  content: "";
+  inline-size: 8px;
+  block-size: 8px;
+  flex: 0 0 auto;
+  border-radius: 2px;
+  background: var(--coral);
+}
+/* دلو التجميع: لون محايد + شكل دائري مختلف — يُعلن أنه ليس فئة منفردة */
+.mont-chip.is-agg::before { background: var(--ink-4); border-radius: 50%; }
+.mont-chip:hover,
+.mont-chip:focus-visible { border-color: var(--brand); background: var(--surface-2); }
+.mont-chip.is-on { border-color: var(--brand); background: var(--accent-softer); }
+.mont-chip-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mont-chip-val { color: var(--ink); font-weight: 700; }
+
+/* ── ملاحظات الصدق أسفل الرسوم ───────────────────────────────────────────── */
+.mont-note {
+  margin: 8px 8px 2px;
+  font-size: 11.5px;
+  line-height: 1.75;
+  color: var(--ink-3);
+}
+
+.mont-missing {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 8px;
+  padding: 28px 22px;
+  border: 1px dashed var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface-2);
+  text-align: center;
+  color: var(--ink-2);
+  font-size: 13px;
+  line-height: 1.8;
+}
+.mont-missing b { font-family: var(--f-display); color: var(--ink); }
+
+/* ── ذيل التبويب: التحفظ المرجعي + المسار الصريح إلى الملحق ──────────────── */
+.mont-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 14px 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--surface);
+  min-width: 0;
+}
+.mont-foot-note {
+  min-width: 0;
+  font-size: 12px;
+  line-height: 1.75;
+  color: var(--ink-3);
+}
+.mont-ax {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  flex: 0 0 auto;
+  padding: 9px 18px;
+  border-radius: 999px;
+  background: var(--brand);
+  color: var(--on-accent);
+  font-size: 13px;
+  font-weight: 700;
+  transition: background var(--dur-micro) var(--ease),
+              transform var(--dur-micro) var(--ease);
+}
+.mont-ax:hover,
+.mont-ax:focus-visible {
+  background: var(--brand-deep);
+  transform: translateX(-2px);
+}
+.mont-ax-arrow { font-size: 15px; line-height: 1; }
+
+/* ── الضيق: 1366 وما دونه — لا تمرير أفقي ولا تصادم تسميات ───────────────── */
+@media (max-width: 1100px) {
+  .mont-banner { align-items: flex-start; }
+  .mont-card .tabcard-note { white-space: normal; }
+  /* عمود واحد: اللوح الجانبي يصير صفاً تحت الخريطة بلا ارتفاع مفروض،
+     فتعود صفوفه إلى ارتفاعها الطبيعي بدل تقاسم ارتفاع لا وجود له */
+  .mont-side .mont-rank > li { flex: 0 0 auto; }
+  .mont-legend-note { margin-inline-start: 0; }
+}
+@media (max-width: 640px) {
+  .mont-views { width: 100%; justify-content: space-between; }
+  .mont-view { flex: 1 1 auto; text-align: center; }
+  .mont-foot { flex-direction: column; align-items: stretch; }
+  .mont-ax { justify-content: center; }
+  .mont-chip-name { max-width: 22ch; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mont-fig,
+  .mont-fig::before,
+  .mont-view,
+  .mont-rank-row,
+  .mont-rank-fill,
+  .mont-chip,
+  .mont-ax { transition: none; }
+  .mont-fig:hover,
+  .mont-fig:focus-visible,
+  .mont-ax:hover,
+  .mont-ax:focus-visible { transform: none; }
+}
+
 /* ═══ src/styles/admin.css ═══ */
 /* ════════════════════════════════════════════════════════════════════════════
    admin.css — تجربة الإدارة: «حكومي تحريري» فاتح، تمرير طبيعي
@@ -20310,6 +22464,15 @@ const RH = {
   VERSION: "1.0.0",
 };
 
+// سجل التبويبات المؤجَّل: ‎RH.tabs.register‎ موجود **قبل** قشرة التبويبات نفسها،
+// فتسجيل أي تبويب لا يعتمد على موضع ملفه في ‎JS_ORDER‎ ولا يحتاج حارساً عند
+// نداء التسجيل. القشرة (‎presenter/tabs.js‎) تستبدل هذا الكائن بالوحدة الحقيقية
+// وتصرِّف ‎_pending‎ فور تعريفها، فلا تسجيلٌ يضيع صامتاً ولا ترتيبٌ يكسر البناء.
+RH.tabs = {
+  _pending: [],
+  register(def) { this._pending.push(def); },
+};
+
 // حاجز أخطاء عام: شاشة عربية رشيقة بدل صفحة بيضاء صامتة
 (function () {
   let shown = false;
@@ -20511,9 +22674,66 @@ RH.core.fmt = (function () {
     return { num: int(n), word: "" };
   }
 
-  /** عزل اتجاهي حتمي للرموز المختلطة (أرقام + ٪) داخل نص عربي —
-      LRI/PDI محارف تحكم صفرية العرض تعمل في DOM وCanvas معاً */
-  const iso = (s) => "\u2066" + s + "\u2069";
+  /* ── العزل الاتجاهي ومقاطع العنونة المركّبة ──────────────────────────────
+     خطأ جذري صُحّح هنا (بلاغ «مسافات مفقودة بين الأرقام والكلمات العربية»):
+     العزل كان LRI دائماً — وLRI يفرض أساساً **يسارياً** على ما بداخله. فإن
+     حوى المقطع كلمةً عربية («0 من 14») انقلب ترتيب مقاطعه بصرياً («من 14 0»)
+     فبدت الأرقام ملتصقة بالكلمات بلا مسافة وبلا معنى. القاعدة الصحيحة:
+       • مقطع رقمي/لاتيني محض      → LRI (\u2066): يبقى الرقم يسارياً داخل RTL.
+       • عبارة مختلطة فيها حرف عربي → FSI (\u2068): «أول قوي» يستنبط الأساس من
+         الحرف العربي فيبقى ترتيب العبارة عربياً سليماً مهما كان اتجاه الوعاء.
+     FSI مطابق لـLRI تماماً حين لا حرف قوي داخله، فالتبديل آمن على كل نداء
+     قائم. PDI (\u2069) يغلق الاثنين، وكلها محارف تحكم صفرية العرض تعمل في
+     DOM وCanvas معاً. */
+
+  /** حرف عربي (الأبجدية + الصور العرضية) — يميّز العبارة المختلطة عن الرقم */
+  const RE_AR_LETTER =
+    /[\u0620-\u064A\u066E-\u06D3\u06FA-\u06FF\uFB50-\uFDFF\uFE70-\uFEFC]/;
+
+  /** معزول أصلاً؟ (يبدأ بـLRI/RLI/FSI وينتهي بـPDI) — فلا يُعزل مرتين */
+  const isIsolated = (s) => /^[\u2066-\u2068][\s\S]*\u2069$/.test(String(s));
+
+  function iso(s) {
+    const t = String(s);
+    if (t === "") return t;
+    if (isIsolated(t)) return t;
+    return (RE_AR_LETTER.test(t) ? "\u2068" : "\u2066") + t + "\u2069";
+  }
+
+  /**
+   * مقطع عنونة موحّد «تسمية + قيمة + وحدة» — الفواصل **صريحة** والقيمة معزولة.
+   * هذا هو المسلك الوحيد لتركيب أي وسم يجمع رقماً بكلمة عربية، فلا يتكرر
+   * اللصق الذي أنتج «الياقات الزرقاء1,164,400 سرير».
+   *   seg({ label: "الياقات الزرقاء", value: int(1164400), unit: "سرير" })
+   *     → «الياقات الزرقاء 1,164,400 سرير» (بفراغ غير فاصل وعزل حول الرقم)
+   * ويقبل نصاً جاهزاً (مثل ناتج pct) فيمرّره كما هو بعد قصّ الفراغ.
+   */
+  function seg(spec) {
+    if (spec == null || spec === false || spec === "") return "";
+    if (typeof spec === "string" || typeof spec === "number") {
+      return String(spec).trim();
+    }
+    const label = spec.label == null ? "" : String(spec.label).trim();
+    const unit = spec.unit == null ? "" : String(spec.unit).trim();
+    const raw = spec.value == null ? "" : String(spec.value).trim();
+    const value = raw === "" ? "" : iso(raw);
+    return [label, value, unit].filter((p) => p !== "").join(NBSP);
+  }
+
+  /** عبارة من مقاطع بفاصل ظاهر — يتخطى الفارغ ولا يلصق مقطعين أبداً */
+  function caption(parts, sep) {
+    const s = sep == null ? " \u00B7 " : sep;
+    return (Array.isArray(parts) ? parts : [parts])
+      .map(seg).filter((t) => t !== "").join(s);
+  }
+
+  /** «n من N» — النمط المتكرر عبر التبويبات الخمسة، معزولاً كعبارة **واحدة**.
+      العزل يلف العبارة كلها لا كل رقم على حدة: عزل الأرقام منفردةً يترك «من»
+      خارج أي عزل فينقلب ترتيب العبارة داخل أي وعاء يساري. الفاصل فراغ عادي
+      (الأوعية الثلاثة التي تعرضها ‎white-space: nowrap‎ فلا تنكسر). */
+  function ofTotal(n, total) {
+    return iso(int(n) + " \u0645\u0646 " + int(total));
+  }
 
   /** ضم تسميات أشهر متعددة بإفصاح كامل — لتسميات الذروة عند التعادل
       (إصلاح مراجعة الجولة 4): «ذروة المخالفات 317 في يوليو 2026» وحدها
@@ -20532,7 +22752,10 @@ RH.core.fmt = (function () {
     return labels.map(String).join(" و");
   }
 
-  return { int, dec1, pct, compact, compactParts, unitAfter, countNoun, noun, date, iso, monthsList, AR_MONTHS, NBSP };
+  return {
+    int, dec1, pct, compact, compactParts, unitAfter, countNoun, noun, date,
+    iso, isIsolated, seg, caption, ofTotal, monthsList, AR_MONTHS, NBSP,
+  };
 })();
 
 /* ═══ src/js/core/bus.js ═══ */
@@ -22681,6 +24904,141 @@ RH.brand = (function () {
   }
 
   /* ══════════════════════════════════════════════════════════════════════════
+     0) قياس هندسة الأصل الرسمي — تفكيك القفل الرأسي إلى رمز + كلمة
+     ──────────────────────────────────────────────────────────────────────────
+     الأصل الرسمي المسلَّم (‎logo-full‎/‎logo-white‎) **قفل رأسي**: الرمز الدائري
+     فوق سطرَي الاسم. إدراجه كصورة واحدة في شريط رأس ارتفاعه ‎44px‎ يُنزل الرمز
+     إلى ‎~26px‎ ويجعل الاسم غير مقروء — وهي الشكوى الحرفية («علامة ‎28px‎ في
+     الزاوية»). الحل ليس تكبير الصورة كلها (فتبتلع الشريط) بل **إعادة تركيبها
+     أفقياً**: الرمز بارتفاع ‎48px‎ وإلى جانبه كتلة الاسم بارتفاعها الخاص.
+
+     الحدود لا تُكتب أرقاماً ثابتة — فأي ملف يُسقطه العميل لاحقاً في
+     ‎assets/brand/‎ بهندسة مختلفة كان سيُقصّ خطأً. تُقاس وقت التشغيل من قناة
+     ألفا للصورة نفسها: صفوف غير شفافة ← نطاقات ← أعلى نطاق «رمز» إن كان
+     أضيق من الصورة وقريباً من المربع، وما تحته «كلمة». يفشل القياس ⇒ الصورة
+     تُعرض كما هي (تدهور رشيق، بلا قصّ أعمى).
+     ══════════════════════════════════════════════════════════════════════════ */
+
+  /** أقصى عرض للتحليل (تقليص للأداء — النِسب وحدها هي المطلوبة) */
+  const GEOM_MAX_W = 480;
+  /** عتبة الشفافية التي تُعدّ عندها البكسل «حبراً» */
+  const ALPHA_MIN = 24;
+
+  const geomValue = new Map();     // src → هندسة مقيسة أو null (فشل/غير قابل)
+  const geomPromise = new Map();   // src → وعد القياس الجاري
+  const geomWaiters = [];          // دوال تُستدعى عند اكتمال أي قياس
+
+  /** مستطيل إحاطة الحبر لمدى صفوف */
+  function inkBox(rowMin, rowMax, a, b) {
+    let x0 = Infinity, x1 = -1;
+    for (let y = a; y <= b; y++) {
+      if (rowMax[y] < 0) continue;
+      if (rowMin[y] < x0) x0 = rowMin[y];
+      if (rowMax[y] > x1) x1 = rowMax[y];
+    }
+    if (x1 < 0) return null;
+    return { x: x0, y: a, w: x1 - x0 + 1, h: b - a + 1 };
+  }
+
+  /** يقيس صورة محمَّلة ويعيد ‎{full, mark, word}‎ أو ‎null‎ إن لم تكن قفلاً رأسياً */
+  function measureImage(img) {
+    const NW = img.naturalWidth, NH = img.naturalHeight;
+    if (!NW || !NH) return null;
+    const k = Math.min(1, GEOM_MAX_W / NW);
+    const w = Math.max(1, Math.round(NW * k));
+    const hh = Math.max(1, Math.round(NH * k));
+    const cv = document.createElement("canvas");
+    cv.width = w; cv.height = hh;
+    const cx = cv.getContext("2d", { willReadFrequently: true });
+    if (!cx) return null;
+    cx.drawImage(img, 0, 0, w, hh);
+    // data: URI لا يلوّث القماش، فالقراءة مشروعة على ‎file://‎ أيضاً
+    const px = cx.getImageData(0, 0, w, hh).data;
+
+    const rowMin = new Int32Array(hh), rowMax = new Int32Array(hh);
+    for (let y = 0; y < hh; y++) {
+      let mn = w, mx = -1;
+      const base = y * w * 4;
+      for (let x = 0; x < w; x++) {
+        if (px[base + x * 4 + 3] > ALPHA_MIN) { if (x < mn) mn = x; mx = x; }
+      }
+      rowMin[y] = mn; rowMax[y] = mx;
+    }
+
+    // نطاقات الصفوف الحبرية، مع دمج الفواصل الأرق من 2.5٪ من الارتفاع
+    // (تباعد الأحرف الداخلي ليس فاصلاً بين كتلتَي الهوية)
+    const gap = Math.max(2, Math.round(hh * 0.025));
+    const runs = [];
+    let start = null;
+    for (let y = 0; y < hh; y++) {
+      const ink = rowMax[y] >= 0;
+      if (ink && start === null) start = y;
+      if (!ink && start !== null) { runs.push([start, y - 1]); start = null; }
+    }
+    if (start !== null) runs.push([start, hh - 1]);
+    const bands = [];
+    for (const r of runs) {
+      const last = bands[bands.length - 1];
+      if (last && r[0] - last[1] - 1 < gap) last[1] = r[1];
+      else bands.push([r[0], r[1]]);
+    }
+    if (bands.length < 2) return null;
+
+    const mark = inkBox(rowMin, rowMax, bands[0][0], bands[0][1]);
+    const word = inkBox(rowMin, rowMax, bands[1][0], bands[bands.length - 1][1]);
+    if (!mark || !word) return null;
+    // شروط «قفل رأسي حقيقي»: الرمز أضيق من الصورة وقريب من المربع،
+    // وكتلة الاسم أعرض منه بوضوح. غير ذلك ⇒ الصورة أفقية سلفاً فتُترك.
+    const ratio = mark.h / mark.w;
+    if (mark.w > w * 0.75) return null;
+    if (ratio < 0.6 || ratio > 1.8) return null;
+    if (word.w < mark.w * 1.25) return null;
+    return { full: { w, h: hh }, mark, word };
+  }
+
+  /** يبدأ قياس ‎src‎ (مرة واحدة) ويخزن نتيجته */
+  function measureAsset(src) {
+    if (!src || typeof document === "undefined") return null;
+    if (geomValue.has(src)) return geomValue.get(src);
+    if (geomPromise.has(src)) return null;
+    const img = new Image();
+    const done = (val) => {
+      geomValue.set(src, val);
+      geomPromise.delete(src);
+      geomWaiters.slice().forEach((fn) => { try { fn(); } catch (_e) {} });
+    };
+    img.onload = () => {
+      let val = null;
+      try { val = measureImage(img); } catch (_e) { val = null; }
+      done(val);
+    };
+    img.onerror = () => done(null);
+    geomPromise.set(src, true);
+    img.src = src;
+    return null;
+  }
+
+  /** يسجّل مستمعاً لاكتمال القياس — يعيد دالة إلغاء */
+  function onMeasured(fn) {
+    geomWaiters.push(fn);
+    return function off() {
+      const i = geomWaiters.indexOf(fn);
+      if (i !== -1) geomWaiters.splice(i, 1);
+    };
+  }
+
+  /* تسخين مبكّر: القياس ينطلق عند تحميل الوحدة، قبل بناء الرأس بكثير
+     (‎RH.data.store.init()‎ غير متزامن) — فالقفل يُبنى أفقياً من أول طلاء. */
+  if (typeof document !== "undefined") {
+    ASSET_KEYS.forEach((key) => {
+      const variant = Object.keys(VARIANT_ASSET)
+        .find((v) => VARIANT_ASSET[v] === key);
+      const src = asset(variant);
+      if (src) measureAsset(src);
+    });
+  }
+
+  /* ══════════════════════════════════════════════════════════════════════════
      1) النمط الهندسي — متوازيات أضلاع متراكبة
      ══════════════════════════════════════════════════════════════════════════ */
 
@@ -22782,12 +25140,45 @@ RH.brand = (function () {
         }))));
   }
 
+  /** ارتفاع الرمز في قفل الرأس (V3: 44–52px — «علامة قابلة للتعرّف لا أيقونة») */
+  const MARK_H = 48;
+  /** ارتفاع كتلة الاسم إلى جانبه (سطر عربي + سطر لاتيني) */
+  const WORD_H = 34;
+
+  /**
+   * ‎cropSpan(src, box, full, renderH, cls)‎ — يقتطع مستطيلاً من صورة الهوية.
+   * القصّ بخلفية موضوعة بدقة بدل ‎clip-path‎: يعمل في كل محرك، ويقبل التكبير
+   * الجزئي، ولا يفرض عنصراً إضافياً. كل الأبعاد مشتقة من القياس الحي —
+   * لا رقم مكتوب بيد.
+   */
+  function cropSpan(src, box, full, renderH, cls) {
+    const s = renderH / box.h;
+    return h("span", {
+      class: cls,
+      "aria-hidden": "true",
+      style: {
+        display: "block",
+        flex: "0 0 auto",
+        width: (box.w * s).toFixed(2) + "px",
+        height: renderH.toFixed(2) + "px",
+        backgroundImage: 'url("' + src + '")',
+        backgroundSize: (full.w * s).toFixed(2) + "px "
+          + (full.h * s).toFixed(2) + "px",
+        backgroundPosition: (-box.x * s).toFixed(2) + "px "
+          + (-box.y * s).toFixed(2) + "px",
+        backgroundRepeat: "no-repeat",
+      },
+    });
+  }
+
   /**
    * ‎logo(el, opts)‎ — يبني الشعار داخل ‎el‎ (يُفرَّغ أولاً).
    * opts:
    *   variant {"full"|"mark"|"white"} افتراضي "full"
    *   sub     {boolean} إظهار سطر الإدارة تحت الاسم (افتراضي: مع "full" فقط)
    *   label   {string}  نص بديل لقارئ الشاشة (افتراضي اسم الجهة)
+   *   row     {boolean} قفل أفقي (رمز كبير + كتلة اسم) — الافتراضي مع "full"
+   *   markH   {number}  ارتفاع الرمز في القفل الأفقي (افتراضي 48)
    * يعيد العنصر الجذري المُنشأ.
    */
   function logo(el, opts) {
@@ -22795,6 +25186,8 @@ RH.brand = (function () {
     const variant = VARIANT_ASSET[o.variant] ? o.variant : "full";
     const label = o.label || ENTITY_AR;
     const showSub = typeof o.sub === "boolean" ? o.sub : (variant === "full");
+    const wantRow = typeof o.row === "boolean" ? o.row : (variant === "full");
+    const markH = typeof o.markH === "number" ? o.markH : MARK_H;
     if (el) clear(el);
 
     // اختيار **الأصل** بحسب السمة السارية: الشعار الملوّن يذوب على سطح داكن،
@@ -22805,8 +25198,22 @@ RH.brand = (function () {
     const src = (variant === "full" && dark && asset("white"))
       || asset(variant);
     let node;
-    if (src) {
-      // الأصل الرسمي المضمَّن — يُعرض كما هو بلا أي تدخل لوني
+    const geom = src && wantRow ? (geomValue.has(src)
+      ? geomValue.get(src) : measureAsset(src)) : null;
+    if (src && geom) {
+      // القفل الأفقي المعاد تركيبه من الأصل الرسمي نفسه: الرمز بحجمه الكامل،
+      // وكتلة الاسم إلى جانبه — تُخفى وحدها على الشاشات الضيقة (CSS) فيبقى
+      // الرمز شاهداً على الهوية بلا ازدحام.
+      node = h("span", {
+        class: "brand-logo brand-logo--asset brand-logo--row is-" + variant,
+        role: "img", "aria-label": label,
+        dataset: { brandSource: "asset", brandLayout: "row" },
+      },
+        cropSpan(src, geom.mark, geom.full, markH, "brand-lock-mark"),
+        cropSpan(src, geom.word, geom.full,
+          markH * (WORD_H / MARK_H), "brand-lock-word"));
+    } else if (src) {
+      // الأصل الرسمي المضمَّن كما هو — لم يُقس بعد (أو ليس قفلاً رأسياً)
       node = h("span", {
         class: "brand-logo brand-logo--asset is-" + variant,
         dataset: { brandSource: "asset" },
@@ -22851,7 +25258,11 @@ RH.brand = (function () {
   function lockup(opts) {
     const o = opts || {};
     const logoBox = h("div", { class: "brand-lock-logo" });
-    logo(logoBox, { variant: o.variant || "full", sub: false });
+    const paint = () => logo(logoBox, {
+      variant: o.variant || "full", sub: false, row: true,
+      markH: typeof o.markH === "number" ? o.markH : MARK_H,
+    });
+    paint();
 
     const titles = h("div", { class: "brand-lock-titles" },
       o.title ? h("h1", { class: "brand-lock-title" }, o.title) : null,
@@ -22864,8 +25275,8 @@ RH.brand = (function () {
     },
       h("div", { class: "brand-lock-inner" },
         logoBox,
-        h("span", { class: "brand-lock-rule", "aria-hidden": "true" }),
         titles,
+        h("span", { class: "brand-lock-rule", "aria-hidden": "true" }),
         actionsEl));
 
     let removePattern = function () {};
@@ -22879,19 +25290,21 @@ RH.brand = (function () {
     }
 
     // تبديل السمة يعيد رسم الشعار كي تُختار نسخة الأصل الملائمة للسطح الجديد
-    const offTheme = RH.core.bus.on("theme:change", () => {
-      logo(logoBox, { variant: o.variant || "full", sub: false });
-    });
+    const offTheme = RH.core.bus.on("theme:change", paint);
+    // واكتمال قياس هندسة الأصل يعيد رسمه أيضاً: إن سبق البناءُ القياسَ
+    // (صورة بطيئة الفكّ) عُرضت الصورة كما هي، ثم تحلّ محلها التركيبة الأفقية
+    // فور توفّر الحدود — بلا انتظار ولا شاشة فارغة.
+    const offMeasure = onMeasured(paint);
 
     return {
       el, actionsEl, logoEl: logoBox,
-      teardown() { removePattern(); offTheme(); },
+      teardown() { removePattern(); offTheme(); offMeasure(); },
     };
   }
 
   return {
-    pattern, logo, lockup, markSvg,
-    hasOfficialAssets, ASSET_KEYS, ENTITY_AR, ENTITY_SUB,
+    pattern, logo, lockup, markSvg, measureImage, onMeasured,
+    hasOfficialAssets, ASSET_KEYS, ENTITY_AR, ENTITY_SUB, MARK_H, WORD_H,
   };
 })();
 
@@ -63783,6 +66196,10 @@ RH.palette = (function () {
 RH.tabs = (function () {
   const { h, clear } = RH.core.dom;
 
+  /** تسجيلات وصلت قبل تعريف القشرة (طابور ‎ns.js‎) — تُصرَّف في نهاية الوحدة */
+  const PENDING = (RH.tabs && Array.isArray(RH.tabs._pending))
+    ? RH.tabs._pending.slice() : [];
+
   /* ══════════════════════════════════════════════════════════════════════════
      1) القائمة القانونية والسجل
      ══════════════════════════════════════════════════════════════════════════ */
@@ -63817,6 +66234,25 @@ RH.tabs = (function () {
     closing: "decisions",    /* الخطوات التالية → سجل القرارات */
   });
 
+  /** أسماء بديلة → المعرف القانوني.
+      المحور الثالث اسمه «الرقابة» ومعرفه القانوني ‎control‎ (V3_CONTRACTS §4-أ)
+      بينما مَلَفّه وتنسيقه وملحقه تحمل اسم ‎monitoring‎؛ والمحور الخامس ملحقه
+      ‎kpi‎ بالمفرد. أي رابط عميق يُكتب بالاسم البديل كان يسقط صامتاً إلى
+      ‎demand‎ ويترك العنوان يكذب على الشاشة — فيُحال هنا إلى معرفه القانوني
+      ويُعاد كتابة العنوان. لا تبويب سادس يُخلق بهذا: الأسماء البديلة إحالات
+      إلى الخمسة لا أعضاء في القائمة القانونية. */
+  const ID_ALIASES = Object.freeze({
+    monitoring: "control",   /* ملف/تنسيق/ملحق التبويب ٣ */
+    kpi: "kpis",             /* ملحق التبويب ٥ بالمفرد */
+  });
+
+  /** يعيد المعرف القانوني لأي مدخل (أو ‎null‎ إن كان مجهولاً تماماً) */
+  function canonicalId(id) {
+    const key = String(id == null ? "" : id).trim().toLowerCase();
+    if (VALID_IDS.includes(key)) return key;
+    return ID_ALIASES[key] || null;
+  }
+
   const defs = new Map();
   let booted = false;
 
@@ -63824,13 +66260,14 @@ RH.tabs = (function () {
     if (!def || !def.id || typeof def.build !== "function") {
       throw new Error("تسجيل تبويب ناقص: id وbuild إلزاميان");
     }
-    if (!VALID_IDS.includes(def.id)) {
+    const id = canonicalId(def.id);
+    if (!id) {
       throw new Error("معرف تبويب خارج القائمة القانونية: " + def.id);
     }
     if (typeof def.order !== "number") {
-      throw new Error("التبويب " + def.id + " بلا ترتيب order");
+      throw new Error("التبويب " + id + " بلا ترتيب order");
     }
-    defs.set(def.id, def);
+    defs.set(id, id === def.id ? def : Object.assign({}, def, { id }));
     if (booted) renderTracker();
   }
 
@@ -64127,8 +66564,9 @@ RH.tabs = (function () {
      ══════════════════════════════════════════════════════════════════════════ */
 
   function go(id, params) {
-    if (!VALID_IDS.includes(id)) id = DEFAULT_ID;
-    RH.core.router.go({ kind: "tab", id, params: params || {} });
+    RH.core.router.go({
+      kind: "tab", id: canonicalId(id) || DEFAULT_ID, params: params || {},
+    });
   }
 
   /**
@@ -64152,8 +66590,15 @@ RH.tabs = (function () {
   /** يعرض تبويباً (يستدعيه معالج الموجّه في app.js) */
   function show(route) {
     ensureRoot();
-    const id = VALID_IDS.includes(route.id) ? route.id : DEFAULT_ID;
+    const id = canonicalId(route.id) || DEFAULT_ID;
     const params = route.params || {};
+    // العنوان لا يكذب على الشاشة: اسم بديل (‎monitoring‎) أو معرف مجهول يُعرض
+    // بمعرفه القانوني، فيُعاد كتابة الهاش استبدالاً صامتاً (لا إدخال في
+    // التاريخ ← لا حلقة رجوع، ولا إعادة بناء لأن ‎replace‎ لا تستدعي المعالج).
+    if (route.id !== id) {
+      RH.core.router.replace(
+        RH.core.router.serialize({ kind: "tab", id, params }));
+    }
     document.body.classList.add("mode-tabs");
     rootEl.hidden = false;
     currentId = id;
@@ -64231,10 +66676,18 @@ RH.tabs = (function () {
     renderTracker();
   }
 
+  /* تصريف الطابور: أي تبويب سجّل نفسه قبل تعريف القشرة يدخل السجل الآن.
+     خطأ تسجيل واحد لا يبتلع البقية — يُعلَن في الوحدة ولا يُسقط البناء. */
+  PENDING.forEach((def) => {
+    try { register(def); } catch (e) {
+      if (typeof console !== "undefined") console.error("tabs/register:", e);
+    }
+  });
+
   return {
     register, boot, show, hide, go, get, list, titleOf, current,
-    resolveLegacy, present, renderTracker,
-    VALID_IDS, DEFAULT_ID, AR_DIGITS,
+    resolveLegacy, present, renderTracker, canonicalId,
+    VALID_IDS, DEFAULT_ID, AR_DIGITS, ID_ALIASES,
     SECTION_TO_TAB, SECTION_TO_APPENDIX,
   };
 })();
@@ -64575,10 +67028,7 @@ RH.tabs = (function () {
       stats: [
         { label: "الطلب", value: fmt.unitAfter(a.demand, "سرير") },
         { label: "الحصة من الإجمالي", value: fmt.pct(pctOf(a.demand, total)) },
-        {
-          label: "الترتيب",
-          value: fmt.iso(fmt.int(rank) + " من " + fmt.int(model.top.length)),
-        },
+        { label: "الترتيب", value: fmt.ofTotal(rank, model.top.length) },
       ],
       appendix: { id: "demand", params: { activity: a.id }, label: AX_LABEL },
       note: asOf(release),
@@ -64756,9 +67206,14 @@ RH.tabs = (function () {
       collarLegend.appendChild(chip({
         cls: "is-tone-" + (r.id === "blue" ? "blue" : "demand"),
         label: r.name,
-        value: fmt.unitAfter(r.value, "سرير") + " · " + fmt.pct(r.share),
-        aria: r.label + ": " + fmt.unitAfter(r.value, "سرير")
-          + "، " + fmt.pct(r.share) + " من إجمالي الطلب — اعرض الإبراز",
+        /* عبارة مركّبة (رقم + وحدة + نسبة) تُبنى بمقاطع fmt.caption وحدها:
+           الفواصل صريحة والرقم معزول، فلا يلتصق العدد بالكلمة ولا ينقلب
+           ترتيب المقاطع مهما كان اتجاه الوعاء. */
+        value: fmt.caption([{ value: fmt.int(r.value), unit: "سرير" }, fmt.pct(r.share)]),
+        aria: fmt.caption([
+          r.label + ":",
+          { value: fmt.int(r.value), unit: "سرير" },
+        ], " ") + "، " + fmt.pct(r.share) + " من إجمالي الطلب — اعرض الإبراز",
         onclick: (ev) => ctx.highlight(Object.assign(
           collarSpec(rel, der, r.id), { anchor: ev.currentTarget })),
       }));
@@ -65061,7 +67516,8 @@ RH.tabs = (function () {
 
    النموذج النقي معرَّف على ‎RH.presenter.tabModels.licensing‎ بلا أي لمس
    لـDOM، فيُختبر بالملف الحقيقي في ‎tests/unit/tab-licensing.test.mjs‎؛
-   والتسجيل يتخطى نفسه بغياب ‎RH.tabs‎ (بيئة اختبار الوحدة).
+   والتسجيل يمر بطابور ‎RH.tabs‎ المؤجَّل المُعرَّف في ‎ns.js‎، فلا يعتمد على
+   موضع الملف في ‎JS_ORDER‎ ولا يسقط صامتاً في بيئة اختبار الوحدة.
    ════════════════════════════════════════════════════════════════════════════ */
 "use strict";
 
@@ -65978,17 +68434,15 @@ RH.tabs = (function () {
   }
 
   /* ══════════════════════════════════════════════════════════════════════════
-     6) التسجيل — يتخطى نفسه بغياب القشرة (بيئة اختبار الوحدة)
+     6) التسجيل — طابور ‎RH.tabs‎ المؤجَّل (‎ns.js‎) يستقبله في أي ترتيب
      ══════════════════════════════════════════════════════════════════════════ */
 
-  if (RH.tabs && typeof RH.tabs.register === "function") {
-    RH.tabs.register({
-      id: "licensing",
-      order: 2,
-      title: "التراخيص",
-      build,
-    });
-  }
+  RH.tabs.register({
+    id: "licensing",
+    order: 2,
+    title: "التراخيص",
+    build,
+  });
 })();
 
 /* ═══ src/js/presenter/tabs/t3-monitoring.js ═══ */
@@ -66036,7 +68490,8 @@ RH.tabs = (function () {
 
    النموذج النقي معرَّف على ‎RH.presenter.tabModels.monitoring‎ بلا لمس DOM،
    فيُختبر بالملف الحقيقي في ‎tests/unit/tab-monitoring.test.mjs‎؛ والتسجيل
-   يتخطى نفسه بغياب ‎RH.tabs‎ (بيئة اختبار الوحدة).
+   يمر بطابور ‎RH.tabs‎ المؤجَّل المُعرَّف في ‎ns.js‎، فلا يعتمد على موضع الملف
+   في ‎JS_ORDER‎ ولا يسقط صامتاً في بيئة اختبار الوحدة.
    ملاحظة معرّف: المحور اسمه «الرقابة» ومعرّفه القانوني في القائمة الخماسية
    ‎control‎ (V3_CONTRACTS §4-أ) بينما ملحقه ومَلَفّه يحملان اسم ‎monitoring‎ —
    يُسجَّل بالمعرف القانوني ولا يُخترع سادس.
@@ -66414,7 +68869,7 @@ RH.tabs = (function () {
         + fmt.int(V.total) + " مخالفة مسجلة.",
       stats: [
         { label: "الحصة", value: fmt.pct(row.share), tone: "neg" },
-        { label: "الترتيب", value: fmt.iso(fmt.int(row.rank) + " من " + fmt.int(V.rows.length)) },
+        { label: "الترتيب", value: fmt.ofTotal(row.rank, V.rows.length) },
         { label: "الإجمالي", value: fmt.int(V.total), tone: "neg" },
       ],
       note: rel.meta.comparison_qualifier,
@@ -67151,19 +69606,17 @@ RH.tabs = (function () {
   }
 
   /* ══════════════════════════════════════════════════════════════════════════
-     6) التسجيل — يتخطى نفسه بغياب القشرة (بيئة اختبار الوحدة)
+     6) التسجيل — طابور ‎RH.tabs‎ المؤجَّل (‎ns.js‎) يستقبله في أي ترتيب
      ══════════════════════════════════════════════════════════════════════════ */
 
-  if (RH.tabs && typeof RH.tabs.register === "function") {
-    RH.tabs.register({
-      id: "control",
-      order: 3,
-      title: "الرقابة",
-      /** النموذج النقي مكشوف للاختبار ولوحة الأوامر — لا حالة فيه ولا DOM */
-      model: MODEL,
-      build,
-    });
-  }
+  RH.tabs.register({
+    id: "control",
+    order: 3,
+    title: "الرقابة",
+    /** النموذج النقي مكشوف للاختبار ولوحة الأوامر — لا حالة فيه ولا DOM */
+    model: MODEL,
+    build,
+  });
 })();
 
 /* ═══ src/js/presenter/tabs/t4-initiatives.js ═══ */
@@ -67393,7 +69846,13 @@ RH.tabs = (function () {
   /**
    * الركائز الأربع جاهزة للحلقات.
    * ‎pct‎ = المنجز ÷ الإجمالي **عدداً** (لا وزناً — لا أوزان في المصدر)،
-   * و‎countLabel‎ العدّ الظاهر الملزم («1 من 6») بعزل اتجاهي.
+   * و‎countLabel‎ العدّ الظاهر الملزم («1 من 6»).
+   *
+   * ‏**العزل الاتجاهي يقع على كل رقم وحده، لا على الجملة.** الجملة عربية
+   * فاتجاهها من اليمين إلى اليسار؛ ولو عُزلت كاملةً بعزل يساري (‎LRI‎) لقلب
+   * محرّك ‎bidi‎ ترتيبها المرئي إلى «‎1 6 من‎» — عدّ مقلوب يقرؤه الحضور خطأً.
+   * بعزل الأرقام منفردة يبقى ترتيب الجملة عربياً («‎1 من 6‎» قراءةً) ويبقى كل
+   * رقم متماسكاً مهما حمل من فواصل آلاف.
    */
   function pillars(release) {
     const st = release.strategy;
@@ -67418,7 +69877,9 @@ RH.tabs = (function () {
         done,
         counts,
         pct: list.length ? pctOf(done, list.length) : null,
-        countLabel: fmt.iso(fmt.int(done) + " من " + fmt.int(list.length)),
+        /* «n من N» عبارة واحدة معزولة بـfmt.ofTotal — العزل الفردي لكل رقم
+           كان يترك «من» خارج أي عزل فينقلب ترتيب العبارة في وعاء يساري. */
+        countLabel: fmt.ofTotal(done, list.length),
       };
     });
   }
@@ -68113,25 +70574,28 @@ RH.tabs = (function () {
 /* ════════════════════════════════════════════════════════════════════════════
    t5-kpis.js — التبويب ٥: «مؤشرات الأداء» (V3_SPEC §4 و§4-ب · V3_CONTRACTS §4)
    ────────────────────────────────────────────────────────────────────────────
-   الموجز الملزم لهذا التبويب — العميل طلب **عدّادات نصف دائرية (gauges)**
-   صراحةً بدل الأشرطة:
+   الموجز الملزم لهذا التبويب — العميل طلب حرفياً «another tab for KPIs where
+   we show **guages** not bars of the strategic KPIs»: أي **شبكة عدّادات** تعرض
+   المؤشرات الاستراتيجية الأربعة عشر **معاً**، لا عدّاداً واحداً مكبَّراً بلوح
+   تفاصيل مرساة وترقيم «1 من 14». البنية إذن ثلاث طبقات لا رابعة:
 
-     ▸ **صف الأرقام الكبرى** أعلى اللوح: تكوين المحفظة المؤشرية (14 مؤشراً ·
-       النسبية · العددية · **القيم الحالية المسجَّلة ‎0 من 14‎ بصدق**). كل رقم
-       زر حقيقي: نقرة واحدة تفتح نافذة الإبراز.
+     ▸ **شريط الموجز** أعلى اللوح في سطر واحد مضغوط: ‎14 مؤشراً · 11 نسبي ·
+       3 عددي · 0 من 14 قيمة حالية مسجّلة‎ — كل رقم زر حقيقي يفتح إبرازه،
+       ويلازمه وسم الصدق الحرفي «القيمة الحالية غير مسجّلة — تُدخل من الإدارة».
 
-     ▸ **العدّاد المكبَّر** للمؤشر المختار (رسم رئيس ‎.tabchart‎ من ECharts):
-       قوس نصف دائري يقرأ من اليمين (الصفر) إلى اليسار (أعلى المقياس) على سنّة
-       الاتجاه العربي، وفيه **علامتان واضحتان**: شريحة ذهبية عند خط الأساس
-       وشريحة أغمق عند المستهدف، وبينهما **نطاق التحسن المطلوب** بصبغة ذهبية
-       شفافة. بجانبه بطاقة حقائق المؤشر وزر الإبراز.
+     ▸ **شبكة العدّادات**: أربعة عشر بطاقة في شبكة متجاوبة **ثلاثة في الصف
+       على 1920 واثنان على 1366** (وواحد على الشاشات الضيقة). كل بطاقة عدّاد
+       نصف دائري مضغوط مرسوم SVG كوداً: قوس يقرأ من اليمين (الصفر) إلى اليسار
+       (أعلى المقياس) على سنّة الاتجاه العربي، وفيه **علامتان واضحتان**
+       (شاخص خط الأساس المجوف وعارضة المستهدف) وبينهما **نطاق التحسن المطلوب**
+       بصبغة ذهبية شفافة؛ فوقه اسم المؤشر **مقصوصاً في سطرين** واسمه الكامل في
+       ‎title‎، و**رقاقة نوع المؤشر (نسبي/عددي)**؛ وفي مركزه **الحالة الصريحة**
+       «القيمة الحالية · غير مسجّلة» بلا إبرة وهمية إطلاقاً.
 
-     ▸ **لوح العدّادات الأربعة عشر**: شبكة مريحة **ثلاثة في الصف كحد أقصى**،
-       كل عدّاد رسم SVG كودي بالهندسة ذاتها (‎arcSegments‎ نفسها التي تُغذّي
-       العدّاد المكبَّر) — فالعدّاد الصغير والعدّاد الكبير لغة بصرية واحدة.
-       لكل عدّاد **رقاقة نوع المؤشر (نسبي/عددي)** كما نصّ الموجز.
+     ▸ **مصفوفة المؤشرات** أسفل الشبكة: الأربعة عشر صفاً بكل حقول المصدر.
 
-     ▸ **مصفوفة المؤشرات** أسفل اللوح: الأربعة عشر صفاً بكل حقول المصدر.
+   **لا ECharts في هذا التبويب**: العدّادات كلها SVG كودي بالهندسة ذاتها،
+   فلا مثيل رسم واحد يحتكر الشاشة، ولا تلميح تحويم يحتاج قانون ‎T.tooltip‎.
 
    ══ صدق البيانات (V3_SPEC §4-ب — يُنفَّذ حرفياً، ولا استثناء) ══
      • **لا توجد قيم حالية للمؤشرات في المصدر (14/14 فارغة).** لذلك يعرض
@@ -68149,16 +70613,16 @@ RH.tabs = (function () {
        وموضع خط الأساس على المقياس) بمرآة تقريب بايثون ‎roundHalfUp‎.
 
    طبقات النقر الثلاث (V3_SPEC §5) — لا رابعة:
-     ١) تحويم على العدّاد المكبَّر → ‎T.ttMicro‎: سطران (عنوان + قيمة واحدة).
-     ٢) نقرة أولى (رقم كبير · عدّاد صغير · صف المصفوفة · زر بطاقة الحقائق)
+     ١) تحويم على بطاقة العدّاد → تلميح المتصفح الأصلي: سطران (اسم المؤشر +
+        قيمة المستهدف). لا يغطي الرسم ولا يعترض النقر.
+     ٢) نقرة أولى (رقم في شريط الموجز · بطاقة عدّاد · صف المصفوفة)
         → ‎ctx.highlight‎: جملة واحدة + ≤3 أرقام + زر واحد، بحدّ ‎320‎ حرفاً
         يحرسه اختبار الوحدة ‎tests/unit/tab-kpis.test.mjs‎.
-     ٣) الزر → ملحق ‎kpi‎ بصفحته المناسبة وبحالة عودة يرمّزها المحرك.
-     • زر «تكبير» داخل بطاقة العدّاد **تصفية/تركيز** لا نافذة: يكتب ‎?kpi=‎
-       في العنوان فيتبدّل العدّاد المكبَّر — فلا تنبثق طبقة مشروطة مع كل تركيز.
+     ٣) زر النافذة → ملحق ‎kpi‎ بصفحته المناسبة وبحالة عودة يرمّزها المحرك.
+     **لا لوح تفاصيل مرسى في التبويب**: التفصيل كله خلف النقرتين لا مرافقاً
+     دائماً للشبكة — فالشاشة تبقى للعدّادات الأربعة عشر.
 
-   اللون: **صفر لون مكتوب**. ألوان العدّاد المكبَّر من ‎RH.viz.theme.C‎ (رموز
-   حيّة تُقرأ وقت البناء لا وقت التحميل)، وألوان العدّادات الصغيرة والواجهة
+   اللون: **صفر لون مكتوب**، ولا لون في JS أصلاً: كل ألوان العدّادات والواجهة
    ‎var(--…)‎ في ‎src/styles/tabs/kpis.css‎ — فتتبع السمتين بلا سطر JS.
    تبديل السمة يعيد بناء التبويب كاملاً عبر خطاف ‎onRetheme‎ في القشرة.
    ════════════════════════════════════════════════════════════════════════════ */
@@ -68197,6 +70661,8 @@ RH.tabs = (function () {
   /** الملحق الوحيد لهذا التبويب ونص زره */
   const AX_ID = "kpi";
   const AX_LABEL = "التفاصيل الكاملة في الملحق";
+  /** ما تَعِد به بطاقة العدّاد عند النقر — نافذة الإبراز لا الملحق مباشرةً */
+  const CARD_HINT = "انقر: إبراز المؤشر";
   /** حجم صفحة جدول الملحق — مرآة ‎ROWS_PER_PAGE‎ في ‎ax-kpi.js‎ */
   const AX_ROWS_PER_PAGE = 8;
 
@@ -68417,7 +70883,7 @@ RH.tabs = (function () {
       numCount: numList.length,
       recordedCount: recorded.length,
       missingCount: list.length - recorded.length,
-      recordedLabel: fmt.iso(fmt.int(recorded.length) + " من " + fmt.int(list.length)),
+      recordedLabel: fmt.ofTotal(recorded.length, list.length),
       widest,
       fullTargets: fullTargets.length,
       minPctTarget,
@@ -68634,16 +71100,16 @@ RH.tabs = (function () {
   }
 
   /** رقاقة نوع المؤشر (نسبي/عددي) — نص + لون، والنص هو حامل المعنى */
-  function typeBadge(r, extra) {
+  function typeBadge(r) {
     return h("span", {
-      class: "kpi5-type is-" + (r.pct ? "pct" : "num") + (extra ? " " + extra : ""),
+      class: "kpi5-type is-" + (r.pct ? "pct" : "num"),
       title: r.typeLong,
     }, r.typeChip);
   }
 
   /**
-   * **العدّاد نصف الدائري المرسوم كوداً** (SVG) — بالهندسة ذاتها التي تُغذّي
-   * العدّاد المكبَّر. لا إبرة إلا حين تُسجَّل قيمة حالية: ‎recorded === false‎
+   * **العدّاد نصف الدائري المرسوم كوداً** (SVG) — هندسة واحدة لكل بطاقات
+   * الشبكة الأربع عشرة. لا إبرة إلا حين تُسجَّل قيمة حالية: ‎recorded === false‎
    * يعني قوساً بعلامتيه ومركزاً يعلن الغياب صراحةً — لا إبرة وهمية أبداً.
    */
   function gaugeSvg(r) {
@@ -68698,9 +71164,16 @@ RH.tabs = (function () {
     }, parts);
   }
 
-  /** مركز العدّاد: القيمة المسجَّلة أو **الحالة الصريحة** بلا إبرة */
+  /**
+   * مركز العدّاد: القيمة المسجَّلة أو **الحالة الصريحة** بلا إبرة.
+   * العنوان + الرقاقة يقرآن معاً «القيمة الحالية · غير مسجّلة»، والجملة
+   * الكاملة من المواصفة في ‎title‎ فلا تُقرأ الرقاقة قيمةً بحال.
+   */
   function gaugeCenter(r) {
-    return h("span", { class: "kpi5-g-center" },
+    return h("span", {
+      class: "kpi5-g-center",
+      title: r.recorded ? CURRENT_LABEL + ": " + r.currentText : NOT_RECORDED,
+    },
       h("span", { class: "kpi5-g-cap" }, CURRENT_LABEL),
       h("b", {
         class: "kpi5-g-val" + (r.recorded ? " is-recorded" : " is-pending"),
@@ -68708,8 +71181,8 @@ RH.tabs = (function () {
   }
 
   /** سطر العلامتين تحت أي عدّاد — الشكل واللون والنص معاً */
-  function markRow(r, cls) {
-    return h("span", { class: "kpi5-marks" + (cls ? " " + cls : "") },
+  function markRow(r) {
+    return h("span", { class: "kpi5-marks" },
       h("span", { class: "kpi5-mark is-base" },
         h("i", { class: "kpi5-mark-glyph is-base", "aria-hidden": "true" }),
         h("span", { class: "kpi5-mark-lab" }, MARK_BASE),
@@ -68728,33 +71201,33 @@ RH.tabs = (function () {
       h("i", { class: "kpi5-scale-end tnum" }, r.maxText));
   }
 
-  /** توصيل نقر مثيل ECharts بفصل مضمون عند مغادرة التبويب */
-  function onChartClick(ctx, chart, handler) {
-    chart.on("click", handler);
-    ctx.onTeardown(() => {
-      try {
-        if (!chart.isDisposed()) chart.off("click", handler);
-      } catch (_e) { /* أُتلف سلفاً */ }
-    });
-  }
-
   /**
-   * صبغة مشتقة من قناة رمز حيّ ‎--x-rgb‎ (المسلك ذاته الذي يعتمده
-   * ‎viz/theme.js‎ في ‎computeAxisTints‎): لا قيمة لونية مكتوبة، والشفافية
-   * تتبع السمة لأن القناة نفسها معرَّفة في ‎tokens.css‎ لكل سمة.
-   * تعيد ‎null‎ حين لا يتوفر ‎getComputedStyle‎ (سياق اختبار) فيسقط النداء
-   * على لون رمزي صريح.
+   * **بطاقة عدّاد واحدة في الشبكة** — البطاقة كلها زر واحد: نقرة = إبراز.
+   * ترتيبها الرأسي: سطر المعرف والرقاقة · اسم المؤشر مقصوصاً في سطرين واسمه
+   * الكامل في ‎title‎ · العدّاد بمركزه المعلن · طرفا المقياس · العلامتان.
    */
-  function tint(name, alpha) {
-    let rgb = "";
-    try {
-      if (typeof getComputedStyle === "function" && document.documentElement) {
-        rgb = String(getComputedStyle(document.documentElement)
-          .getPropertyValue(name) || "").trim();
-      }
-    } catch (_e) { rgb = ""; }
-    if (!rgb) return null;
-    return "rgba(" + rgb + ", " + alpha + ")";
+  function gaugeCard(r, onOpen) {
+    return h("button", {
+      class: "kpi5-g-card", type: "button", "data-interactive": "",
+      dataset: { kpi: String(r.id) },
+      /* الطبقة الأولى: تلميح مصغّر **سطران** (عنوان + قيمة واحدة) بالتلميح
+         الأصلي للمتصفح — لا يغطي الرسم ولا يعترض النقر */
+      title: r.name + "\n" + MARK_TARGET + ": " + r.targetText,
+      "aria-label": "المؤشر " + r.id + ": " + r.name + " — " + r.typeLong
+        + "؛ " + MARK_BASE + " " + r.baseText
+        + "؛ " + MARK_TARGET + " " + r.targetText
+        + "؛ " + NOT_RECORDED + "؛ افتح الإبراز",
+      onclick: (ev) => onOpen(r, ev.currentTarget),
+    },
+      h("span", { class: "kpi5-g-meta" },
+        h("span", { class: "kpi5-g-id tnum" }, r.idText),
+        typeBadge(r)),
+      /* الاسم الكامل في ‎title‎ فالقصّ في سطرين لا يخفي معنى */
+      h("span", { class: "kpi5-g-name", title: r.name }, r.name),
+      h("span", { class: "kpi5-g-wrap" }, gaugeSvg(r), gaugeCenter(r)),
+      scaleRow(r),
+      markRow(r),
+      h("span", { class: "kpi5-g-more" }, CARD_HINT));
   }
 
   /* ══════════════════════════════════════════════════════════════════════════
@@ -68762,16 +71235,13 @@ RH.tabs = (function () {
      ══════════════════════════════════════════════════════════════════════════ */
 
   function build(el, ctx) {
-    const T = RH.viz.theme;
     const rel = ctx.release;
-    const su = ctx.su;
 
     const sum = summary(rel);
     const all = sum.list;
     const mix = mixOf(ctx.params);
     const sort = sortOf(ctx.params);
     const board = applySort(applyMix(all, mix), sort);
-    const focus = focusOf(all, (ctx.params && ctx.params.kpi) || "");
 
     guard("build", {
       "14 مؤشراً بالضبط (بوابة strategy.kpis14)": all.length === 14,
@@ -68789,19 +71259,24 @@ RH.tabs = (function () {
       "كل عدّاد له علامتان على قوسه":
         all.every((r) => r.segments.some((s) => s.role === "base")
           && r.segments.some((s) => s.role === "target")),
-      "لوح العدّادات غير فارغ بعد الترشيح": board.length > 0,
+      "شبكة العدّادات غير فارغة بعد الترشيح": board.length > 0,
     });
 
     const root = h("div", { class: "kpi5" });
     el.appendChild(root);
+
+    /** فاتح نافذة الإبراز لمؤشر — نقطة الدخول الوحيدة للطبقة الثانية */
+    const openKpi = (r, anchor) =>
+      ctx.highlight(Object.assign(kpiSpec(rel, r.id), { anchor }));
 
     /* ── ٤-أ) لافتة التبويب بالنمط الهندسي للهوية ───────────────────────── */
     const banner = h("div", { class: "kpi5-banner" },
       h("div", { class: "kpi5-banner-main" },
         h("h1", { class: "kpi5-title" }, "مؤشرات الأداء"),
         h("p", { class: "kpi5-lede" },
-          "عدّاد نصف دائري لكل مؤشر استراتيجي: قوسه من خط الأساس إلى "
-          + "المستهدف بعلامتين واضحتين، والقيمة الحالية معلنة كما هي في المصدر.")),
+          "عدّاد نصف دائري لكل مؤشر استراتيجي، والأربعة عشر معاً في شبكة "
+          + "واحدة: قوس كلٍّ من خط الأساس إلى المستهدف بعلامتين واضحتين، "
+          + "والقيمة الحالية معلنة كما هي في المصدر.")),
       h("p", { class: "kpi5-asof" }, "البيانات حتى ", sum.asOf));
     root.appendChild(banner);
     if (RH.brand && typeof RH.brand.pattern === "function") {
@@ -68810,262 +71285,64 @@ RH.tabs = (function () {
       }));
     }
 
-    /* ── ٤-ب) الأرقام الكبرى: تكوين المحفظة المؤشرية ────────────────────── */
-    const figs = h("div", {
-      class: "tabfigs kpi5-figs", role: "group",
-      "aria-label": "تكوين المؤشرات الاستراتيجية — كل رقم يفتح إبرازه",
+    /* ── ٤-ب) شريط الموجز: سطر واحد مضغوط، كل رقم فيه زر إبراز ──────────── */
+    const strip = h("div", {
+      class: "kpi5-strip", role: "group",
+      "aria-label": "موجز المحفظة المؤشرية — كل رقم يفتح إبرازه",
     });
     const pAll = nounParts(sum.total, "indicator");
-    const pPct = nounParts(sum.pctCount, "indicator");
-    const pNum = nounParts(sum.numCount, "indicator");
-    const figures = [
+    const stripItems = [
       {
-        key: "all", label: "المؤشرات الاستراتيجية",
-        value: pAll.num, unit: pAll.word,
-        foot: "من خطة عمل المشروع",
+        key: "all", value: pAll.num, unit: pAll.word,
+        label: "المؤشرات الاستراتيجية",
         spec: () => overviewSpec(rel),
       },
       {
-        key: "pct", label: "بصيغة " + TYPE_PCT_LONG,
-        value: pPct.num, unit: pPct.word,
-        foot: "المستهدفات بين " + sum.minPctTargetText + " و" + sum.maxPctTargetText,
+        key: "pct", value: fmt.int(sum.pctCount), unit: TYPE_PCT,
+        label: TYPE_PCT_LONG,
         spec: () => typeSpec(rel, "pct"),
       },
       {
-        key: "num", label: "بصيغة " + TYPE_NUM_LONG,
-        value: pNum.num, unit: pNum.word,
-        foot: "المقياس ينتهي عند المستهدف",
+        key: "num", value: fmt.int(sum.numCount), unit: TYPE_NUM,
+        label: TYPE_NUM_LONG,
         spec: () => typeSpec(rel, "num"),
       },
       {
-        key: "current", label: "القيم الحالية المسجَّلة",
-        value: sum.recordedLabel, unit: null, tone: "pending",
-        foot: NOT_RECORDED,
+        key: "current", value: sum.recordedLabel, unit: "قيمة حالية مسجّلة",
+        label: "القيم الحالية المسجَّلة", tone: "pending",
         spec: () => currentSpec(rel),
       },
     ];
-    for (const f of figures) {
+    for (const s of stripItems) {
       const btn = h("button", {
-        class: "tabfig kpi5-fig" + (f.tone ? " is-" + f.tone : ""),
+        class: "kpi5-stat" + (s.tone ? " is-" + s.tone : ""),
         type: "button", "data-interactive": "",
-        dataset: { fig: f.key },
-        "aria-label": f.label + ": " + f.value + (f.unit ? " " + f.unit : "")
-          + "؛ " + f.foot + "؛ افتح الإبراز",
+        dataset: { stat: s.key },
+        "aria-label": s.label + ": " + s.value + " " + s.unit + "؛ افتح الإبراز",
       },
-        h("span", { class: "tabfig-label" }, f.label),
-        h("span", { class: "tabfig-value" },
-          h("span", { class: "num tnum" }, f.value),
-          f.unit ? h("span", { class: "unit" }, f.unit) : null),
-        h("span", { class: "tabfig-foot" }, f.foot));
+        h("b", { class: "kpi5-stat-num tnum" }, s.value),
+        h("span", { class: "kpi5-stat-unit" }, s.unit));
       btn.addEventListener("click", () => {
-        ctx.highlight(Object.assign(f.spec(), { anchor: btn }));
+        ctx.highlight(Object.assign(s.spec(), { anchor: btn }));
       });
-      figs.appendChild(btn);
+      strip.appendChild(btn);
     }
-    root.appendChild(figs);
+    /* وسم الصدق الحرفي ملازم للشريط — لا يُقرأ العدّاد بلا هذه الجملة */
+    strip.appendChild(h("p", { class: "kpi5-strip-note" }, NOT_RECORDED));
+    root.appendChild(strip);
 
-    /* ── ٤-ج) الشبكة العليا: العدّاد المكبَّر + بطاقة حقائق المؤشر ────────── */
-    const topGrid = h("div", { class: "tabgrid is-3 kpi5-top" });
-    root.appendChild(topGrid);
-
-    const pos = all.indexOf(focus);
-    const stepper = h("div", {
-      class: "kpi5-step", role: "group", "aria-label": "تبديل المؤشر المكبَّر",
-    },
-      h("button", {
-        class: "kpi5-step-btn", type: "button", "data-interactive": "",
-        disabled: pos <= 0,
-        "aria-label": "المؤشر السابق في العدّاد المكبَّر",
-        onclick: () => ctx.update({ kpi: String(all[Math.max(0, pos - 1)].id) }),
-      }, "→"),
-      h("span", { class: "kpi5-step-pos tnum" },
-        fmt.iso(fmt.int(pos + 1) + " من " + fmt.int(all.length))),
-      h("button", {
-        class: "kpi5-step-btn", type: "button", "data-interactive": "",
-        disabled: pos >= all.length - 1,
-        "aria-label": "المؤشر التالي في العدّاد المكبَّر",
-        onclick: () => ctx.update({
-          kpi: String(all[Math.min(all.length - 1, pos + 1)].id) }),
-      }, "←"));
-
-    const focusCard = panelCard({
-      title: "العدّاد المكبَّر — المؤشر " + focus.idText,
-      note: focus.scaleNote + " · " + NOT_RECORDED,
-      cls: "kpi5-focus-card",
-    });
-    focusCard.head.appendChild(stepper);
-    topGrid.appendChild(focusCard.card);
-
-    focusCard.body.appendChild(h("h3", { class: "kpi5-focus-name" },
-      typeBadge(focus, "kpi5-focus-type"), focus.name));
-
-    const chartEl = h("div", { class: "tabchart kpi5-focus-chart" });
-    focusCard.body.appendChild(chartEl);
-    focusCard.body.appendChild(markRow(focus, "is-lg"));
-    focusCard.body.appendChild(scaleRow(focus));
-
-    /* ألوان العدّاد المكبَّر من الرموز الحية وقت البناء (لا وقت التحميل) */
-    const ROLE = {
-      /* المسار المحايد بلون الشعيرة المعايَرة: يبقى مقروءاً على السمتين معاً
-         (‎--surface-3‎ الداكن يكاد يذوب في سطح البطاقة فيبدو القوس مبتوراً) */
-      track: T.C.line,
-      /* نطاق التحسن: صبغة ذهبية شفافة من قناة الرمز الحيّة، وبديلها الرمز نفسه */
-      band: tint("--gold-rgb", 0.28) || T.C.gold,
-      base: T.C.gold,
-      target: T.C.goldHi,
-    };
-    const axisColor = focus.segments.map((s) => [s.stop, ROLE[s.role] || ROLE.track]);
-    const bandWidth = Math.max(16, Math.round(28 * su));
-    const gauge = ctx.chart("focus", chartEl);
-
-    /** مركز القوس رأسياً ككسر من ارتفاع القماش — نصف الدائرة كله فوقه */
-    const CY_FRAC = 0.82;
-    /**
-     * نصف قطر القوس بالبكسل من مقاس القماش الفعلي: ‎radius‎ النسبي في ECharts
-     * يُحسب من ‎min(العرض, الارتفاع) ÷ 2‎ فيهدر نصف دائرةٍ عرضُها ضعف ارتفاعها.
-     * يُعاد حسابه عند تغيّر المقاس (المستمع مسجَّل في تنظيف التبويب).
-     */
-    function fitRadius() {
-      const cw = gauge.getWidth() || chartEl.clientWidth || 600;
-      const ch = gauge.getHeight() || chartEl.clientHeight || 400;
-      const pad = Math.round(30 * su) + 10;   /* فسحة تسميتَي طرفَي المقياس */
-      return Math.max(60, Math.min(cw / 2 - pad, ch * CY_FRAC - pad));
-    }
-
-    const opt = Object.assign(T.base(su), {
-      tooltip: Object.assign(T.tooltip(su), {
-        formatter: () => T.ttMicro(
-          "المؤشر " + focus.idText + " · " + MARK_TARGET, focus.targetText),
-      }),
-      series: [{
-        type: "gauge",
-        /* نصف دائرة علوية من ‎0°‎ (يمين) إلى ‎180°‎ (يسار): الصفر عند بداية
-           السطر العربي وأعلى المقياس عند نهايته. ‎clockwise: false‎ إلزامي —
-           بدونه يمسح ECharts النصف السفلي المخفي ولا يظهر قوس. */
-        startAngle: 0,
-        endAngle: 180,
-        clockwise: false,
-        center: ["50%", Math.round(CY_FRAC * 100) + "%"],
-        radius: fitRadius(),
-        min: 0,
-        max: focus.max || 1,
-        splitNumber: 1,
-        axisLine: { lineStyle: { width: bandWidth, color: axisColor } },
-        axisTick: { show: false },
-        splitLine: { show: false },
-        axisLabel: {
-          show: true,
-          distance: Math.round(bandWidth * 0.62) + 6,
-          color: T.C.faint,
-          fontFamily: "IBM Plex Sans Arabic",
-          fontSize: T.fs(su, 12.5),
-          formatter: (v) => kpiVal(focus, v),
-        },
-        /* **لا إبرة ولا قوس تقدم ما لم تُسجَّل قيمة حالية** (V3_SPEC §4-ب) */
-        pointer: focus.recorded
-          ? {
-            show: true, icon: "rect", width: Math.max(4, Math.round(5 * su)),
-            length: "62%", offsetCenter: [0, "-4%"],
-            itemStyle: { color: T.C.green },
-          }
-          : { show: false },
-        progress: focus.recorded
-          ? { show: true, width: bandWidth, itemStyle: { color: T.C.green } }
-          : { show: false },
-        anchor: { show: false },
-        title: {
-          show: true, offsetCenter: [0, "-44%"],
-          color: T.C.mut, fontFamily: "Cairo", fontSize: T.fs(su, 13.5),
-        },
-        detail: {
-          show: true, offsetCenter: [0, "-20%"],
-          color: focus.recorded ? T.C.ivory : T.C.gold,
-          fontFamily: "IBM Plex Sans Arabic",
-          fontWeight: focus.recorded ? 700 : 600,
-          fontSize: T.fs(su, focus.recorded ? 30 : 21),
-          formatter: () => focus.currentText,
-        },
-        data: [{ value: focus.recorded ? focus.current : 0, name: CURRENT_LABEL }],
-        animation: !T.REDUCED,
-      }],
-    });
-    gauge.setOption(opt, true);
-
-    /* إعادة ملاءمة نصف القطر عند تغيّر المقاس — تُمرَّر **شجرة الخيارات كاملة**
-       كي يبقى ما يلتقطه سجل الثيم مكتملاً فلا تفقد إعادةُ الصبغة خياراتها. */
-    let fitTimer = null;
-    function onWinResize() {
-      clearTimeout(fitTimer);
-      fitTimer = setTimeout(() => {
-        if (gauge.isDisposed()) return;
-        const r = fitRadius();
-        if (Math.abs(r - opt.series[0].radius) < 2) return;
-        opt.series[0].radius = r;
-        gauge.setOption(opt, true);
-      }, 180);
-    }
-    window.addEventListener("resize", onWinResize, { passive: true });
-    ctx.onTeardown(() => {
-      clearTimeout(fitTimer);
-      window.removeEventListener("resize", onWinResize);
-    });
-
-    onChartClick(ctx, gauge, () => {
-      ctx.highlight(Object.assign(kpiSpec(rel, focus.id), { anchor: chartEl }));
-    });
-
-    /* بطاقة حقائق المؤشر المختار — نصٌّ بديل كامل للعدّاد وزر الإبراز */
-    const facts = panelCard({
-      title: "حقائق المؤشر",
-      note: "كل قيمة من المصدر حرفياً",
-      cls: "kpi5-facts-card",
-    });
-    topGrid.appendChild(facts.card);
-
-    const dl = h("dl", { class: "kpi5-dl" });
-    const factRows = [
-      { k: "المعرف", v: focus.idText },
-      { k: "النوع", v: focus.type },
-      { k: "الصيغة", v: focus.typeLong },
-      { k: MARK_BASE, v: focus.baseText, cls: "is-gold" },
-      { k: MARK_TARGET, v: focus.targetText, cls: "is-gold" },
-      { k: SPAN_LABEL, v: focus.spanText },
-      { k: "موضع خط الأساس على المقياس", v: focus.basePosText },
-      {
-        k: CURRENT_LABEL,
-        v: focus.recorded ? focus.currentText : NOT_RECORDED_SHORT,
-        cls: focus.recorded ? null : "is-pending",
-      },
-    ];
-    for (const row of factRows) {
-      dl.appendChild(h("div", {
-        class: "kpi5-dl-row" + (row.cls ? " " + row.cls : ""),
-      },
-        h("dt", {}, row.k),
-        h("dd", { class: "tnum" }, row.v)));
-    }
-    facts.body.appendChild(dl);
-    facts.body.appendChild(h("p", { class: "kpi5-facts-note" }, focus.note));
-    facts.body.appendChild(h("div", { class: "kpi5-facts-act" },
-      h("button", {
-        class: "kpi5-btn", type: "button", "data-interactive": "",
-        "aria-label": "إبراز المؤشر " + focus.id + ": " + focus.name,
-        onclick: (ev) => ctx.highlight(Object.assign(
-          kpiSpec(rel, focus.id), { anchor: ev.currentTarget })),
-      }, "إبراز المؤشر")));
-
-    /* ── ٤-د) لوح العدّادات الأربعة عشر (ثلاثة في الصف كحد أقصى) ─────────── */
+    /* ── ٤-ج) شبكة العدّادات الأربعة عشر (٣ في الصف على 1920 · ٢ على 1366) ── */
     const boardGrid = h("div", { class: "tabgrid is-1 kpi5-board-grid" });
     const boardCard = panelCard({
       title: "عدّادات المؤشرات الاستراتيجية",
-      note: "قوس من خط الأساس إلى المستهدف · بلا إبرة ما دامت القيمة الحالية "
-        + "غير مسجّلة",
+      note: "قوس كل عدّاد من خط الأساس إلى المستهدف · بلا إبرة ما دامت القيمة "
+        + "الحالية غير مسجّلة · نقرة واحدة على أي عدّاد تفتح إبرازه",
       cls: "kpi5-board-card",
     });
     boardGrid.appendChild(boardCard.card);
     root.appendChild(boardGrid);
 
-    /* أدوات اللوح: ترشيح بالصيغة + ترتيب — تكتب حالتها في العنوان */
+    /* أدوات الشبكة: ترشيح بالصيغة + ترتيب — تكتب حالتها في العنوان */
     const tools = h("div", { class: "kpi5-tools" });
     const chipGroup = (label, opts, current, param) => {
       const grp = h("div", {
@@ -69101,65 +71378,29 @@ RH.tabs = (function () {
     });
     boardCard.body.appendChild(boardEl);
 
-    for (const r of board) {
-      const on = r.id === focus.id;
-      const gbtn = h("button", {
-        class: "kpi5-g-btn", type: "button", "data-interactive": "",
-        dataset: { kpi: String(r.id) },
-        /* الطبقة الأولى على العدّاد الصغير: تلميح مصغّر **سطران** (عنوان +
-           قيمة واحدة) بالتلميح الأصلي للمتصفح — لا يغطي الرسم ولا يعترض النقر */
-        title: r.name + "\n" + MARK_TARGET + ": " + r.targetText,
-        "aria-label": "المؤشر " + r.id + ": " + r.name + " — " + r.typeLong
-          + "؛ " + MARK_BASE + " " + r.baseText
-          + "؛ " + MARK_TARGET + " " + r.targetText
-          + "؛ " + NOT_RECORDED + "؛ افتح الإبراز",
-        onclick: (ev) => ctx.highlight(Object.assign(
-          kpiSpec(rel, r.id), { anchor: ev.currentTarget })),
-      },
-        h("span", { class: "kpi5-g-head" },
-          h("span", { class: "kpi5-g-id tnum" }, r.idText),
-          h("span", { class: "kpi5-g-name" }, r.name),
-          typeBadge(r)),
-        h("span", { class: "kpi5-g-wrap" }, gaugeSvg(r), gaugeCenter(r)),
-        scaleRow(r),
-        markRow(r));
+    for (const r of board) boardEl.appendChild(gaugeCard(r, openKpi));
 
-      const zoom = h("button", {
-        class: "kpi5-g-zoom", type: "button", "data-interactive": "",
-        "aria-pressed": on ? "true" : "false",
-        "aria-label": on
-          ? "المؤشر " + r.id + " معروض في العدّاد المكبَّر"
-          : "اعرض المؤشر " + r.id + " في العدّاد المكبَّر",
-        onclick: () => ctx.update({ kpi: String(r.id) }),
-      }, on ? "معروض" : "تكبير");
-
-      boardEl.appendChild(h("article", {
-        class: "kpi5-g-card" + (on ? " is-on" : ""),
-        dataset: { kpi: String(r.id) },
-      }, gbtn, zoom));
-    }
-
-    /* ملاحة الأسهم داخل اللوح — تنقّل مفاتيحي بين العدّادات */
+    /* ملاحة الأسهم داخل الشبكة — تنقّل مفاتيحي بين العدّادات */
     function onBoardKey(ev) {
       if (ev.key !== "ArrowLeft" && ev.key !== "ArrowRight") return;
-      const btns = Array.prototype.slice.call(
-        boardEl.querySelectorAll(".kpi5-g-btn"));
-      const i = btns.indexOf(document.activeElement);
+      const cards = Array.prototype.slice.call(
+        boardEl.querySelectorAll(".kpi5-g-card"));
+      const i = cards.indexOf(document.activeElement);
       if (i < 0) return;
       /* RTL: السهم الأيسر يتقدّم في القراءة */
       const next = ev.key === "ArrowLeft" ? i + 1 : i - 1;
-      if (next < 0 || next >= btns.length) return;
+      if (next < 0 || next >= cards.length) return;
       ev.preventDefault();
-      btns[next].focus();
+      cards[next].focus();
     }
     boardEl.addEventListener("keydown", onBoardKey);
     ctx.onTeardown(() => boardEl.removeEventListener("keydown", onBoardKey));
 
-    /* ── ٤-هـ) مصفوفة المؤشرات ──────────────────────────────────────────── */
+    /* ── ٤-د) مصفوفة المؤشرات ───────────────────────────────────────────── */
     const matrixGrid = h("div", { class: "tabgrid is-1 kpi5-matrix-grid" });
     const matrixCard = panelCard({
       title: "مصفوفة المؤشرات",
-      note: "ترتيب الجدول يتبع أدوات اللوح أعلاه",
+      note: "ترتيب الجدول يتبع أدوات الشبكة أعلاه",
       cls: "kpi5-matrix-card",
     });
     matrixGrid.appendChild(matrixCard.card);
@@ -69173,7 +71414,7 @@ RH.tabs = (function () {
     const tbody = h("tbody", {});
     for (const r of board) {
       tbody.appendChild(h("tr", {
-        class: "kpi5-row" + (r.id === focus.id ? " is-on" : ""),
+        class: "kpi5-row",
         dataset: { kpi: String(r.id) },
       },
         h("th", { scope: "row", class: "tnum" }, r.idText),
@@ -69181,8 +71422,7 @@ RH.tabs = (function () {
           h("button", {
             class: "kpi5-row-btn", type: "button", "data-interactive": "",
             "aria-label": "إبراز المؤشر " + r.id + ": " + r.name,
-            onclick: (ev) => ctx.highlight(Object.assign(
-              kpiSpec(rel, r.id), { anchor: ev.currentTarget })),
+            onclick: (ev) => openKpi(r, ev.currentTarget),
           }, r.name)),
         h("td", {}, typeBadge(r)),
         h("td", { class: "tnum is-gold" }, r.baseText),
@@ -69203,7 +71443,7 @@ RH.tabs = (function () {
           + " · القيم الحالية تُدخل من الإدارة ولا تُحوَّل إلى صفر"),
         thead, tbody)));
 
-    /* ── ٤-و) سطر الصدق أسفل اللوح ──────────────────────────────────────── */
+    /* ── ٤-هـ) سطر الصدق أسفل اللوح ─────────────────────────────────────── */
     root.appendChild(h("p", { class: "kpi5-foot" },
       "المصدر: ", h("span", { class: "kpi5-foot-src" }, sum.source),
       " · ", sum.note,
@@ -69211,19 +71451,17 @@ RH.tabs = (function () {
   }
 
   /* ══════════════════════════════════════════════════════════════════════════
-     ٥) التسجيل — يتخطى نفسه بغياب القشرة (بيئة اختبار الوحدة)
+     ٥) التسجيل — طابور ‎RH.tabs‎ المؤجَّل (‎ns.js‎) يستقبله في أي ترتيب
      ══════════════════════════════════════════════════════════════════════════ */
 
-  if (RH.tabs && typeof RH.tabs.register === "function") {
-    RH.tabs.register({
-      id: "kpis",
-      order: 5,
-      title: "مؤشرات الأداء",
-      /** النموذج النقي مكشوف للاختبار ولوحة الأوامر — لا حالة فيه ولا DOM */
-      model: MODEL,
-      build,
-    });
-  }
+  RH.tabs.register({
+    id: "kpis",
+    order: 5,
+    title: "مؤشرات الأداء",
+    /** النموذج النقي مكشوف للاختبار ولوحة الأوامر — لا حالة فيه ولا DOM */
+    model: MODEL,
+    build,
+  });
 })();
 
 /* ═══ src/js/report/report-charts.js ═══ */

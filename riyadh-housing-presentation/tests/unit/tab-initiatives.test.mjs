@@ -161,11 +161,18 @@ test("حلقات الركائز الأربع: نسبة المنجز عدداً �
   assert.deepEqual(norm(pills.map((p) => p.total)), [6, 4, 3, 5]);
   assert.deepEqual(norm(pills.map((p) => p.done)), [1, 0, 1, 0]);
   assert.deepEqual(norm(pills.map((p) => p.pct)), [16.7, 0, 33.3, 0]);
-  /* العدّ الظاهر الملزم بعزل اتجاهي — «1 من 6» للركيزة الأولى حرفياً */
-  assert.equal(pills[0].countLabel, fmt.iso("1 من 6"));
-  assert.equal(pills[1].countLabel, fmt.iso("0 من 4"));
-  assert.equal(pills[2].countLabel, fmt.iso("1 من 3"));
-  assert.equal(pills[3].countLabel, fmt.iso("0 من 5"));
+  /* العدّ الظاهر الملزم — «1 من 6» للركيزة الأولى حرفياً.
+     إصلاح جذري: العبارة تُعزل **كاملة** بـFSI من fmt.ofTotal لا كل رقم على حدة:
+     عزل الأرقام منفردةً يترك «من» خارج أي عزل، فينقلب ترتيب العبارة
+     داخل أي وعاء يساري فتُقرأ «6 من 1». */
+  const cnt = (a, b) => fmt.ofTotal(Number(a), Number(b));
+  assert.equal(pills[0].countLabel, cnt("1", "6"));
+  assert.equal(pills[1].countLabel, cnt("0", "4"));
+  assert.equal(pills[2].countLabel, cnt("1", "3"));
+  assert.equal(pills[3].countLabel, cnt("0", "5"));
+  /* لا عزل يساري يبتلع الجملة: أول محرف ليس ‎LRI‎ متبوعاً بالجملة كاملة */
+  assert.ok(!pills[0].countLabel.startsWith("⁦" + "1 من"),
+    "الجملة العربية لا تُعزل عزلاً يسارياً — الأرقام وحدها تُعزل");
   /* مجموع مبادرات الركائز = المحفظة كاملة — لا مبادرة يتيمة ولا مكرّرة */
   assert.equal(pills.reduce((a, p) => a + p.total, 0), 18);
 });
@@ -365,7 +372,7 @@ test("مواصفة الركيزة تحمل العدّ الظاهر وتقود إ
   const spec = M.pillarSpec(release, "p1");
   assert.equal(spec.title, "زيادة المعروض المرخص");
   assert.equal(spec.stats[0].label, M.RING_LABEL);
-  assert.equal(spec.stats[0].value, fmt.iso("1 من 6"));
+  assert.equal(spec.stats[0].value, fmt.ofTotal(1, 6));
   assert.equal(spec.stats[0].tone, "pos");
   assert.ok(spec.sentence.includes(fmt.pct(16.7)));
   assert.ok(spec.sentence.includes("عدداً لا وزناً"),
@@ -374,7 +381,7 @@ test("مواصفة الركيزة تحمل العدّ الظاهر وتقود إ
 
   /* ركيزة بلا منجز: لا نغمة إيجابية ولا ادّعاء تقدم */
   const p2 = M.pillarSpec(release, "p2");
-  assert.equal(p2.stats[0].value, fmt.iso("0 من 4"));
+  assert.equal(p2.stats[0].value, fmt.ofTotal(0, 4));
   assert.equal(p2.stats[0].tone, null);
   /* معرّف مجهول يسقط على الركيزة الأولى بصمت */
   assert.equal(M.pillarSpec(release, "زائف").appendix.id, "pillar/p1");

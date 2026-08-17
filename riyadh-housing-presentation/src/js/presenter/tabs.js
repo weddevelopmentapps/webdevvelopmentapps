@@ -25,6 +25,10 @@
 RH.tabs = (function () {
   const { h, clear } = RH.core.dom;
 
+  /** تسجيلات وصلت قبل تعريف القشرة (طابور ‎ns.js‎) — تُصرَّف في نهاية الوحدة */
+  const PENDING = (RH.tabs && Array.isArray(RH.tabs._pending))
+    ? RH.tabs._pending.slice() : [];
+
   /* ══════════════════════════════════════════════════════════════════════════
      1) القائمة القانونية والسجل
      ══════════════════════════════════════════════════════════════════════════ */
@@ -59,6 +63,25 @@ RH.tabs = (function () {
     closing: "decisions",    /* الخطوات التالية → سجل القرارات */
   });
 
+  /** أسماء بديلة → المعرف القانوني.
+      المحور الثالث اسمه «الرقابة» ومعرفه القانوني ‎control‎ (V3_CONTRACTS §4-أ)
+      بينما مَلَفّه وتنسيقه وملحقه تحمل اسم ‎monitoring‎؛ والمحور الخامس ملحقه
+      ‎kpi‎ بالمفرد. أي رابط عميق يُكتب بالاسم البديل كان يسقط صامتاً إلى
+      ‎demand‎ ويترك العنوان يكذب على الشاشة — فيُحال هنا إلى معرفه القانوني
+      ويُعاد كتابة العنوان. لا تبويب سادس يُخلق بهذا: الأسماء البديلة إحالات
+      إلى الخمسة لا أعضاء في القائمة القانونية. */
+  const ID_ALIASES = Object.freeze({
+    monitoring: "control",   /* ملف/تنسيق/ملحق التبويب ٣ */
+    kpi: "kpis",             /* ملحق التبويب ٥ بالمفرد */
+  });
+
+  /** يعيد المعرف القانوني لأي مدخل (أو ‎null‎ إن كان مجهولاً تماماً) */
+  function canonicalId(id) {
+    const key = String(id == null ? "" : id).trim().toLowerCase();
+    if (VALID_IDS.includes(key)) return key;
+    return ID_ALIASES[key] || null;
+  }
+
   const defs = new Map();
   let booted = false;
 
@@ -66,13 +89,14 @@ RH.tabs = (function () {
     if (!def || !def.id || typeof def.build !== "function") {
       throw new Error("تسجيل تبويب ناقص: id وbuild إلزاميان");
     }
-    if (!VALID_IDS.includes(def.id)) {
+    const id = canonicalId(def.id);
+    if (!id) {
       throw new Error("معرف تبويب خارج القائمة القانونية: " + def.id);
     }
     if (typeof def.order !== "number") {
-      throw new Error("التبويب " + def.id + " بلا ترتيب order");
+      throw new Error("التبويب " + id + " بلا ترتيب order");
     }
-    defs.set(def.id, def);
+    defs.set(id, id === def.id ? def : Object.assign({}, def, { id }));
     if (booted) renderTracker();
   }
 
@@ -369,8 +393,9 @@ RH.tabs = (function () {
      ══════════════════════════════════════════════════════════════════════════ */
 
   function go(id, params) {
-    if (!VALID_IDS.includes(id)) id = DEFAULT_ID;
-    RH.core.router.go({ kind: "tab", id, params: params || {} });
+    RH.core.router.go({
+      kind: "tab", id: canonicalId(id) || DEFAULT_ID, params: params || {},
+    });
   }
 
   /**
@@ -394,8 +419,15 @@ RH.tabs = (function () {
   /** يعرض تبويباً (يستدعيه معالج الموجّه في app.js) */
   function show(route) {
     ensureRoot();
-    const id = VALID_IDS.includes(route.id) ? route.id : DEFAULT_ID;
+    const id = canonicalId(route.id) || DEFAULT_ID;
     const params = route.params || {};
+    // العنوان لا يكذب على الشاشة: اسم بديل (‎monitoring‎) أو معرف مجهول يُعرض
+    // بمعرفه القانوني، فيُعاد كتابة الهاش استبدالاً صامتاً (لا إدخال في
+    // التاريخ ← لا حلقة رجوع، ولا إعادة بناء لأن ‎replace‎ لا تستدعي المعالج).
+    if (route.id !== id) {
+      RH.core.router.replace(
+        RH.core.router.serialize({ kind: "tab", id, params }));
+    }
     document.body.classList.add("mode-tabs");
     rootEl.hidden = false;
     currentId = id;
@@ -473,10 +505,18 @@ RH.tabs = (function () {
     renderTracker();
   }
 
+  /* تصريف الطابور: أي تبويب سجّل نفسه قبل تعريف القشرة يدخل السجل الآن.
+     خطأ تسجيل واحد لا يبتلع البقية — يُعلَن في الوحدة ولا يُسقط البناء. */
+  PENDING.forEach((def) => {
+    try { register(def); } catch (e) {
+      if (typeof console !== "undefined") console.error("tabs/register:", e);
+    }
+  });
+
   return {
     register, boot, show, hide, go, get, list, titleOf, current,
-    resolveLegacy, present, renderTracker,
-    VALID_IDS, DEFAULT_ID, AR_DIGITS,
+    resolveLegacy, present, renderTracker, canonicalId,
+    VALID_IDS, DEFAULT_ID, AR_DIGITS, ID_ALIASES,
     SECTION_TO_TAB, SECTION_TO_APPENDIX,
   };
 })();

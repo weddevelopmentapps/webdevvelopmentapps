@@ -24,3 +24,5 @@ require("./compare-model.test.mjs");
 // V3: بوابتا القبول الجديدتان (حد نص الإبراز 320 حرفاً + عقد مبدّل السمة)
 require("./highlight-cap.test.mjs");
 require("./theme-mode.test.mjs");
+// V3: بوابة التباعد والعزل الاتجاهي في الوسوم المركّبة (رقم + كلمة عربية)
+require("./caption-spacing.test.mjs");

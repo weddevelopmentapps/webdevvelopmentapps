@@ -150,12 +150,16 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+/* قيمة الرقاقة عبارة **مركّبة** (رقم + وحدة عربية + نسبة) لا رقم مجرد، فلا
+   يجوز فرض ‎direction: ltr‎ عليها: الفرض كان يقلب ترتيب مقاطعها بصرياً
+   («82.0٪ · سرير 1,164,400») فتبدو الأرقام ملتصقة بالكلمات. العزل وحده هو
+   المطلوب — يفصلها عن جارتها ويُبقي أساسها عربياً، والرقم بداخلها معزول
+   من ‎fmt.caption‎ فيقرأ يسارياً كما يجب. */
 .dmt-chip-value {
   font-family: var(--f-display);
   font-weight: 700;
   color: var(--ink);
   white-space: nowrap;
-  direction: ltr;
   unicode-bidi: isolate;
 }
 

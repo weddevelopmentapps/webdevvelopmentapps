@@ -54,6 +54,190 @@ RH.brand = (function () {
   }
 
   /* ══════════════════════════════════════════════════════════════════════════
+     0) قياس هندسة الأصل الرسمي — تفكيك القفل الرأسي إلى رمز + كلمة
+     ──────────────────────────────────────────────────────────────────────────
+     الأصل الرسمي المسلَّم (‎logo-full‎/‎logo-white‎) **قفل رأسي**: الرمز الدائري
+     فوق سطرَي الاسم. إدراجه كصورة واحدة في شريط رأس ارتفاعه ‎44px‎ يُنزل الرمز
+     إلى ‎~26px‎ ويجعل الاسم غير مقروء — وهي الشكوى الحرفية («علامة ‎28px‎ في
+     الزاوية»). الحل ليس تكبير الصورة كلها (فتبتلع الشريط) بل **إعادة تركيبها
+     أفقياً**: الرمز بارتفاع ‎48px‎ وإلى جانبه كتلة الاسم بارتفاعها الخاص.
+
+     الحدود لا تُكتب أرقاماً ثابتة — فأي ملف يُسقطه العميل لاحقاً في
+     ‎assets/brand/‎ بهندسة مختلفة كان سيُقصّ خطأً. تُقاس وقت التشغيل من قناة
+     ألفا للصورة نفسها: صفوف غير شفافة ← نطاقات ← أعلى نطاق «رمز» إن كان
+     أضيق من الصورة وقريباً من المربع، وما تحته «كلمة». يفشل القياس ⇒ الصورة
+     تُعرض كما هي (تدهور رشيق، بلا قصّ أعمى).
+     ══════════════════════════════════════════════════════════════════════════ */
+
+  /** أقصى عرض للتحليل (تقليص للأداء — النِسب وحدها هي المطلوبة) */
+  const GEOM_MAX_W = 480;
+  /** عتبة الشفافية التي تُعدّ عندها البكسل «حبراً» */
+  const ALPHA_MIN = 24;
+
+  const geomValue = new Map();     // src → هندسة مقيسة أو null (فشل/غير قابل)
+  const geomPromise = new Map();   // src → وعد القياس الجاري
+  const geomWaiters = [];          // دوال تُستدعى عند اكتمال أي قياس
+
+  /** مستطيل إحاطة الحبر لمدى صفوف */
+  function inkBox(rowMin, rowMax, a, b) {
+    let x0 = Infinity, x1 = -1;
+    for (let y = a; y <= b; y++) {
+      if (rowMax[y] < 0) continue;
+      if (rowMin[y] < x0) x0 = rowMin[y];
+      if (rowMax[y] > x1) x1 = rowMax[y];
+    }
+    if (x1 < 0) return null;
+    return { x: x0, y: a, w: x1 - x0 + 1, h: b - a + 1 };
+  }
+
+  /** يقيس صورة محمَّلة ويعيد ‎{full, mark, word}‎ أو ‎null‎ إن لم تكن قفلاً رأسياً */
+  function measureImage(img) {
+    const NW = img.naturalWidth, NH = img.naturalHeight;
+    if (!NW || !NH) return null;
+    const k = Math.min(1, GEOM_MAX_W / NW);
+    const w = Math.max(1, Math.round(NW * k));
+    const hh = Math.max(1, Math.round(NH * k));
+    const cv = document.createElement("canvas");
+    cv.width = w; cv.height = hh;
+    const cx = cv.getContext("2d", { willReadFrequently: true });
+    if (!cx) return null;
+    cx.drawImage(img, 0, 0, w, hh);
+    // data: URI لا يلوّث القماش، فالقراءة مشروعة على ‎file://‎ أيضاً
+    const px = cx.getImageData(0, 0, w, hh).data;
+
+    const rowMin = new Int32Array(hh), rowMax = new Int32Array(hh);
+    for (let y = 0; y < hh; y++) {
+      let mn = w, mx = -1;
+      const base = y * w * 4;
+      for (let x = 0; x < w; x++) {
+        if (px[base + x * 4 + 3] > ALPHA_MIN) { if (x < mn) mn = x; mx = x; }
+      }
+      rowMin[y] = mn; rowMax[y] = mx;
+    }
+
+    // نطاقات الصفوف الحبرية، مع دمج الفواصل الأرق من 2.5٪ من الارتفاع
+    // (تباعد الأحرف الداخلي ليس فاصلاً بين كتلتَي الهوية)
+    const gap = Math.max(2, Math.round(hh * 0.025));
+    const runs = [];
+    let start = null;
+    for (let y = 0; y < hh; y++) {
+      const ink = rowMax[y] >= 0;
+      if (ink && start === null) start = y;
+      if (!ink && start !== null) { runs.push([start, y - 1]); start = null; }
+    }
+    if (start !== null) runs.push([start, hh - 1]);
+    const bands = [];
+    for (const r of runs) {
+      const last = bands[bands.length - 1];
+      if (last && r[0] - last[1] - 1 < gap) last[1] = r[1];
+      else bands.push([r[0], r[1]]);
+    }
+    if (bands.length < 2) return null;
+
+    const mark = inkBox(rowMin, rowMax, bands[0][0], bands[0][1]);
+    const word = inkBox(rowMin, rowMax, bands[1][0], bands[bands.length - 1][1]);
+    if (!mark || !word) return null;
+    // شروط «قفل رأسي حقيقي»: الرمز أضيق من الصورة وقريب من المربع،
+    // وكتلة الاسم أعرض منه بوضوح. غير ذلك ⇒ الصورة أفقية سلفاً فتُترك.
+    const ratio = mark.h / mark.w;
+    if (mark.w > w * 0.75) return null;
+    if (ratio < 0.6 || ratio > 1.8) return null;
+    if (word.w < mark.w * 1.25) return null;
+    return {
+      full: { w, h: hh },
+      natural: { w: NW, h: NH },
+      img,                       /* الصورة المفكوكة — تخدم الصبغ أدناه */
+      mark, word,
+    };
+  }
+
+  /* ── صبغ كتلة الاسم للأسطح الداكنة ──────────────────────────────────────
+     نسخة ‎logo-white.png‎ المسلَّمة مشتقة بعتبة إضاءة، فحروفها العربية ملتحمة
+     ومقطّعة والسطر اللاتيني غير مقروء — استعمالها على السطح الداكن يشوّه اسم
+     الجهة. الأصل الملوّن يحمل الشكل الصحيح في **قناة ألفا** (الحروف مصمتة
+     والخلفية شفافة)، فيُعاد صبغه هنا بلون الرمز الحي ‎--on-invert‎ عبر
+     ‎source-in‎: الشكل الرسمي حرفياً، بلون السمة، بلا تلفيق ولا لون مكتوب.
+     الرمز الدائري يبقى **ملوَّناً** في السمتين — تفاصيله الفاتحة (القلعة
+     والسماء) تقرأ على الداكن، وتسطيحه إلى قرص أبيض يمحوها. */
+  const tintCache = new Map();   // src|color|box → data URI
+
+  /** يقرأ قيمة رمز CSS حياً (لا لون مكتوب في هذا الملف) */
+  function tokenColor(name, fallback) {
+    try {
+      const v = getComputedStyle(document.documentElement)
+        .getPropertyValue(name).trim();
+      return v || fallback;
+    } catch (_e) { return fallback; }
+  }
+
+  function tintCrop(geom, box, color) {
+    const key = geom.img.src.slice(-64) + "|" + color
+      + "|" + box.x + "," + box.y + "," + box.w + "," + box.h;
+    if (tintCache.has(key)) return tintCache.get(key);
+    let uri = null;
+    try {
+      const sc = geom.natural.w / geom.full.w;   // فضاء القياس → بكسل أصلي
+      const sx = Math.round(box.x * sc), sy = Math.round(box.y * sc);
+      const sw = Math.max(1, Math.round(box.w * sc));
+      const sh = Math.max(1, Math.round(box.h * sc));
+      const cv = document.createElement("canvas");
+      cv.width = sw; cv.height = sh;
+      const cx = cv.getContext("2d");
+      if (cx) {
+        cx.drawImage(geom.img, sx, sy, sw, sh, 0, 0, sw, sh);
+        cx.globalCompositeOperation = "source-in";
+        cx.fillStyle = color;
+        cx.fillRect(0, 0, sw, sh);
+        uri = cv.toDataURL("image/png");
+      }
+    } catch (_e) { uri = null; }
+    tintCache.set(key, uri);
+    return uri;
+  }
+
+  /** يبدأ قياس ‎src‎ (مرة واحدة) ويخزن نتيجته */
+  function measureAsset(src) {
+    if (!src || typeof document === "undefined") return null;
+    if (geomValue.has(src)) return geomValue.get(src);
+    if (geomPromise.has(src)) return null;
+    const img = new Image();
+    const done = (val) => {
+      geomValue.set(src, val);
+      geomPromise.delete(src);
+      geomWaiters.slice().forEach((fn) => { try { fn(); } catch (_e) {} });
+    };
+    img.onload = () => {
+      let val = null;
+      try { val = measureImage(img); } catch (_e) { val = null; }
+      done(val);
+    };
+    img.onerror = () => done(null);
+    geomPromise.set(src, true);
+    img.src = src;
+    return null;
+  }
+
+  /** يسجّل مستمعاً لاكتمال القياس — يعيد دالة إلغاء */
+  function onMeasured(fn) {
+    geomWaiters.push(fn);
+    return function off() {
+      const i = geomWaiters.indexOf(fn);
+      if (i !== -1) geomWaiters.splice(i, 1);
+    };
+  }
+
+  /* تسخين مبكّر: القياس ينطلق عند تحميل الوحدة، قبل بناء الرأس بكثير
+     (‎RH.data.store.init()‎ غير متزامن) — فالقفل يُبنى أفقياً من أول طلاء. */
+  if (typeof document !== "undefined") {
+    ASSET_KEYS.forEach((key) => {
+      const variant = Object.keys(VARIANT_ASSET)
+        .find((v) => VARIANT_ASSET[v] === key);
+      const src = asset(variant);
+      if (src) measureAsset(src);
+    });
+  }
+
+  /* ══════════════════════════════════════════════════════════════════════════
      1) النمط الهندسي — متوازيات أضلاع متراكبة
      ══════════════════════════════════════════════════════════════════════════ */
 
@@ -155,12 +339,45 @@ RH.brand = (function () {
         }))));
   }
 
+  /** ارتفاع الرمز في قفل الرأس (V3: 44–52px — «علامة قابلة للتعرّف لا أيقونة») */
+  const MARK_H = 48;
+  /** ارتفاع كتلة الاسم إلى جانبه (سطر عربي + سطر لاتيني) */
+  const WORD_H = 34;
+
+  /**
+   * ‎cropSpan(src, box, full, renderH, cls)‎ — يقتطع مستطيلاً من صورة الهوية.
+   * القصّ بخلفية موضوعة بدقة بدل ‎clip-path‎: يعمل في كل محرك، ويقبل التكبير
+   * الجزئي، ولا يفرض عنصراً إضافياً. كل الأبعاد مشتقة من القياس الحي —
+   * لا رقم مكتوب بيد.
+   */
+  function cropSpan(src, box, full, renderH, cls) {
+    const s = renderH / box.h;
+    return h("span", {
+      class: cls,
+      "aria-hidden": "true",
+      style: {
+        display: "block",
+        flex: "0 0 auto",
+        width: (box.w * s).toFixed(2) + "px",
+        height: renderH.toFixed(2) + "px",
+        backgroundImage: 'url("' + src + '")',
+        backgroundSize: (full.w * s).toFixed(2) + "px "
+          + (full.h * s).toFixed(2) + "px",
+        backgroundPosition: (-box.x * s).toFixed(2) + "px "
+          + (-box.y * s).toFixed(2) + "px",
+        backgroundRepeat: "no-repeat",
+      },
+    });
+  }
+
   /**
    * ‎logo(el, opts)‎ — يبني الشعار داخل ‎el‎ (يُفرَّغ أولاً).
    * opts:
    *   variant {"full"|"mark"|"white"} افتراضي "full"
    *   sub     {boolean} إظهار سطر الإدارة تحت الاسم (افتراضي: مع "full" فقط)
    *   label   {string}  نص بديل لقارئ الشاشة (افتراضي اسم الجهة)
+   *   row     {boolean} قفل أفقي (رمز كبير + كتلة اسم) — الافتراضي مع "full"
+   *   markH   {number}  ارتفاع الرمز في القفل الأفقي (افتراضي 48)
    * يعيد العنصر الجذري المُنشأ.
    */
   function logo(el, opts) {
@@ -168,6 +385,8 @@ RH.brand = (function () {
     const variant = VARIANT_ASSET[o.variant] ? o.variant : "full";
     const label = o.label || ENTITY_AR;
     const showSub = typeof o.sub === "boolean" ? o.sub : (variant === "full");
+    const wantRow = typeof o.row === "boolean" ? o.row : (variant === "full");
+    const markH = typeof o.markH === "number" ? o.markH : MARK_H;
     if (el) clear(el);
 
     // اختيار **الأصل** بحسب السمة السارية: الشعار الملوّن يذوب على سطح داكن،
@@ -178,8 +397,22 @@ RH.brand = (function () {
     const src = (variant === "full" && dark && asset("white"))
       || asset(variant);
     let node;
-    if (src) {
-      // الأصل الرسمي المضمَّن — يُعرض كما هو بلا أي تدخل لوني
+    const geom = src && wantRow ? (geomValue.has(src)
+      ? geomValue.get(src) : measureAsset(src)) : null;
+    if (src && geom) {
+      // القفل الأفقي المعاد تركيبه من الأصل الرسمي نفسه: الرمز بحجمه الكامل،
+      // وكتلة الاسم إلى جانبه — تُخفى وحدها على الشاشات الضيقة (CSS) فيبقى
+      // الرمز شاهداً على الهوية بلا ازدحام.
+      node = h("span", {
+        class: "brand-logo brand-logo--asset brand-logo--row is-" + variant,
+        role: "img", "aria-label": label,
+        dataset: { brandSource: "asset", brandLayout: "row" },
+      },
+        cropSpan(src, geom.mark, geom.full, markH, "brand-lock-mark"),
+        cropSpan(src, geom.word, geom.full,
+          markH * (WORD_H / MARK_H), "brand-lock-word"));
+    } else if (src) {
+      // الأصل الرسمي المضمَّن كما هو — لم يُقس بعد (أو ليس قفلاً رأسياً)
       node = h("span", {
         class: "brand-logo brand-logo--asset is-" + variant,
         dataset: { brandSource: "asset" },
@@ -224,7 +457,11 @@ RH.brand = (function () {
   function lockup(opts) {
     const o = opts || {};
     const logoBox = h("div", { class: "brand-lock-logo" });
-    logo(logoBox, { variant: o.variant || "full", sub: false });
+    const paint = () => logo(logoBox, {
+      variant: o.variant || "full", sub: false, row: true,
+      markH: typeof o.markH === "number" ? o.markH : MARK_H,
+    });
+    paint();
 
     const titles = h("div", { class: "brand-lock-titles" },
       o.title ? h("h1", { class: "brand-lock-title" }, o.title) : null,
@@ -237,8 +474,8 @@ RH.brand = (function () {
     },
       h("div", { class: "brand-lock-inner" },
         logoBox,
-        h("span", { class: "brand-lock-rule", "aria-hidden": "true" }),
         titles,
+        h("span", { class: "brand-lock-rule", "aria-hidden": "true" }),
         actionsEl));
 
     let removePattern = function () {};
@@ -252,18 +489,20 @@ RH.brand = (function () {
     }
 
     // تبديل السمة يعيد رسم الشعار كي تُختار نسخة الأصل الملائمة للسطح الجديد
-    const offTheme = RH.core.bus.on("theme:change", () => {
-      logo(logoBox, { variant: o.variant || "full", sub: false });
-    });
+    const offTheme = RH.core.bus.on("theme:change", paint);
+    // واكتمال قياس هندسة الأصل يعيد رسمه أيضاً: إن سبق البناءُ القياسَ
+    // (صورة بطيئة الفكّ) عُرضت الصورة كما هي، ثم تحلّ محلها التركيبة الأفقية
+    // فور توفّر الحدود — بلا انتظار ولا شاشة فارغة.
+    const offMeasure = onMeasured(paint);
 
     return {
       el, actionsEl, logoEl: logoBox,
-      teardown() { removePattern(); offTheme(); },
+      teardown() { removePattern(); offTheme(); offMeasure(); },
     };
   }
 
   return {
-    pattern, logo, lockup, markSvg,
-    hasOfficialAssets, ASSET_KEYS, ENTITY_AR, ENTITY_SUB,
+    pattern, logo, lockup, markSvg, measureImage, onMeasured,
+    hasOfficialAssets, ASSET_KEYS, ENTITY_AR, ENTITY_SUB, MARK_H, WORD_H,
   };
 })();

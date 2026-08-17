@@ -487,13 +487,14 @@ test("وسم الصدق (note) خارج حساب الحد فلا يُقصّ ول
 });
 
 test("لا رقم ظاهر بلا صياغة fmt: كل قيمة مساندة تطابق صيغة معتمدة", () => {
-  const ok = /^[⁦⁩٠-٩٪0-9,.+−\s؀-ۿ]+$/;
+  /* ⁨ (FSI) معزل معتمد كـLRI: هو عزل العبارة المختلطة «n من N» */
+  const ok = /^[⁦-⁩٠-٩٪0-9,.+−\s؀-ۿ]+$/;
   for (const spec of M.allHighlightSpecs(rel, der, geo, index)) {
     for (const st of spec.stats) {
       assert.ok(ok.test(st.value),
         "قيمة غير منسقة: «" + st.value + "» في " + spec.title);
       /* أي عدد من أربع خانات فأكثر يحمل فاصل الآلاف الموحد */
-      const bare = st.value.replace(/[⁦⁩]/g, "");
+      const bare = st.value.replace(/[⁦-⁩]/g, "");
       if (/^\d+$/.test(bare)) {
         assert.ok(bare.length <= 3, "رقم كبير بلا فاصل آلاف: " + bare);
       }
@@ -551,7 +552,7 @@ test("إبراز الامتثال يقول صراحة إن المنهجية لم
 test("إبراز فئة منفردة يحمل رتبتها من ستٍّ، والدلو يرفض ادّعاء الرتبة", () => {
   const top = M.violationHighlight(rel, "overcrowding");
   assert.equal(top.title, "الاكتظاظ وتجاوز الطاقة الاستيعابية");
-  assert.equal(top.stats[1].value, LRI + "1 من 6" + PDI);
+  assert.equal(top.stats[1].value, fmt.ofTotal(1, 6));
   assert.equal(top.stats[0].value, fmt.pct(RH.data.derive.pct(1121, 3617)));
 
   const agg = M.violationHighlight(rel, "other");

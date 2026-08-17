@@ -100,7 +100,7 @@
 
 .int-ring-kicker {
   font-family: var(--f-display);
-  font-size: 11.5px;
+  font-size: clamp(12px, 0.78vw, 14px);
   font-weight: 700;
   letter-spacing: 0.02em;
   color: var(--brand);
@@ -111,8 +111,8 @@
 /* الحلقة: مربع مرن يحمل SVG والمركز النصي فوقه */
 .int-ring-wrap {
   position: relative;
-  inline-size: clamp(104px, 8.6vw, 148px);
-  block-size: clamp(104px, 8.6vw, 148px);
+  inline-size: clamp(116px, 9.4vw, 168px);
+  block-size: clamp(116px, 9.4vw, 168px);
   flex: 0 0 auto;
 }
 .int-ring {
@@ -121,15 +121,20 @@
   block-size: 100%;
   overflow: visible;
 }
+/* ‏**‎fill: none‎ ملزم على دائرتي الحلقة**: القيمة الابتدائية لخاصية ‎fill‎ في
+   ‎SVG‎ هي الأسود، فلو سقط هذا الملف من حزمة البناء أو سقطت القاعدة تحوّلت
+   الحلقتان إلى قرصين أسودين صلبين. لذلك تُكتب ‎fill‎ صراحةً على الصنفين، ولا
+   يُعتمد على الوراثة ولا على قاعدة عامة أخرى. سماكة ‎12‎ من ‎120‎ في نظام
+   إحداثيات ‎viewBox‎ ⇒ نحو ‎17px‎ فعلية عند أكبر مقاس: تُقرأ من أربعة أمتار. */
 .int-ring-track {
   fill: none;
   stroke: var(--surface-3);
-  stroke-width: 11;
+  stroke-width: 12;
 }
 .int-ring-fill {
   fill: none;
   stroke: var(--green);
-  stroke-width: 11;
+  stroke-width: 12;
   stroke-linecap: round;
   transition: stroke-dashoffset var(--dur-major) var(--ease);
 }
@@ -146,34 +151,40 @@
   gap: 2px;
   pointer-events: none;
 }
+/* رقم المركز: أثقل وزناً وأكبر مقاساً من الافتراضي — العرض من مسافة القاعة */
 .int-ring-pct {
   font-family: var(--f-display);
-  font-size: clamp(19px, 1.8vw, 29px);
-  font-weight: 300;
-  line-height: 1.05;
+  font-size: clamp(25px, 2.1vw, 38px);
+  font-weight: 600;
+  line-height: 1.02;
+  letter-spacing: -0.015em;
   color: var(--ink);
   direction: ltr;
   unicode-bidi: isolate;
 }
-/* العدّ الظاهر الملزم («1 من 6») — لا يُخفى على أي مقاس */
+/* العدّ الظاهر الملزم («1 من 6») — لا يُخفى على أي مقاس.
+   الجملة عربية الاتجاه؛ والأرقام معزولة داخلها من ‎JS‎ رقماً رقماً. */
 .int-ring-count {
-  font-size: clamp(11px, 0.82vw, 13px);
-  font-weight: 600;
+  font-size: clamp(13px, 1vw, 17px);
+  font-weight: 700;
+  line-height: 1.35;
   color: var(--ink-2);
+  direction: rtl;
+  unicode-bidi: isolate;
   white-space: nowrap;
 }
 
 .int-ring-title {
   font-family: var(--f-display);
-  font-size: clamp(12.5px, 0.95vw, 15px);
-  font-weight: 600;
-  line-height: 1.5;
+  font-size: clamp(14px, 1.05vw, 18px);
+  font-weight: 700;
+  line-height: 1.45;
   color: var(--ink);
   min-width: 0;
 }
 /* التسمية الحرفية الملزمة: «المنجز من مبادرات الركيزة» */
 .int-ring-cap {
-  font-size: 11px;
+  font-size: clamp(11.5px, 0.72vw, 13px);
   line-height: 1.6;
   color: var(--ink-3);
 }
@@ -392,13 +403,14 @@
 }
 .int-group.is-enabler .int-group-kicker { color: var(--brand-teal); }
 .int-group-name { min-width: 0; }
+/* «n من N» عبارة مركّبة فيها كلمة عربية — العزل يكفي، وفرض الاتجاه اليساري
+   كان يقلب ترتيبها فتُقرأ «6 من 1». */
 .int-group-count {
   margin-inline-start: auto;
   font-family: var(--f-display);
   font-size: 13px;
   font-weight: 700;
   color: var(--ink);
-  direction: ltr;
   unicode-bidi: isolate;
   white-space: nowrap;
 }

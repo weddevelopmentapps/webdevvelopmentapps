@@ -602,9 +602,14 @@ test("CSS التبويب يلتزم بادئته ولا يعيد تعريف أص
   assert.ok(/\.kpi5-arc\.is-band\s*\{[^}]*stroke:\s*rgba\(var\(--gold-rgb\)/.test(css));
   /* الإبرة معرَّفة لمسار القيمة المسجَّلة، ولونها الأخضر الدلالي */
   assert.ok(/\.kpi5-needle\s*\{[^}]*stroke:\s*var\(--green\)/.test(css));
-  /* **لوح ثلاثة في الصف كحد أقصى** — الموجز الملزم لهذا التبويب */
+  /* **شبكة ثلاثة في الصف على 1920 واثنان على 1366** — الموجز الملزم */
   assert.ok(/\.kpi5-board\s*\{[^}]*grid-template-columns:\s*repeat\(3,/.test(css),
-    "شبكة العدّادات ثلاثة في الصف كحد أقصى");
+    "شبكة العدّادات ثلاثة في الصف على الشاشة العريضة");
+  assert.ok(/@media\s*\(max-width:\s*1500px\)\s*\{\s*\.kpi5-board\s*\{[^}]*repeat\(2,/
+    .test(css), "عتبة 1366 تعطي عمودين لا ثلاثة");
+  /* اسم المؤشر مقصوص في سطرين بإعلان صريح */
+  assert.ok(/\.kpi5-g-name\s*\{[^}]*-webkit-line-clamp:\s*2/.test(css),
+    "اسم المؤشر بلا قصّ معلن في سطرين");
   assert.equal(/repeat\(\s*([4-9]|\d{2,})\s*,/.test(css), false,
     "لا شبكة تتجاوز ثلاثة أعمدة في هذا اللوح");
   /* التمرير الأفقي محصور داخل حاوية المصفوفة ولا يصل إلى الصفحة */
@@ -612,42 +617,56 @@ test("CSS التبويب يلتزم بادئته ولا يعيد تعريف أص
 });
 
 /* ══════════════════════════════════════════════════════════════════════════
-   ١١) قانون التلميح وعقود البناء في مصدر التبويب (V3_CONTRACTS §2-ب و§4)
+   ١١) عقد البناء في مصدر التبويب: **شبكة عدّادات لا عدّاد مكبَّر**
+       (الموجز الملزم: «show guages … of the strategic KPIs» — V3_CONTRACTS §4)
    ══════════════════════════════════════════════════════════════════════════ */
 
-test("كل تلميح في التبويب من T.tooltip(su) ومحتواه ttMicro حصراً", () => {
+test("التبويب شبكة عدّادات SVG بلا ECharts ولا تلميح رسم", () => {
   const src = readFileSync(path.join(ROOT, TAB_FILE), "utf8");
-  const tooltips = src.match(/tooltip:/g) || [];
-  const lawful = src.match(/Object\.assign\(T\.tooltip\(su\)/g) || [];
-  assert.equal(tooltips.length, lawful.length,
-    "كل ‎tooltip:‎ يمر من ‎T.tooltip(su)‎");
-  assert.equal(lawful.length, 1, "رسم رئيس واحد = تلميح واحد");
-  assert.equal((src.match(/T\.ttMicro\(/g) || []).length, 1);
-  for (const banned of ["T.ttRow(", "T.ttTitle("]) {
-    assert.equal(src.includes(banned), false,
-      banned + " ممنوعة في التبويبات — التفاصيل في نافذة الإبراز");
-  }
-  /* لا ‎echarts.init‎ مباشرة: كل مثيل عبر ‎ctx.chart‎ كي يُتلف مع التبويب */
+  /* لا مثيل رسم في هذا التبويب أصلاً: العدّادات الأربعة عشر SVG كودي */
   assert.equal(src.includes("echarts.init"), false);
-  assert.equal((src.match(/ctx\.chart\(/g) || []).length, 1);
-  /* الرسم الرئيس بالصنف الملزم ‎.tabchart‎ */
-  assert.equal((src.match(/class: "tabchart /g) || []).length, 1);
+  assert.equal((src.match(/ctx\.chart\(/g) || []).length, 0,
+    "لا مثيل ECharts — العدّادات مرسومة كوداً");
+  assert.equal((src.match(/tooltip:/g) || []).length, 0,
+    "لا تلميح رسم: الطبقة الأولى تلميح المتصفح الأصلي على البطاقة");
+  for (const banned of ["T.ttRow(", "T.ttTitle(", "T.ttMicro("]) {
+    assert.equal(src.includes(banned), false,
+      banned + " لا محل لها بلا رسم ECharts");
+  }
   /* كل مستمع وطبقة مسجَّل في تنظيف التبويب */
-  assert.ok((src.match(/ctx\.onTeardown\(/g) || []).length >= 3,
+  assert.ok((src.match(/ctx\.onTeardown\(/g) || []).length >= 2,
     "التنظيف مسجَّل لكل مستمع/طبقة");
 });
 
-test("العدّاد المكبَّر لا يرسم إبرة ولا قوس تقدم إلا بشرط التسجيل", () => {
+test("لا عدّاد مكبَّر ولا لوح تفاصيل مرسى ولا ترقيم «1 من 14»", () => {
   const src = readFileSync(path.join(ROOT, TAB_FILE), "utf8");
-  /* ‎pointer‎ و‎progress‎ مشروطان بـ‎focus.recorded‎ حصراً — لا إبرة غير مشروطة */
-  assert.ok(/pointer:\s*focus\.recorded/.test(src),
+  const css = readFileSync(path.join(ROOT, CSS_FILE), "utf8");
+  for (const gone of ["kpi5-focus-card", "kpi5-facts-card", "kpi5-step",
+    "kpi5-g-zoom", "kpi5-dl"]) {
+    assert.equal(src.includes(gone), false,
+      "بقية العدّاد المكبَّر في JS: " + gone);
+    assert.equal(css.includes(gone), false,
+      "بقية العدّاد المكبَّر في CSS: " + gone);
+  }
+  /* معامل التركيز ‎?kpi=‎ لم يعد يحكم الشاشة — الأربعة عشر ظاهرة دائماً */
+  assert.equal(/params\s*&&\s*ctx\.params\.kpi/.test(src), false,
+    "معامل ‎kpi‎ ما زال يقصر الشاشة على مؤشر واحد");
+  /* البطاقة نفسها زر: نقرة واحدة = إبراز (الطبقة الثانية) لا تصفية */
+  assert.ok(/class: "kpi5-g-card"/.test(src), "بطاقة العدّاد هي الزر");
+  assert.ok(src.includes("gaugeCard("), "بانِي بطاقة العدّاد موجود");
+});
+
+test("كل عدّاد في الشبكة يعلن حالته بلا إبرة وهمية", () => {
+  const src = readFileSync(path.join(ROOT, TAB_FILE), "utf8");
+  /* الإبرة مشروطة بـ‎r.recorded‎ حصراً داخل ‎gaugeSvg‎ */
+  assert.ok(/if\s*\(r\.recorded\s*&&\s*r\.currentFrac\s*!=\s*null\)/.test(src),
     "الإبرة غير مشروطة بتسجيل القيمة");
-  assert.ok(/progress:\s*focus\.recorded/.test(src),
-    "قوس التقدم غير مشروط بتسجيل القيمة");
-  assert.ok(src.includes("show: false"), "حالة الإخفاء الصريحة موجودة");
   /* النص الحرفي للحالة الصريحة حاضر في المصدر */
   assert.ok(src.includes("القيمة الحالية غير مسجّلة — تُدخل من الإدارة"));
-  /* ونصف الدائرة بالاتجاه العربي: من ‎0°‎ إلى ‎180°‎ */
-  assert.ok(/startAngle:\s*0/.test(src) && /endAngle:\s*180/.test(src),
-    "العدّاد نصف دائري يقرأ من اليمين إلى اليسار");
+  /* الاسم مقصوص في سطرين والاسم الكامل في ‎title‎ — لا بتر خفي */
+  assert.ok(/class: "kpi5-g-name", title: r\.name/.test(src),
+    "الاسم الكامل غائب عن ‎title‎");
+  /* نصف الدائرة بالاتجاه العربي: الصفر يميناً وأعلى المقياس يساراً —
+     تحرسه هندسة ‎polar‎ المغطاة أعلاه، وهنا نتأكد أن العدّاد SVG وحده */
+  assert.ok(src.includes("function gaugeSvg("), "عدّاد SVG كودي");
 });
