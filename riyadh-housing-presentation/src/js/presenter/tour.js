@@ -400,8 +400,8 @@ RH.tour = (function () {
   const memStore = Object.create(null);
   function readStore(key) {
     try {
-      if (typeof localStorage !== "undefined" && localStorage) {
-        const v = localStorage.getItem(key);
+      if (typeof RH.core.storage.local !== "undefined" && RH.core.storage.local) {
+        const v = RH.core.storage.local.getItem(key);
         if (v != null) return v;
       }
     } catch (_e) { /* ممنوع في file:// — نكمل بالذاكرة */ }
@@ -410,8 +410,8 @@ RH.tour = (function () {
   function writeStore(key, value) {
     memStore[key] = String(value);
     try {
-      if (typeof localStorage !== "undefined" && localStorage) {
-        localStorage.setItem(key, String(value));
+      if (typeof RH.core.storage.local !== "undefined" && RH.core.storage.local) {
+        RH.core.storage.local.setItem(key, String(value));
       }
     } catch (_e) { /* لا شيء — الذاكرة كافية للجلسة */ }
   }

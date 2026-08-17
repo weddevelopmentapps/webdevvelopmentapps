@@ -7,7 +7,7 @@
      مملّحة مكررة (PBKDF2 عبر WebCrypto حيث يتاح، وإلا SHA-256 مكرر 20,000 مرة).
      يُعرض وسم «وضع محلي تجريبي» دائماً — هذا ضبط وصول جهازي لا مصادقة خادم،
      وحدوده موثقة في ADMIN_GUIDE_AR.md. لا يمنح أي حماية لبيانات الخادم.
-   الجلسة في sessionStorage (تنتهي بإغلاق التبويب). لا localStorage للاعتماد. */
+   الجلسة في RH.core.storage.session (تنتهي بإغلاق التبويب). لا RH.core.storage.local للاعتماد. */
 "use strict";
 
 RH.admin.auth = (function () {
@@ -34,7 +34,9 @@ RH.admin.auth = (function () {
   const kvGet = async (key) => {
     // نستخدم مخزن kv نفسه عبر store (يتشارك القاعدة)
     return new Promise((res) => {
-      const req = indexedDB.open("rh-presentation");
+      const _idb = RH.core.storage.idb();
+    if (!_idb) return null;
+    const req = _idb.open("rh-presentation");
       req.onsuccess = () => {
         const db = req.result;
         try {
@@ -47,7 +49,9 @@ RH.admin.auth = (function () {
     });
   };
   const kvSet = async (key, val) => new Promise((res) => {
-    const req = indexedDB.open("rh-presentation");
+    const _idb = RH.core.storage.idb();
+    if (!_idb) return null;
+    const req = _idb.open("rh-presentation");
     req.onsuccess = () => {
       const db = req.result;
       const t = db.transaction("kv", "readwrite");
@@ -92,21 +96,21 @@ RH.admin.auth = (function () {
       name: cred.name, role: cred.role, mode: "local-demo",
       at: new Date().toISOString(),
     };
-    sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
+    RH.core.storage.session.setItem(SESSION_KEY, JSON.stringify(session));
     await RH.data.store.audit(cred.name, "auth.sign_in", { mode: "local-demo" });
     return session;
   }
 
   function session() {
     try {
-      return JSON.parse(sessionStorage.getItem(SESSION_KEY));
+      return JSON.parse(RH.core.storage.session.getItem(SESSION_KEY));
     } catch (_e) { return null; }
   }
 
   function signOut() {
     const s = session();
     if (s) RH.data.store.audit(s.name, "auth.sign_out", {});
-    sessionStorage.removeItem(SESSION_KEY);
+    RH.core.storage.session.removeItem(SESSION_KEY);
   }
 
   /** أدوار: العارض يقرأ، المحرر يحرر المسودة، الناشر ينشر ويتراجع */

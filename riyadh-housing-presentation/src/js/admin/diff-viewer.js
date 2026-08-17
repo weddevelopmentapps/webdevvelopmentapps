@@ -1232,8 +1232,8 @@ RH.admin.diffViewer = (function () {
   /** تفضيلات العرض تُحفظ محلياً — لا بيانات فيها، تفضيل واجهة فقط */
   function loadView() {
     try {
-      if (typeof localStorage === "undefined") return;
-      const raw = localStorage.getItem(VIEW_KEY);
+      if (typeof RH.core.storage.local === "undefined") return;
+      const raw = RH.core.storage.local.getItem(VIEW_KEY);
       if (!raw) return;
       const v = JSON.parse(raw);
       if (!v || typeof v !== "object") return;
@@ -1247,8 +1247,8 @@ RH.admin.diffViewer = (function () {
 
   function saveView() {
     try {
-      if (typeof localStorage === "undefined") return;
-      localStorage.setItem(VIEW_KEY, JSON.stringify({
+      if (typeof RH.core.storage.local === "undefined") return;
+      RH.core.storage.local.setItem(VIEW_KEY, JSON.stringify({
         sort: state.sort, dir: state.dir, perPage: state.perPage,
         severity: state.severity, honestyOnly: state.honestyOnly,
       }));

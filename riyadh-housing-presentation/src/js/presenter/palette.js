@@ -1247,13 +1247,13 @@ RH.palette = (function () {
     return list.slice(0, cap);
   }
 
-  /* التخزين: localStorage قد يُمنع على file:// — السقوط إلى ذاكرة الجلسة */
+  /* التخزين: RH.core.storage.local قد يُمنع على file:// — السقوط إلى ذاكرة الجلسة */
   let memoryRecent = [];
 
   function readRecent() {
     try {
-      const raw = CAN_DOM && window.localStorage
-        ? window.localStorage.getItem(STORE_KEY) : null;
+      const raw = CAN_DOM && RH.core.storage.local
+        ? RH.core.storage.local.getItem(STORE_KEY) : null;
       if (!raw) return memoryRecent.slice();
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed)) return parsed.filter((x) => typeof x === "string");
@@ -1266,8 +1266,8 @@ RH.palette = (function () {
   function writeRecent(list) {
     memoryRecent = list.slice();
     try {
-      if (CAN_DOM && window.localStorage) {
-        window.localStorage.setItem(STORE_KEY, JSON.stringify(list));
+      if (CAN_DOM && RH.core.storage.local) {
+        RH.core.storage.local.setItem(STORE_KEY, JSON.stringify(list));
       }
     } catch (_e) { /* file:// أو وضع خاص: ذاكرة الجلسة تكفي */ }
   }

@@ -36,6 +36,7 @@ def _globbed(pattern, exclude=()):
 # V2: مشاهد V1 (presenter/scenes/*) متقاعدة — خارج الضم والملفات باقية للمرجع.
 JS_ORDER = [
     "src/js/core/ns.js",
+    "src/js/core/safe-storage.js",   # يجب أن يسبق أي وحدة تلمس التخزين
     "src/js/core/dom.js",
     "src/js/core/format.js",
     "src/js/core/bus.js",

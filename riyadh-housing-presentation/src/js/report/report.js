@@ -86,14 +86,14 @@ RH.report = RH.report || {};
   /** تخزين محلي متسامح: file:// قد يمنعه — السقوط الصامت إلى الافتراضي */
   function readZoom() {
     try {
-      const v = window.localStorage.getItem(ZOOM_KEY);
+      const v = RH.core.storage.local.getItem(ZOOM_KEY);
       const n = v == null ? NaN : parseFloat(v);
       if (Number.isFinite(n) && ZOOMS.indexOf(n) !== -1) return n;
     } catch (_e) { /* بيئة بلا تخزين */ }
     return DEFAULT_ZOOM;
   }
   function writeZoom(z) {
-    try { window.localStorage.setItem(ZOOM_KEY, String(z)); }
+    try { RH.core.storage.local.setItem(ZOOM_KEY, String(z)); }
     catch (_e) { /* لا شيء — التفضيل يعيش للجلسة فقط */ }
   }
 

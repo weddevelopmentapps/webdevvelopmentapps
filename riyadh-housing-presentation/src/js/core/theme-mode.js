@@ -6,7 +6,7 @@
        في tokens.css وحدها — وهذا يجعل «الفاتح» الافتراضي على كل جهاز لا يطلب
        الداكن صراحةً (V3_SPEC §1: الفاتح هو الافتراضي).
      • الاختيار الصريح يكتب ‎data-theme="light|dark"‎ على ‎<html>‎ ويُحفظ في
-       localStorage تحت المفتاح ‎rh:theme‎.
+       RH.core.storage.local تحت المفتاح ‎rh:theme‎.
      • كل تغيّر يبثّ ‎theme:change‎ على ‎RH.core.bus‎ بحمولة
        ‎{mode, effective, previous}‎ — ‎effective‎ هو «light» أو «dark» فعلياً.
      • لا يلمس هذا الملف أي DOM وقت التحميل عدا ‎<html>‎ (يُستدعى ‎apply()‎ من
@@ -32,7 +32,7 @@ RH.core.themeMode = (function () {
 
   function storageGet() {
     try {
-      const v = window.localStorage.getItem(KEY);
+      const v = RH.core.storage.local.getItem(KEY);
       return MODES.includes(v) ? v : null;
     } catch (_e) {
       return null;   // file:// بلا تخزين، أو منع من سياسة الخصوصية — لا يعطّل شيئاً
@@ -40,8 +40,8 @@ RH.core.themeMode = (function () {
   }
   function storageSet(v) {
     try {
-      if (v === "auto") window.localStorage.removeItem(KEY);
-      else window.localStorage.setItem(KEY, v);
+      if (v === "auto") RH.core.storage.local.removeItem(KEY);
+      else RH.core.storage.local.setItem(KEY, v);
     } catch (_e) { /* التخزين ترف لا شرط */ }
   }
 

@@ -22517,6 +22517,87 @@ RH.tabs = {
   RH.core.showFatal = showFatal;
 })();
 
+/* ═══ src/js/core/safe-storage.js ═══ */
+/* safe-storage.js — طبقة تخزين متسامحة مع البيئات المقيَّدة
+   ────────────────────────────────────────────────────────────
+   لماذا: بعض بيئات العرض (إطار مضمَّن معزول sandbox، تصفح خاص متشدد،
+   حظر ملفات تعريف الارتباط والتخزين) تجعل مجرد قراءة
+   ‎window.localStorage‎ يرمي DOMException("SecurityError").
+   الوصول المباشر كان يُسقط التطبيق كله عبر حاجز الفشل.
+
+   العقد: كل وصول للتخزين في المنصة يمر عبر ‎RH.core.storage‎ حصراً.
+   عند تعذر التخزين الحقيقي نستبدله بذاكرة داخل الصفحة: التطبيق يعمل
+   كاملاً، وتضيع التفضيلات عند إعادة التحميل فقط — ولا شاشة خطأ.
+
+   واجهة متعمَّدة الصغر (getItem/setItem/removeItem) لتطابق ما نستخدمه. */
+"use strict";
+
+RH.core.storage = (function () {
+  /** ذاكرة بديلة تحاكي Storage عند الحظر */
+  function memoryStore() {
+    const map = new Map();
+    return {
+      getItem: (k) => (map.has(String(k)) ? map.get(String(k)) : null),
+      setItem: (k, v) => { map.set(String(k), String(v)); },
+      removeItem: (k) => { map.delete(String(k)); },
+      key: (i) => Array.from(map.keys())[i] ?? null,
+      get length() { return map.size; },
+      __memory: true,
+    };
+  }
+
+  /** يفحص توفر مخزن حقيقي بكتابة اختبارية (الوصول وحده قد يرمي) */
+  function probe(kind) {
+    try {
+      const s = window[kind];
+      if (!s) return null;
+      const probeKey = "__rh_probe__";
+      s.setItem(probeKey, "1");
+      s.removeItem(probeKey);
+      return s;
+    } catch (_e) {
+      return null;
+    }
+  }
+
+  const realLocal = probe("localStorage");
+  const realSession = probe("sessionStorage");
+
+  const local = realLocal || memoryStore();
+  const session = realSession || memoryStore();
+
+  /** IndexedDB قد يكون محظوراً بالمثل — نعيد null بدل الرمي */
+  function idb() {
+    try {
+      return window.indexedDB || null;
+    } catch (_e) {
+      return null;
+    }
+  }
+
+  /** غلاف آمن لأي عملية تخزين: لا يرمي أبداً، ويعيد القيمة البديلة */
+  function attempt(fn, fallback) {
+    try {
+      return fn();
+    } catch (_e) {
+      return fallback;
+    }
+  }
+
+  const persistent = !!(realLocal && realSession);
+
+  return {
+    local,
+    session,
+    idb,
+    attempt,
+    /** هل التفضيلات ستبقى بعد إعادة التحميل؟ تستخدمه الواجهة لتلميح صادق */
+    isPersistent: () => persistent,
+    /** للاختبارات فقط */
+    _memoryStore: memoryStore,
+  };
+})();
+
 /* ═══ src/js/core/dom.js ═══ */
 /* dom.js — أدوات DOM دقيقة: بناء عناصر آمن (لا innerHTML لمحتوى المستخدم) */
 "use strict";
@@ -22800,7 +22881,7 @@ RH.core.bus = (function () {
        في tokens.css وحدها — وهذا يجعل «الفاتح» الافتراضي على كل جهاز لا يطلب
        الداكن صراحةً (V3_SPEC §1: الفاتح هو الافتراضي).
      • الاختيار الصريح يكتب ‎data-theme="light|dark"‎ على ‎<html>‎ ويُحفظ في
-       localStorage تحت المفتاح ‎rh:theme‎.
+       RH.core.storage.local تحت المفتاح ‎rh:theme‎.
      • كل تغيّر يبثّ ‎theme:change‎ على ‎RH.core.bus‎ بحمولة
        ‎{mode, effective, previous}‎ — ‎effective‎ هو «light» أو «dark» فعلياً.
      • لا يلمس هذا الملف أي DOM وقت التحميل عدا ‎<html>‎ (يُستدعى ‎apply()‎ من
@@ -22826,7 +22907,7 @@ RH.core.themeMode = (function () {
 
   function storageGet() {
     try {
-      const v = window.localStorage.getItem(KEY);
+      const v = RH.core.storage.local.getItem(KEY);
       return MODES.includes(v) ? v : null;
     } catch (_e) {
       return null;   // file:// بلا تخزين، أو منع من سياسة الخصوصية — لا يعطّل شيئاً
@@ -22834,8 +22915,8 @@ RH.core.themeMode = (function () {
   }
   function storageSet(v) {
     try {
-      if (v === "auto") window.localStorage.removeItem(KEY);
-      else window.localStorage.setItem(KEY, v);
+      if (v === "auto") RH.core.storage.local.removeItem(KEY);
+      else RH.core.storage.local.setItem(KEY, v);
     } catch (_e) { /* التخزين ترف لا شرط */ }
   }
 
@@ -23517,8 +23598,9 @@ RH.data.store = (function () {
 
   function openDB() {
     return new Promise((resolve) => {
-      if (!window.indexedDB) return resolve(null);
-      const req = indexedDB.open(DB_NAME, DB_VER);
+      const _idb = RH.core.storage.idb();
+      if (!_idb) return resolve(null);
+      const req = _idb.open(DB_NAME, DB_VER);
       req.onupgradeneeded = () => {
         const d = req.result;
         if (!d.objectStoreNames.contains("releases")) {
@@ -62696,8 +62778,8 @@ RH.tour = (function () {
   const memStore = Object.create(null);
   function readStore(key) {
     try {
-      if (typeof localStorage !== "undefined" && localStorage) {
-        const v = localStorage.getItem(key);
+      if (typeof RH.core.storage.local !== "undefined" && RH.core.storage.local) {
+        const v = RH.core.storage.local.getItem(key);
         if (v != null) return v;
       }
     } catch (_e) { /* ممنوع في file:// — نكمل بالذاكرة */ }
@@ -62706,8 +62788,8 @@ RH.tour = (function () {
   function writeStore(key, value) {
     memStore[key] = String(value);
     try {
-      if (typeof localStorage !== "undefined" && localStorage) {
-        localStorage.setItem(key, String(value));
+      if (typeof RH.core.storage.local !== "undefined" && RH.core.storage.local) {
+        RH.core.storage.local.setItem(key, String(value));
       }
     } catch (_e) { /* لا شيء — الذاكرة كافية للجلسة */ }
   }
@@ -65244,13 +65326,13 @@ RH.palette = (function () {
     return list.slice(0, cap);
   }
 
-  /* التخزين: localStorage قد يُمنع على file:// — السقوط إلى ذاكرة الجلسة */
+  /* التخزين: RH.core.storage.local قد يُمنع على file:// — السقوط إلى ذاكرة الجلسة */
   let memoryRecent = [];
 
   function readRecent() {
     try {
-      const raw = CAN_DOM && window.localStorage
-        ? window.localStorage.getItem(STORE_KEY) : null;
+      const raw = CAN_DOM && RH.core.storage.local
+        ? RH.core.storage.local.getItem(STORE_KEY) : null;
       if (!raw) return memoryRecent.slice();
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed)) return parsed.filter((x) => typeof x === "string");
@@ -65263,8 +65345,8 @@ RH.palette = (function () {
   function writeRecent(list) {
     memoryRecent = list.slice();
     try {
-      if (CAN_DOM && window.localStorage) {
-        window.localStorage.setItem(STORE_KEY, JSON.stringify(list));
+      if (CAN_DOM && RH.core.storage.local) {
+        RH.core.storage.local.setItem(STORE_KEY, JSON.stringify(list));
       }
     } catch (_e) { /* file:// أو وضع خاص: ذاكرة الجلسة تكفي */ }
   }
@@ -74016,14 +74098,14 @@ RH.report = RH.report || {};
   /** تخزين محلي متسامح: file:// قد يمنعه — السقوط الصامت إلى الافتراضي */
   function readZoom() {
     try {
-      const v = window.localStorage.getItem(ZOOM_KEY);
+      const v = RH.core.storage.local.getItem(ZOOM_KEY);
       const n = v == null ? NaN : parseFloat(v);
       if (Number.isFinite(n) && ZOOMS.indexOf(n) !== -1) return n;
     } catch (_e) { /* بيئة بلا تخزين */ }
     return DEFAULT_ZOOM;
   }
   function writeZoom(z) {
-    try { window.localStorage.setItem(ZOOM_KEY, String(z)); }
+    try { RH.core.storage.local.setItem(ZOOM_KEY, String(z)); }
     catch (_e) { /* لا شيء — التفضيل يعيش للجلسة فقط */ }
   }
 
@@ -74831,7 +74913,7 @@ RH.report = RH.report || {};
      مملّحة مكررة (PBKDF2 عبر WebCrypto حيث يتاح، وإلا SHA-256 مكرر 20,000 مرة).
      يُعرض وسم «وضع محلي تجريبي» دائماً — هذا ضبط وصول جهازي لا مصادقة خادم،
      وحدوده موثقة في ADMIN_GUIDE_AR.md. لا يمنح أي حماية لبيانات الخادم.
-   الجلسة في sessionStorage (تنتهي بإغلاق التبويب). لا localStorage للاعتماد. */
+   الجلسة في RH.core.storage.session (تنتهي بإغلاق التبويب). لا RH.core.storage.local للاعتماد. */
 "use strict";
 
 RH.admin.auth = (function () {
@@ -74858,7 +74940,9 @@ RH.admin.auth = (function () {
   const kvGet = async (key) => {
     // نستخدم مخزن kv نفسه عبر store (يتشارك القاعدة)
     return new Promise((res) => {
-      const req = indexedDB.open("rh-presentation");
+      const _idb = RH.core.storage.idb();
+    if (!_idb) return null;
+    const req = _idb.open("rh-presentation");
       req.onsuccess = () => {
         const db = req.result;
         try {
@@ -74871,7 +74955,9 @@ RH.admin.auth = (function () {
     });
   };
   const kvSet = async (key, val) => new Promise((res) => {
-    const req = indexedDB.open("rh-presentation");
+    const _idb = RH.core.storage.idb();
+    if (!_idb) return null;
+    const req = _idb.open("rh-presentation");
     req.onsuccess = () => {
       const db = req.result;
       const t = db.transaction("kv", "readwrite");
@@ -74916,21 +75002,21 @@ RH.admin.auth = (function () {
       name: cred.name, role: cred.role, mode: "local-demo",
       at: new Date().toISOString(),
     };
-    sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
+    RH.core.storage.session.setItem(SESSION_KEY, JSON.stringify(session));
     await RH.data.store.audit(cred.name, "auth.sign_in", { mode: "local-demo" });
     return session;
   }
 
   function session() {
     try {
-      return JSON.parse(sessionStorage.getItem(SESSION_KEY));
+      return JSON.parse(RH.core.storage.session.getItem(SESSION_KEY));
     } catch (_e) { return null; }
   }
 
   function signOut() {
     const s = session();
     if (s) RH.data.store.audit(s.name, "auth.sign_out", {});
-    sessionStorage.removeItem(SESSION_KEY);
+    RH.core.storage.session.removeItem(SESSION_KEY);
   }
 
   /** أدوار: العارض يقرأ، المحرر يحرر المسودة، الناشر ينشر ويتراجع */
@@ -76882,8 +76968,8 @@ RH.admin.reportBuilder = (function () {
   /** قراءة الاختيار المحفوظ — العقد: داخل try/catch دائماً */
   function loadSelection() {
     try {
-      if (typeof localStorage === "undefined") return null;
-      const raw = localStorage.getItem(STORAGE_KEY);
+      if (typeof RH.core.storage.local === "undefined") return null;
+      const raw = RH.core.storage.local.getItem(STORAGE_KEY);
       if (!raw) return null;
       const parsed = JSON.parse(raw);
       if (!Array.isArray(parsed)) return null;
@@ -76896,8 +76982,8 @@ RH.admin.reportBuilder = (function () {
   /** حفظ الاختيار */
   function saveSelection(ids) {
     try {
-      if (typeof localStorage === "undefined") return false;
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(normalize(ids)));
+      if (typeof RH.core.storage.local === "undefined") return false;
+      RH.core.storage.local.setItem(STORAGE_KEY, JSON.stringify(normalize(ids)));
       return true;
     } catch (_e) {
       return false;  // مخزن ممتلئ — الاختيار يبقى حياً في الجلسة
@@ -76907,8 +76993,8 @@ RH.admin.reportBuilder = (function () {
   /** سجل الاختيارات الأخيرة على هذا الجهاز */
   function loadHistory() {
     try {
-      if (typeof localStorage === "undefined") return [];
-      const raw = localStorage.getItem(HISTORY_KEY);
+      if (typeof RH.core.storage.local === "undefined") return [];
+      const raw = RH.core.storage.local.getItem(HISTORY_KEY);
       if (!raw) return [];
       const parsed = JSON.parse(raw);
       if (!Array.isArray(parsed)) return [];
@@ -76922,12 +77008,12 @@ RH.admin.reportBuilder = (function () {
 
   function pushHistory(ids) {
     try {
-      if (typeof localStorage === "undefined") return;
+      if (typeof RH.core.storage.local === "undefined") return;
       const norm = normalize(ids);
       const key = norm.join(",");
       const prev = loadHistory().filter((r) => r.pages.join(",") !== key);
       prev.unshift({ pages: norm, at: new Date().toISOString() });
-      localStorage.setItem(HISTORY_KEY, JSON.stringify(prev.slice(0, HISTORY_MAX)));
+      RH.core.storage.local.setItem(HISTORY_KEY, JSON.stringify(prev.slice(0, HISTORY_MAX)));
     } catch (_e) { /* راحة لا وظيفة */ }
   }
 
@@ -79258,8 +79344,8 @@ RH.admin.diffViewer = (function () {
   /** تفضيلات العرض تُحفظ محلياً — لا بيانات فيها، تفضيل واجهة فقط */
   function loadView() {
     try {
-      if (typeof localStorage === "undefined") return;
-      const raw = localStorage.getItem(VIEW_KEY);
+      if (typeof RH.core.storage.local === "undefined") return;
+      const raw = RH.core.storage.local.getItem(VIEW_KEY);
       if (!raw) return;
       const v = JSON.parse(raw);
       if (!v || typeof v !== "object") return;
@@ -79273,8 +79359,8 @@ RH.admin.diffViewer = (function () {
 
   function saveView() {
     try {
-      if (typeof localStorage === "undefined") return;
-      localStorage.setItem(VIEW_KEY, JSON.stringify({
+      if (typeof RH.core.storage.local === "undefined") return;
+      RH.core.storage.local.setItem(VIEW_KEY, JSON.stringify({
         sort: state.sort, dir: state.dir, perPage: state.perPage,
         severity: state.severity, honestyOnly: state.honestyOnly,
       }));

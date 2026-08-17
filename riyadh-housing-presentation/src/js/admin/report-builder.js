@@ -219,8 +219,8 @@ RH.admin.reportBuilder = (function () {
   /** قراءة الاختيار المحفوظ — العقد: داخل try/catch دائماً */
   function loadSelection() {
     try {
-      if (typeof localStorage === "undefined") return null;
-      const raw = localStorage.getItem(STORAGE_KEY);
+      if (typeof RH.core.storage.local === "undefined") return null;
+      const raw = RH.core.storage.local.getItem(STORAGE_KEY);
       if (!raw) return null;
       const parsed = JSON.parse(raw);
       if (!Array.isArray(parsed)) return null;
@@ -233,8 +233,8 @@ RH.admin.reportBuilder = (function () {
   /** حفظ الاختيار */
   function saveSelection(ids) {
     try {
-      if (typeof localStorage === "undefined") return false;
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(normalize(ids)));
+      if (typeof RH.core.storage.local === "undefined") return false;
+      RH.core.storage.local.setItem(STORAGE_KEY, JSON.stringify(normalize(ids)));
       return true;
     } catch (_e) {
       return false;  // مخزن ممتلئ — الاختيار يبقى حياً في الجلسة
@@ -244,8 +244,8 @@ RH.admin.reportBuilder = (function () {
   /** سجل الاختيارات الأخيرة على هذا الجهاز */
   function loadHistory() {
     try {
-      if (typeof localStorage === "undefined") return [];
-      const raw = localStorage.getItem(HISTORY_KEY);
+      if (typeof RH.core.storage.local === "undefined") return [];
+      const raw = RH.core.storage.local.getItem(HISTORY_KEY);
       if (!raw) return [];
       const parsed = JSON.parse(raw);
       if (!Array.isArray(parsed)) return [];
@@ -259,12 +259,12 @@ RH.admin.reportBuilder = (function () {
 
   function pushHistory(ids) {
     try {
-      if (typeof localStorage === "undefined") return;
+      if (typeof RH.core.storage.local === "undefined") return;
       const norm = normalize(ids);
       const key = norm.join(",");
       const prev = loadHistory().filter((r) => r.pages.join(",") !== key);
       prev.unshift({ pages: norm, at: new Date().toISOString() });
-      localStorage.setItem(HISTORY_KEY, JSON.stringify(prev.slice(0, HISTORY_MAX)));
+      RH.core.storage.local.setItem(HISTORY_KEY, JSON.stringify(prev.slice(0, HISTORY_MAX)));
     } catch (_e) { /* راحة لا وظيفة */ }
   }
 
