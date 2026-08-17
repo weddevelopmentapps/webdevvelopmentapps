@@ -31,9 +31,11 @@ const ROUTES = argOf("--routes",
     "appendix/compare", "appendix/compare?page=1", "appendix/compare?page=2",
     "appendix/compare?page=3", "appendix/compare?page=4",
     // ── حالات لا يبلغها العنوان وحده (تفاعل لازم) — أسماء زائفة يحلّها
-    //    جدول PSEUDO أدناه: وضع الموجز، لوحة الأوامر مفتوحة، خطوة جولة ──
+    //    جدول PSEUDO أدناه: وضع الموجز، لوحة الأوامر مفتوحة، خطوة جولة،
+    //    درج ملاحظات المقدِّم (N)، وتبويبا الإدارة الجديدان (خلف بوابة دخول) ──
     "state/report", "state/report-print",
-    "state/palette", "state/tour"].join(",")).split(",");
+    "state/palette", "state/tour", "state/notes",
+    "state/admin-report", "state/admin-diff"].join(",")).split(",");
 const SIZES = argOf("--sizes", "1920x1080,1366x768").split(",")
   .map((s) => s.split("x").map(Number));
 
@@ -47,6 +49,24 @@ const indexUrl = "file://" + path.join(ROOT, "index.html");
    حلقة المقاسات ذاتها فتخضع لفحص الكونسول نفسه، وتنتج لقطة مسمّاة كبقية
    المسارات. تخرج التأكيدات بقائمة نصوص أخطاء (فارغة = خضراء).
    ══════════════════════════════════════════════════════════════════════════ */
+/* دخول الإدارة (وضع محلي تجريبي): البوابة تطلب اسماً وعبارة مرور عند أول
+   تهيئة في سياق متصفح جديد، والعبارة وحدها إن سبقت التهيئة — فنتعامل مع
+   الحالتين. لا جلسة قائمة = لا بوابة، فنمرّ بلا عمل. */
+async function adminSignIn(page) {
+  const errs = [];
+  const gate = page.locator(".adm-gate-card");
+  if (await gate.count() === 0) return errs;
+  const nameIn = gate.locator("input[type=text]");
+  if (await nameIn.count() > 0) await nameIn.first().fill("مدقق الجودة");
+  await gate.locator("input[type=password]").first().fill("عبارة-مرور-اختبارية-قوية");
+  await gate.locator("button[type=submit]").first().click();
+  await page.waitForTimeout(1600);
+  if (await page.locator(".adm-shell").count() === 0) {
+    errs.push("تعذر الدخول إلى الإدارة من البوابة");
+  }
+  return errs;
+}
+
 const PSEUDO = {
   /* وضع الموجز التنفيذي: مستند A4 يتجاوز المسرح كلياً */
   "state/report": {
@@ -199,6 +219,139 @@ const PSEUDO = {
       await page.waitForTimeout(400);
     },
   },
+
+  /* درج ملاحظات المقدِّم (مفتاح N) فوق لوحة حية — يعمل دون جولة نشطة */
+  "state/notes": {
+    hash: "#/section/control",
+    settle: 3400,
+    async prepare(page) {
+      await page.keyboard.press("KeyN");
+      await page.waitForTimeout(1000);
+      return [];
+    },
+    async check(page) {
+      return page.evaluate(() => {
+        const errs = [];
+        if (!document.body.classList.contains("tour-notes-open")) {
+          errs.push("درج الملاحظات لم يُفتح بمفتاح N");
+          return errs;
+        }
+        const dr = document.querySelector(".tour-notes");
+        if (!dr || dr.hidden) { errs.push("درج الملاحظات غائب أو مخفي"); return errs; }
+        const r = dr.getBoundingClientRect();
+        if (r.top < -1 || r.bottom > window.innerHeight + 1) {
+          errs.push("درج الملاحظات مقصوص رأسياً");
+        }
+        if (r.left < -1 || r.right > window.innerWidth + 1) {
+          errs.push("درج الملاحظات مقصوص أفقياً");
+        }
+        const body = dr.querySelector(".tour-notes-body");
+        if (body && body.scrollWidth > body.clientWidth + 2) {
+          errs.push("جسم الملاحظات يفيض عرضياً");
+        }
+        if (!dr.querySelector(".tour-notes-title")
+          || !String(dr.textContent || "").trim()) {
+          errs.push("درج الملاحظات مفتوح لكنه بلا محتوى");
+        }
+        return errs;
+      });
+    },
+    async after(page) {
+      await page.keyboard.press("KeyN");
+      await page.waitForTimeout(300);
+    },
+  },
+
+  /* منشئ الموجز في الإدارة (تبويب #/admin/report) — خلف بوابة الدخول */
+  "state/admin-report": {
+    hash: "#/admin",
+    settle: 1700,
+    async prepare(page) {
+      const errs = await adminSignIn(page);
+      if (errs.length) return errs;
+      await page.goto(indexUrl + "#/admin/report", { waitUntil: "load" });
+      await page.waitForTimeout(2400);
+      return errs;
+    },
+    async check(page) {
+      return page.evaluate(() => {
+        const errs = [];
+        if (!/admin\/report/.test(location.hash)) {
+          errs.push("لم نصل إلى تبويب منشئ الموجز");
+        }
+        const content = document.querySelector(".adm-content");
+        if (!content || !String(content.textContent || "").trim()) {
+          errs.push("جسم تبويب منشئ الموجز فارغ");
+          return errs;
+        }
+        const rows = document.querySelectorAll(".adf-pagerow").length;
+        if (rows < 3) errs.push("صفوف اختيار صفحات الموجز " + rows + " (<3)");
+        if (content.scrollWidth > content.clientWidth + 2) {
+          errs.push("جسم منشئ الموجز يفيض عرضياً");
+        }
+        const stage = document.getElementById("stage");
+        if (stage && !stage.hidden) errs.push("المسرح ظاهر داخل الإدارة");
+        return errs;
+      });
+    },
+  },
+
+  /* مقارن الإصدارات (تبويب #/admin/diff): يتطلب مسودة مفتوحة — نفتحها من
+     الإصدار المنشور بمسار الواجهة نفسه ونجري تعديلاً واحداً موثّقاً على حقل
+     تاريخ العرض كي تُرى المقارنة عاملة لا فارغة. المسودة محلية زائلة في سياق
+     متصفح اللقطات، ولا تمسّ الإصدار المنشور بحال. */
+  "state/admin-diff": {
+    hash: "#/admin",
+    settle: 1700,
+    async prepare(page) {
+      const errs = await adminSignIn(page);
+      if (errs.length) return errs;
+      await page.goto(indexUrl + "#/admin/meta", { waitUntil: "load" });
+      await page.waitForTimeout(1400);
+      const open = page.locator("button", { hasText: "فتح مسودة للتحرير" });
+      if (await open.count() > 0) {
+        await open.first().click();
+        await page.waitForTimeout(1400);
+      }
+      const dateField = page.locator(".fitem input[type=date]").first();
+      if (await dateField.count() === 0) {
+        errs.push("حقل تاريخ العرض غائب عن محرر البيانات الوصفية");
+      } else {
+        await dateField.fill("2026-09-01");
+        await page.locator("button", { hasText: "حفظ المسودة" }).first().click();
+        await page.waitForTimeout(1000);
+      }
+      await page.goto(indexUrl + "#/admin/diff", { waitUntil: "load" });
+      await page.waitForTimeout(2400);
+      return errs;
+    },
+    async check(page) {
+      return page.evaluate(() => {
+        const errs = [];
+        if (!/admin\/diff/.test(location.hash)) {
+          errs.push("لم نصل إلى تبويب مقارنة الإصدارات");
+        }
+        const content = document.querySelector(".adm-content");
+        if (!content || !String(content.textContent || "").trim()) {
+          errs.push("جسم تبويب المقارنة فارغ");
+          return errs;
+        }
+        if (document.querySelectorAll(".adf-identity").length !== 1) {
+          errs.push("بطاقة هوية طرفي المقارنة غائبة (لا مسودة مفتوحة؟)");
+        }
+        if (!document.querySelector(".adf-side-base")
+          || !document.querySelector(".adf-side-draft")) {
+          errs.push("أحد طرفي المقارنة (المنشور/المسودة) غائب");
+        }
+        const tallies = document.querySelectorAll(".adf-tally").length;
+        if (tallies < 2) errs.push("عدّادات الفروق " + tallies + " (<2)");
+        if (content.scrollWidth > content.clientWidth + 2) {
+          errs.push("جسم المقارن يفيض عرضياً");
+        }
+        return errs;
+      });
+    },
+  },
 };
 
 const browser = await chromium.launch({
@@ -227,8 +380,12 @@ for (const [w, hgt] of SIZES) {
       const prepErrs = pseudo.prepare ? (await pseudo.prepare(page)) || [] : [];
       await page.waitForTimeout(600);
       const pname = route.replace(/[\/?=&]/g, "_") + `_${w}x${hgt}.png`;
-      // الموجز مستند طويل — لقطة كاملة الصفحة كي تُرى كل أوراقه في الدليل
-      const full = route.startsWith("state/report");
+      // الموجز مستند طويل، وتبويبا الإدارة صفحتا أداة تتمرران بحق (لا مسرح
+      // مقدِّم) — لقطة كاملة الصفحة في الحالتين كي يرى المجلس السطح كله لا
+      // رأسه وحده. أما درج الملاحظات ولوحة الأوامر والجولة فطبقات فوق مسرح
+      // بلا تمرير، فلقطة الإطار هي تمثيلها الصادق.
+      const full = route.startsWith("state/report")
+        || route.startsWith("state/admin-");
       await page.screenshot({ path: path.join(OUT, pname), fullPage: full });
       const errs = prepErrs.concat(pseudo.check ? await pseudo.check(page) : []);
       for (const e of errs) consoleErrors.push(`[${w}x${hgt}] ${route}: ${e}`);
