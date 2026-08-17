@@ -172,7 +172,9 @@ RH.presenter.layout = (function () {
         class: "rail-item " + (["pos", "neg", "warn", "neu"].includes(p.cls) ? p.cls : "neu"),
       },
         h("div", { class: "rail-item-title" }, p.title),
-        h("div", { class: "rail-item-text" }, p.text),
+        /* النص الكامل في التلميح دوماً — الأقسام التي تقص النص لأسطر
+           محدودة (قصّ معلن بعلامة …) لا تفقد المحتوى (مراجعة الجولة 3) */
+        h("div", { class: "rail-item-text", title: p.text }, p.text),
       )),
     );
     el.appendChild(rail);

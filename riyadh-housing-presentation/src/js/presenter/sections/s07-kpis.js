@@ -714,7 +714,9 @@
          مراجعة الشريك الجولة 1): خط أساسه 130 ألفاً ومستهدفه 260 ألفاً
          بينما اللوحة تعلن 612,400 سرير مرخص اليوم — التوتر التعريفي يُعلن
          للحاضر بدل أن يُترك سؤالاً مفتوحاً أمام الأمين */
-      (!k.pct && k.id === 5 && /الأسرة المرخصة/.test(String(k.name)))
+      /* المطابقة تتسامح مع الشدّة وغيابها (على سنّة تطبيع «دون/بدون» في حارس
+         الورقة) — اسم المؤشر صار بالشدّة «الأسرّة» تطبيقاً لسجل المراجعة اللغوية */
+      (!k.pct && k.id === 5 && /الأسرّ?ة المرخصة/.test(String(k.name)))
         ? h("p", { class: "kpi7-profile-scope" },
           "تنبيه تعريفي: القيمتان (خط الأساس 130,000 والمستهدف 260,000) كما "
           + "وردتا حرفياً في خطة عمل المشروع V.1.0.0 — نطاق قياس المؤشر يخص "
@@ -806,6 +808,14 @@
         v: fmt.iso(fmt.int(model.availableCurrent) + "/" + fmt.int(model.kpis.length))
           + " — لا قيمة حالية في هذا الإصدار",
         cls: "pending",
+      },
+      {
+        k: "مجموعتا خط الأساس",
+        v: fmt.int(model.zeroBase.length) + " تبدأ من الصفر · "
+          + fmt.int(model.liveBase.length) + " لها خط أساس قائم"
+          + (model.nearest
+            ? " (أقربها انطلاقاً: المؤشر " + fmt.int(model.nearest.id) + ")"
+            : ""),
       },
       { k: "تاريخ الحساب المرجعي", v: fmt.date(model.calc) },
       { k: "البيانات حتى", v: String(rel.meta.data_as_of) },
@@ -1315,6 +1325,15 @@
     const col = h("div", { class: "kpi7-truth-col" });
     cell.appendChild(col);
 
+    /* إصلاح مراجعة الجولة 3 (بنيوي لا ترقيعي): العمود كان أطول من ارتفاع
+       خليته فتُقص بطاقة «مصدر المؤشرات» عند الطية وتطبع شارة الإصدار فوق
+       جثتها — أعيد تكوين العمود ليتسع كاملاً فوق الشريط المحجوز للشارة:
+         • بطاقة الصدق مضغوطة تضم سطر البوابات والحداثة (كانا ذيلاً مستقلاً)
+         • بطاقتا خط الأساس دُمجتا سطراً واحداً داخل بطاقة الصدق (المشتق ذاته)
+         • بطاقة المصدر صارت سطراً مدمجاً واحداً بالنص الحرفي في التلميح
+           (النص الكامل معروض في بطاقة «التعريف والمصدر» من الشريط)
+         • نصوص الرؤى الثلاث بسطر واحد وقصّ معلن … والنص الكامل في التلميح */
+
     /* ── 10.a بطاقة الصدق — الذهبي وسم «بانتظار التسجيل» المقنن حصراً ── */
     const truth = RH.presenter.layout.card(col, {
       title: "القيم الحالية تُسجَّل من المنصة",
@@ -1323,92 +1342,77 @@
     });
     truth.body.appendChild(h("div", { class: "kpi7-truth-row" },
       h("span", { class: "kpi7-truth-dot", "aria-hidden": "true" }),
-      h("p", { class: "kpi7-truth-note" }, String(model.note)),
+      h("p", { class: "kpi7-truth-note", title: String(model.note) },
+        String(model.note)),
     ));
-    truth.body.appendChild(h("div", { class: "kpi7-truth-line" },
-      "المتوفر في هذا الإصدار: ",
+    const v = rel.validation || null;
+    const gatesOk = v && Number.isFinite(v.gates_passed)
+      && Number.isFinite(v.gates_total);
+    truth.body.appendChild(h("div", {
+      class: "kpi7-truth-line",
+      title: "المتوفر من القيم الحالية "
+        + model.availableCurrent + "/" + model.kpis.length
+        + " · " + model.zeroBase.length + " تبدأ من الصفر و"
+        + model.liveBase.length + " لها خط أساس قائم"
+        + (gatesOk
+          ? " · اجتاز الإصدار بوابات التحقق "
+            + v.gates_passed + "/" + v.gates_total
+            + " — " + fmt.date(v.checked_at)
+          : "")
+        + " · تاريخ الحساب المرجعي " + fmt.date(model.calc)
+        + " · البيانات حتى " + String(rel.meta.data_as_of),
+    },
+      "المتوفر: ",
       h("b", {}, fmt.iso(fmt.int(model.availableCurrent) + "/"
         + fmt.int(model.kpis.length))),
-      " — لا امتلاء بياني مختلق.",
+      gatesOk ? " · بوابات التحقق: " : null,
+      gatesOk
+        ? h("b", { class: "pass" },
+          fmt.iso(fmt.int(v.gates_passed) + "/" + fmt.int(v.gates_total)))
+        : null,
+      (gatesOk && v.gates_passed === v.gates_total) ? " ✓" : null,
     ));
     activatable(truth.card,
       () => open(honestyDetail(model, rel), "القيم الحالية — بيان الصدق", truth.card),
       "القيم الحالية تُسجَّل من المنصة — المتوفر "
       + fmt.int(model.availableCurrent) + " من " + fmt.int(model.kpis.length)
+      + "، " + fmt.int(model.zeroBase.length) + " تبدأ من الصفر و"
+      + fmt.int(model.liveBase.length) + " بخط أساس قائم"
+      + (model.nearest
+        ? " — أقربها انطلاقاً المؤشر " + fmt.int(model.nearest.id) + " عند "
+          + fmt.pct(round1(basePos(model.nearest) * 100)) + " من مساره"
+        : "")
       + "، عرض بيان الصدق الكامل");
 
-    /* ── 10.b مجموعتا خط الأساس — بطاقتا إحصاء مدمجتان (مشتق شفاف):
-          «تبدأ من الصفر» مقابل «لها خط أساس قائم»، وسطر «الأقرب انطلاقاً» ── */
-    const baseRow = h("div", { class: "kpi7-base-row" });
-    const pZero = nounParts(model.zeroBase.length, "indicator");
-    const pLive = nounParts(model.liveBase.length, "indicator");
-    RH.presenter.layout.statCard(baseRow, {
-      label: "تبدأ من الصفر",
-      value: pZero.num,
-      unit: pZero.word,
-      foot: "خط أساسها صفر في المصدر",
-    });
-    RH.presenter.layout.statCard(baseRow, {
-      label: "لها خط أساس قائم",
-      value: pLive.num,
-      unit: pLive.word,
-      foot: model.nearest
-        ? "أقربها انطلاقاً: المؤشر " + fmt.int(model.nearest.id) + " عند "
-          + fmt.pct(round1(basePos(model.nearest) * 100)) + " من مساره"
-        : "",
-    });
-    col.appendChild(baseRow);
-
-    /* ── 10.c (محذوف — إصلاح مراجعة الجولة 2): بطاقة «مزيج الصيغ» كانت
-       تُقص عند طية 1080p فلا يظهر منها إلا العنوان وشريط بلا وسوم، وسطر
-       إصدار المنصة يطبع فوقها — والمعلومة نفسها معلنة أصلاً في بطاقتي
-       الصف الرئيسي «بصيغة نسبة مئوية 11» و«بصيغة قيمة عددية 3»،
-       فحذفها يحرر العمود ولا يفقد اللوحة أي حقيقة. ── */
-
-    /* ── 10.d بطاقة المصدر الحرفي + معبر إلى قسم المبادرات ── */
-    const src = RH.presenter.layout.card(col, {
-      title: "مصدر المؤشرات",
-      cls: "kpi7-src",
-    });
-    src.body.appendChild(sourceQuote(rel));
-    src.body.appendChild(h("div", { class: "kpi7-src-actions" },
+    /* ── 10.b سطر المصدر المدمج: الوسم القصير + معبر المبادرات —
+          النص الحرفي الكامل في التلميح وفي بطاقة «التعريف والمصدر» ── */
+    let srcShort = String(rel.strategy.source || "").split("—")[0].trim();
+    const mLat = /^(.*?)([A-Za-z][A-Za-z0-9._-]*)$/.exec(srcShort);
+    if (mLat) srcShort = mLat[1] + fmt.iso(mLat[2]);
+    col.appendChild(h("div", {
+      class: "kpi7-src-bar",
+      title: String(rel.strategy.source),
+    },
+      h("span", { class: "kpi7-src-badge" }, srcShort),
+      h("span", { class: "kpi7-src-label" }, "مصدر المؤشرات — حرفياً"),
       h("button", {
-        class: "kpi7-btn ghost",
+        class: "kpi7-src-go",
         type: "button",
         "data-interactive": "",
         title: "الانتقال إلى قسم «المبادرات والركائز»",
         "aria-label": "الانتقال إلى قسم «المبادرات والركائز»",
         onclick: () => RH.presenter.engine.goScene("initiatives"),
       },
-        h("span", {}, "المبادرات والركائز"),
+        h("span", {}, "المبادرات"),
         h("span", { class: "kpi7-btn-arrow", "aria-hidden": "true" }, "←"),
       ),
     ));
 
-    /* ── 10.e عمود الرؤى — المفتاح القانوني الأقرب (محفظة المبادرات التي
+    /* ── 10.c عمود الرؤى — المفتاح القانوني الأقرب (محفظة المبادرات التي
           تقيسها هذه المؤشرات) موسوماً بمرجعه بصدق؛ غيابه = لا شيء يُرسم ── */
     RH.presenter.layout.insightRail(col, "initiatives", {
       title: "رؤى تحليلية — محفظة المبادرات",
     });
-
-    /* ── 10.f سطر الحداثة وبوابات التحقق ── */
-    const v = rel.validation || null;
-    col.appendChild(h("div", { class: "kpi7-meta-foot" },
-      h("div", { class: "kpi7-meta-line" },
-        "تاريخ الحساب المرجعي: " + fmt.date(model.calc)
-        + " · البيانات حتى " + String(rel.meta.data_as_of)),
-      (v && Number.isFinite(v.gates_passed) && Number.isFinite(v.gates_total))
-        ? h("div", { class: "kpi7-meta-line gates" },
-          h("span", { class: "kpi7-gates-dot", "aria-hidden": "true" }),
-          (v.gates_passed === v.gates_total
-            ? "اجتاز الإصدار جميع بوابات التحقق "
-              + fmt.iso(fmt.int(v.gates_passed) + "/" + fmt.int(v.gates_total))
-            : "اجتاز الإصدار "
-              + fmt.iso(fmt.int(v.gates_passed) + "/" + fmt.int(v.gates_total))
-              + " من بوابات التحقق")
-          + " — " + fmt.date(v.checked_at))
-        : null,
-    ));
   }
 
   /* ══════════════════════════════════════════════════════════════════════════

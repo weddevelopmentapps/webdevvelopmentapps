@@ -361,12 +361,25 @@
   background: rgba(244, 241, 230, 0.16);
   border-radius: 999px;
 }
+/* مقاسات مشدودة (الجولة 3): بطاقات الرؤى الثلاث كاملة داخل صندوق العمود —
+   لا توصية تنتهي على كلمة معلقة عند حافة البطاقة */
+[data-section="control"] .ctl-rail-cell .rail {
+  gap: calc(var(--su) * 7);
+}
 [data-section="control"] .ctl-rail-cell .rail-item {
-  padding: calc(var(--su) * 9) calc(var(--su) * 13);
+  padding: calc(var(--su) * 7) calc(var(--su) * 13);
 }
 [data-section="control"] .ctl-rail-cell .rail-item-text {
   font-size: calc(var(--su) * 12.5);
-  line-height: 1.55;
+  line-height: 1.5;
+  /* إصلاح مراجعة الجولة 3: قصّ معلن … بثلاثة أسطر بحد أقصى — لا تنتهي
+     توصية تنفيذية على كلمة معلقة بلا علامة قص أبداً (نص cd3 ذاته اختُصر
+     في الإصدار ليتسع كاملاً؛ هذا صمام أمان لأي نص إداري أطول مستقبلاً،
+     والنص الكامل في تلميح العنصر) */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 /* بطاقة «توزيع القدرة الرقابية» — نقاط خضراء (قدرة) وعبء مرجاني (خلل).
@@ -526,9 +539,9 @@
   font-size: calc(var(--su) * 12);
   color: var(--faint-d);
   padding-inline-start: calc(var(--su) * 4);
-  /* إصلاح مراجعة الجولة 2: حشوة سفلية تفصل السطر عن حبة شارة الإصدار
-     الثابتة في الزاوية نفسها */
-  padding-bottom: calc(var(--su) * 22);
+  /* الشريط السفلي لشارة الإصدار محجوز مركزياً في .dash-body (الجولة 3) —
+     الحشوة المحلية القديمة قُلّصت إلى فاصل بصري خفيف فقط */
+  padding-bottom: calc(var(--su) * 4);
 }
 [data-section="control"] .ctl-meta b {
   color: var(--mut-d);

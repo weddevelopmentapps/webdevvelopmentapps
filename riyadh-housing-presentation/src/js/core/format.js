@@ -104,5 +104,22 @@ RH.core.fmt = (function () {
       LRI/PDI محارف تحكم صفرية العرض تعمل في DOM وCanvas معاً */
   const iso = (s) => "\u2066" + s + "\u2069";
 
-  return { int, dec1, pct, compact, compactParts, unitAfter, countNoun, noun, date, iso, AR_MONTHS, NBSP };
+  /** ضم تسميات أشهر متعددة بإفصاح كامل — لتسميات الذروة عند التعادل
+      (إصلاح مراجعة الجولة 4): «ذروة المخالفات 317 في يوليو 2026» وحدها
+      توحي بانحسارٍ بعد يوليو لم يحدث والذروة قائمة في أغسطس أيضاً.
+      السنة المشتركة تُدمج: ["يوليو 2026","أغسطس 2026"] → «يوليو وأغسطس 2026»؛
+      وعند اختلاف السنوات تُعطف التسميات كاملة. */
+  function monthsList(labels) {
+    if (!labels || !labels.length) return "—";
+    if (labels.length === 1) return String(labels[0]);
+    const parts = labels.map((l) => {
+      const m = /^(.*?)\s+(\d{4})$/.exec(String(l).trim());
+      return m ? { name: m[1], year: m[2] } : { name: String(l), year: null };
+    });
+    const oneYear = parts.every((p) => p.year && p.year === parts[0].year);
+    if (oneYear) return parts.map((p) => p.name).join(" و") + NBSP + parts[0].year;
+    return labels.map(String).join(" و");
+  }
+
+  return { int, dec1, pct, compact, compactParts, unitAfter, countNoun, noun, date, iso, monthsList, AR_MONTHS, NBSP };
 })();

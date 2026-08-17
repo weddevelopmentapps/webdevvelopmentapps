@@ -1397,13 +1397,16 @@
       });
     }
 
-    /* 14.3) بطاقة المصدر: الوسم القصير + النص الحرفي الكامل من الإصدار */
-    cell.appendChild(h("div", { class: "ini-source" },
+    /* 14.3) سطر المصدر: الوسم القصير + التسمية — سطر واحد لا يُبتر أبداً
+       (إصلاح مراجعة الجولة 3: النص الحرفي الكامل كان يُقص «كما ور…» منتصف
+       الكلمة — صار في تلميح السطر وفي بطاقات التفاصيل وملحق الركائز حيث
+       متسعه الحقيقي، لا في سطر ضيق) */
+    cell.appendChild(h("div", { class: "ini-source", title: model.source },
       h("div", { class: "ini-source-head" },
         h("span", { class: "ini-source-badge", title: model.source }, SOURCE_BADGE),
-        h("span", { class: "ini-source-label" }, "مصدر طبقة الاستراتيجية"),
+        h("span", { class: "ini-source-label" },
+          "مصدر طبقة الاستراتيجية — حرفياً"),
       ),
-      h("div", { class: "ini-source-text", title: model.source }, model.source),
     ));
 
     /* 14.4) سطر الحداثة والاحتساب */

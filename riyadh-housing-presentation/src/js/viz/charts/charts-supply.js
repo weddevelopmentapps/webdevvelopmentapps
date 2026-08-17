@@ -868,7 +868,10 @@ RH.viz.charts2 = RH.viz.charts2 || {};
        إصلاح مراجعة الجولة 2: الحزام في المدمج 34٪ (كان 18٪) — عند 1366 كانت
        الحبة تطبع فوق تسميات الأشهر (مارس/يناير/نوفمبر) لضيق الحزام، ورفعه
        يرفع خط الأساس والحبة معه بعيداً عن حزام المحور. */
-    const belt = compact ? 0.34 : 0.18;
+    /* إصلاح مراجعة الجولة 4: الفئة الضيقة غير المدمجة (قسم التوقعات عند
+       1366) ترفع الحزام إلى 0.30 — حبة «العجز الحالي» الذهبية كانت تهبط
+       على حزام تسميات الأشهر الدوارة فتحجب «أكتوبر 2026» بالكامل. */
+    const belt = compact ? 0.34 : (T.narrow() ? 0.30 : 0.18);
     const yMin = Math.floor((lo - (yMax - lo) * belt) / 1000) * 1000;
 
     const cats = monthCats(rows, compact);
@@ -918,7 +921,12 @@ RH.viz.charts2 = RH.viz.charts2 || {};
         endLabel: Object.assign({
           show: !compact,
           distance: T.fs(su, 8),
-          formatter: () => d.name + " " + fmt.compact(last),
+          /* الفئة الضيقة (1366): رقم مجرد بلا لاحقة «ألف» — اللاحقة كانت
+             تُقص عند حافة البطاقة فتظهر «أساسي 865 أل» مبتورة، ومحور القيم
+             يعلن «ألف» فلا لبس (إصلاح مراجعة الجولة 4) */
+          formatter: () => d.name + " " + (T.narrow()
+            ? fmt.compactParts(last).num
+            : fmt.compact(last)),
         }, txtStyle(su, 12.5, d.color, 600)),
         labelLayout: { hideOverlap: true },
         data: rows.map((r) => r[d.key]),
@@ -960,10 +968,13 @@ RH.viz.charts2 = RH.viz.charts2 || {};
          إصلاح مراجعة الجولة 2: قناة علامات القيم اليمنى في المدمج 78 (كانت
          54) — «914 ألف» كانت تفقد رقمها الأخير عند حافة البطاقة في 1366
          فتُقرأ «91 ألف» — لا يُقص أي رقم بعد الآن. */
+      /* إصلاح مراجعة الجولة 4: هامش اليسار في الفئة الضيقة غير المدمجة 120
+         (كان 104) — تسميات الأطراف كانت تُقص عند حافة البطاقة في 1366،
+         ومع إسقاط لاحقة «ألف» يتسع الهامش للتسمية كاملة بلا حرف مبتور. */
       grid: gridBox(su, compact, {
         top: T.fs(su, compact ? 40 : 50),
         bottom: T.fs(su, compact ? 38 : 42),
-        left: T.fs(su, compact ? 88 : 104),
+        left: T.fs(su, compact ? 88 : (T.narrow() ? 120 : 104)),
         right: T.fs(su, compact ? 78 : 72),
       }),
       xAxis: T.catXAxis(su, cats, {

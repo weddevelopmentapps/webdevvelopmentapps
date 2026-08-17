@@ -1338,19 +1338,28 @@
     );
     cell.appendChild(pulse);
 
-    /* ── سطر بوابات التحقق: ثقة الإصدار المنشور (من كتلة validation) ── */
+    /* ── سطر بوابات التحقق: ثقة الإصدار المنشور (من كتلة validation) ──
+       صيغة مدمجة بسطر واحد لا يلتف أبداً (إصلاح مراجعة الجولة 3: كانت
+       الجملة الطويلة تلتف فيطبع سطرها الثاني «2026» تحت شارة الإصدار) —
+       الجملة الكاملة في تلميح السطر وفي بطاقات الأصل. */
     if (rel.validation
       && Number.isFinite(rel.validation.gates_passed)
       && Number.isFinite(rel.validation.gates_total)) {
       const v = rel.validation;
       const all = v.gates_passed === v.gates_total;
       const ratio = fmt.iso(fmt.int(v.gates_passed) + "/" + fmt.int(v.gates_total));
-      cell.appendChild(h("div", { class: "sum-gates" },
+      cell.appendChild(h("div", {
+        class: "sum-gates",
+        title: (all
+          ? "اجتاز الإصدار جميع بوابات التحقق " + v.gates_passed + "/" + v.gates_total
+          : "اجتاز الإصدار " + v.gates_passed + "/" + v.gates_total
+            + " من بوابات التحقق")
+          + " — " + fmt.date(v.checked_at),
+      },
         h("span", { class: "sum-gates-dot", "aria-hidden": "true" }),
-        (all
-          ? "اجتاز الإصدار جميع بوابات التحقق " + ratio
-          : "اجتاز الإصدار " + ratio + " من بوابات التحقق")
-        + " — " + fmt.date(v.checked_at),
+        h("span", { class: "sum-gates-text" },
+          "بوابات التحقق: ", h("b", {}, ratio), (all ? " ✓" : ""),
+          " — " + fmt.date(v.checked_at)),
       ));
     }
   }

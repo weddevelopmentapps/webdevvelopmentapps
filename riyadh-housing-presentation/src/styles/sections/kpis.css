@@ -35,10 +35,12 @@
 }
 [data-section="kpis"] .dash-body::-webkit-scrollbar-track { background: transparent; }
 
-/* ── الشبكة: صفان — الأعلى (المصفوفة) أوسع قليلاً من الأسفل (عمود الصدق) ── */
+/* ── الشبكة: صفان — عمود الصدق (الأسفل) أعلى قليلاً من المصفوفة كي يتسع
+   كاملاً فوق شريط الشارة (الجولة 3)؛ المصفوفة المدمجة الجديدة (بلا عمودي
+   النوع/الصيغة) تعرض 4-5 صفوف كاملة في المساحة المتبقية ── */
 [data-section="kpis"] .kpi7-grid {
-  grid-template-rows: minmax(calc(var(--su) * 300), 1.06fr)
-                      minmax(calc(var(--su) * 280), 0.94fr);
+  grid-template-rows: minmax(calc(var(--su) * 280), 0.92fr)
+                      minmax(calc(var(--su) * 300), 1.08fr);
   grid-auto-flow: row;
 }
 [data-section="kpis"] .kpi7-cell { min-height: 0; }
@@ -413,8 +415,17 @@
    5) خلية المصفوفة — kpiMatrix القانوني داخل البطاقة الزجاجية
    ════════════════════════════════════════════════════════════════════════════ */
 [data-section="kpis"] .kpi7-matrix .card-body {
-  padding-top: calc(var(--su) * 6);
+  padding-top: calc(var(--su) * 4);
+  padding-bottom: calc(var(--su) * 8);
   min-height: 0;
+}
+[data-section="kpis"] .kpi7-matrix .table-dense th {
+  padding-top: calc(var(--su) * 5);
+  padding-bottom: calc(var(--su) * 5);
+}
+/* خط أصغر قليلاً في المصفوفة المدمجة: 4-5 صفوف كاملة عند 1920 (الجولة 3) */
+[data-section="kpis"] .kpi7-matrix .table-dense {
+  font-size: calc(var(--su) * 13.5);
 }
 /* سلسلة التمرير مكتملة حتى الجدول: القص يقع على حدود الصفوف داخل متمرر
    ظاهر الشريط مع تلاشٍ سفلي يعلن وجود بقية — لا بتر صف في منتصفه أبداً
@@ -430,9 +441,9 @@
   scrollbar-color: rgba(244, 241, 230, 0.28) transparent;
   scrollbar-gutter: stable;
   -webkit-mask-image: linear-gradient(180deg,
-    #000 0%, #000 calc(100% - var(--su) * 34), transparent 100%);
+    #000 0%, #000 calc(100% - var(--su) * 20), transparent 100%);
   mask-image: linear-gradient(180deg,
-    #000 0%, #000 calc(100% - var(--su) * 34), transparent 100%);
+    #000 0%, #000 calc(100% - var(--su) * 20), transparent 100%);
 }
 [data-section="kpis"] .kpi7-matrix .table-scroll::-webkit-scrollbar {
   width: calc(var(--su) * 7);
@@ -446,6 +457,15 @@
   outline-offset: 1px;
   border-radius: 3px;
 }
+/* صفوف مضغوطة: 4-5 صفوف كاملة ظاهرة عند 1920 (كثافة الجولة 3) —
+   حشوة رأسية أصغر وسطران محكمان لاسم المؤشر */
+[data-section="kpis"] .kpi7-matrix .table-dense td {
+  padding-top: calc(var(--su) * 4.5);
+  padding-bottom: calc(var(--su) * 4.5);
+}
+[data-section="kpis"] .kpi7-matrix .table-dense td b {
+  line-height: 1.4;
+}
 
 /* ════════════════════════════════════════════════════════════════════════════
    6) عمود الصدق والمصدر والرؤى — الصف الثاني الجانبي
@@ -455,22 +475,16 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: calc(var(--su) * 9);
+  gap: calc(var(--su) * 7);
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: thin;
   scrollbar-color: rgba(244, 241, 230, 0.28) transparent;
-  scrollbar-gutter: stable;
-  /* تلاشٍ سفلي يعلن أن العمود يتمرر — لا قصّ صامتاً عند خط الطي
-     (مراجعة الجولة 1: بطاقة «مزيج الصيغ» كانت تبدو مبتورة بلا دليل) */
-  -webkit-mask-image: linear-gradient(180deg,
-    #000 0%, #000 calc(100% - var(--su) * 30), transparent 100%);
-  mask-image: linear-gradient(180deg,
-    #000 0%, #000 calc(100% - var(--su) * 30), transparent 100%);
   padding-inline-end: calc(var(--su) * 2);
-  /* إصلاح مراجعة الجولة 2: حشوة سفلية تُبقي آخر عناصر العمود فوق شريط
-     الإصدار الثابت — لا يتقاطع أي عنصر من العمود مع سطر الإصدار */
-  padding-bottom: calc(var(--su) * 26);
+  /* إصلاح مراجعة الجولة 3: العمود مضغوط ليتسع كاملاً فوق شريط الشارة
+     المحجوز مركزياً في .dash-body — لا تلاشي إخفاء ولا حشوة ترقيع بعد
+     اليوم؛ التمرير هنا صمام أمان استثنائي فقط لا وضعاً افتراضياً. */
+  padding-bottom: calc(var(--su) * 4);
 }
 [data-section="kpis"] .kpi7-truth-col::-webkit-scrollbar { width: 7px; }
 [data-section="kpis"] .kpi7-truth-col::-webkit-scrollbar-thumb {
@@ -481,14 +495,18 @@
 
 /* بطاقة الصدق — قابلة للنقر، بخيط ذهبي علوي من dashboard.css (tone gold) */
 [data-section="kpis"] .kpi7-truth { cursor: pointer; }
+[data-section="kpis"] .kpi7-truth .card-head {
+  padding-top: calc(var(--su) * 10);
+}
 [data-section="kpis"] .kpi7-truth:hover { border-color: rgba(214, 171, 76, 0.4); }
 [data-section="kpis"] .kpi7-truth:focus-visible {
   outline: 2px solid var(--gold);
   outline-offset: 2px;
 }
 [data-section="kpis"] .kpi7-truth .card-body {
-  gap: calc(var(--su) * 7);
-  padding-bottom: calc(var(--su) * 12);
+  gap: calc(var(--su) * 5);
+  padding-top: calc(var(--su) * 5);
+  padding-bottom: calc(var(--su) * 8);
 }
 [data-section="kpis"] .kpi7-truth-row {
   display: flex;
@@ -505,12 +523,20 @@
 }
 [data-section="kpis"] .kpi7-truth-note {
   font-size: calc(var(--su) * 13);
-  line-height: 1.65;
+  line-height: 1.55;
   color: var(--ink2-d);
+  /* سطر واحد بقصّ معلن … — النص الكامل في التلميح وبيان الصدق (الجولة 3) */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 [data-section="kpis"] .kpi7-truth-line {
   font-size: calc(var(--su) * 12);
   color: var(--mut-d);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 [data-section="kpis"] .kpi7-truth-line b {
   font-family: var(--f-display);
@@ -519,25 +545,70 @@
   direction: ltr;
   unicode-bidi: isolate;
 }
+[data-section="kpis"] .kpi7-truth-line b.pass { color: var(--green-hi); }
 
-/* بطاقتا خط الأساس المتجاورتان */
-[data-section="kpis"] .kpi7-base-row {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+/* (بطاقتا خط الأساس وبطاقة «مزيج الصيغ» وبطاقة المصدر الكاملة حُذفت في
+   إصلاحي الجولتين 2 و3 — معلوماتها مدموجة في بطاقة الصدق وسطر المصدر
+   المدمج وبطاقات التفاصيل، كي يتسع العمود كاملاً فوق شريط الشارة) */
+
+/* سطر المصدر المدمج: وسم ذهبي + تسمية + معبر المبادرات — سطر واحد */
+[data-section="kpis"] .kpi7-src-bar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
   gap: calc(var(--su) * 9);
+  min-width: 0;
+  background: rgba(16, 32, 26, 0.58);
+  border: 1px solid var(--hair-d2);
+  border-radius: var(--r-sm);
+  padding: calc(var(--su) * 4) calc(var(--su) * 12);
 }
-[data-section="kpis"] .kpi7-base-row .stat-foot {
+[data-section="kpis"] .kpi7-src-badge {
+  flex: none;
+  font-size: calc(var(--su) * 11.5);
+  font-weight: 700;
+  color: var(--gold);
+  border: 1px solid rgba(214, 171, 76, 0.45);
+  background: rgba(214, 171, 76, 0.07);
+  border-radius: 999px;
+  padding: calc(var(--su) * 2) calc(var(--su) * 10);
+  white-space: nowrap;
+}
+[data-section="kpis"] .kpi7-src-label {
+  flex: 1;
+  min-width: 0;
+  font-size: calc(var(--su) * 11.5);
+  color: var(--mut-d);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
-/* (بطاقة «مزيج الصيغ» حُذفت في إصلاح مراجعة الجولة 2 — كانت تُقص عند
-   طية 1080p ومعلومتها معلنة في بطاقتي الصف الرئيسي 11/3) */
-
-/* بطاقة المصدر الحرفي */
-[data-section="kpis"] .kpi7-src .card-body { gap: calc(var(--su) * 8); }
-[data-section="kpis"] .kpi7-src-actions { display: flex; }
+[data-section="kpis"] .kpi7-src-go {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--su) * 6);
+  font-family: var(--f-body);
+  font-size: calc(var(--su) * 11.5);
+  font-weight: 700;
+  color: var(--ink2-d);
+  border: 1px solid var(--hair-d2);
+  border-radius: 999px;
+  padding: calc(var(--su) * 3) calc(var(--su) * 10);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color var(--dur-micro) var(--ease),
+              border-color var(--dur-micro) var(--ease);
+}
+[data-section="kpis"] .kpi7-src-go:hover {
+  color: var(--ivory);
+  border-color: var(--hair-d);
+}
+[data-section="kpis"] .kpi7-src-go:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
 
 /* اقتباس المصدر — نص الإصدار كما هو */
 [data-section="kpis"] .kpi7-quote {
@@ -562,33 +633,28 @@
   color: var(--ivory);
 }
 
-/* عمود الرؤى داخل العمود الجانبي: النص مقصوص بسطرين حفاظاً على الكثافة */
-[data-section="kpis"] .kpi7-truth-col .rail { flex: none; overflow: visible; }
+/* عمود الرؤى داخل العمود الجانبي: النص سطر واحد بقصّ معلن … والنص الكامل
+   في تلميح البطاقة (ضغط الجولة 3 — يتسع العمود كاملاً فوق شريط الشارة) */
+[data-section="kpis"] .kpi7-truth-col .rail {
+  flex: none;
+  overflow: visible;
+  gap: calc(var(--su) * 5);
+}
+[data-section="kpis"] .kpi7-truth-col .rail-item {
+  padding: calc(var(--su) * 4) calc(var(--su) * 13);
+}
+[data-section="kpis"] .kpi7-truth-col .rail-item-title {
+  font-size: calc(var(--su) * 13.5);
+  margin-bottom: calc(var(--su) * 1);
+}
 [data-section="kpis"] .kpi7-truth-col .rail-item-text {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+  font-size: calc(var(--su) * 11.5);
+  line-height: 1.5;
+  white-space: nowrap;
   overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* سطر الحداثة والبوابات */
-[data-section="kpis"] .kpi7-meta-foot {
-  display: flex;
-  flex-direction: column;
-  gap: calc(var(--su) * 5);
-  padding-inline: calc(var(--su) * 4);
-}
-[data-section="kpis"] .kpi7-meta-line {
-  font-size: calc(var(--su) * 11.5);
-  color: var(--faint-d);
-  line-height: 1.6;
-}
-[data-section="kpis"] .kpi7-meta-line.gates {
-  display: flex;
-  align-items: center;
-  gap: calc(var(--su) * 7);
-  color: var(--mut-d);
-}
 [data-section="kpis"] .kpi7-gates-dot {
   flex: none;
   width: calc(var(--su) * 8);

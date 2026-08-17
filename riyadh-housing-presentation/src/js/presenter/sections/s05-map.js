@@ -1334,15 +1334,13 @@
       h("span", { class: "map-rail-title" }, "ملخص القطاعات"),
       layerChip,
     ));
-    /* إشارة تمرير صريحة — إصلاح مراجعة الجولة 2 (استكمال): التلاشي السفلي
-       وشريط التمرير وحدهما لم يكونا كافيين لإعلان البطاقات المطوية تحت
-       خط الطي (الشرق — الأعلى تغطية — قد يقبع أسفل)؛ سطر «5 قطاعات — مرر»
-       يعلن العدد الكامل نصاً في كل مقاس. */
-    rail.appendChild(h("div", { class: "map-rail-scrollhint", "aria-hidden": "true" },
-      (rel.sectors.length === 5 ? "القطاعات الخمسة" :
-        fmt.noun(rel.sectors.length, "sector")) + " — مرر لاستعراضها كاملة"));
-
-    /* ── 6.3) خمس بطاقات قطاعية بأشرطة قياس متزامنة مع الطبقة ── */
+    /* ── 6.3) خمسة صفوف قطاعية بأشرطة قياس متزامنة مع الطبقة ──
+       إصلاح مراجعة الجولة 3 (بنيوي): البطاقات متعددة الأسطر كانت تفيض عن
+       العمود فيُقص الشمال منتصف بطاقته وتغيب الشرق — الأعلى تغطية — تحت
+       الطية كلياً. الصفوف الآن سطر واحد لكل قطاع (القطاع · شريط الطبقة
+       وقيمتها · التغطية · العجز — الخريطة ذاتها تحمل الباقي، وملف القطاع
+       بالنقر يحمل كل التفاصيل) فتظهر الخمسة كاملة فوق شريط الشارة في كلا
+       المقاسين بلا تمرير — وسطر «مرر لاستعراضها» حُذف لأنه لم يعد صادقاً. */
     const secsWrap = h("div", { class: "map-secs" });
     rail.appendChild(secsWrap);
 
@@ -1362,56 +1360,33 @@
       const val = h("b", { class: "map-sec-val" }, "");
 
       const card = h("article", { class: "map-sec dash-card" },
-        h("div", { class: "map-sec-top" },
-          h("div", { class: "map-sec-id" },
-            h("span", { class: "map-sec-name" }, String(s.name)),
-            gs ? h("span", { class: "map-sec-sub" },
-              fmt.countNoun(gs.districts, LOCAL_NOUNS.district)
-              + (gs.hotspots
-                ? " · " + fmt.countNoun(gs.hotspots, LOCAL_NOUNS.point) + " تركّز"
-                : "")) : null,
-          ),
-          h("div", {
-            class: "map-sec-cov"
-              + (sd.coverage_pct < der.coverage_pct ? " neg" : " pos"),
-          },
-            h("b", {}, fmt.pct(sd.coverage_pct)),
-            h("span", {}, "تغطية"),
-          ),
-        ),
-        h("div", { class: "map-sec-meter" },
-          h("span", { class: "map-sec-bar" }, bar),
-          val,
-        ),
-        h("div", { class: "map-sec-micro" },
-          h("span", { class: "map-sec-cellv neg" },
-            h("b", {}, fmt.compact(sd.deficit_beds)),
-            h("span", {}, "عجز"),
-          ),
-          h("span", { class: "map-sec-cellv neg" },
-            h("b", {}, fmt.int(s.violations)),
-            h("span", {}, "مخالفة"),
-          ),
-          /* العدد والمعدود عبر fmt.noun حصراً (قاعدة رأس الملف): «3 مراقبين»
-             لا «3 مراقب» — إصلاح مراجعة الجولة 1 (المراجع اللغوي) */
-          (() => {
-            const full = fmt.noun(s.monitors, "monitor");
-            const prefix = fmt.int(s.monitors) + fmt.NBSP;
-            const unit = full.indexOf(prefix) === 0
-              ? full.slice(prefix.length) : full;
-            return h("span", { class: "map-sec-cellv" },
-              h("b", {}, fmt.int(s.monitors)),
-              h("span", {}, unit),
-            );
-          })(),
-        ),
+        h("span", { class: "map-sec-name" }, String(s.short || s.name)),
+        h("span", { class: "map-sec-bar", "aria-hidden": "true" }, bar),
+        val,
+        h("span", {
+          class: "map-sec-cov"
+            + (sd.coverage_pct < der.coverage_pct ? " neg" : " pos"),
+        }, fmt.pct(sd.coverage_pct)),
+        /* المرجاني للعجز حصراً — قيمة بيانات لا زخرفة */
+        h("span", { class: "map-sec-deficit" },
+          "عجز " + fmt.compact(sd.deficit_beds)),
       );
 
+      /* البديل النصي الكامل يحمل ما خرج من الصف المضغوط (المخالفات
+         والمراقبون وعدّ الأحياء) — العدد والمعدود عبر fmt.noun حصراً */
       activatable(card,
         () => ctx.openDetail(sectorDetail(ctx, s), { title: String(s.name) }),
-        String(s.name) + " — تغطية " + fmt.pct(sd.coverage_pct)
+        String(s.name) + " — التغطية " + fmt.pct(sd.coverage_pct)
+        + " والعجز " + fmt.unitAfter(sd.deficit_beds, "سرير")
+        + "، " + fmt.noun(s.violations, "violation")
+        + " و" + fmt.noun(s.monitors, "monitor")
+        + (gs ? "، " + fmt.countNoun(gs.districts, LOCAL_NOUNS.district)
+          + (gs.hotspots
+            ? " و" + fmt.countNoun(gs.hotspots, LOCAL_NOUNS.point) + " تركّز"
+            : "")
+          : "")
         + " — عرض الملف القطاعي الموحد");
-      card.title = "عرض الملف القطاعي الموحد";
+      card.title = String(s.name) + " — عرض الملف القطاعي الموحد";
 
       refs.push({ sector: s, barEl: bar, valEl: val });
       secsWrap.appendChild(card);

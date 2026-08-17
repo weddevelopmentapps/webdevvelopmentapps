@@ -338,15 +338,21 @@
 
 /* ── 8) العمود الجانبي: donut + رقاقات + رؤى + مصدر + حداثة ── */
 [data-section="initiatives"] .ini-cell-side {
-  gap: calc(var(--su) * 8);
+  gap: calc(var(--su) * 6);
   overflow: hidden;
+}
+[data-section="initiatives"] .ini-cell-side .rail-title {
+  line-height: 1.3;
 }
 /* بطاقة الحلقة: ارتفاع ثابت يترك للرؤى بقية العمود */
 [data-section="initiatives"] .ini-donut-card {
   flex: none;
-  /* 150: يترك لعمود الرؤى الثلاث الكاملة بنصوصها ارتفاعها الحقيقي
-     (إصلاح مراجعة الجولة 1: كانت الرؤى عناوين مبتورة بلا نصوص) */
-  height: calc(var(--su) * 150);
+  /* 170 (كانت 146): إصلاح مراجعة الجولة 5 — مضيف الحلقة كان ~57px فطغى
+     رقم المركز الثابت على الأقواس؛ رُفع الارتفاع ليتسع مضيف حقيقي
+     (~83px عند 1920) والمساحة مستردّة من فراغات عمود الرؤى أدناه
+     (gap ومسافات rail-item) لا من محتواه — الرؤى الثلاث تبقى كاملة
+     بلا تمرير (بوابة الجولة 3 محفوظة) */
+  height: calc(var(--su) * 170);
 }
 /* رقاقات الحالات أسفل الحلقة */
 [data-section="initiatives"] .ini-chips {
@@ -354,7 +360,8 @@
   display: flex;
   flex-wrap: wrap;
   gap: calc(var(--su) * 5);
-  padding: calc(var(--su) * 3) calc(var(--su) * 12) calc(var(--su) * 8);
+  /* السفلي 3 (كان 5): استرداد جزئي لرفع بطاقة الحلقة (الجولة 5) */
+  padding: calc(var(--su) * 2) calc(var(--su) * 12) calc(var(--su) * 3);
 }
 [data-section="initiatives"] .ini-chip {
   display: inline-flex;
@@ -405,19 +412,29 @@
   overflow-x: hidden;
   scrollbar-width: thin;
   scrollbar-color: rgba(244, 241, 230, 0.18) transparent;
-  gap: calc(var(--su) * 7);
+  /* 4 (كان 6): استرداد فراغ لصالح بطاقة الحلقة المرفوعة (الجولة 5) */
+  gap: calc(var(--su) * 4);
 }
 [data-section="initiatives"] .ini-cell-side .rail-item {
   flex: none;
-  padding: calc(var(--su) * 6) calc(var(--su) * 11);
+  /* الرأسي 3 (كان 4): استرداد فراغ الجولة 5 — النص الكامل بسطريه باقٍ */
+  padding: calc(var(--su) * 3) calc(var(--su) * 11);
 }
 [data-section="initiatives"] .ini-cell-side .rail-item-title {
   font-size: calc(var(--su) * 12.5);
-  margin-bottom: calc(var(--su) * 2);
+  margin-bottom: calc(var(--su) * 1);
+  line-height: 1.35;
 }
 [data-section="initiatives"] .ini-cell-side .rail-item-text {
   font-size: calc(var(--su) * 11);
   line-height: 1.4;
+  /* إصلاح مراجعة الجولة 3: قصّ معلن … بسطرين بحد أقصى (النص الكامل في
+     تلميح العنصر) — لا بطاقة عنوان مبتورة عند الطية بعد اليوم؛ نص id3
+     ذاته اختُصر في الإصدار ليتسع كاملاً */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 [data-section="initiatives"] .ini-cell-side .rail-title {
   font-size: calc(var(--su) * 12.5);
@@ -441,7 +458,7 @@
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid var(--hair-d2);
   border-radius: var(--r-sm);
-  padding: calc(var(--su) * 7) calc(var(--su) * 12);
+  padding: calc(var(--su) * 5) calc(var(--su) * 12);
   display: flex;
   gap: calc(var(--su) * 9);
 }
@@ -485,7 +502,11 @@
   font-size: calc(var(--su) * 12);
   color: var(--faint-d);
   padding-inline-start: calc(var(--su) * 4);
-  padding-bottom: calc(var(--su) * 22);
+  /* الشريط السفلي لشارة الإصدار محجوز مركزياً في .dash-body (الجولة 3) */
+  padding-bottom: calc(var(--su) * 4);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 [data-section="initiatives"] .ini-meta b {
   color: var(--mut-d);

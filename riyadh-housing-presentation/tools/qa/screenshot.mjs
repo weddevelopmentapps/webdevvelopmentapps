@@ -56,9 +56,16 @@ for (const [w, hgt] of SIZES) {
     // بوابات «لا صف بيانات مقصوص»: عناصر معدودة يجب أن تكون كاملة داخل
     // إطار العرض (مراجعة الجولة 1 — صف الجنوب وصف المتفائل المقصوصان)
     const VISIBLE_COUNTS = {
-      "section/control": [[".ctl-mon-row", 5]],
+      "section/summary": [[".sum-gates", 1]],
+      "section/demand": [[".dmd-rank-row", 5], [".dmd-appx", 1], [".dmd-meta", 1]],
+      "section/control": [[".ctl-mon-row", 5], [".rail-item", 3], [".ctl-meta", 1]],
       "section/forecast": [[".fct-rank-row", 3], [".fct-sc", 3]],
-      "section/map": [[".map-sec", 1]], // الأسوأ تغطيةً يتصدر فوق خط الطي
+      // الجولة 3: القطاعات الخمسة كلها ظاهرة كاملة (كانت 1 = المتصدر فقط)
+      "section/map": [[".map-sec", 5], [".map-src", 1]],
+      "section/initiatives": [[".rail-item", 3], [".ini-source", 1], [".ini-meta", 1]],
+      "section/kpis": [[".kpi7-src-bar", 1], [".rail-item", 3]],
+      "section/kpis?step=2": [[".kpi7-src-bar", 1], [".rail-item", 3]],
+      "section/closing": [[".cls-home", 1]],
     };
     const checks = VISIBLE_COUNTS[route];
     if (checks) {
@@ -97,6 +104,75 @@ for (const [w, hgt] of SIZES) {
       return false;
     });
     if (scrollable) consoleErrors.push(`[${w}x${hgt}] ${route}: تمرير رأسي على مستوى المسرح (${scrollable})!`);
+
+    // بوابة الجولة 3 (وعد الجولة 2 المؤتمت): على كل شاشات الأقسام وبكلا
+    // المقاسين — (أ) لا محتوى يُرسم تحت شارة الإصدار الثابتة، (ب) لا بطاقة/
+    // صف يُقص عند طية العرض خارج متمرر داخلي معلن، (ج) لا نص رؤية يفيض
+    // بلا قصّ line-clamp معلن (بتر عند حافة البطاقة).
+    if (route.startsWith("section/")) {
+      const layoutErrs = await page.evaluate(() => {
+        const errs = [];
+        const CONTENT = ".dash-card, .rail-item, .stat-card, .pending-card, .kpi, "
+          + ".dmd-rank-row, .dmd-appx, .dmd-meta, .dmd-chip, .dmd-cardfoot, "
+          + ".ctl-mon-row, .ctl-appx, .ctl-meta, .ini-source, .ini-meta, "
+          + ".map-sec, .map-src, .sum-gates, .kpi7-src-bar, .kpi7-truth, "
+          + ".cls-footer, .cls-linkbtn, .table-dense, button";
+
+        // (أ) عيّنة نقاط عبر مستطيل الشارة: elementFromPoint يتجاهل الشارة
+        // (pointer-events:none) فيصيب ما يُرسم تحتها فعلاً — أي إصابة لعنصر
+        // محتوى تعني تصادماً بصرياً حقيقياً لا تقاطع مستطيلات نظرياً.
+        const badge = document.getElementById("release-badge");
+        if (badge && !badge.hidden) {
+          const br = badge.getBoundingClientRect();
+          let hitCls = null;
+          outer:
+          for (let fx = 0.06; fx <= 0.95; fx += 0.22) {
+            for (let fy = 0.15; fy <= 0.85; fy += 0.35) {
+              const el = document.elementFromPoint(
+                br.left + br.width * fx, br.top + br.height * fy);
+              const c = el && el.closest ? el.closest(CONTENT) : null;
+              if (c) { hitCls = c.className || c.tagName; break outer; }
+            }
+          }
+          if (hitCls) errs.push("محتوى يُرسم تحت شارة الإصدار: " + hitCls);
+        }
+
+        // (ب) القص عند الطية: عنصر بطاقي ظاهرُ الأعلى مقصوصُ الأسفل خارج
+        // أي متمرر داخلي (المتمرر المعلن بشريطه يقصّ مشروعاً — سواه لا).
+        const CARDS = document.querySelectorAll(
+          ".rail-item, .stat-card, .pending-card, .map-sec, .dmd-rank-row, "
+          + ".ctl-mon-row, .dmd-appx, .ctl-appx, .ini-source, .kpi7-src-bar, "
+          + ".dash-card");
+        const vh = window.innerHeight;
+        for (const el of CARDS) {
+          const r = el.getBoundingClientRect();
+          if (r.height < 8 || r.top >= vh || r.bottom <= vh + 1) continue;
+          let anc = el.parentElement, scrollableAnc = false;
+          while (anc) {
+            const oy = getComputedStyle(anc).overflowY;
+            if ((oy === "auto" || oy === "scroll")
+              && anc.scrollHeight > anc.clientHeight + 2) { scrollableAnc = true; break; }
+            anc = anc.parentElement;
+          }
+          if (!scrollableAnc) {
+            errs.push("عنصر مقصوص عند الطية بلا متمرر: " + (el.className || el.tagName));
+          }
+        }
+
+        // (ج) نص رؤية يفيض عن صندوقه بلا line-clamp معلن = بتر منتصف جملة
+        for (const t of document.querySelectorAll(".rail-item-text")) {
+          const cs = getComputedStyle(t);
+          const clamped = cs.webkitLineClamp && cs.webkitLineClamp !== "none";
+          const oneLine = cs.whiteSpace === "nowrap" && cs.textOverflow === "ellipsis";
+          if (t.scrollHeight > t.clientHeight + 3 && !clamped && !oneLine) {
+            errs.push("نص رؤية مبتور بلا قصّ معلن: "
+              + String(t.textContent || "").slice(0, 40));
+          }
+        }
+        return errs;
+      });
+      for (const e of layoutErrs) consoleErrors.push(`[${w}x${hgt}] ${route}: ${e}`);
+    }
   }
   await page.close();
 }

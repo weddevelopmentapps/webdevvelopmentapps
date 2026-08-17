@@ -263,6 +263,16 @@
       if (r.visits > months[peakV].visits) peakV = i;
       if (r.violations > months[peakF].violations) peakF = i;
     });
+    /* إفصاح تعادل الذروة (إصلاح مراجعة الجولة 4): كل الأشهر المساوية للأقصى
+       تُعدّ ذروةً وتُسمّى كلها — يوليو وأغسطس 2026 يتشاركان ذروة المخالفات
+       317، وقصر التسمية على يوليو يوحي بانحسارٍ في آخر شهر لم يحدث */
+    const peaksV = [], peaksF = [];
+    months.forEach((r, i) => {
+      if (r.visits === months[peakV].visits) peaksV.push(i);
+      if (r.violations === months[peakF].violations) peaksF.push(i);
+    });
+    const peakVWhen = fmt.monthsList(peaksV.map((i) => months[i].label));
+    const peakFWhen = fmt.monthsList(peaksF.map((i) => months[i].label));
 
     /* القطاعات: الصف الخام + المشتقات المنشورة + العبء الرقابي الشفاف
        (مخالفات لكل مراقب — نفس حساب تلميح charts-control حرفياً) + أوسمة
@@ -345,7 +355,7 @@
       avgVisits: der.avg_monthly_visits,
       southShare: der.south_violations_share_pct,
       compliance: rel.compliance,
-      months, cum, peakV, peakF,
+      months, cum, peakV, peakF, peaksV, peaksF, peakVWhen, peakFWhen,
       sectors, sectorById, maxSector, topClosures, topVisits, minMon, maxMon,
       types, top5, maxTop5, closureSharePct,
       calc: rel.meta.calculation_date,
@@ -487,7 +497,7 @@
         met.label, "pos"),
       rowsGrid([
         { k: "المتوسط الشهري", v: fmt.noun(model.avgVisits, "visit"), tone: "pos" },
-        { k: "ذروة النشاط — " + peak.label, v: fmt.noun(peak.visits, "visit") },
+        { k: "ذروة النشاط — " + model.peakVWhen, v: fmt.noun(peak.visits, "visit") },
         { k: "الأعلى زياراتٍ", v: model.topVisits.row.name },
         { k: "حصته من الزيارات", v: fmt.pct(model.topVisits.sd.visits_share_pct) },
         { k: "الزيارات لكل مراقب (إجمالاً)", v: fmt.int(round0(model.totVisits / model.totMon)) },
@@ -631,8 +641,10 @@
     const c = model.cum[idx];
     const prev = idx > 0 ? model.months[idx - 1] : null;
     const lic = model.rel.monthly.licensing[idx] || null;
-    const isPeakV = idx === model.peakV;
-    const isPeakF = idx === model.peakF;
+    /* وسم الذروة تعادلياً: كل شهر يساوي الأقصى ذروةٌ (يوليو وأغسطس 2026
+       يتشاركان ذروة المخالفات — كلاهما يستحق الوسام) */
+    const isPeakV = model.peaksV.indexOf(idx) !== -1;
+    const isPeakF = model.peaksF.indexOf(idx) !== -1;
 
     const badges = [];
     if (isPeakV) badges.push({ text: "ذروة الزيارات في الفترة", tone: "pos" });
@@ -1087,13 +1099,14 @@
     if (head) head.appendChild(bar);
     syncBtns();
 
-    /* ذيل قراءة موجز: الذروتان بالتسمية والقيمة — أرقام tabular داكنة */
+    /* ذيل قراءة موجز: الذروتان بالتسمية والقيمة — أرقام tabular داكنة.
+       التسمية تعادلية: كل أشهر الذروة تُذكر (يوليو وأغسطس 2026 للمخالفات) */
     const pv = model.months[model.peakV];
     const pf = model.months[model.peakF];
     res.card.appendChild(h("div", { class: "ctl-cardfoot" },
-      "ذروة الزيارات ", h("b", {}, fmt.int(pv.visits)), " في " + pv.label
+      "ذروة الزيارات ", h("b", {}, fmt.int(pv.visits)), " في " + model.peakVWhen
         + " · ذروة المخالفات ", h("b", {}, fmt.int(pf.violations)),
-      " في " + pf.label + " · انقر أي شهر لملفه الكامل",
+      " في " + model.peakFWhen + " · انقر أي شهر لملفه الكامل",
     ));
   }
 

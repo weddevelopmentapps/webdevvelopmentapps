@@ -385,15 +385,10 @@
   scrollbar-color: rgba(244, 241, 230, 0.45) rgba(244, 241, 230, 0.12);
   scrollbar-gutter: stable;
   padding-inline-end: calc(var(--su) * 2);
-  /* إصلاح مراجعة الجولة 2: البطاقات المطوية (الشمال/الشرق) كانت تُقص عند
-     الطي بلا أي دليل تمرير، وشارة الإصدار تطبع فوق آخر بطاقة ظاهرة —
-     تلاشٍ سفلي يعلن التمرير + شريط تمرير دائم الظهور بمسار مرئي +
-     حشوة سفلية تُبقي آخر بطاقة فوق شارة الإصدار الثابتة. */
-  padding-bottom: calc(var(--su) * 30);
-  -webkit-mask-image: linear-gradient(180deg,
-    #000 0%, #000 calc(100% - var(--su) * 28), transparent 100%);
-  mask-image: linear-gradient(180deg,
-    #000 0%, #000 calc(100% - var(--su) * 28), transparent 100%);
+  /* إصلاح مراجعة الجولة 3: الصفوف القطاعية المضغوطة تجعل العمود يتسع
+     كاملاً فوق شريط الشارة المحجوز مركزياً في .dash-body — لا تلاشي إخفاء
+     ولا حشوة ترقيع؛ التمرير صمام أمان استثنائي فقط. */
+  padding-bottom: calc(var(--su) * 4);
 }
 [data-section="map"] .map-rail::-webkit-scrollbar { width: 7px; }
 [data-section="map"] .map-rail::-webkit-scrollbar-track {
@@ -627,14 +622,8 @@
   color: var(--mut-d);
   letter-spacing: 0.3px;
 }
-/* سطر إشارة التمرير أسفل الترويسة — يعلن عدد البطاقات الكامل */
-[data-section="map"] .map-rail-scrollhint {
-  flex: none;
-  font-size: calc(var(--su) * 10.5);
-  color: var(--faint-d);
-  padding: 0 calc(var(--su) * 2);
-  margin-top: calc(var(--su) * -6);
-}
+/* (سطر «مرر لاستعراضها كاملة» حُذف في الجولة 3 — الصفوف الخمسة كلها
+   ظاهرة كاملة فلا تمرير يُعلن عنه) */
 [data-section="map"] .map-rail-layer {
   font-size: calc(var(--su) * 11.5);
   font-weight: 700;
@@ -657,17 +646,27 @@
   border-color: rgba(170, 138, 62, 0.45);
 }
 
-/* ── 3.3) بطاقات الملخص القطاعية الخمس ── */
+/* ── 3.3) الصفوف القطاعية الخمسة — سطر واحد لكل قطاع ──
+   إصلاح مراجعة الجولة 3: القطاع · شريط الطبقة النشطة وقيمتها · التغطية ·
+   العجز — الخمسة كلها ظاهرة كاملة فوق شريط الشارة في كلا المقاسين
+   (الخريطة ذاتها تحمل التفاصيل، وملف القطاع بالنقر يحمل الباقي). */
 [data-section="map"] .map-secs {
   display: flex;
   flex-direction: column;
-  gap: calc(var(--su) * 8);
+  gap: calc(var(--su) * 6);
   flex: none;
 }
 [data-section="map"] .map-sec {
-  /* حشوة مضغوطة: بطاقات القطاعات الخمس كلها داخل العمود (إصلاح المراجعة) */
-  padding: calc(var(--su) * 7) calc(var(--su) * 12) calc(var(--su) * 6);
-  gap: calc(var(--su) * 5);
+  display: grid;
+  grid-template-columns:
+    calc(var(--su) * 52)
+    minmax(0, 1fr)
+    calc(var(--su) * 62)
+    calc(var(--su) * 52)
+    calc(var(--su) * 78);
+  align-items: center;
+  gap: calc(var(--su) * 9);
+  padding: calc(var(--su) * 7) calc(var(--su) * 12);
   cursor: pointer;
   transition: transform var(--dur-micro) var(--ease),
     border-color var(--dur-micro) var(--ease),
@@ -683,62 +682,17 @@
   outline-offset: 2px;
 }
 [data-section="map"] .map-sec:active { transform: translateY(0); }
-[data-section="map"] .map-sec-top {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: calc(var(--su) * 8);
-}
-[data-section="map"] .map-sec-id { min-width: 0; }
 [data-section="map"] .map-sec-name {
-  display: block;
-  font-size: calc(var(--su) * 14.5);
+  font-size: calc(var(--su) * 13.5);
   font-weight: 700;
   color: var(--ivory);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-[data-section="map"] .map-sec-sub {
-  display: block;
-  font-size: calc(var(--su) * 11);
-  color: var(--faint-d);
-  margin-top: calc(var(--su) * 2);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-[data-section="map"] .map-sec-cov {
-  flex: none;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: calc(var(--su) * 1);
-}
-[data-section="map"] .map-sec-cov b {
-  font-family: var(--f-display);
-  font-variant-numeric: tabular-nums;
-  font-size: calc(var(--su) * 19);
-  font-weight: 700;
-  direction: ltr;
-  unicode-bidi: isolate;
-}
-[data-section="map"] .map-sec-cov span {
-  font-size: calc(var(--su) * 10.5);
-  color: var(--faint-d);
-}
-/* دلالة التغطية: دون تغطية المدينة = مرجاني (عجز)، فوقها = أخضر */
-[data-section="map"] .map-sec-cov.pos b { color: var(--green-hi); }
-[data-section="map"] .map-sec-cov.neg b { color: var(--coral); }
 
 /* شريط قياس الطبقة النشطة — اللون من سلمها الدلالي عبر dataset.ramp */
-[data-section="map"] .map-sec-meter {
-  display: flex;
-  align-items: center;
-  gap: calc(var(--su) * 9);
-}
 [data-section="map"] .map-sec-bar {
-  flex: 1;
   height: calc(var(--su) * 7);
   border-radius: 999px;
   background: rgba(244, 241, 230, 0.07);
@@ -761,47 +715,40 @@
   background: var(--demand);
 }
 [data-section="map"] .map-sec-val {
-  flex: none;
-  min-width: calc(var(--su) * 64);
   text-align: start;
   font-family: var(--f-display);
   font-variant-numeric: tabular-nums;
-  font-size: calc(var(--su) * 13.5);
+  font-size: calc(var(--su) * 12.5);
   font-weight: 700;
   color: var(--ivory);
   direction: ltr;
   unicode-bidi: isolate;
-}
-
-/* الخانات الدقيقة الثلاث: عجز/مخالفات (مرجاني حصراً) + مراقبون */
-[data-section="map"] .map-sec-micro {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: calc(var(--su) * 6);
-}
-[data-section="map"] .map-sec-cellv {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-[data-section="map"] .map-sec-cellv b {
-  font-family: var(--f-display);
-  font-variant-numeric: tabular-nums;
-  font-size: calc(var(--su) * 13);
-  font-weight: 700;
-  color: var(--ink2-d);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+/* دلالة التغطية: دون تغطية المدينة = مرجاني (عجز)، فوقها = أخضر */
+[data-section="map"] .map-sec-cov {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-size: calc(var(--su) * 13.5);
+  font-weight: 700;
+  text-align: end;
   direction: ltr;
   unicode-bidi: isolate;
-}
-[data-section="map"] .map-sec-cellv span {
-  font-size: calc(var(--su) * 10.5);
-  color: var(--faint-d);
   white-space: nowrap;
 }
-[data-section="map"] .map-sec-cellv.neg b { color: var(--coral); }
+[data-section="map"] .map-sec-cov.pos { color: var(--green-hi); }
+[data-section="map"] .map-sec-cov.neg { color: var(--coral); }
+/* نص العجز: المرجاني للعجز حصراً — قيمة بيانات لا زخرفة */
+[data-section="map"] .map-sec-deficit {
+  font-size: calc(var(--su) * 11);
+  color: var(--coral);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: end;
+}
 
 /* ── 3.4) سطرا الإسناد الإلزاميان ── */
 [data-section="map"] .map-src {

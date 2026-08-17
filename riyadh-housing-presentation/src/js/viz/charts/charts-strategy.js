@@ -794,34 +794,69 @@ RH.viz.charts2 = RH.viz.charts2 || {};
     const centerNum = parts.length > 1 ? parts[0] : fmt.int(total);
     const centerWord = parts.length > 1 ? parts.slice(1).join(fmt.NBSP) : "";
 
-    const c = T.chart(cid("statusDonut", opts), el);
-    c.setOption(Object.assign(T.base(su), {
-      graphic: [
+    /* إصلاح مراجعة الجولة 5: مركز المدمج يُقاس على مضيفه الحقيقي لا على
+       مقاس ثابت صُمم لمضيف الملخص الأطول — قطر فتحة الحلقة (نصف القطر
+       الداخلي 62% من القطر الأصغر للمضيف) يحكم الحجمين: الرقم ≈ 40% من
+       الفتحة بسقف المقاس المعهود، والمعدود ≈ 18% بسقفه، ويُخفى المعدود
+       كلياً حين تضيق الفتحة عن ~44px أو ينحدر خطه دون عتبة القراءة (10px)
+       فيحمله سطر البطاقة الفرعي «18 مبادرة» بصدق (مضيف المبادرات). عند
+       بلوغ السقفين (مضيفا الملخص والختام) يبقى الرسم كما كان حرفياً.
+       القياس يُعاد اشتقاقه عبر ResizeObserver لأن مضيف المبادرات يتقلص
+       بعد إدراج صف الرقاقات لاحقاً في البطاقة (سبب العطب الأصلي). */
+    const pxFont = (px, weight, plex) =>
+      weight + " " + px + "px " + (plex ? "'IBM Plex Sans Arabic'" : "Cairo");
+    function centerGraphic() {
+      const hostH = el.clientHeight || 0;
+      const hostD = Math.min(el.clientWidth || 0, hostH);
+      const holeD = hostD > 0
+        ? hostD * (compact ? 0.62 : 0.58)
+        : Infinity; /* مضيف بلا قياس بعد → المقاسات المعهودة */
+      const numCap = T.fs(su, compact ? 30 : 42);
+      const wordCap = T.fs(su, compact ? 12 : 14);
+      const numPx = Math.min(numCap, Math.round(holeD * 0.40));
+      const wordPx = Math.min(wordCap, Math.round(holeD * 0.18));
+      const showWord = !compact || (holeD >= 44 && wordPx >= 10);
+      const scaledC = compact && numPx < numCap && hostH > 0;
+      /* في الوضع المقاس تتمركز الكتلة على مركز الحلقة الفعلي (52% رأسياً) */
+      const numTop = scaledC
+        ? Math.round(hostH * 0.52 - numPx * (showWord ? 1.05 : 0.62))
+        : (compact ? "40%" : "41%");
+      const wordTop = scaledC
+        ? Math.round(hostH * 0.52 + numPx * 0.25)
+        : (compact ? "57%" : "55%");
+      return [
         {
           type: "text",
           left: "center",
-          top: compact ? "40%" : "41%",
+          top: numTop,
           silent: true,
           style: {
             text: centerNum,
             fill: T.C.ivory,
-            font: cFont(su, compact ? 30 : 42, 700, true),
+            font: pxFont(numPx, 700, true),
           },
           z: 50,
         },
         {
           type: "text",
           left: "center",
-          top: compact ? "57%" : "55%",
+          top: wordTop,
           silent: true,
+          invisible: !showWord,
           style: {
-            text: centerWord,
+            /* نص فارغ عند الإخفاء — لا اعتماد على invisible وحدها */
+            text: showWord ? centerWord : "",
             fill: T.C.mut,
-            font: cFont(su, compact ? 12 : 14, 600),
+            font: pxFont(wordPx, 600),
           },
           z: 50,
         },
-      ],
+      ];
+    }
+
+    const c = T.chart(cid("statusDonut", opts), el);
+    c.setOption(Object.assign(T.base(su), {
+      graphic: centerGraphic(),
       tooltip: Object.assign(T.tooltip(su), {
         formatter: (p) => {
           let out = T.ttTitle(p.name)
@@ -864,6 +899,22 @@ RH.viz.charts2 = RH.viz.charts2 || {};
         data: data,
       }],
     }), true);
+
+    /* إعادة اشتقاق مركز الحلقة عند كل تغيّر في مقاس المضيف — يغطي إدراج
+       الرقاقات بعد الإنشاء (المبادرات) وتغيّر إطار العرض معاً. المراقب
+       يفصل نفسه متى تخلّص السجل من المثيل أو انفصل المضيف عن الوثيقة. */
+    if (typeof ResizeObserver !== "undefined") {
+      let lastD = 0;
+      const ro = new ResizeObserver(() => {
+        if (c.isDisposed() || !el.isConnected) { ro.disconnect(); return; }
+        const d = Math.min(el.clientWidth || 0, el.clientHeight || 0);
+        if (d === lastD) return;
+        lastD = d;
+        c.resize();
+        c.setOption({ graphic: centerGraphic() });
+      });
+      ro.observe(el);
+    }
 
     a11y(el,
       "توزيع حالات محفظة " + fmt.noun(total, "initiative") + ": "
@@ -1327,23 +1378,34 @@ RH.viz.charts2 = RH.viz.charts2 || {};
     const caption = document.createElement("caption");
     caption.textContent = "مصفوفة مؤشرات الأداء — خط الأساس والمستهدف من"
       + " خطة العمل، والقيم الحالية تُدار من المنصة";
-    caption.style.cssText = "text-align:start;font-size:" + suPx(12)
-      + ";color:var(--faint-d);padding-bottom:" + suPx(6) + ";caption-side:top;";
+    if (compact) {
+      /* في المدمج: التسمية لقارئات الشاشة فقط — بصرياً تكرر عنوان البطاقة
+         وسطرها الثانوي وتسرق ارتفاع صف كامل (كثافة الجولة 3) */
+      caption.style.cssText = "position:absolute;width:1px;height:1px;"
+        + "overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;";
+    } else {
+      caption.style.cssText = "text-align:start;font-size:" + suPx(12)
+        + ";color:var(--faint-d);padding-bottom:" + suPx(6) + ";caption-side:top;";
+    }
     table.appendChild(caption);
 
     /* تعريف الأعمدة: sortKey يجعل العمود قابلاً للفرز (قيم رقمية خالصة).
-       إصلاح مراجعة الجولة 2: في المدمج ترويسة العمود الأخير «القيمة» —
-       كانت «القيمة الحالية» تدفع الجدول خارج البطاقة فتُقص حبات
-       «غير متوفرة» منتصف الكلمة عند الحافة. */
-    const COLS = [
+       إصلاح مراجعة الجولة 2: في المدمج ترويسة العمود الأخير «القيمة».
+       إصلاح مراجعة الجولة 3: في المدمج يسقط عمودا «النوع» و«الصيغة» —
+       النوع ثابت («استراتيجي» لكل الصفوف، معلن في سطر الخلاصة) والصيغة
+       تُدمج رقاقة صغيرة داخل خلية الاسم؛ فيسترد عمود «المؤشر» عرضه
+       (~40٪) ويلتف الاسم سطرين بحد أقصى بقصّ معلن … بدل برج
+       كلمة-في-كل-سطر الذي أفقد المصفوفة كثافتها. */
+    const BASE_COLS = [
       { label: "#", sortKey: (k) => k.id },
       { label: "المؤشر", sortKey: null },
-      { label: "النوع", sortKey: null },
-      { label: "الصيغة", sortKey: null },
+      { label: "النوع", sortKey: null, wide: true },
+      { label: "الصيغة", sortKey: null, wide: true },
       { label: "خط الأساس", sortKey: (k) => k.baseline },
       { label: "المستهدف", sortKey: (k) => k.target },
       { label: compact ? "القيمة" : "القيمة الحالية", sortKey: null },
     ];
+    const COLS = compact ? BASE_COLS.filter((c) => !c.wide) : BASE_COLS;
 
     /* حالة الفرز العرضية: الافتراضي الترتيب القانوني بالمعرف تصاعدياً */
     const sort = { idx: 0, dir: 1 };
@@ -1423,22 +1485,37 @@ RH.viz.charts2 = RH.viz.charts2 || {};
         const bName = document.createElement("b");
         bName.textContent = String(k.name);
         tdName.appendChild(bName);
-        /* إصلاح مراجعة الجولة 2: عمود المؤشر هو المرن (يلتف لأسطر) —
-           عرضه الأدنى في المدمج 96 (كان 140) كي يتسع عمود «القيمة»
-           بحبته الكاملة داخل البطاقة فلا تُقص «غير متوفرة» أبداً. */
-        tdName.style.cssText = "white-space:normal;line-height:1.5;min-width:"
-          + suPx(compact ? 96 : 230) + ";";
+        /* إصلاح مراجعة الجولة 3: في المدمج يأخذ الاسم ~40٪ من عرض الجدول
+           بسطرين بحد أقصى وقصّ معلن … (الاسم الكامل في التلميح)، ورقاقة
+           الصيغة تُدمج بجانبه بدل عمود مستقل — فتظهر 4-5 صفوف كاملة بلا
+           التفاف كلمة-في-كل-سطر. */
+        if (compact) {
+          /* الصيغة في التلميح (العمود المستقل أُسقط والرقاقة المرئية كانت
+             تضيف سطراً ثالثاً لكل صف فتُنقص الصفوف الظاهرة) — والنوع ثابت
+             معلن في سطر الخلاصة أسفل الجدول */
+          tdName.title = String(k.name) + " — الصيغة: "
+            + (k.pct ? "نسبة مئوية" : "قيمة عددية");
+          tdName.style.cssText = "white-space:normal;line-height:1.5;"
+            + "width:40%;min-width:" + suPx(150) + ";";
+          bName.style.cssText = "display:-webkit-box;-webkit-line-clamp:2;"
+            + "-webkit-box-orient:vertical;overflow:hidden;";
+        } else {
+          tdName.style.cssText = "white-space:normal;line-height:1.5;min-width:"
+            + suPx(230) + ";";
+        }
         tr.appendChild(tdName);
 
-        const tdType = document.createElement("td");
-        tdType.textContent = String(k.type);
-        tdType.style.cssText = "color:var(--mut-d);";
-        tr.appendChild(tdType);
+        if (!compact) {
+          const tdType = document.createElement("td");
+          tdType.textContent = String(k.type);
+          tdType.style.cssText = "color:var(--mut-d);";
+          tr.appendChild(tdType);
 
-        const tdForm = document.createElement("td");
-        tdForm.textContent = k.pct ? "نسبة مئوية" : "عدد";
-        tdForm.style.cssText = "color:var(--mut-d);";
-        tr.appendChild(tdForm);
+          const tdForm = document.createElement("td");
+          tdForm.textContent = k.pct ? "نسبة مئوية" : "عدد";
+          tdForm.style.cssText = "color:var(--mut-d);";
+          tr.appendChild(tdForm);
+        }
 
         const tdBase = document.createElement("td");
         tdBase.textContent = kpiVal(k, k.baseline);
@@ -1471,12 +1548,18 @@ RH.viz.charts2 = RH.viz.charts2 || {};
     const nPct = kpis.filter((k) => k.pct).length;
     const nAbs = kpis.length - nPct;
     const note = document.createElement("p");
-    note.textContent = fmt.noun(kpis.length, "indicator") + " من النوع "
-      + String(kpis[0].type) + " — مرر داخل الجدول لاستعراضها كاملة: "
+    note.textContent = fmt.noun(kpis.length, "indicator") + " من النوع «"
+      + String(kpis[0].type) + "» — مرر داخل الجدول لاستعراضها كاملة: "
       + fmt.int(nPct) + " بصيغة نسبة مئوية و"
       + fmt.int(nAbs) + " بصيغة عددية — " + String(kd.note) + ".";
+    note.title = note.textContent;
+    /* في المدمج سطر واحد بقصّ معلن … (النص الكامل في التلميح) — يحرر
+       ارتفاع صف كامل لصالح صفوف البيانات (كثافة الجولة 3) */
     note.style.cssText = "font-size:" + suPx(12) + ";color:var(--faint-d);"
-      + "line-height:1.6;margin:" + suPx(8) + " 0 0;flex:none;";
+      + "line-height:1.6;margin:" + suPx(6) + " 0 0;flex:none;"
+      + (compact
+        ? "white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"
+        : "");
     wrap.appendChild(note);
 
     el.appendChild(wrap);

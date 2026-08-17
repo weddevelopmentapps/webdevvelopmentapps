@@ -397,6 +397,23 @@
   line-height: 1.5;
   color: var(--faint-d);
   padding: calc(var(--su) * 4) calc(var(--su) * 2) 0;
+  min-width: 0;
+}
+/* سطر واحد دائماً بقصّ معلن — لا التفاف يطبع سطراً ثانياً تحت الشارة
+   (إصلاح مراجعة الجولة 3؛ الجملة الكاملة في التلميح) */
+[data-section="summary"] .sum-gates-text {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+[data-section="summary"] .sum-gates-text b {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  color: var(--green-hi);
+  direction: ltr;
+  unicode-bidi: isolate;
 }
 [data-section="summary"] .sum-gates-dot {
   width: calc(var(--su) * 7);
@@ -569,10 +586,6 @@
   }
 }
 
-/* ── إصلاح مراجعة الجولة 2 (تحصين): عند فئة العرض 1366 يُرفع سطر بوابات
-   التحقق فوق نطاق شارة الإصدار الثابتة كي لا تحجب حبة الشارة ذيله ── */
-@media (max-width: 1440px) {
-  [data-section="summary"] .sum-gates {
-    padding-bottom: calc(var(--su) * 20);
-  }
-}
+/* ── إصلاح مراجعة الجولة 3: حشوة ترقيع 1366 القديمة لسطر البوابات حُذفت —
+   الشريط السفلي لشارة الإصدار محجوز مركزياً في .dash-body لكل الأقسام
+   والمقاسات، والسطر ذاته صار سطراً واحداً لا يلتف ── */

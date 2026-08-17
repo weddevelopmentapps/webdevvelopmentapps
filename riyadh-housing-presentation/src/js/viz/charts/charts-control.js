@@ -297,6 +297,18 @@ RH.viz.charts2 = RH.viz.charts2 || {};
     return best;
   }
 
+  /** كل فهارس القيمة العظمى بترتيب السلسلة — إفصاح تعادل الذروة
+      (إصلاح مراجعة الجولة 4): عند تعادل الأقصى في أكثر من شهر تُوسم
+      وتُسمّى الأشهر كلها لا أولها فقط، وإلا أوحى النص بانحسارٍ لم يحدث */
+  function maxIdxAll(values) {
+    const top = values[maxIdx(values)];
+    const out = [];
+    for (let i = 0; i < values.length; i++) {
+      if (values[i] === top) out.push(i);
+    }
+    return out;
+  }
+
   /** فرق شهري موقَّع للتلميح: «+13» بعزل اتجاهي حتمي أو «−197» عبر fmt.int */
   function signedDelta(d) {
     if (d == null) return "—";
@@ -373,8 +385,14 @@ RH.viz.charts2 = RH.viz.charts2 || {};
     });
 
     const cats = monthCats(rows, compact);
-    const iMaxV = maxIdx(visits);   // ذروة الزيارات (أول الأقصى عند التعادل)
-    const iMaxF = maxIdx(viols);    // ذروة المخالفات
+    /* ذروتا اللوحتين بكل فهارس التعادل — التسمية والملخص يسمّيان كل أشهر
+       الذروة (يوليو وأغسطس 2026 يتشاركان ذروة المخالفات 317) */
+    const peaksV = maxIdxAll(visits);   // ذروة الزيارات
+    const peaksF = maxIdxAll(viols);    // ذروة المخالفات
+    const iMaxV = peaksV[0];
+    const iMaxF = peaksF[0];
+    const peaksVLabel = fmt.monthsList(peaksV.map((i) => rows[i].label));
+    const peaksFLabel = fmt.monthsList(peaksF.map((i) => rows[i].label));
 
     const NAME_V = "الزيارات الميدانية";
     const NAME_F = "المخالفات المسجلة";
@@ -404,11 +422,12 @@ RH.viz.charts2 = RH.viz.charts2 || {};
       ? NAME_F + " تراكمياً — " + fmt.noun(totViol, "violation") + " بنهاية الفترة"
       : NAME_F + " — " + fmt.noun(totViol, "violation") + " خلال الفترة";
 
-    /* تسمية مباشرة انتقائية: الذروة فقط (لا رقم فوق كل عمود — قاعدة صارمة) */
+    /* تسمية مباشرة انتقائية: الذروة فقط (لا رقم فوق كل عمود — قاعدة صارمة).
+       peakAt مصفوفة فهارس: كل أشهر التعادل تُوسم بقيمتها لا أولها فقط */
     const peakLabel = (peakAt, color) => Object.assign({
       show: !compact,
       position: "top",
-      formatter: (p) => (p.dataIndex === peakAt ? fmt.int(p.value) : ""),
+      formatter: (p) => (peakAt.indexOf(p.dataIndex) !== -1 ? fmt.int(p.value) : ""),
     }, numStyle(su, 12, color, 700));
 
     /* لوحة شهرية: أعمدة مرساة عند الصفر بذروة موسومة (+ متوسط الزيارات) */
@@ -540,7 +559,7 @@ RH.viz.charts2 = RH.viz.charts2 || {};
           cumPanel(NAME_F, cum.violations, T.C.coral, T.C.coral, 1, totViol),
         ]
         : [
-          Object.assign(barPanel(NAME_V, visits, T.C.green, T.C.greenHi, 0, iMaxV), {
+          Object.assign(barPanel(NAME_V, visits, T.C.green, T.C.greenHi, 0, peaksV), {
             /* المتوسط الشهري من المشتقات المنشورة — بصبغة السلسلة خافتةً:
                ليس مستهدفاً ولا خط أساس فلا يجوز له الذهبي */
             markLine: {
@@ -558,7 +577,7 @@ RH.viz.charts2 = RH.viz.charts2 || {};
               data: [{ yAxis: avgVisits }],
             },
           }),
-          barPanel(NAME_F, viols, T.C.coral, T.C.coral, 1, iMaxF),
+          barPanel(NAME_F, viols, T.C.coral, T.C.coral, 1, peaksF),
         ],
     }), true);
 
@@ -569,9 +588,9 @@ RH.viz.charts2 = RH.viz.charts2 || {};
         + String(rows[rows.length - 1].label)
       : "النشاط الرقابي الشهري في لوحتين منفصلتين: "
         + fmt.noun(totVisits, "visit") + " و" + fmt.noun(totViol, "violation")
-        + " خلال 12 شهراً؛ ذروة الزيارات في " + String(rows[iMaxV].label)
+        + " خلال 12 شهراً؛ ذروة الزيارات في " + peaksVLabel
         + " بواقع " + fmt.noun(visits[iMaxV], "visit")
-        + " وذروة المخالفات في " + String(rows[iMaxF].label)
+        + " وذروة المخالفات في " + peaksFLabel
         + " بواقع " + fmt.noun(viols[iMaxF], "violation")
         + "؛ المتوسط الشهري " + fmt.noun(avgVisits, "visit"));
 

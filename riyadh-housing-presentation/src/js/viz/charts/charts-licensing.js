@@ -639,10 +639,14 @@ RH.viz.charts2 = RH.viz.charts2 || {};
           textStyle: txtStyle(su, compact ? 12 : 13.5, T.C.ink2, 600),
         },
       ],
+      /* إصلاح مراجعة الجولة 3: حشوة علوية أكبر في المدمج (64 بدل 48) —
+         كانت علامة المحور العليا (6,000) تُطبع تحت عنوان الشبكة عند 1366
+         فتظهر «,000» مبتورة؛ الفاصل يمنع تقاطع العلامة مع العنوان مهما
+         اختار المحور من علامات. */
       grid: [
-        { top: T.fs(su, compact ? 48 : 60), bottom: T.fs(su, compact ? 20 : 28),
+        { top: T.fs(su, compact ? 64 : 60), bottom: T.fs(su, compact ? 20 : 28),
           left: "56%", right: T.fs(su, 8), containLabel: true },
-        { top: T.fs(su, compact ? 48 : 60), bottom: T.fs(su, compact ? 20 : 28),
+        { top: T.fs(su, compact ? 64 : 60), bottom: T.fs(su, compact ? 20 : 28),
           left: T.fs(su, 8), right: "56%", containLabel: true },
       ],
       axisPointer: { link: [{ xAxisIndex: "all" }] },
@@ -1004,10 +1008,14 @@ RH.viz.charts2 = RH.viz.charts2 || {};
           textStyle: txtStyle(su, compact ? 12 : 13.5, T.C.ink2, 600),
         },
       ],
+      /* إصلاح مراجعة الجولة 3: حشوة علوية أكبر في المدمج (64 بدل 48) —
+         كانت علامة المحور العليا (6,000) تُطبع تحت عنوان الشبكة عند 1366
+         فتظهر «,000» مبتورة؛ الفاصل يمنع تقاطع العلامة مع العنوان مهما
+         اختار المحور من علامات. */
       grid: [
-        { top: T.fs(su, compact ? 48 : 60), bottom: T.fs(su, compact ? 20 : 28),
+        { top: T.fs(su, compact ? 64 : 60), bottom: T.fs(su, compact ? 20 : 28),
           left: "56%", right: T.fs(su, 8), containLabel: true },
-        { top: T.fs(su, compact ? 48 : 60), bottom: T.fs(su, compact ? 20 : 28),
+        { top: T.fs(su, compact ? 64 : 60), bottom: T.fs(su, compact ? 20 : 28),
           left: T.fs(su, 8), right: "56%", containLabel: true },
       ],
       axisPointer: { link: [{ xAxisIndex: "all" }] },

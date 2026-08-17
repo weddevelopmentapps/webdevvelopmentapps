@@ -130,27 +130,44 @@
   font-weight: 700;
 }
 
-/* ── 6) عمود الرؤى الممتد ── */
+/* ── 6) عمود الرؤى الممتد ──
+   إصلاح مراجعة الجولة 3 (بنيوي): كل عنصر في العمود flex:none بمقاس محتواه —
+   لا انكماش يسحق صف «الشرق» تحت زر الملحق بعد اليوم؛ نصوص الرؤى مقصوصة
+   بسطرين معلنين … (النص الكامل في التلميح) فيتسع العمود كاملاً فوق شريط
+   الشارة المحجوز مركزياً في .dash-body. */
 [data-section="demand"] .dmd-rail-cell {
-  gap: calc(var(--su) * 12);
+  gap: calc(var(--su) * 8);
   overflow: hidden;
 }
 [data-section="demand"] .dmd-rail-cell .rail {
   flex: none;
+  gap: calc(var(--su) * 7);
+}
+[data-section="demand"] .dmd-rail-cell .rail-item {
+  padding: calc(var(--su) * 7) calc(var(--su) * 13);
+}
+[data-section="demand"] .dmd-rail-cell .rail-item-text {
+  font-size: calc(var(--su) * 12.5);
+  line-height: 1.55;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-/* بطاقة «ترتيب القطاعات بنسبة التغطية» — قائمة الأولوية التدخلية */
+/* بطاقة «ترتيب القطاعات بنسبة التغطية» — قائمة الأولوية التدخلية:
+   flex:none — صفوفها الخمسة بيانات لا تُسحق ولا تُقص أبداً */
 [data-section="demand"] .dmd-rank {
+  flex: none;
   background: rgba(16, 32, 26, 0.58);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid var(--hair-d2);
   border-radius: var(--r-sm);
-  padding: calc(var(--su) * 12) calc(var(--su) * 14) calc(var(--su) * 10);
+  padding: calc(var(--su) * 10) calc(var(--su) * 14) calc(var(--su) * 8);
   display: flex;
   flex-direction: column;
-  gap: calc(var(--su) * 6);
-  min-height: 0;
+  gap: calc(var(--su) * 5);
 }
 [data-section="demand"] .dmd-rank-title {
   font-size: calc(var(--su) * 14);
@@ -236,11 +253,12 @@
 
 /* زر الملحق التحليلي — تعمق قانوني بحفظ الحالة (لا لون بيانات) */
 [data-section="demand"] .dmd-appx {
+  flex: none;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: calc(var(--su) * 10);
-  padding: calc(var(--su) * 11) calc(var(--su) * 15);
+  padding: calc(var(--su) * 9) calc(var(--su) * 14);
   border: 1px solid var(--hair-d2);
   border-radius: var(--r-sm);
   background: rgba(16, 32, 26, 0.58);
@@ -265,11 +283,15 @@
   outline-offset: 2px;
 }
 
-/* سطر حداثة البيانات أسفل العمود */
+/* سطر حداثة البيانات أسفل العمود — سطر واحد بقصّ معلن عند الضيق */
 [data-section="demand"] .dmd-meta {
+  flex: none;
   font-size: calc(var(--su) * 12);
   color: var(--faint-d);
   padding-inline-start: calc(var(--su) * 4);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 [data-section="demand"] .dmd-meta b {
   color: var(--mut-d);
