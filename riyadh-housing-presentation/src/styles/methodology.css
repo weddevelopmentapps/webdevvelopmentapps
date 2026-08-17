@@ -68,15 +68,15 @@
   display: flex;
   flex-direction: column;
   gap: calc(var(--su) * 3);
-  background: rgba(16, 32, 26, 0.55);
+  background: rgba(var(--surf-2-rgb), 0.55);
   border: 1px solid var(--hair-d2);
   border-radius: var(--r-sm);
   padding: calc(var(--su) * 10) calc(var(--su) * 14);
   min-width: 0;
 }
-.mth-stat.pos { border-top: 2px solid rgba(49, 162, 109, 0.55); }
-.mth-stat.neg { border-top: 2px solid rgba(214, 106, 80, 0.55); }
-.mth-stat.warn { border-top: 2px solid rgba(214, 171, 76, 0.5); }
+.mth-stat.pos { border-top: 2px solid rgba(var(--green-rgb), 0.55); }
+.mth-stat.neg { border-top: 2px solid rgba(var(--coral-rgb), 0.55); }
+.mth-stat.warn { border-top: 2px solid rgba(var(--gold-rgb), 0.5); }
 .mth-stat-k {
   font-size: calc(var(--su) * 12);
   font-weight: 600;
@@ -206,28 +206,28 @@
   border-radius: 999px;
   border: 1px solid var(--hair-d);
   color: var(--mut-d);
-  background: rgba(244, 241, 230, 0.04);
+  background: rgba(var(--ink-rgb), 0.04);
   white-space: nowrap;
 }
 .mth-badge.gold {
   color: var(--gold-hi);
-  border-color: rgba(214, 171, 76, 0.45);
-  background: rgba(214, 171, 76, 0.08);
+  border-color: rgba(var(--gold-rgb), 0.45);
+  background: rgba(var(--gold-rgb), 0.08);
 }
 .mth-badge.pos {
   color: var(--green-hi);
-  border-color: rgba(49, 162, 109, 0.42);
-  background: rgba(49, 162, 109, 0.08);
+  border-color: rgba(var(--green-rgb), 0.42);
+  background: rgba(var(--green-rgb), 0.08);
 }
 .mth-badge.neg {
   color: var(--coral);
-  border-color: rgba(214, 106, 80, 0.45);
-  background: rgba(214, 106, 80, 0.08);
+  border-color: rgba(var(--coral-rgb), 0.45);
+  background: rgba(var(--coral-rgb), 0.08);
 }
 .mth-badge.blue {
   color: var(--collar-blue);
-  border-color: rgba(63, 127, 176, 0.45);
-  background: rgba(63, 127, 176, 0.08);
+  border-color: rgba(var(--blue-rgb), 0.45);
+  background: rgba(var(--blue-rgb), 0.08);
 }
 .mth-badge.neu { color: var(--ink2-d); }
 
@@ -241,7 +241,7 @@
 .mth-note.wide { max-width: none; }
 .mth-note.warnline {
   color: var(--gold-hi);
-  border-inline-start: 2px solid rgba(214, 171, 76, 0.45);
+  border-inline-start: 2px solid rgba(var(--gold-rgb), 0.45);
   padding-inline-start: calc(var(--su) * 10);
 }
 
@@ -264,12 +264,12 @@
 
 .mth-tr { transition: background var(--dur-micro); }
 .mth-tr[role="button"] { cursor: pointer; }
-.mth-tr[role="button"]:hover { background: rgba(244, 241, 230, 0.035); }
+.mth-tr[role="button"]:hover { background: rgba(var(--ink-rgb), 0.035); }
 .mth-tr[role="button"]:focus-visible {
   outline: 2px solid var(--gold);
   outline-offset: -2px;
 }
-.mth-tr.now { background: rgba(214, 171, 76, 0.09); }
+.mth-tr.now { background: rgba(var(--gold-rgb), 0.09); }
 .mth-tr.now td { color: var(--ivory); }
 .mth-tr.bad td:first-child { box-shadow: inset 2px 0 0 var(--coral); }
 .mth-tr.warn td:first-child { box-shadow: inset 2px 0 0 var(--gold); }
@@ -317,7 +317,7 @@
   display: inline-flex;
   align-items: center;
   gap: calc(var(--su) * 6);
-  background: rgba(8, 16, 9, 0.6);
+  background: rgba(var(--base-rgb), 0.6);
   border: 1px solid var(--hair-d);
   border-radius: 999px;
   padding: calc(var(--su) * 4) calc(var(--su) * 8) calc(var(--su) * 4) calc(var(--su) * 4);
@@ -375,7 +375,7 @@
   font-size: calc(var(--su) * 12.5);
   font-weight: 600;
   color: var(--mut-d);
-  background: rgba(16, 32, 26, 0.55);
+  background: rgba(var(--surf-2-rgb), 0.55);
   border: 1px solid var(--hair-d2);
   border-radius: 999px;
   padding: calc(var(--su) * 5) calc(var(--su) * 13);
@@ -419,7 +419,7 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  background: rgba(16, 32, 26, 0.5);
+  background: rgba(var(--surf-2-rgb), 0.5);
   border: 1px solid var(--hair-d2);
   border-radius: var(--r-sm);
   padding: calc(var(--su) * 6) calc(var(--su) * 8);
@@ -518,7 +518,7 @@
   align-items: baseline;
   justify-content: space-between;
   gap: calc(var(--su) * 10);
-  background: rgba(8, 16, 9, 0.45);
+  background: rgba(var(--base-rgb), 0.45);
   border: 1px solid var(--hair-d2);
   border-radius: var(--r-sm);
   padding: calc(var(--su) * 6) calc(var(--su) * 10);
@@ -527,7 +527,7 @@
 }
 .mth-chain-link:hover, .mth-chain-link:focus-visible {
   border-color: var(--gold);
-  background: rgba(214, 171, 76, 0.07);
+  background: rgba(var(--gold-rgb), 0.07);
 }
 .mth-chain-name {
   font-size: calc(var(--su) * 12.5);
@@ -599,8 +599,8 @@
   gap: calc(var(--su) * 8);
 }
 .mth-disc-item {
-  background: rgba(214, 171, 76, 0.05);
-  border: 1px dashed rgba(214, 171, 76, 0.35);
+  background: rgba(var(--gold-rgb), 0.05);
+  border: 1px dashed rgba(var(--gold-rgb), 0.35);
   border-radius: var(--r-sm);
   padding: calc(var(--su) * 9) calc(var(--su) * 13);
   display: flex;
@@ -644,7 +644,7 @@
   font-size: calc(var(--su) * 13.5);
   font-weight: 700;
   color: var(--ivory);
-  background: rgba(16, 32, 26, 0.6);
+  background: rgba(var(--surf-2-rgb), 0.6);
   border: 1px solid var(--hair-d);
   border-radius: 999px;
   padding: calc(var(--su) * 7) calc(var(--su) * 18);
@@ -674,8 +674,8 @@
   gap: calc(var(--su) * 8);
 }
 .mth-warn {
-  background: rgba(214, 171, 76, 0.05);
-  border: 1px solid rgba(214, 171, 76, 0.3);
+  background: rgba(var(--gold-rgb), 0.05);
+  border: 1px solid rgba(var(--gold-rgb), 0.3);
   border-radius: var(--r-sm);
   padding: calc(var(--su) * 8) calc(var(--su) * 12);
 }
@@ -830,7 +830,7 @@
   padding-inline-start: calc(var(--su) * 6);
 }
 .mth-gtab.now .mth-gtab-fail { color: var(--stage-0); }
-.mth-gtab.has-fail { border-color: rgba(214, 171, 76, 0.4); }
+.mth-gtab.has-fail { border-color: rgba(var(--gold-rgb), 0.4); }
 
 .mth-glist-host {
   flex: 1;
@@ -905,7 +905,7 @@
   display: flex;
   align-items: baseline;
   gap: calc(var(--su) * 10);
-  background: rgba(8, 16, 9, 0.45);
+  background: rgba(var(--base-rgb), 0.45);
   border: 1px solid var(--hair-d2);
   border-radius: var(--r-sm);
   padding: calc(var(--su) * 7) calc(var(--su) * 11);
@@ -914,7 +914,7 @@
 }
 .mth-openbtn:hover, .mth-openbtn:focus-visible {
   border-color: var(--gold);
-  background: rgba(214, 171, 76, 0.07);
+  background: rgba(var(--gold-rgb), 0.07);
 }
 .mth-open-topic {
   flex: 1;
@@ -952,7 +952,7 @@
   padding: calc(var(--su) * 8) calc(var(--su) * 18);
   border: 1px solid var(--hair-d2);
   border-radius: 999px;
-  background: rgba(16, 32, 26, 0.6);
+  background: rgba(var(--surf-2-rgb), 0.6);
   color: var(--ink2-d);
   font-family: var(--f-body);
   font-size: calc(var(--su) * 14);

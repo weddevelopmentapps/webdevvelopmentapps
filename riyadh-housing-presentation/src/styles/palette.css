@@ -37,10 +37,10 @@
    ══════════════════════════════════════════════════════════════════════════ */
 .pal-veil {
   --pal-u: max(0.66px, var(--su));
-  --pal-glass: rgba(9, 18, 15, 0.95);
-  --pal-glass-2: rgba(16, 32, 26, 0.82);
-  --pal-row: rgba(16, 32, 26, 0.5);
-  --pal-row-now: rgba(22, 41, 31, 0.92);
+  --pal-glass: rgba(var(--base-rgb), 0.95);
+  --pal-glass-2: rgba(var(--surf-2-rgb), 0.82);
+  --pal-row: rgba(var(--surf-2-rgb), 0.5);
+  --pal-row-now: rgba(var(--surf-3-rgb), 0.92);
   --pal-hair: var(--hair-d);
   --pal-hair-2: var(--hair-d2);
   --pal-ink: var(--ivory);
@@ -48,10 +48,10 @@
   --pal-mut: var(--mut-d);
   --pal-faint: var(--faint-d);
   --pal-accent: var(--gold);
-  --pal-veil-bg: rgba(4, 8, 6, 0.66);
+  --pal-veil-bg: rgba(var(--scrim-rgb), 0.66);
   --pal-radius: var(--r);
   --pal-radius-sm: var(--r-sm);
-  --pal-shadow: 0 calc(var(--pal-u) * 40) calc(var(--pal-u) * 120) rgba(2, 6, 4, 0.62);
+  --pal-shadow: 0 calc(var(--pal-u) * 40) calc(var(--pal-u) * 120) rgba(var(--scrim-rgb), 0.62);
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
@@ -114,7 +114,7 @@ body.pal-open { overflow: hidden; }
   gap: calc(var(--pal-u) * 12);
   padding: calc(var(--pal-u) * 16) calc(var(--pal-u) * 20);
   border-bottom: 1px solid var(--pal-hair);
-  background: rgba(8, 16, 9, 0.42);
+  background: rgba(var(--base-rgb), 0.42);
 }
 
 .pal-ico {
@@ -197,11 +197,11 @@ body.pal-open { overflow: hidden; }
   width: 1px;
   background: var(--pal-hair-2);
 }
-.pal-clear:hover { color: var(--pal-ink-2); background: rgba(244, 241, 230, 0.06); }
+.pal-clear:hover { color: var(--pal-ink-2); background: rgba(var(--ink-rgb), 0.06); }
 .pal-close:hover {
   color: var(--pal-ink);
   border-color: var(--pal-hair);
-  background: rgba(244, 241, 230, 0.06);
+  background: rgba(var(--ink-rgb), 0.06);
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
@@ -238,8 +238,8 @@ body.pal-open { overflow: hidden; }
 .pal-chip:hover { color: var(--pal-ink-2); border-color: var(--pal-hair); }
 .pal-chip.on {
   color: var(--pal-ink);
-  border-color: rgba(244, 241, 230, 0.34);
-  background: rgba(244, 241, 230, 0.08);
+  border-color: rgba(var(--ink-rgb), 0.34);
+  background: rgba(var(--ink-rgb), 0.08);
 }
 /* مرشّح مقفل بنطاق مكتوب في الحقل: يبقى مقروءاً ويُعلن قفله بصرياً */
 .pal-chip.locked { opacity: 0.45; }
@@ -304,12 +304,12 @@ body.pal-open { overflow: hidden; }
   margin: 0;
   list-style: none;
   scrollbar-width: thin;
-  scrollbar-color: rgba(244, 241, 230, 0.18) transparent;
+  scrollbar-color: rgba(var(--ink-rgb), 0.18) transparent;
 }
 .pal-list::-webkit-scrollbar { width: calc(var(--pal-u) * 8); }
 .pal-list::-webkit-scrollbar-track { background: transparent; }
 .pal-list::-webkit-scrollbar-thumb {
-  background: rgba(244, 241, 230, 0.16);
+  background: rgba(var(--ink-rgb), 0.16);
   border-radius: 999px;
 }
 
@@ -391,7 +391,7 @@ body.pal-open { overflow: hidden; }
   padding: calc(var(--pal-u) * 2) calc(var(--pal-u) * 8);
   border: 1px solid var(--pal-hair-2);
   border-radius: 999px;
-  background: rgba(244, 241, 230, 0.04);
+  background: rgba(var(--ink-rgb), 0.04);
   color: var(--pal-mut);
   font-size: max(8px, calc(var(--pal-u) * 11.5));
   font-weight: 700;
@@ -404,7 +404,7 @@ body.pal-open { overflow: hidden; }
   background: transparent;
   color: inherit;
   font-weight: 800;
-  border-bottom: 1px solid rgba(214, 171, 76, 0.55);
+  border-bottom: 1px solid rgba(var(--gold-rgb), 0.55);
   padding-bottom: 1px;
 }
 
@@ -412,9 +412,9 @@ body.pal-open { overflow: hidden; }
 .pal-badge {
   flex: 0 0 auto;
   padding: calc(var(--pal-u) * 2) calc(var(--pal-u) * 9);
-  border: 1px dashed rgba(214, 171, 76, 0.45);
+  border: 1px dashed rgba(var(--gold-rgb), 0.45);
   border-radius: 999px;
-  background: rgba(214, 171, 76, 0.07);
+  background: rgba(var(--gold-rgb), 0.07);
   color: var(--gold);
   font-size: max(8px, calc(var(--pal-u) * 11));
   font-weight: 700;
@@ -531,13 +531,13 @@ body.pal-open { overflow: hidden; }
   padding: calc(var(--pal-u) * 16) calc(var(--pal-u) * 18);
   overflow-y: auto;
   overscroll-behavior: contain;
-  background: rgba(8, 16, 9, 0.34);
+  background: rgba(var(--base-rgb), 0.34);
   scrollbar-width: thin;
-  scrollbar-color: rgba(244, 241, 230, 0.16) transparent;
+  scrollbar-color: rgba(var(--ink-rgb), 0.16) transparent;
 }
 .pal-preview::-webkit-scrollbar { width: calc(var(--pal-u) * 8); }
 .pal-preview::-webkit-scrollbar-thumb {
-  background: rgba(244, 241, 230, 0.14);
+  background: rgba(var(--ink-rgb), 0.14);
   border-radius: 999px;
 }
 
@@ -573,7 +573,7 @@ body.pal-open { overflow: hidden; }
   padding: calc(var(--pal-u) * 12) calc(var(--pal-u) * 14);
   border: 1px solid var(--pal-hair-2);
   border-radius: var(--pal-radius-sm);
-  background: rgba(16, 32, 26, 0.46);
+  background: rgba(var(--surf-2-rgb), 0.46);
 }
 .pal-pv-value {
   display: flex;
@@ -686,7 +686,7 @@ body.pal-open { overflow: hidden; }
   padding: calc(var(--pal-u) * 7) calc(var(--pal-u) * 15);
   border: 1px solid var(--pal-hair);
   border-radius: 999px;
-  background: rgba(244, 241, 230, 0.04);
+  background: rgba(var(--ink-rgb), 0.04);
   color: var(--pal-ink-2);
   font-family: var(--f-body);
   font-size: max(10px, calc(var(--pal-u) * 13));
@@ -695,13 +695,13 @@ body.pal-open { overflow: hidden; }
   transition: color var(--dur-micro), background var(--dur-micro),
     border-color var(--dur-micro);
 }
-.pal-act:hover { color: var(--pal-ink); background: rgba(244, 241, 230, 0.09); }
+.pal-act:hover { color: var(--pal-ink); background: rgba(var(--ink-rgb), 0.09); }
 .pal-act-main {
-  border-color: rgba(49, 162, 109, 0.5);
-  background: rgba(49, 162, 109, 0.12);
+  border-color: rgba(var(--green-rgb), 0.5);
+  background: rgba(var(--green-rgb), 0.12);
   color: var(--green-hi);
 }
-.pal-act-main:hover { background: rgba(49, 162, 109, 0.2); color: var(--green-hi); }
+.pal-act-main:hover { background: rgba(var(--green-rgb), 0.2); color: var(--green-hi); }
 .pal-act-key {
   padding: 0 calc(var(--pal-u) * 5);
   border: 1px solid var(--pal-hair-2);
@@ -744,7 +744,7 @@ body.mode-report .pal-veil .mcr-ratio.t-neu { --mcr-tone: var(--mut); --mcr-tone
   gap: calc(var(--pal-u) * 14);
   padding: calc(var(--pal-u) * 9) calc(var(--pal-u) * 18);
   border-top: 1px solid var(--pal-hair);
-  background: rgba(8, 16, 9, 0.5);
+  background: rgba(var(--base-rgb), 0.5);
 }
 .pal-range {
   font-size: max(9px, calc(var(--pal-u) * 12));
@@ -795,10 +795,10 @@ body.mode-report .pal-veil .mcr-ratio.t-neu { --mcr-tone: var(--mut); --mcr-tone
    الحقل وحده فتعيد رسم الحلقة. */
 .pal-veil .pal-input:focus-visible { outline: none; }
 .pal-veil .pal-search:focus-within {
-  box-shadow: inset 0 calc(var(--pal-u) * -2) 0 rgba(214, 171, 76, 0.55);
+  box-shadow: inset 0 calc(var(--pal-u) * -2) 0 rgba(var(--gold-rgb), 0.55);
 }
 body.mode-report .pal-veil .pal-search:focus-within {
-  box-shadow: inset 0 calc(var(--pal-u) * -2) 0 rgba(10, 122, 72, 0.5);
+  box-shadow: inset 0 calc(var(--pal-u) * -2) 0 rgba(var(--accent-rgb), 0.5);
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
@@ -807,49 +807,49 @@ body.mode-report .pal-veil .pal-search:focus-within {
    القلب هنا رموز فقط: لا صنف جديد ولا بنية مختلفة.
    ══════════════════════════════════════════════════════════════════════════ */
 body.mode-report .pal-veil {
-  --pal-glass: rgba(255, 255, 255, 0.98);
-  --pal-glass-2: rgba(247, 248, 246, 0.98);
-  --pal-row: rgba(17, 24, 21, 0.04);
-  --pal-row-now: rgba(10, 122, 72, 0.08);
+  --pal-glass: rgba(var(--surf-1-rgb), 0.98);
+  --pal-glass-2: rgba(var(--base-rgb), 0.98);
+  --pal-row: rgba(var(--ink-rgb), 0.04);
+  --pal-row-now: rgba(var(--accent-rgb), 0.08);
   --pal-hair: var(--hair);
   --pal-hair-2: var(--hair2);
   --pal-ink: var(--ink);
   --pal-ink-2: var(--ink2);
   --pal-mut: var(--mut);
   --pal-faint: var(--faint);
-  --pal-veil-bg: rgba(17, 24, 21, 0.42);
-  --pal-shadow: 0 calc(var(--pal-u) * 30) calc(var(--pal-u) * 90) rgba(17, 24, 21, 0.28);
+  --pal-veil-bg: rgba(var(--ink-rgb), 0.42);
+  --pal-shadow: 0 calc(var(--pal-u) * 30) calc(var(--pal-u) * 90) rgba(var(--ink-rgb), 0.28);
 }
-body.mode-report .pal-search { background: rgba(17, 24, 21, 0.02); }
-body.mode-report .pal-preview { background: rgba(17, 24, 21, 0.02); }
-body.mode-report .pal-foot { background: rgba(17, 24, 21, 0.02); }
-body.mode-report .pal-pv-answer { background: rgba(17, 24, 21, 0.03); }
+body.mode-report .pal-search { background: rgba(var(--ink-rgb), 0.02); }
+body.mode-report .pal-preview { background: rgba(var(--ink-rgb), 0.02); }
+body.mode-report .pal-foot { background: rgba(var(--ink-rgb), 0.02); }
+body.mode-report .pal-pv-answer { background: rgba(var(--ink-rgb), 0.03); }
 body.mode-report .pal-list::-webkit-scrollbar-thumb,
 body.mode-report .pal-preview::-webkit-scrollbar-thumb {
-  background: rgba(17, 24, 21, 0.18);
+  background: rgba(var(--ink-rgb), 0.18);
 }
 body.mode-report .pal-clear:hover,
 body.mode-report .pal-close:hover,
-body.mode-report .pal-chip.on { background: rgba(17, 24, 21, 0.06); }
-body.mode-report .pal-act { background: rgba(17, 24, 21, 0.03); }
-body.mode-report .pal-act:hover { background: rgba(17, 24, 21, 0.07); }
+body.mode-report .pal-chip.on { background: rgba(var(--ink-rgb), 0.06); }
+body.mode-report .pal-act { background: rgba(var(--ink-rgb), 0.03); }
+body.mode-report .pal-act:hover { background: rgba(var(--ink-rgb), 0.07); }
 body.mode-report .pal-act-main {
-  border-color: rgba(10, 122, 72, 0.45);
-  background: rgba(10, 122, 72, 0.1);
+  border-color: rgba(var(--accent-rgb), 0.45);
+  background: rgba(var(--accent-rgb), 0.1);
   color: var(--accent);
 }
-body.mode-report .pal-act-main:hover { background: rgba(10, 122, 72, 0.16); }
+body.mode-report .pal-act-main:hover { background: rgba(var(--accent-rgb), 0.16); }
 /* النغمات على الورق: درجات أدكن تحفظ التباين مع بقاء الدلالة ذاتها */
 body.mode-report .pal-veil .t-pos { color: var(--ok); }
 body.mode-report .pal-veil .t-neg { color: var(--bad); }
 body.mode-report .pal-veil .t-gold { color: var(--warn); }
-body.mode-report .pal-veil .t-demand { color: #7A5E1F; }
+body.mode-report .pal-veil .t-demand { color: var(--demand); }
 body.mode-report .pal-veil .t-blue { color: var(--info); }
 body.mode-report .pal-veil .t-neu { color: var(--ink2); }
 body.mode-report .pal-badge,
 body.mode-report .pal-answer-tag,
 body.mode-report .pal-pv-caveat-t { color: var(--warn); }
-body.mode-report .pal-hl { border-bottom-color: rgba(183, 122, 18, 0.6); }
+body.mode-report .pal-hl { border-bottom-color: rgba(var(--warn-rgb), 0.6); }
 
 /* ══════════════════════════════════════════════════════════════════════════
    10) مقاسات ضيقة — اللوح يبقى قابلاً للتشغيل بلوحة المفاتيح كاملاً

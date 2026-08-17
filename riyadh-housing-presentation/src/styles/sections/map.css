@@ -25,11 +25,11 @@
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: thin;
-  scrollbar-color: rgba(244, 241, 230, 0.18) transparent;
+  scrollbar-color: rgba(var(--ink-rgb), 0.18) transparent;
 }
 [data-section="map"] .dash-body::-webkit-scrollbar { width: 8px; }
 [data-section="map"] .dash-body::-webkit-scrollbar-thumb {
-  background: rgba(244, 241, 230, 0.16);
+  background: rgba(var(--ink-rgb), 0.16);
   border-radius: 8px;
 }
 [data-section="map"] .dash-body::-webkit-scrollbar-track { background: transparent; }
@@ -66,7 +66,7 @@
 [data-section="map"] .map-kpi:hover {
   transform: translateY(calc(var(--su) * -2));
   border-color: var(--hair-d);
-  background: rgba(22, 41, 31, 0.66);
+  background: rgba(var(--surf-3-rgb), 0.66);
 }
 [data-section="map"] .map-kpi:focus-visible {
   outline: 2px solid var(--gold);
@@ -99,8 +99,8 @@
 }
 [data-section="map"] .map-mode-chip.live {
   color: var(--green-hi);
-  border-color: rgba(49, 162, 109, 0.45);
-  background: rgba(49, 162, 109, 0.08);
+  border-color: rgba(var(--green-rgb), 0.45);
+  background: rgba(var(--green-rgb), 0.08);
 }
 
 /* ── شريط التحكم: ثلاث مجموعات تلتف عند الضيق ── */
@@ -130,7 +130,7 @@
   padding: calc(var(--su) * 5) calc(var(--su) * 12);
   border: 1px solid var(--hair-d2);
   border-radius: 999px;
-  background: rgba(11, 21, 18, 0.55);
+  background: rgba(var(--surf-1-rgb), 0.55);
   color: var(--mut-d);
   font-family: var(--f-body);
   font-size: calc(var(--su) * 13);
@@ -144,7 +144,7 @@
 [data-section="map"] .map-lyr-btn:hover {
   color: var(--ivory);
   border-color: var(--hair-d);
-  background: rgba(22, 41, 31, 0.8);
+  background: rgba(var(--surf-3-rgb), 0.8);
 }
 [data-section="map"] .map-lyr-btn:focus-visible {
   outline: 2px solid var(--gold);
@@ -169,16 +169,16 @@
 /* الطبقة النشطة: حد وخلفية بلون سلمها الدلالي */
 [data-section="map"] .map-lyr-btn.active { color: var(--ivory); }
 [data-section="map"] .map-lyr-btn.r-seq.active {
-  border-color: rgba(49, 162, 109, 0.55);
-  background: rgba(49, 162, 109, 0.14);
+  border-color: rgba(var(--green-rgb), 0.55);
+  background: rgba(var(--green-rgb), 0.14);
 }
 [data-section="map"] .map-lyr-btn.r-viol.active {
-  border-color: rgba(214, 106, 80, 0.55);
-  background: rgba(214, 106, 80, 0.13);
+  border-color: rgba(var(--coral-rgb), 0.55);
+  background: rgba(var(--coral-rgb), 0.13);
 }
 [data-section="map"] .map-lyr-btn.r-demand.active {
-  border-color: rgba(170, 138, 62, 0.6);
-  background: rgba(170, 138, 62, 0.14);
+  border-color: rgba(var(--demand-rgb), 0.6);
+  background: rgba(var(--demand-rgb), 0.14);
 }
 
 /* ── مفتاحا نقاط التركّز وإبراز العينة ── */
@@ -189,7 +189,7 @@
   padding: calc(var(--su) * 5) calc(var(--su) * 12);
   border: 1px solid var(--hair-d2);
   border-radius: 999px;
-  background: rgba(11, 21, 18, 0.55);
+  background: rgba(var(--surf-1-rgb), 0.55);
   color: var(--mut-d);
   font-family: var(--f-body);
   font-size: calc(var(--su) * 13);
@@ -218,23 +218,23 @@
 }
 /* نقاط التركّز الرقابي: مرجاني حصراً (مواضع مخالفات) */
 [data-section="map"] .map-tgl.tgl-hs .map-tgl-dot {
-  background: rgba(214, 106, 80, 0.42);
+  background: rgba(var(--coral-rgb), 0.42);
   border: 1px solid var(--coral);
 }
 [data-section="map"] .map-tgl.tgl-hs.active {
   color: var(--ivory);
-  border-color: rgba(214, 106, 80, 0.55);
-  background: rgba(214, 106, 80, 0.13);
+  border-color: rgba(var(--coral-rgb), 0.55);
+  background: rgba(var(--coral-rgb), 0.13);
 }
 /* إبراز العينة: حد عاجي (وسم هوية لا قيمة بيانات) */
 [data-section="map"] .map-tgl.tgl-sm .map-tgl-dot {
   background: transparent;
-  border: calc(var(--su) * 1.6) solid rgba(244, 241, 230, 0.8);
+  border: calc(var(--su) * 1.6) solid rgba(var(--ink-rgb), 0.8);
 }
 [data-section="map"] .map-tgl.tgl-sm.active {
   color: var(--ivory);
-  border-color: rgba(244, 241, 230, 0.4);
-  background: rgba(244, 241, 230, 0.07);
+  border-color: rgba(var(--ink-rgb), 0.4);
+  background: rgba(var(--ink-rgb), 0.07);
 }
 [data-section="map"] .map-tgl-count {
   font-family: var(--f-display);
@@ -253,7 +253,7 @@
   padding: calc(var(--su) * 5) calc(var(--su) * 12);
   border: 1px solid var(--hair-d2);
   border-radius: 999px;
-  background: rgba(11, 21, 18, 0.55);
+  background: rgba(var(--surf-1-rgb), 0.55);
   color: var(--mut-d);
   font-family: var(--f-body);
   font-size: calc(var(--su) * 12.5);
@@ -275,8 +275,8 @@
 }
 [data-section="map"] .map-mode-btn.active {
   color: var(--ivory);
-  border-color: rgba(244, 241, 230, 0.35);
-  background: rgba(244, 241, 230, 0.08);
+  border-color: rgba(var(--ink-rgb), 0.35);
+  background: rgba(var(--ink-rgb), 0.08);
 }
 [data-section="map"] .map-mode-btn:disabled {
   opacity: 0.4;
@@ -304,7 +304,7 @@
   border: 1px solid var(--hair-d2);
   border-inline-start: 3px solid var(--faint-d);
   border-radius: var(--r-sm);
-  background: rgba(11, 21, 18, 0.5);
+  background: rgba(var(--surf-1-rgb), 0.5);
   color: var(--ink2-d);
   font-size: calc(var(--su) * 13.5);
   line-height: 1.5;
@@ -312,7 +312,7 @@
   transition: background var(--dur-micro) var(--ease),
     border-color var(--dur-micro) var(--ease);
 }
-[data-section="map"] .map-reading:hover { background: rgba(22, 41, 31, 0.72); }
+[data-section="map"] .map-reading:hover { background: rgba(var(--surf-3-rgb), 0.72); }
 [data-section="map"] .map-reading:focus-visible {
   outline: 2px solid var(--gold);
   outline-offset: 2px;
@@ -361,7 +361,7 @@
 }
 [data-section="map"] .map-stage.sm-on .geomap-district.has-sample {
   opacity: 1;
-  stroke: rgba(244, 241, 230, 0.85);
+  stroke: rgba(var(--ink-rgb), 0.85);
   stroke-width: 1.5;
 }
 [data-section="map"] .map-stage.sm-on .geomap-district:hover,
@@ -382,7 +382,7 @@
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: thin;
-  scrollbar-color: rgba(244, 241, 230, 0.45) rgba(244, 241, 230, 0.12);
+  scrollbar-color: rgba(var(--ink-rgb), 0.45) rgba(var(--ink-rgb), 0.12);
   scrollbar-gutter: stable;
   padding-inline-end: calc(var(--su) * 2);
   /* إصلاح مراجعة الجولة 3: الصفوف القطاعية المضغوطة تجعل العمود يتسع
@@ -392,11 +392,11 @@
 }
 [data-section="map"] .map-rail::-webkit-scrollbar { width: 7px; }
 [data-section="map"] .map-rail::-webkit-scrollbar-track {
-  background: rgba(244, 241, 230, 0.12);
+  background: rgba(var(--ink-rgb), 0.12);
   border-radius: 6px;
 }
 [data-section="map"] .map-rail::-webkit-scrollbar-thumb {
-  background: rgba(244, 241, 230, 0.45);
+  background: rgba(var(--ink-rgb), 0.45);
   border-radius: 6px;
 }
 
@@ -408,7 +408,7 @@
 }
 [data-section="map"] .map-dock-hint {
   border-style: dashed;
-  background: rgba(16, 32, 26, 0.4);
+  background: rgba(var(--surf-2-rgb), 0.4);
 }
 [data-section="map"] .map-dock-hint-title {
   display: flex;
@@ -423,7 +423,7 @@
   width: calc(var(--su) * 9);
   height: calc(var(--su) * 9);
   border-radius: 50%;
-  border: calc(var(--su) * 1.6) solid rgba(244, 241, 230, 0.7);
+  border: calc(var(--su) * 1.6) solid rgba(var(--ink-rgb), 0.7);
   flex: none;
 }
 [data-section="map"] .map-dock-hint-text {
@@ -535,7 +535,7 @@
   display: flex;
   flex-direction: column;
   gap: calc(var(--su) * 1);
-  background: rgba(11, 21, 18, 0.55);
+  background: rgba(var(--surf-1-rgb), 0.55);
   border: 1px solid var(--hair-d2);
   border-radius: calc(var(--su) * 9);
   padding: calc(var(--su) * 7) calc(var(--su) * 10);
@@ -579,9 +579,9 @@
   align-items: center;
   justify-content: center;
   padding: calc(var(--su) * 6) calc(var(--su) * 10);
-  border: 1px solid rgba(49, 162, 109, 0.45);
+  border: 1px solid rgba(var(--green-rgb), 0.45);
   border-radius: 999px;
-  background: rgba(49, 162, 109, 0.12);
+  background: rgba(var(--green-rgb), 0.12);
   color: var(--ivory);
   font-family: var(--f-body);
   font-size: calc(var(--su) * 12.5);
@@ -591,19 +591,19 @@
   transition: background var(--dur-micro) var(--ease),
     border-color var(--dur-micro) var(--ease);
 }
-[data-section="map"] .map-btn:hover { background: rgba(49, 162, 109, 0.22); }
+[data-section="map"] .map-btn:hover { background: rgba(var(--green-rgb), 0.22); }
 [data-section="map"] .map-btn:focus-visible {
   outline: 2px solid var(--gold);
   outline-offset: 2px;
 }
 [data-section="map"] .map-btn.ghost {
   border-color: var(--hair-d2);
-  background: rgba(11, 21, 18, 0.5);
+  background: rgba(var(--surf-1-rgb), 0.5);
   color: var(--ink2-d);
 }
 [data-section="map"] .map-btn.ghost:hover {
   border-color: var(--hair-d);
-  background: rgba(22, 41, 31, 0.8);
+  background: rgba(var(--surf-3-rgb), 0.8);
   color: var(--ivory);
 }
 
@@ -635,15 +635,15 @@
 }
 [data-section="map"] .map-rail[data-ramp="seq"] .map-rail-layer {
   color: var(--green-hi);
-  border-color: rgba(49, 162, 109, 0.4);
+  border-color: rgba(var(--green-rgb), 0.4);
 }
 [data-section="map"] .map-rail[data-ramp="viol"] .map-rail-layer {
   color: var(--coral);
-  border-color: rgba(214, 106, 80, 0.4);
+  border-color: rgba(var(--coral-rgb), 0.4);
 }
 [data-section="map"] .map-rail[data-ramp="demand"] .map-rail-layer {
   color: var(--demand);
-  border-color: rgba(170, 138, 62, 0.45);
+  border-color: rgba(var(--demand-rgb), 0.45);
 }
 
 /* ── 3.3) الصفوف القطاعية الخمسة — سطر واحد لكل قطاع ──
@@ -675,7 +675,7 @@
 [data-section="map"] .map-sec:hover {
   transform: translateY(calc(var(--su) * -1));
   border-color: var(--hair-d);
-  background: rgba(22, 41, 31, 0.72);
+  background: rgba(var(--surf-3-rgb), 0.72);
 }
 [data-section="map"] .map-sec:focus-visible {
   outline: 2px solid var(--gold);
@@ -695,7 +695,7 @@
 [data-section="map"] .map-sec-bar {
   height: calc(var(--su) * 7);
   border-radius: 999px;
-  background: rgba(244, 241, 230, 0.07);
+  background: rgba(var(--ink-rgb), 0.07);
   overflow: hidden;
   /* RTL: الشريط ينمو من اليمين (بداية القراءة) */
   display: flex;
@@ -863,9 +863,9 @@
   display: inline-flex;
   align-items: center;
   padding: calc(var(--su) * 7) calc(var(--su) * 16);
-  border: 1px solid rgba(49, 162, 109, 0.45);
+  border: 1px solid rgba(var(--green-rgb), 0.45);
   border-radius: 999px;
-  background: rgba(49, 162, 109, 0.12);
+  background: rgba(var(--green-rgb), 0.12);
   color: var(--ivory);
   font-family: var(--f-body);
   font-size: calc(var(--su) * 13);
@@ -874,7 +874,7 @@
   transition: background var(--dur-micro) var(--ease),
     border-color var(--dur-micro) var(--ease);
 }
-[data-section="map"] .map-detail-go:hover { background: rgba(49, 162, 109, 0.22); }
+[data-section="map"] .map-detail-go:hover { background: rgba(var(--green-rgb), 0.22); }
 [data-section="map"] .map-detail-go:focus-visible {
   outline: 2px solid var(--gold);
   outline-offset: 2px;

@@ -21,13 +21,13 @@
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: thin;
-  scrollbar-color: rgba(244, 241, 230, 0.18) transparent;
+  scrollbar-color: rgba(var(--ink-rgb), 0.18) transparent;
 }
 [data-section="closing"] .dash-body::-webkit-scrollbar {
   width: calc(var(--su) * 8);
 }
 [data-section="closing"] .dash-body::-webkit-scrollbar-thumb {
-  background: rgba(244, 241, 230, 0.16);
+  background: rgba(var(--ink-rgb), 0.16);
   border-radius: 999px;
 }
 [data-section="closing"] .dash-body::-webkit-scrollbar-track {
@@ -66,15 +66,15 @@
 /* ثلاث درجات زمردية/عاجية خافتة — لا ذهبي ولا مرجاني في الزخرفة */
 [data-section="closing"] .cls-bokeh-dot.v0 {
   background: radial-gradient(circle,
-    rgba(49, 162, 109, 0.16), rgba(49, 162, 109, 0.02) 70%);
+    rgba(var(--green-rgb), 0.16), rgba(var(--green-rgb), 0.02) 70%);
 }
 [data-section="closing"] .cls-bokeh-dot.v1 {
   background: radial-gradient(circle,
-    rgba(76, 193, 140, 0.10), rgba(76, 193, 140, 0.015) 70%);
+    rgba(var(--green-hi-rgb), 0.10), rgba(var(--green-hi-rgb), 0.015) 70%);
 }
 [data-section="closing"] .cls-bokeh-dot.v2 {
   background: radial-gradient(circle,
-    rgba(244, 241, 230, 0.055), rgba(244, 241, 230, 0.008) 70%);
+    rgba(var(--ink-rgb), 0.055), rgba(var(--ink-rgb), 0.008) 70%);
 }
 @keyframes cls-bokeh-drift {
   from { transform: translate3d(calc(var(--su) * -14), calc(var(--su) * 10), 0) scale(0.96); }
@@ -88,9 +88,9 @@
   position: relative;
 }
 /* خيط الحافة العلوية بدلالة الحقيقة: أخضر/حياد عاجي/مرجاني */
-[data-section="closing"] .cls-fact.pos { border-top: 2px solid rgba(49, 162, 109, 0.65); }
-[data-section="closing"] .cls-fact.neu { border-top: 2px solid rgba(244, 241, 230, 0.28); }
-[data-section="closing"] .cls-fact.neg { border-top: 2px solid rgba(214, 106, 80, 0.65); }
+[data-section="closing"] .cls-fact.pos { border-top: 2px solid rgba(var(--green-rgb), 0.65); }
+[data-section="closing"] .cls-fact.neu { border-top: 2px solid rgba(var(--ink-rgb), 0.28); }
+[data-section="closing"] .cls-fact.neg { border-top: 2px solid rgba(var(--coral-rgb), 0.65); }
 
 /* السطر التمهيدي: رتبة الحقيقة + موضوعها + وسم التحقق */
 [data-section="closing"] .cls-fact-kicker {
@@ -115,8 +115,8 @@
   font-size: calc(var(--su) * 11.5);
   font-weight: 700;
   color: var(--gold);
-  border: 1px solid rgba(214, 171, 76, 0.45);
-  background: rgba(214, 171, 76, 0.07);
+  border: 1px solid rgba(var(--gold-rgb), 0.45);
+  background: rgba(var(--gold-rgb), 0.07);
   border-radius: 999px;
   padding: calc(var(--su) * 2) calc(var(--su) * 10);
   white-space: nowrap;
@@ -142,7 +142,7 @@
   color: var(--ivory);
   direction: ltr;
   unicode-bidi: isolate;
-  text-shadow: 0 calc(var(--su) * 10) calc(var(--su) * 44) rgba(4, 10, 8, 0.55);
+  text-shadow: 0 calc(var(--su) * 10) calc(var(--su) * 44) rgba(var(--shadow-rgb), 0.55);
 }
 [data-section="closing"] .cls-fact.pos .cls-fact-num { color: var(--green-hi); }
 [data-section="closing"] .cls-fact.neg .cls-fact-num { color: var(--coral); }
@@ -166,15 +166,15 @@
   font-weight: 600;
   color: var(--mut-d);
   border: 1px solid var(--hair-d2);
-  background: rgba(11, 21, 18, 0.45);
+  background: rgba(var(--surf-1-rgb), 0.45);
   border-radius: 999px;
   padding: calc(var(--su) * 3) calc(var(--su) * 11);
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
 }
-[data-section="closing"] .cls-chip.pos { color: var(--green-hi); border-color: rgba(49, 162, 109, 0.35); }
-[data-section="closing"] .cls-chip.neg { color: var(--coral); border-color: rgba(214, 106, 80, 0.35); }
-[data-section="closing"] .cls-chip.demand { color: var(--demand); border-color: rgba(156, 122, 46, 0.35); }
+[data-section="closing"] .cls-chip.pos { color: var(--green-hi); border-color: rgba(var(--green-rgb), 0.35); }
+[data-section="closing"] .cls-chip.neg { color: var(--coral); border-color: rgba(var(--coral-rgb), 0.35); }
+[data-section="closing"] .cls-chip.demand { color: var(--demand); border-color: rgba(var(--demand-rgb), 0.35); }
 
 /* الرسم المصغر الحي */
 [data-section="closing"] .cls-fact-chartwrap {
@@ -226,7 +226,7 @@
     border-color var(--dur-micro) var(--ease);
 }
 [data-section="closing"] .cls-act:hover {
-  background: rgba(22, 41, 31, 0.62);
+  background: rgba(var(--surf-3-rgb), 0.62);
 }
 [data-section="closing"] .cls-act:focus-visible {
   outline: 2px solid var(--gold);
@@ -236,7 +236,7 @@
   transform: translateY(calc(var(--su) * 1));
 }
 [data-section="closing"] .cls-fact-hero.cls-act:hover {
-  background: rgba(22, 41, 31, 0.5);
+  background: rgba(var(--surf-3-rgb), 0.5);
 }
 
 /* السهم الدال على الفعل */
@@ -267,7 +267,7 @@
   flex-direction: column;
   gap: calc(var(--su) * 4);
   min-height: 0;
-  background: rgba(11, 21, 18, 0.5);
+  background: rgba(var(--surf-1-rgb), 0.5);
   border: 1px solid var(--hair-d2);
   border-inline-start: 3px solid var(--faint-d);
   border-radius: var(--r-sm);
@@ -345,7 +345,7 @@
   padding-top: calc(var(--su) * 6);
 }
 [data-section="closing"] .cls-rec.cls-act:hover {
-  background: rgba(22, 41, 31, 0.66);
+  background: rgba(var(--surf-3-rgb), 0.66);
   border-color: var(--hair-d);
 }
 
@@ -412,8 +412,8 @@
   font-size: calc(var(--su) * 10.5);
   font-weight: 700;
   color: var(--gold);
-  border: 1px solid rgba(214, 171, 76, 0.45);
-  background: rgba(214, 171, 76, 0.07);
+  border: 1px solid rgba(var(--gold-rgb), 0.45);
+  background: rgba(var(--gold-rgb), 0.07);
   border-radius: 999px;
   padding: calc(var(--su) * 1) calc(var(--su) * 8);
 }
@@ -443,7 +443,7 @@
   font-size: calc(var(--su) * 12.5);
   font-weight: 700;
   color: var(--ink2-d);
-  background: rgba(11, 21, 18, 0.45);
+  background: rgba(var(--surf-1-rgb), 0.45);
   border: 1px solid var(--hair-d2);
   border-radius: var(--r-sm);
   padding: calc(var(--su) * 7) calc(var(--su) * 12);
@@ -453,7 +453,7 @@
     border-color var(--dur-micro) var(--ease);
 }
 [data-section="closing"] .cls-linkbtn:hover {
-  background: rgba(22, 41, 31, 0.7);
+  background: rgba(var(--surf-3-rgb), 0.7);
   border-color: var(--hair-d);
   color: var(--ivory);
 }
@@ -504,8 +504,8 @@
   font-size: calc(var(--su) * 10.5);
   font-weight: 700;
   color: var(--gold);
-  border: 1px solid rgba(214, 171, 76, 0.45);
-  background: rgba(214, 171, 76, 0.07);
+  border: 1px solid rgba(var(--gold-rgb), 0.45);
+  background: rgba(var(--gold-rgb), 0.07);
   border-radius: 999px;
   padding: calc(var(--su) * 1) calc(var(--su) * 8);
 }
@@ -516,10 +516,10 @@
 }
 [data-section="closing"] .cls-footer-actions .cls-linkbtn { width: auto; }
 [data-section="closing"] .cls-home {
-  border-color: rgba(49, 162, 109, 0.4);
+  border-color: rgba(var(--green-rgb), 0.4);
 }
 [data-section="closing"] .cls-home:hover {
-  border-color: rgba(49, 162, 109, 0.7);
+  border-color: rgba(var(--green-rgb), 0.7);
 }
 
 /* ── 10) ذيل بطاقة عام ── */
@@ -584,12 +584,12 @@
 }
 [data-section="closing"] .cls-badge.gold {
   color: var(--gold);
-  border-color: rgba(214, 171, 76, 0.45);
-  background: rgba(214, 171, 76, 0.07);
+  border-color: rgba(var(--gold-rgb), 0.45);
+  background: rgba(var(--gold-rgb), 0.07);
 }
 [data-section="closing"] .cls-badge.neg {
   color: var(--coral);
-  border-color: rgba(214, 106, 80, 0.4);
+  border-color: rgba(var(--coral-rgb), 0.4);
 }
 [data-section="closing"] .cls-cap {
   font-size: calc(var(--su) * 14.5);
@@ -622,7 +622,7 @@
 }
 [data-section="closing"] .cls-cbar-track {
   height: calc(var(--su) * 10);
-  background: rgba(244, 241, 230, 0.07);
+  background: rgba(var(--ink-rgb), 0.07);
   border-radius: 999px;
   overflow: hidden;
   display: block;
@@ -683,7 +683,7 @@
   border: 1px solid var(--hair-d2);
   border-radius: var(--r-sm);
   scrollbar-width: thin;
-  scrollbar-color: rgba(244, 241, 230, 0.18) transparent;
+  scrollbar-color: rgba(var(--ink-rgb), 0.18) transparent;
 }
 [data-section="closing"] .cls-table .table-dense th[scope="row"] {
   position: static;
@@ -730,7 +730,7 @@
   font-size: calc(var(--su) * 13);
   font-weight: 700;
   color: var(--ink2-d);
-  background: rgba(16, 32, 26, 0.7);
+  background: rgba(var(--surf-2-rgb), 0.7);
   border: 1px solid var(--hair-d2);
   border-radius: 999px;
   padding: calc(var(--su) * 8) calc(var(--su) * 16);

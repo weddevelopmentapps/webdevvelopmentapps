@@ -18,13 +18,13 @@
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: thin;
-  scrollbar-color: rgba(244, 241, 230, 0.18) transparent;
+  scrollbar-color: rgba(var(--ink-rgb), 0.18) transparent;
 }
 [data-section="demand"] .dash-body::-webkit-scrollbar {
   width: calc(var(--su) * 8);
 }
 [data-section="demand"] .dash-body::-webkit-scrollbar-thumb {
-  background: rgba(244, 241, 230, 0.16);
+  background: rgba(var(--ink-rgb), 0.16);
   border-radius: 999px;
 }
 [data-section="demand"] .dash-body::-webkit-scrollbar-track {
@@ -50,7 +50,7 @@
     background-color var(--dur-micro) var(--ease);
 }
 [data-section="demand"] .kpi.dmd-act:hover {
-  background: rgba(22, 41, 31, 0.72);
+  background: rgba(var(--surf-3-rgb), 0.72);
   border-color: var(--hair-d);
   transform: translateY(calc(var(--su) * -2));
 }
@@ -79,7 +79,7 @@
   padding: calc(var(--su) * 6) calc(var(--su) * 8);
   border: 1px solid var(--hair-d2);
   border-radius: 999px;
-  background: rgba(11, 21, 18, 0.55);
+  background: rgba(var(--surf-1-rgb), 0.55);
   color: var(--ink2-d);
   font-family: var(--f-body);
   font-size: calc(var(--su) * 12.5);
@@ -93,8 +93,8 @@
 }
 [data-section="demand"] .dmd-chip:hover,
 [data-section="demand"] .dmd-chip.hl {
-  background: rgba(49, 162, 109, 0.14);
-  border-color: rgba(49, 162, 109, 0.5);
+  background: rgba(var(--green-rgb), 0.14);
+  border-color: rgba(var(--green-rgb), 0.5);
   color: var(--ivory);
 }
 [data-section="demand"] .dmd-chip:focus-visible {
@@ -159,7 +159,7 @@
    flex:none — صفوفها الخمسة بيانات لا تُسحق ولا تُقص أبداً */
 [data-section="demand"] .dmd-rank {
   flex: none;
-  background: rgba(16, 32, 26, 0.58);
+  background: rgba(var(--surf-2-rgb), 0.58);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid var(--hair-d2);
@@ -203,8 +203,8 @@
 }
 [data-section="demand"] .dmd-rank-row:hover,
 [data-section="demand"] .dmd-rank-row.hl {
-  background: rgba(49, 162, 109, 0.1);
-  border-color: rgba(49, 162, 109, 0.38);
+  background: rgba(var(--green-rgb), 0.1);
+  border-color: rgba(var(--green-rgb), 0.38);
 }
 [data-section="demand"] .dmd-rank-row:focus-visible {
   outline: 2px solid var(--gold);
@@ -222,7 +222,7 @@
   display: block;
   height: calc(var(--su) * 8);
   border-radius: 999px;
-  background: rgba(244, 241, 230, 0.08);
+  background: rgba(var(--ink-rgb), 0.08);
   overflow: hidden;
 }
 [data-section="demand"] .dmd-rank-fill {
@@ -261,7 +261,7 @@
   padding: calc(var(--su) * 9) calc(var(--su) * 14);
   border: 1px solid var(--hair-d2);
   border-radius: var(--r-sm);
-  background: rgba(16, 32, 26, 0.58);
+  background: rgba(var(--surf-2-rgb), 0.58);
   color: var(--ink2-d);
   font-family: var(--f-body);
   font-size: calc(var(--su) * 13.5);
@@ -274,7 +274,7 @@
     color var(--dur-micro) var(--ease);
 }
 [data-section="demand"] .dmd-appx:hover {
-  background: rgba(22, 41, 31, 0.78);
+  background: rgba(var(--surf-3-rgb), 0.78);
   border-color: var(--hair-d);
   color: var(--ivory);
 }
@@ -355,18 +355,18 @@
 }
 [data-section="demand"] .dmd-badge.pos {
   color: var(--green-hi);
-  border-color: rgba(49, 162, 109, 0.45);
-  background: rgba(49, 162, 109, 0.07);
+  border-color: rgba(var(--green-rgb), 0.45);
+  background: rgba(var(--green-rgb), 0.07);
 }
 [data-section="demand"] .dmd-badge.neg {
   color: var(--coral);
-  border-color: rgba(214, 106, 80, 0.45);
-  background: rgba(214, 106, 80, 0.07);
+  border-color: rgba(var(--coral-rgb), 0.45);
+  background: rgba(var(--coral-rgb), 0.07);
 }
 [data-section="demand"] .dmd-badge.gold {
   color: var(--gold);
-  border-color: rgba(214, 171, 76, 0.45);
-  background: rgba(214, 171, 76, 0.07);
+  border-color: rgba(var(--gold-rgb), 0.45);
+  background: rgba(var(--gold-rgb), 0.07);
 }
 
 /* سطر السياق */
@@ -401,7 +401,7 @@
   display: block;
   height: calc(var(--su) * 12);
   border-radius: 999px;
-  background: rgba(244, 241, 230, 0.07);
+  background: rgba(var(--ink-rgb), 0.07);
   overflow: hidden;
 }
 [data-section="demand"] .dmd-cbar-fill {
@@ -463,13 +463,13 @@
   border: 1px solid var(--hair-d2);
   border-radius: var(--r-sm);
   scrollbar-width: thin;
-  scrollbar-color: rgba(244, 241, 230, 0.18) transparent;
+  scrollbar-color: rgba(var(--ink-rgb), 0.18) transparent;
 }
 [data-section="demand"] .dmd-table::-webkit-scrollbar {
   width: calc(var(--su) * 7);
 }
 [data-section="demand"] .dmd-table::-webkit-scrollbar-thumb {
-  background: rgba(244, 241, 230, 0.16);
+  background: rgba(var(--ink-rgb), 0.16);
   border-radius: 999px;
 }
 [data-section="demand"] .dmd-table .table-dense th:first-child,
@@ -519,7 +519,7 @@
   padding: calc(var(--su) * 9) calc(var(--su) * 16);
   border: 1px solid var(--hair-d);
   border-radius: 999px;
-  background: rgba(244, 241, 230, 0.05);
+  background: rgba(var(--ink-rgb), 0.05);
   color: var(--ivory);
   font-family: var(--f-body);
   font-size: calc(var(--su) * 13.5);
@@ -530,8 +530,8 @@
     border-color var(--dur-micro) var(--ease);
 }
 [data-section="demand"] .dmd-btn:hover {
-  background: rgba(244, 241, 230, 0.1);
-  border-color: rgba(244, 241, 230, 0.35);
+  background: rgba(var(--ink-rgb), 0.1);
+  border-color: rgba(var(--ink-rgb), 0.35);
 }
 [data-section="demand"] .dmd-btn:focus-visible {
   outline: 2px solid var(--gold);

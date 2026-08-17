@@ -194,13 +194,13 @@ body.mode-report .mcr-delta, body.mode-report .mcr-empty {
 }
 .mcr-delta.pos {
   color: var(--green-hi);
-  background: rgba(49, 162, 109, 0.11);
-  border-color: rgba(49, 162, 109, 0.28);
+  background: rgba(var(--green-rgb), 0.11);
+  border-color: rgba(var(--green-rgb), 0.28);
 }
 .mcr-delta.neg {
   color: var(--coral);
-  background: rgba(214, 106, 80, 0.11);
-  border-color: rgba(214, 106, 80, 0.3);
+  background: rgba(var(--coral-rgb), 0.11);
+  border-color: rgba(var(--coral-rgb), 0.3);
 }
 .mcr-delta.neu {
   color: var(--mcr-mut);
@@ -210,13 +210,13 @@ body.mode-report .mcr-delta, body.mode-report .mcr-empty {
 /* على الورق الفاتح تُشدَّد الدرجات كي تبقى فوق عتبة التباين */
 body.mode-admin .mcr-delta.pos, body.mode-report .mcr-delta.pos {
   color: var(--ok);
-  background: rgba(14, 131, 69, 0.09);
-  border-color: rgba(14, 131, 69, 0.26);
+  background: rgba(var(--ok-rgb), 0.09);
+  border-color: rgba(var(--ok-rgb), 0.26);
 }
 body.mode-admin .mcr-delta.neg, body.mode-report .mcr-delta.neg {
   color: var(--bad);
-  background: rgba(179, 64, 47, 0.09);
-  border-color: rgba(179, 64, 47, 0.26);
+  background: rgba(var(--bad-rgb), 0.09);
+  border-color: rgba(var(--bad-rgb), 0.26);
 }
 
 /* ════════════════ ratioBar — البديل القانوني للـgauge المحرّم ════════════════ */
@@ -335,7 +335,7 @@ body.mode-admin .mcr-sm-cell, body.mode-report .mcr-sm-cell {
     background: transparent;
   }
   .mcr-bar-track, .mcr-ratio-track {
-    border-color: rgba(17, 24, 21, 0.25);
+    border-color: rgba(var(--ink-rgb), 0.25);
   }
   /* طابعات كثيرة تُسقط الخلفيات — الحد يضمن قراءة الشريط ولو بلا تعبئة */
   .mcr-bar-fill, .mcr-ratio-fill {

@@ -37,8 +37,8 @@
   /* عرض الدرج يُعرَّف على اللوحين معاً لا على الدرج وحده: الشريط يحسب عرضه
      بطرحه عند فتح الدرج، والخصائص المخصصة لا تُورَّث بين شقيقين */
   --tour-notes-w: clamp(320px, calc(var(--su) * 430), 46vw);
-  --tour-glass: rgba(8, 16, 9, 0.86);
-  --tour-glass-2: rgba(16, 32, 26, 0.72);
+  --tour-glass: rgba(var(--base-rgb), 0.86);
+  --tour-glass-2: rgba(var(--surf-2-rgb), 0.72);
   --tour-hair: var(--hair-d);
   --tour-hair-2: var(--hair-d2);
   --tour-ink: var(--ivory);
@@ -46,7 +46,7 @@
   --tour-mut: var(--mut-d);
   --tour-faint: var(--faint-d);
   --tour-ring: var(--gold);
-  --tour-veil: rgba(4, 8, 6, 0.62);
+  --tour-veil: rgba(var(--scrim-rgb), 0.62);
   --tour-radius: var(--r);
   --tour-radius-sm: var(--r-sm);
 }
@@ -93,8 +93,8 @@
   border: 2px solid var(--tour-ring);
   box-shadow:
     0 0 0 9999px var(--tour-veil),
-    0 0 calc(var(--su) * 26) rgba(214, 171, 76, 0.28) inset,
-    0 0 calc(var(--su) * 34) rgba(214, 171, 76, 0.18);
+    0 0 calc(var(--su) * 26) rgba(var(--gold-rgb), 0.28) inset,
+    0 0 calc(var(--su) * 34) rgba(var(--gold-rgb), 0.18);
   pointer-events: none;
   transition:
     top var(--dur-std) var(--ease),
@@ -133,7 +133,7 @@
   max-width: calc(var(--su) * 420);
   padding: calc(var(--su) * 6) calc(var(--su) * 14);
   border-radius: 999px;
-  border: 1px solid rgba(214, 171, 76, 0.45);
+  border: 1px solid rgba(var(--gold-rgb), 0.45);
   background: var(--tour-glass);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -178,7 +178,7 @@ body.tour-active .tour-lit {
     linear-gradient(180deg, var(--tour-glass-2) 0%, var(--tour-glass) 62%);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
-  box-shadow: 0 calc(var(--su) * 18) calc(var(--su) * 60) rgba(0, 0, 0, 0.5);
+  box-shadow: 0 calc(var(--su) * 18) calc(var(--su) * 60) rgba(var(--shadow-rgb), 0.5);
   overflow: hidden;
   animation: tour-bar-in var(--dur-std) var(--ease);
 }
@@ -264,8 +264,8 @@ body.tour-notes-open .tour-bar {
 }
 .tour-pace.t-on {
   color: var(--green-hi);
-  border-color: rgba(49, 162, 109, 0.32);
-  background: rgba(49, 162, 109, 0.08);
+  border-color: rgba(var(--green-rgb), 0.32);
+  background: rgba(var(--green-rgb), 0.08);
 }
 .tour-pace.t-near {
   color: var(--tour-ink-2);
@@ -353,8 +353,8 @@ body.tour-notes-open .tour-bar {
 }
 .tour-chip.on {
   color: var(--gold-hi);
-  border-color: rgba(214, 171, 76, 0.5);
-  background: rgba(214, 171, 76, 0.09);
+  border-color: rgba(var(--gold-rgb), 0.5);
+  background: rgba(var(--gold-rgb), 0.09);
 }
 
 /* ── وسوم الصدق: تُقرأ مع الأرقام ولا تُطوى أبداً ── */
@@ -378,8 +378,8 @@ body.tour-notes-open .tour-bar {
   font-weight: 600;
   line-height: 1.5;
   color: var(--gold);
-  background: rgba(214, 171, 76, 0.06);
-  border: 1px dashed rgba(214, 171, 76, 0.4);
+  background: rgba(var(--gold-rgb), 0.06);
+  border: 1px dashed rgba(var(--gold-rgb), 0.4);
   border-radius: var(--tour-radius-sm);
   padding: calc(var(--su) * 5) calc(var(--su) * 11);
 }
@@ -451,21 +451,21 @@ body.tour-notes-open .tour-bar {
 .tour-btn:focus-visible:not(:disabled) {
   color: var(--tour-ink);
   border-color: var(--tour-hair);
-  background: rgba(244, 241, 230, 0.09);
+  background: rgba(var(--ink-rgb), 0.09);
 }
 .tour-btn:disabled {
   opacity: 0.38;
   cursor: default;
 }
 .tour-btn.primary {
-  color: #071009;
-  background: var(--ivory);
-  border-color: var(--ivory);
+  color: var(--on-invert);
+  background: var(--invert-bg);
+  border-color: var(--invert-bg);
 }
 .tour-btn.primary:hover:not(:disabled),
 .tour-btn.primary:focus-visible:not(:disabled) {
-  background: #FFFFFF;
-  color: #071009;
+  background: var(--invert-bg-hi);
+  color: var(--on-invert);
 }
 .tour-btn.ghost {
   background: transparent;
@@ -557,7 +557,7 @@ body.tour-notes-open .tour-bar {
     linear-gradient(200deg, var(--tour-glass-2) 0%, var(--tour-glass) 55%);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  box-shadow: calc(var(--su) * -18) 0 calc(var(--su) * 60) rgba(0, 0, 0, 0.45);
+  box-shadow: calc(var(--su) * -18) 0 calc(var(--su) * 60) rgba(var(--shadow-rgb), 0.45);
   animation: tour-notes-in var(--dur-std) var(--ease);
 }
 .tour-notes[hidden] { display: none; }
@@ -625,7 +625,7 @@ body.tour-notes-open .tour-bar {
 }
 .tour-nbtn.on {
   color: var(--gold-hi);
-  border-color: rgba(214, 171, 76, 0.45);
+  border-color: rgba(var(--gold-rgb), 0.45);
 }
 .tour-nbtn.close:hover,
 .tour-nbtn.close:focus-visible { color: var(--ivory); }
@@ -677,8 +677,8 @@ body.tour-notes-open .tour-bar {
 }
 .tour-schip.now {
   color: var(--gold-hi);
-  border-color: rgba(214, 171, 76, 0.5);
-  background: rgba(214, 171, 76, 0.09);
+  border-color: rgba(var(--gold-rgb), 0.5);
+  background: rgba(var(--gold-rgb), 0.09);
 }
 /* قسم بلا ملاحظات معتمدة: يظهر ولا يُخفى — الصدق قبل الأناقة */
 .tour-schip.empty { opacity: 0.55; }
@@ -814,7 +814,7 @@ body.tour-notes-open .tour-bar {
 .tour-qa {
   border: 1px solid var(--tour-hair-2);
   border-radius: var(--tour-radius-sm);
-  background: rgba(16, 32, 26, 0.4);
+  background: rgba(var(--surf-2-rgb), 0.4);
   padding: calc(var(--su) * 8) calc(var(--su) * 12);
 }
 .tour-qa > summary {
@@ -893,9 +893,9 @@ body.tour-notes-open .tour-bar {
   flex-direction: column;
   gap: calc(var(--su) * 7);
   padding: calc(var(--su) * 14) calc(var(--su) * 15);
-  border: 1px dashed rgba(214, 171, 76, 0.4);
+  border: 1px dashed rgba(var(--gold-rgb), 0.4);
   border-radius: var(--tour-radius-sm);
-  background: rgba(214, 171, 76, 0.05);
+  background: rgba(var(--gold-rgb), 0.05);
 }
 .tour-empty b {
   font-size: 0.98em;

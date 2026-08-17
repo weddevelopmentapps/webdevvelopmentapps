@@ -15,9 +15,9 @@
 .sc-cover .cover-media .media-glass {
   background:
     linear-gradient(180deg,
-      rgba(8, 16, 9, calc(var(--media-dim, 0.38) * 0.8)) 0%,
-      rgba(11, 21, 18, calc(var(--media-dim, 0.38) * 0.55)) 45%,
-      rgba(11, 21, 18, var(--media-dim, 0.38)) 100%);
+      rgba(var(--base-rgb), calc(var(--media-dim, 0.38) * 0.8)) 0%,
+      rgba(var(--surf-1-rgb), calc(var(--media-dim, 0.38) * 0.55)) 45%,
+      rgba(var(--surf-1-rgb), var(--media-dim, 0.38)) 100%);
 }
 
 /* ── شريط المعلومات السفلي (إصلاح فراغ الغلاف) ── */
@@ -31,8 +31,8 @@
   justify-content: center;
   gap: calc(var(--su) * 34);
   padding: calc(var(--su) * 14) calc(var(--su) * 40) calc(var(--su) * 16);
-  background: linear-gradient(0deg, rgba(4, 12, 9, 0.86), rgba(4, 12, 9, 0.35) 78%, transparent);
-  border-top: 1px solid rgba(244, 241, 230, 0.08);
+  background: linear-gradient(0deg, rgba(var(--scrim-rgb), 0.86), rgba(var(--scrim-rgb), 0.35) 78%, transparent);
+  border-top: 1px solid rgba(var(--ink-rgb), 0.08);
   flex-wrap: wrap;
 }
 .sc-cover .cover-tick {

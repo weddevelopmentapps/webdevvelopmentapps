@@ -38,15 +38,15 @@
   display: flex;
   flex-direction: column;
   gap: calc(var(--su) * 3);
-  background: rgba(16, 32, 26, 0.55);
+  background: rgba(var(--surf-2-rgb), 0.55);
   border: 1px solid var(--hair-d2);
   border-radius: var(--r-sm);
   padding: calc(var(--su) * 10) calc(var(--su) * 14);
   min-width: 0;
 }
-.dcs-stat.pos { border-top: 2px solid rgba(49, 162, 109, 0.55); }
-.dcs-stat.neg { border-top: 2px solid rgba(214, 106, 80, 0.55); }
-.dcs-stat.warn { border-top: 2px solid rgba(214, 171, 76, 0.5); }
+.dcs-stat.pos { border-top: 2px solid rgba(var(--green-rgb), 0.55); }
+.dcs-stat.neg { border-top: 2px solid rgba(var(--coral-rgb), 0.55); }
+.dcs-stat.warn { border-top: 2px solid rgba(var(--gold-rgb), 0.5); }
 .dcs-stat-k {
   font-size: calc(var(--su) * 12);
   font-weight: 600;
@@ -88,7 +88,7 @@
   flex-wrap: wrap;
   gap: calc(var(--su) * 6);
   padding: calc(var(--su) * 4);
-  background: rgba(8, 16, 9, 0.5);
+  background: rgba(var(--base-rgb), 0.5);
   border: 1px solid var(--hair-d2);
   border-radius: 999px;
 }
@@ -132,23 +132,23 @@
   border-radius: 999px;
   border: 1px solid var(--hair-d);
   color: var(--ink2-d);
-  background: rgba(244, 241, 230, 0.04);
+  background: rgba(var(--ink-rgb), 0.04);
   white-space: nowrap;
 }
 .dcs-badge.warn {
   color: var(--gold-hi);
-  border-color: rgba(214, 171, 76, 0.45);
-  background: rgba(214, 171, 76, 0.08);
+  border-color: rgba(var(--gold-rgb), 0.45);
+  background: rgba(var(--gold-rgb), 0.08);
 }
 .dcs-badge.neg {
   color: var(--coral);
-  border-color: rgba(214, 106, 80, 0.45);
-  background: rgba(214, 106, 80, 0.08);
+  border-color: rgba(var(--coral-rgb), 0.45);
+  background: rgba(var(--coral-rgb), 0.08);
 }
 .dcs-badge.pos {
   color: var(--green-hi);
-  border-color: rgba(49, 162, 109, 0.42);
-  background: rgba(49, 162, 109, 0.08);
+  border-color: rgba(var(--green-rgb), 0.42);
+  background: rgba(var(--green-rgb), 0.08);
 }
 .dcs-badge.neu { color: var(--mut-d); }
 
@@ -176,7 +176,7 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  background: rgba(16, 32, 26, 0.5);
+  background: rgba(var(--surf-2-rgb), 0.5);
   border: 1px solid var(--hair-d2);
   border-radius: var(--r-sm);
   padding: calc(var(--su) * 6) calc(var(--su) * 8);
@@ -200,9 +200,9 @@
 
 .dcs-tr { transition: background var(--dur-micro); }
 .dcs-tr[role="button"] { cursor: pointer; }
-.dcs-tr[role="button"]:hover { background: rgba(244, 241, 230, 0.035); }
+.dcs-tr[role="button"]:hover { background: rgba(var(--ink-rgb), 0.035); }
 .dcs-tr[role="button"]:focus-visible { outline: 2px solid var(--gold); outline-offset: -2px; }
-.dcs-tr.now { background: rgba(214, 171, 76, 0.09); }
+.dcs-tr.now { background: rgba(var(--gold-rgb), 0.09); }
 .dcs-tr.warn td:first-child { box-shadow: inset 2px 0 0 var(--gold); }
 .dcs-tr.neg td:first-child { box-shadow: inset 2px 0 0 var(--coral); }
 .dcs-tr.pos td:first-child { box-shadow: inset 2px 0 0 var(--green); }
@@ -223,7 +223,7 @@
   display: flex;
   flex-direction: column;
   gap: calc(var(--su) * 8);
-  background: rgba(16, 32, 26, 0.58);
+  background: rgba(var(--surf-2-rgb), 0.58);
   border: 1px solid var(--hair-d2);
   border-radius: var(--r-sm);
   padding: calc(var(--su) * 11) calc(var(--su) * 14);
@@ -288,7 +288,7 @@
   font-size: calc(var(--su) * 12.5);
   font-weight: 700;
   color: var(--ivory);
-  background: rgba(8, 16, 9, 0.5);
+  background: rgba(var(--base-rgb), 0.5);
   border: 1px solid var(--hair-d);
   border-radius: 999px;
   padding: calc(var(--su) * 6) calc(var(--su) * 15);
@@ -368,7 +368,7 @@
   gap: calc(var(--su) * 6);
 }
 .dcs-reveal {
-  background: rgba(8, 16, 9, 0.5);
+  background: rgba(var(--base-rgb), 0.5);
   border: 1px dashed var(--hair-d);
   border-radius: var(--r-sm);
   padding: calc(var(--su) * 9) calc(var(--su) * 13);

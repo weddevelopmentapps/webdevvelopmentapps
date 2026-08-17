@@ -14,12 +14,12 @@
   }
 
   body.mode-admin {
-    background: #FFF;
+    background: var(--print-paper);
   }
 
   .adm-card {
     box-shadow: none;
-    border-color: #CCC;
+    border-color: var(--print-line);
     break-inside: avoid;
   }
 

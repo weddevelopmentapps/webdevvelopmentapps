@@ -26,7 +26,7 @@
       `.rpt-chart-plate` معاً بدل عنصر واحد.
 
    5) **لوحة الرسم تبقى داكنة.** مكتبة الرسوم المعتمدة مصممة على سطح
-      ‎#0B1512‎ ومنظومتها اللونية متحقق منها عليه؛ قلبها إلى الأبيض يكسر كل
+      ‎var(--stage-1)‎ ومنظومتها اللونية متحقق منها عليه؛ قلبها إلى الأبيض يكسر كل
       فحوص التباين وCVD. فالرسم يُدرج في المستند كـ«لوحة» داكنة محددة —
       كما تُدرج لقطة لوحة قيادة في تقرير مطبوع — مع `print-color-adjust:
       exact` كي لا يفرّغها المتصفح عند الطباعة.
@@ -69,19 +69,19 @@ body.mode-report :focus-visible {
   --rpt-hair2: var(--hair2);
 
   /* المنظومة الدلالية على الورق: الصبغة نفسها بدرجات تبلغ تباين النص.
-     ألوان المسرح (‎#31A26D/#D66A50/#9C7A2E/#D6AB4C‎) معايَرة لسطح داكن؛
+     ألوان المسرح (‎var(--green)/var(--coral)/var(--demand)/var(--gold)‎) معايَرة لسطح داكن؛
      على الأبيض تُستعمل نظائرها الورقية المعتمدة أصلاً في لغة الإدارة. */
   --rpt-pos: var(--ok);          /* الطاقة/التحسن — أخضر ورقي */
   --rpt-neg: var(--bad);         /* العجز/المخالفات حصراً — مرجاني ورقي */
   --rpt-blue: var(--info);       /* فئة تصنيفية ثانوية */
-  --rpt-demand: #8A6A28;         /* الطلب — برونزي صحراوي داكن (صبغة --demand) */
-  --rpt-gold: #8F6C10;           /* المستهدف/خط الأساس — يُميَّز بالحد المتقطع */
+  --rpt-demand: var(--demand);         /* الطلب — برونزي صحراوي داكن (صبغة --demand) */
+  --rpt-gold: var(--gold);           /* المستهدف/خط الأساس — يُميَّز بالحد المتقطع */
   --rpt-gold-line: var(--gold);  /* الحد الذهبي نفسه لون tokens بلا تعديل */
   --rpt-neu: var(--ink2);
 
   /* لوحة الرسم الداكنة */
-  --rpt-plate: var(--stage-1);
-  --rpt-plate-edge: rgba(17, 24, 21, 0.28);
+  --rpt-plate: var(--surface-2);
+  --rpt-plate-edge: rgba(var(--ink-rgb), 0.28);
 
   --rpt-zoom: 1;
 
@@ -127,7 +127,7 @@ body.mode-report :focus-visible {
   gap: 20px;
   flex-wrap: wrap;
   padding: 12px 22px;
-  background: rgba(11, 21, 18, 0.94);
+  background: rgba(var(--surf-1-rgb), 0.94);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--hair-d);
@@ -159,16 +159,16 @@ body.mode-report :focus-visible {
 .rpt-status-restricted {
   padding: 3px 11px;
   border-radius: 999px;
-  border: 1px solid rgba(63, 127, 176, 0.45);
-  background: rgba(63, 127, 176, 0.12);
-  color: #A8C6DD;
+  border: 1px solid rgba(var(--blue-rgb), 0.45);
+  background: rgba(var(--blue-rgb), 0.12);
+  color: var(--blue-hi);
 }
 /* الإنذار ذهبي — لكنة «بانتظار/تعذر» في كروم الواجهة، لا لون بيانات */
 .rpt-status-warn {
   padding: 3px 11px;
   border-radius: 999px;
-  border: 1px dashed rgba(214, 171, 76, 0.5);
-  background: rgba(214, 171, 76, 0.09);
+  border: 1px dashed rgba(var(--gold-rgb), 0.5);
+  background: rgba(var(--gold-rgb), 0.09);
   color: var(--gold-hi);
 }
 
@@ -179,7 +179,7 @@ body.mode-report :focus-visible {
   padding: 8px 15px;
   border-radius: 9px;
   border: 1px solid var(--hair-d);
-  background: rgba(22, 41, 31, 0.7);
+  background: rgba(var(--surf-3-rgb), 0.7);
   color: var(--ink2-d);
   font-family: var(--f-body);
   font-size: 13px;
@@ -191,20 +191,20 @@ body.mode-report :focus-visible {
 }
 .rpt-btn:hover,
 .rpt-btn:focus-visible {
-  background: rgba(49, 162, 109, 0.16);
-  border-color: rgba(49, 162, 109, 0.5);
+  background: rgba(var(--green-rgb), 0.16);
+  border-color: rgba(var(--green-rgb), 0.5);
   color: var(--ivory);
 }
 .rpt-btn.is-primary {
   background: var(--green);
   border-color: var(--green);
-  color: #07130D;
+  color: var(--on-accent);
 }
 .rpt-btn.is-primary:hover,
 .rpt-btn.is-primary:focus-visible {
   background: var(--green-hi);
   border-color: var(--green-hi);
-  color: #07130D;
+  color: var(--on-accent);
 }
 .rpt-btn.is-quiet {
   padding: 6px 11px;
@@ -214,7 +214,7 @@ body.mode-report :focus-visible {
 }
 .rpt-btn.is-quiet:hover,
 .rpt-btn.is-quiet:focus-visible {
-  background: rgba(244, 241, 230, 0.07);
+  background: rgba(var(--ink-rgb), 0.07);
   border-color: var(--hair-d);
 }
 .rpt-btn[disabled] { opacity: 0.45; cursor: default; }
@@ -275,7 +275,7 @@ body.mode-report :focus-visible {
   padding: 12mm;
   background: var(--rpt-surface);
   color: var(--rpt-ink);
-  box-shadow: 0 2px 6px rgba(4, 10, 8, 0.35), 0 22px 60px rgba(4, 10, 8, 0.45);
+  box-shadow: 0 2px 6px rgba(var(--shadow-rgb), 0.35), 0 22px 60px rgba(var(--shadow-rgb), 0.45);
   display: flex;
   flex-direction: column;
   /* الفيض مرئي عمداً على الشاشة: أي تجاوز لحد القص يجب أن يُرى في المعاينة
@@ -458,7 +458,7 @@ body.mode-report :focus-visible {
   padding: 2.6mm 4mm;
   border: 1px dashed var(--rpt-gold-line);
   border-radius: 8px;
-  background: rgba(214, 171, 76, 0.08);
+  background: rgba(var(--gold-rgb), 0.08);
   color: var(--rpt-ink2);
   font-size: 10.5px;
   line-height: 1.6;
@@ -686,7 +686,7 @@ body.mode-report :focus-visible {
 .rpt-chart-fail-meta code {
   font-family: var(--f-display);
   unicode-bidi: isolate;
-  background: rgba(17, 24, 21, 0.05);
+  background: rgba(var(--ink-rgb), 0.05);
   padding: 1px 5px;
   border-radius: 4px;
 }
@@ -745,7 +745,7 @@ body.mode-report :focus-visible {
   padding: 2.4mm 3.4mm;
   border: 1px dashed var(--rpt-gold-line);
   border-radius: 7px;
-  background: rgba(214, 171, 76, 0.06);
+  background: rgba(var(--gold-rgb), 0.06);
   -webkit-print-color-adjust: exact;
   print-color-adjust: exact;
 }
@@ -830,7 +830,7 @@ body.mode-report :focus-visible {
 }
 .rpt-table tbody tr:nth-child(even) th,
 .rpt-table tbody tr:nth-child(even) td {
-  background: rgba(17, 24, 21, 0.022);
+  background: rgba(var(--ink-rgb), 0.022);
   -webkit-print-color-adjust: exact;
   print-color-adjust: exact;
 }
@@ -888,7 +888,7 @@ body.mode-report :focus-visible {
 .rpt-cell-micro .mcr-ratio-track {
   height: 5px;
   border-radius: 3px;
-  background: rgba(17, 24, 21, 0.09);
+  background: rgba(var(--ink-rgb), 0.09);
   -webkit-print-color-adjust: exact;
   print-color-adjust: exact;
 }
@@ -927,7 +927,7 @@ body.mode-report :focus-visible {
 .rpt-missing .rpt-btn.is-primary {
   background: var(--accent);
   border-color: var(--accent);
-  color: #FFF;
+  color: var(--on-accent);
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
@@ -952,7 +952,7 @@ body.mode-report :focus-visible {
 
   body.mode-report,
   html {
-    background: #FFF !important;
+    background: var(--print-paper) !important;
     color: var(--ink) !important;
     overflow: visible !important;
     height: auto !important;
@@ -962,7 +962,7 @@ body.mode-report :focus-visible {
     display: block !important;
     min-height: 0;
     padding: 0;
-    background: #FFF;
+    background: var(--print-paper);
   }
 
   /* (ب) شريط الأدوات ورابط التخطي أدوات شاشة لا محتوى مستند */
@@ -993,7 +993,7 @@ body.mode-report :focus-visible {
     height: 272mm;
     padding: 0 !important;
     box-shadow: none !important;
-    background: #FFF;
+    background: var(--print-paper);
     break-after: page;
     page-break-after: always;
     break-inside: avoid;

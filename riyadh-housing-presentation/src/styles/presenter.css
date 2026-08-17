@@ -211,7 +211,7 @@
   font-size: max(12px, calc(var(--su) * 14.5));
   font-weight: 600;
   color: var(--mut-d);
-  background: rgba(8, 16, 9, 0.55);
+  background: rgba(var(--base-rgb), 0.55);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border: 1px solid var(--hair-d2);

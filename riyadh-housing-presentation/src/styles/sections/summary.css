@@ -22,11 +22,11 @@
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: thin;
-  scrollbar-color: rgba(244, 241, 230, 0.18) transparent;
+  scrollbar-color: rgba(var(--ink-rgb), 0.18) transparent;
 }
 [data-section="summary"] .dash-body::-webkit-scrollbar { width: 8px; }
 [data-section="summary"] .dash-body::-webkit-scrollbar-thumb {
-  background: rgba(244, 241, 230, 0.16);
+  background: rgba(var(--ink-rgb), 0.16);
   border-radius: 8px;
 }
 [data-section="summary"] .dash-body::-webkit-scrollbar-track { background: transparent; }
@@ -64,7 +64,7 @@
 [data-section="summary"] .sum-kpi:hover {
   transform: translateY(calc(var(--su) * -2));
   border-color: var(--hair-d);
-  background: rgba(22, 41, 31, 0.66);
+  background: rgba(var(--surf-3-rgb), 0.66);
 }
 [data-section="summary"] .sum-kpi:focus-visible {
   outline: 2px solid var(--gold);
@@ -78,8 +78,8 @@
    اعتماد المنهجية». الذهبي هنا وسم اعتماد (كروم) لا لون قيمة: الرقم يبقى
    عاجياً كسائر القيم المحايدة. */
 [data-section="summary"] .sum-kpi-flag {
-  border: 1px dashed rgba(214, 171, 76, 0.45);
-  background: rgba(214, 171, 76, 0.05);
+  border: 1px dashed rgba(var(--gold-rgb), 0.45);
+  background: rgba(var(--gold-rgb), 0.05);
 }
 [data-section="summary"] .sum-kpi-flag .kpi-note {
   color: var(--gold);
@@ -103,7 +103,7 @@
   padding: calc(var(--su) * 3) calc(var(--su) * 11);
   border: 1px solid var(--hair-d2);
   border-radius: 999px;
-  background: rgba(11, 21, 18, 0.5);
+  background: rgba(var(--surf-1-rgb), 0.5);
   color: var(--mut-d);
   font-family: var(--f-body);
   font-size: calc(var(--su) * 12);
@@ -117,7 +117,7 @@
 [data-section="summary"] .sum-link:hover {
   color: var(--ivory);
   border-color: var(--hair-d);
-  background: rgba(22, 41, 31, 0.8);
+  background: rgba(var(--surf-3-rgb), 0.8);
 }
 [data-section="summary"] .sum-link:focus-visible {
   outline: 2px solid var(--gold);
@@ -130,7 +130,7 @@
 }
 [data-section="summary"] .sum-link.ghost:hover {
   border-color: var(--hair-d2);
-  background: rgba(11, 21, 18, 0.5);
+  background: rgba(var(--surf-1-rgb), 0.5);
 }
 [data-section="summary"] .sum-link-arrow {
   font-size: calc(var(--su) * 12);
@@ -162,7 +162,7 @@
   padding: calc(var(--su) * 5) calc(var(--su) * 10);
   border: 1px solid var(--hair-d2);
   border-radius: calc(var(--su) * 9);
-  background: rgba(11, 21, 18, 0.5);
+  background: rgba(var(--surf-1-rgb), 0.5);
   cursor: pointer;
   text-align: start;
   font-family: var(--f-body);
@@ -171,7 +171,7 @@
     transform var(--dur-micro) var(--ease);
 }
 [data-section="summary"] .sum-chip:hover {
-  background: rgba(22, 41, 31, 0.8);
+  background: rgba(var(--surf-3-rgb), 0.8);
   transform: translateX(calc(var(--su) * -2));
 }
 [data-section="summary"] .sum-chip:focus-visible {
@@ -207,11 +207,11 @@
 /* الألوان الدلالية للحالات: منجزة=طاقة منجزة (أخضر)، جاري=فئة ثانوية (أزرق)،
    متأخرة=خلل (مرجاني حصراً)، لم يبدأ=حياد خافت */
 [data-section="summary"] .sum-chip.pos .sum-chip-dot { background: var(--green); }
-[data-section="summary"] .sum-chip.pos:hover { border-color: rgba(49, 162, 109, 0.5); }
+[data-section="summary"] .sum-chip.pos:hover { border-color: rgba(var(--green-rgb), 0.5); }
 [data-section="summary"] .sum-chip.run .sum-chip-dot { background: var(--collar-blue); }
-[data-section="summary"] .sum-chip.run:hover { border-color: rgba(63, 127, 176, 0.5); }
+[data-section="summary"] .sum-chip.run:hover { border-color: rgba(var(--blue-rgb), 0.5); }
 [data-section="summary"] .sum-chip.late .sum-chip-dot { background: var(--coral); }
-[data-section="summary"] .sum-chip.late:hover { border-color: rgba(214, 106, 80, 0.5); }
+[data-section="summary"] .sum-chip.late:hover { border-color: rgba(var(--coral-rgb), 0.5); }
 [data-section="summary"] .sum-chip.late .sum-chip-count { color: var(--coral); }
 [data-section="summary"] .sum-chip.idle .sum-chip-dot { background: var(--faint-d); }
 
@@ -245,7 +245,7 @@
   padding: calc(var(--su) * 3) calc(var(--su) * 10);
   border: 1px solid var(--hair-d2);
   border-radius: 999px;
-  background: rgba(11, 21, 18, 0.55);
+  background: rgba(var(--surf-1-rgb), 0.55);
   color: var(--mut-d);
   font-family: var(--f-body);
   font-size: calc(var(--su) * 11.5);
@@ -273,11 +273,11 @@
 [data-section="summary"] .sum-layer-btn.vio .sum-layer-dot { background: var(--coral); }
 [data-section="summary"] .sum-layer-btn.active {
   color: var(--ivory);
-  background: rgba(22, 41, 31, 0.9);
+  background: rgba(var(--surf-3-rgb), 0.9);
 }
-[data-section="summary"] .sum-layer-btn.cov.active { border-color: rgba(49, 162, 109, 0.6); }
-[data-section="summary"] .sum-layer-btn.dem.active { border-color: rgba(170, 138, 62, 0.6); }
-[data-section="summary"] .sum-layer-btn.vio.active { border-color: rgba(214, 106, 80, 0.6); }
+[data-section="summary"] .sum-layer-btn.cov.active { border-color: rgba(var(--green-rgb), 0.6); }
+[data-section="summary"] .sum-layer-btn.dem.active { border-color: rgba(var(--demand-rgb), 0.6); }
+[data-section="summary"] .sum-layer-btn.vio.active { border-color: rgba(var(--coral-rgb), 0.6); }
 
 /* ترويسة بطاقة الخريطة تزدحم (عنوان + مبدل + أزرار تعمق): تلتف بأمان */
 [data-section="summary"] .sum-map-card .card-head {
@@ -336,7 +336,7 @@
   transition: background var(--dur-micro) var(--ease);
   border-radius: calc(var(--su) * 6);
 }
-[data-section="summary"] .sum-pulse-row:hover { background: rgba(22, 41, 31, 0.7); }
+[data-section="summary"] .sum-pulse-row:hover { background: rgba(var(--surf-3-rgb), 0.7); }
 [data-section="summary"] .sum-pulse-row:focus-visible {
   outline: 2px solid var(--gold);
   outline-offset: 1px;
@@ -498,10 +498,10 @@
   border: 1px solid var(--hair-d2);
   border-radius: calc(var(--su) * 10);
   scrollbar-width: thin;
-  scrollbar-color: rgba(244, 241, 230, 0.18) transparent;
+  scrollbar-color: rgba(var(--ink-rgb), 0.18) transparent;
 }
 [data-section="summary"] .sum-detail-table .table-dense th {
-  background: rgba(16, 32, 26, 0.96);
+  background: rgba(var(--surf-2-rgb), 0.96);
 }
 
 /* ملاحظات التحفظ: ذهبية — وسوم «بانتظار الاعتماد» (كروم حصراً) */
@@ -512,8 +512,8 @@
   font-size: calc(var(--su) * 12.5);
   line-height: 1.65;
   color: var(--gold);
-  background: rgba(214, 171, 76, 0.06);
-  border: 1px dashed rgba(214, 171, 76, 0.35);
+  background: rgba(var(--gold-rgb), 0.06);
+  border: 1px dashed rgba(var(--gold-rgb), 0.35);
   border-radius: calc(var(--su) * 9);
   padding: calc(var(--su) * 8) calc(var(--su) * 12);
 }
@@ -546,9 +546,9 @@
 }
 [data-section="summary"] .sum-detail-go {
   padding: calc(var(--su) * 7) calc(var(--su) * 16);
-  border: 1px solid rgba(49, 162, 109, 0.5);
+  border: 1px solid rgba(var(--green-rgb), 0.5);
   border-radius: 999px;
-  background: rgba(49, 162, 109, 0.09);
+  background: rgba(var(--green-rgb), 0.09);
   color: var(--green-hi);
   font-family: var(--f-body);
   font-size: calc(var(--su) * 13);
@@ -558,7 +558,7 @@
     border-color var(--dur-micro) var(--ease);
 }
 [data-section="summary"] .sum-detail-go:hover {
-  background: rgba(49, 162, 109, 0.18);
+  background: rgba(var(--green-rgb), 0.18);
   border-color: var(--green);
 }
 [data-section="summary"] .sum-detail-go:focus-visible {

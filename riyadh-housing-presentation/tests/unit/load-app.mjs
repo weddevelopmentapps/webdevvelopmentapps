@@ -19,6 +19,8 @@ const JS_ORDER = [
   "src/js/core/dom.js",
   "src/js/core/format.js",
   "src/js/core/bus.js",
+  // V3: مبدّل السمة — لا يلمس DOM وقت التحميل (يقرأ documentElement كسولاً)
+  "src/js/core/theme-mode.js",
   "src/js/data/derive.js",
   "src/js/data/validate.js",
   "src/js/core/router.js",
@@ -26,6 +28,8 @@ const JS_ORDER = [
   // خارج محاكاة DOM الدنيا أدناه — فتُختبران بالملف الحقيقي لا بنسخة.
   "src/js/viz/geomap-utils.js",
   "src/js/viz/charts-micro.js",
+  // V3: نافذة الإبراز — نموذجها (normalize/measure) نقي وقابل للاختبار كاملاً
+  "src/js/presenter/highlight.js",
 ];
 
 /* ── محاكاة DOM دنيا: تكفي h()/svg()/clear دون محرك عرض ── */
@@ -70,7 +74,13 @@ class FakeElement extends FakeNode {
   querySelectorAll() { return []; }
 }
 
+/* عنصر الجذر ‎<html>‎ الوهمي: يكفي لفحص كتابة/مسح ‎data-theme‎ */
+export const documentElementMock = new FakeElement("html");
+
 const documentMock = {
+  documentElement: documentElementMock,
+  addEventListener() {},
+  removeEventListener() {},
   createElement: (t) => new FakeElement(t),
   createElementNS: (ns, t) => new FakeElement(t, ns),
   createTextNode: (t) => new FakeText(t),
@@ -92,7 +102,35 @@ const historyMock = {
   pushState(_state, _title, url) { historyCalls.push(String(url)); },
 };
 
+/* تخزين محلي وهمي قابل للفحص (عقد RH.core.themeMode) */
+class FakeStorage {
+  constructor() { this.map = new Map(); }
+  getItem(k) { return this.map.has(k) ? this.map.get(k) : null; }
+  setItem(k, v) { this.map.set(k, String(v)); }
+  removeItem(k) { this.map.delete(k); }
+  clear() { this.map.clear(); }
+}
+
+export const localStorageMock = new FakeStorage();
+
+/* ‎matchMedia‎ وهمي: تُضبط ‎matches‎ من الاختبار لمحاكاة تفضيل النظام */
+export const mediaState = { dark: false, reduced: false };
+function matchMediaMock(query) {
+  const dark = /prefers-color-scheme:\s*dark/.test(query);
+  const reduced = /prefers-reduced-motion/.test(query);
+  return {
+    media: query,
+    get matches() {
+      return dark ? mediaState.dark : (reduced ? mediaState.reduced : false);
+    },
+    addEventListener() {}, removeEventListener() {},
+    addListener() {}, removeListener() {},
+  };
+}
+
 export const win = {
+  localStorage: localStorageMock,
+  matchMedia: matchMediaMock,
   location: {
     hash: "",
     href: "https://unit.test/index.html",
@@ -111,6 +149,7 @@ export const win = {
 const sandbox = {
   window: win,
   document: documentMock,
+  getComputedStyle: () => ({ getPropertyValue: () => "" }),
   history: historyMock,
   location: win.location,
   Node: FakeNode,

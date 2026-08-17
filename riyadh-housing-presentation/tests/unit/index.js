@@ -21,3 +21,6 @@ require("./palette-index.test.mjs");
 require("./diff-model.test.mjs");
 require("./methodology-model.test.mjs");
 require("./compare-model.test.mjs");
+// V3: بوابتا القبول الجديدتان (حد نص الإبراز 320 حرفاً + عقد مبدّل السمة)
+require("./highlight-cap.test.mjs");
+require("./theme-mode.test.mjs");

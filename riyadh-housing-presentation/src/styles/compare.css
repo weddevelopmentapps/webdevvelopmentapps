@@ -30,7 +30,7 @@
   padding: calc(var(--su) * 8) calc(var(--su) * 18);
   border: 1px solid var(--hair-d2);
   border-radius: 999px;
-  background: rgba(16, 32, 26, 0.6);
+  background: rgba(var(--surf-2-rgb), 0.6);
   color: var(--ink2-d);
   font-family: var(--f-body);
   font-size: calc(var(--su) * 14);
@@ -87,7 +87,7 @@
 }
 
 /* ── نغمات الحبر: دلالية مقفلة ──
-   الرملي (الطلب) غائب عمداً عن حبر النص: تباينه على ‎#10201A دون عتبة
+   الرملي (الطلب) غائب عمداً عن حبر النص: تباينه على ‎var(--stage-2) دون عتبة
    النص الصغير، فيُعرض حبره عاجياً ويبقى الرملي على العلامة البيانية. */
 .cmp-t-pos { color: var(--green-hi); }
 .cmp-t-neg { color: var(--coral); }
@@ -112,7 +112,7 @@
   align-items: center;
   gap: calc(var(--su) * 3);
   padding: calc(var(--su) * 3);
-  background: rgba(16, 32, 26, 0.55);
+  background: rgba(var(--surf-2-rgb), 0.55);
   border: 1px solid var(--hair-d2);
   border-radius: 999px;
 }
@@ -148,7 +148,7 @@
   font-size: calc(var(--su) * 13.5);
   font-weight: 700;
   color: var(--ink2-d);
-  background: rgba(16, 32, 26, 0.6);
+  background: rgba(var(--surf-2-rgb), 0.6);
   border: 1px solid var(--hair-d2);
   border-radius: 999px;
   padding: calc(var(--su) * 8) calc(var(--su) * 16);
@@ -188,7 +188,7 @@
   font-size: calc(var(--su) * 12.5);
   font-weight: 600;
   color: var(--mut-d);
-  background: rgba(16, 32, 26, 0.5);
+  background: rgba(var(--surf-2-rgb), 0.5);
   border: 1px solid var(--hair-d2);
   border-radius: 999px;
   padding: calc(var(--su) * 5) calc(var(--su) * 13);
@@ -200,7 +200,7 @@
 .cmp-chip.now {
   color: var(--ivory);
   border-color: var(--gold);
-  background: rgba(214, 171, 76, 0.08);
+  background: rgba(var(--gold-rgb), 0.08);
 }
 .cmp-chip:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 
@@ -249,8 +249,8 @@
 .cmp-secbtn:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
 
 .cmp-row { transition: background-color var(--dur-micro) var(--ease); }
-.cmp-row:hover { background: rgba(22, 41, 31, 0.5); }
-.cmp-row.now { background: rgba(214, 171, 76, 0.07); }
+.cmp-row:hover { background: rgba(var(--surf-3-rgb), 0.5); }
+.cmp-row.now { background: rgba(var(--gold-rgb), 0.07); }
 .cmp-row.now .cmp-ind-label { color: var(--gold-hi); }
 
 .cmp-td-ind { white-space: normal !important; }
@@ -292,14 +292,14 @@
   white-space: nowrap;
 }
 .cmp-tag.k-raw { color: var(--ink2-d); }
-.cmp-tag.k-derived { color: var(--green-hi); border-color: rgba(49, 162, 109, 0.35); }
-.cmp-tag.k-definitional { color: var(--gold-hi); border-color: rgba(214, 171, 76, 0.4); }
-.cmp-tag.k-geo { color: var(--collar-blue); border-color: rgba(63, 127, 176, 0.4); }
+.cmp-tag.k-derived { color: var(--green-hi); border-color: rgba(var(--green-rgb), 0.35); }
+.cmp-tag.k-definitional { color: var(--gold-hi); border-color: rgba(var(--gold-rgb), 0.4); }
+.cmp-tag.k-geo { color: var(--collar-blue); border-color: rgba(var(--blue-rgb), 0.4); }
 .cmp-tag.k-unit, .cmp-tag.k-dir { color: var(--faint-d); }
 
 .cmp-td-cell { text-align: center; }
-.cmp-td-cell.best { box-shadow: inset 0 0 0 1px rgba(49, 162, 109, 0.28); }
-.cmp-td-cell.worst { box-shadow: inset 0 0 0 1px rgba(214, 106, 80, 0.28); }
+.cmp-td-cell.best { box-shadow: inset 0 0 0 1px rgba(var(--green-rgb), 0.28); }
+.cmp-td-cell.worst { box-shadow: inset 0 0 0 1px rgba(var(--coral-rgb), 0.28); }
 
 .cmp-cell-v {
   display: block;
@@ -520,7 +520,7 @@
   display: flex;
   flex-direction: column;
   gap: calc(var(--su) * 1);
-  background: rgba(16, 32, 26, 0.55);
+  background: rgba(var(--surf-2-rgb), 0.55);
   border: 1px solid var(--hair-d2);
   border-radius: calc(var(--su) * 10);
   padding: calc(var(--su) * 7) calc(var(--su) * 13);
@@ -601,8 +601,8 @@
 }
 .cmp-map { width: 100%; height: 100%; display: block; }
 .cmp-map-d {
-  fill: rgba(38, 66, 53, 0.92);
-  stroke: rgba(244, 241, 230, 0.16);
+  fill: rgba(var(--surf-3-rgb), 0.92);
+  stroke: rgba(var(--ink-rgb), 0.16);
   stroke-width: 0.9;
 }
 .cmp-map-d.now {
@@ -611,7 +611,7 @@
   stroke-width: 1.4;
 }
 .cmp-map-hs circle {
-  fill: rgba(214, 106, 80, 0.42);
+  fill: rgba(var(--coral-rgb), 0.42);
   stroke: var(--coral);
   stroke-width: 1.2;
 }
@@ -645,12 +645,12 @@
   flex: none;
 }
 .cmp-legend-item.sel::before { background: var(--green-dim); box-shadow: inset 0 0 0 1px var(--green-hi); }
-.cmp-legend-item.base::before { background: rgba(30, 54, 43, 0.85); box-shadow: inset 0 0 0 1px var(--hair-d2); }
+.cmp-legend-item.base::before { background: rgba(var(--surf-3-rgb), 0.85); box-shadow: inset 0 0 0 1px var(--hair-d2); }
 .cmp-legend-item.hs::before {
   border-radius: 50%;
   width: calc(var(--su) * 9);
   height: calc(var(--su) * 9);
-  background: rgba(214, 106, 80, 0.42);
+  background: rgba(var(--coral-rgb), 0.42);
   box-shadow: inset 0 0 0 1px var(--coral);
 }
 .cmp-mapnote { line-height: 1.6; }
@@ -698,7 +698,7 @@
   cursor: pointer;
   transition: background-color var(--dur-micro) var(--ease);
 }
-.cmp-rankrow:hover { background: rgba(22, 41, 31, 0.6); }
+.cmp-rankrow:hover { background: rgba(var(--surf-3-rgb), 0.6); }
 .cmp-rankrow:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
 .cmp-rankrow-badge {
   grid-area: badge;
@@ -795,7 +795,7 @@
   unicode-bidi: isolate;
 }
 .cmp-balrow-tr { transition: background-color var(--dur-micro) var(--ease); }
-.cmp-balrow-tr:hover { background: rgba(22, 41, 31, 0.55); }
+.cmp-balrow-tr:hover { background: rgba(var(--surf-3-rgb), 0.55); }
 .cmp-linkbtn {
   font-family: var(--f-body);
   font-size: calc(var(--su) * 12.5);
@@ -831,7 +831,7 @@
   white-space: nowrap;
 }
 .cmp-rectbl td.cmp-origin { font-size: calc(var(--su) * 10.5); }
-.cmp-rectbl tr.bad { background: rgba(214, 106, 80, 0.07); }
+.cmp-rectbl tr.bad { background: rgba(var(--coral-rgb), 0.07); }
 
 .cmp-gate {
   display: inline-flex;
@@ -850,9 +850,9 @@
   border-radius: 50%;
   flex: none;
 }
-.cmp-gate.ok { color: var(--green-hi); border: 1px solid rgba(49, 162, 109, 0.4); }
+.cmp-gate.ok { color: var(--green-hi); border: 1px solid rgba(var(--green-rgb), 0.4); }
 .cmp-gate.ok::before { background: var(--green); }
-.cmp-gate.bad { color: var(--coral); border: 1px solid rgba(214, 106, 80, 0.45); }
+.cmp-gate.bad { color: var(--coral); border: 1px solid rgba(var(--coral-rgb), 0.45); }
 .cmp-gate.bad::before { background: var(--coral); }
 
 .cmp-limcard .card-body { gap: calc(var(--su) * 8); }
@@ -861,7 +861,7 @@
   flex-direction: column;
   gap: calc(var(--su) * 3);
   padding: calc(var(--su) * 8) calc(var(--su) * 12);
-  background: rgba(16, 32, 26, 0.5);
+  background: rgba(var(--surf-2-rgb), 0.5);
   border: 1px solid var(--hair-d2);
   border-inline-start: calc(var(--su) * 3) solid var(--faint-d);
   border-radius: calc(var(--su) * 9);
@@ -870,7 +870,7 @@
    وسم اعتماد لا قيمة بيانات، تماماً كما في بطاقة «بانتظار الاعتماد». */
 .cmp-limit.tagged {
   border-inline-start-color: var(--gold);
-  background: rgba(214, 171, 76, 0.05);
+  background: rgba(var(--gold-rgb), 0.05);
 }
 .cmp-limit-head {
   display: flex;
@@ -893,7 +893,7 @@
   gap: calc(var(--su) * 2);
   margin-top: calc(var(--su) * 3);
   padding-top: calc(var(--su) * 5);
-  border-top: 1px dashed rgba(214, 171, 76, 0.35);
+  border-top: 1px dashed rgba(var(--gold-rgb), 0.35);
 }
 .cmp-limit-status { font-size: calc(var(--su) * 10.5); font-weight: 700; color: var(--gold-hi); }
 .cmp-limit-note { font-size: calc(var(--su) * 10.5); color: var(--mut-d); line-height: 1.65; }
@@ -905,7 +905,7 @@
 .cmp-provtbl { font-size: calc(var(--su) * 12); }
 .cmp-provtbl td { white-space: normal; vertical-align: top; line-height: 1.55; }
 .cmp-provtbl td b { color: var(--ivory); }
-.cmp-provtbl tr.now { background: rgba(214, 171, 76, 0.07); }
+.cmp-provtbl tr.now { background: rgba(var(--gold-rgb), 0.07); }
 .cmp-prov-note {
   font-size: calc(var(--su) * 10.5);
   color: var(--faint-d);

@@ -1,0 +1,540 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   tabs/initiatives.css — أنماط التبويب ٤ «المبادرات» (بادئة ‎int-‎ حصراً)
+   ────────────────────────────────────────────────────────────────────────────
+   يُقرأ مع ‎src/styles/tabs.css‎ الذي يوفّر الأصناف الجاهزة
+   (‎.tabfigs‎ ‎.tabgrid‎ ‎.tabcard‎ ‎.tabchart‎) — هذا الملف **يزيّنها ولا يعيد
+   اختراعها**، ويضيف مكوّنات هذا التبويب وحدها:
+     ‎.int-ring-card‎  بطاقة الركيزة بحلقة تقدم دائرية كبيرة (SVG كودي)
+     ‎.int-chip‎       رقاقة حالة/نطاق = المسار المفاتيحي إلى نافذة الإبراز
+     ‎.int-ini‎        صف مبادرة: معرف + اسم + حالة + شريط «مضي المدة الزمنية»
+     ‎.int-bar‎        الشريط الزمني المسمّى حرفياً (لا يدّعي إنجازاً)
+
+   القاعدة الحاكمة (V3_SPEC §1 · V3_CONTRACTS §1-د):
+     **صفر لون مكتوب هنا.** كل لون ‎var(--…)‎ من ‎tokens.css‎، وكل شفافية
+     ‎rgba(var(--x-rgb), a)‎ — فتتبع الحلقات والأشرطة السمتين تلقائياً بلا
+     كتلة داكنة خاصة وبلا سطر JS واحد.
+
+   الصدق البصري (V3_SPEC §4-ب):
+     • الحلقة تعبّر عن **عدد** المنجز لا عن نسبة إنجاز مزعومة؛ ولذلك يرافقها
+       دائماً العدّ الظاهر والتسمية الحرفية ‎.int-ring-cap‎.
+     • الشريط ‎.int-bar‎ لا يُرسم مساره إطلاقاً في الحالة ‎.is-none‎ (لا تواريخ
+       في المصدر) — الغياب يُعلن نصاً ولا يُملأ بصفر مضلِّل.
+     • كل حالة مكتوبة نصاً بجانب نقطتها: اللون تعزيز لا حامل معنى وحيد.
+
+   التمرير الأفقي ممنوع: ‎min-width: 0‎ موروث من ‎.tabgrid > *‎، ولا عرض ثابت
+   في أي قاعدة هنا، والنصوص الطويلة تُقصّ بـ‎text-overflow‎ لا بالفيض.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.int {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 1.3vw, 22px);
+  min-width: 0;
+}
+
+/* ══ ١) شريط الركائز: أربع حلقات تقدم دائرية كبيرة ══════════════════════════
+   الشريط حاضنٌ للنمط الهندسي (متوازيات الأضلاع) الذي يحقنه ‎RH.brand.pattern‎
+   طبقةً مطلقة الموضع — فيلزمه ‎position: relative‎ و‎overflow: hidden‎، وترتفع
+   البطاقات فوقه بـ‎z-index‎. */
+.int-rings {
+  position: relative;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  padding: clamp(10px, 1vw, 16px);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background:
+    linear-gradient(135deg,
+      rgba(var(--brand-rgb), 0.05),
+      rgba(var(--surf-1-rgb), 0) 64%),
+    var(--surface-2);
+  overflow: hidden;
+}
+@media (max-width: 1180px) {
+  .int-rings { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 560px) {
+  .int-rings { grid-template-columns: minmax(0, 1fr); }
+}
+
+.int-ring-card {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  overflow: hidden;
+  transition: border-color var(--dur-micro) var(--ease),
+              box-shadow var(--dur-micro) var(--ease);
+}
+.int-ring-card:hover { border-color: rgba(var(--brand-rgb), 0.45); }
+/* الركيزة المختارة: إطار الهوية + شعيرة علوية — إشارتان لا لون وحده،
+   ويكمّلهما ‎aria-pressed‎ على الزر نفسه. */
+.int-ring-card.is-on {
+  border-color: var(--brand);
+  /* قاعدة الظل الموحدة ‎--shadow-rgb‎ داكنة في السمتين — لا هالة فاتحة في الداكن */
+  box-shadow: 0 6px 22px rgba(var(--shadow-rgb), 0.16);
+}
+.int-ring-card.is-on::before {
+  content: "";
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: 0;
+  block-size: 3px;
+  background: linear-gradient(90deg, var(--brand-teal), var(--brand-deep));
+}
+
+.int-ring-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  padding: clamp(12px, 1.1vw, 18px) 12px 10px;
+  min-width: 0;
+  text-align: center;
+  color: var(--ink-2);
+}
+.int-ring-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: -3px; }
+
+.int-ring-kicker {
+  font-family: var(--f-display);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--brand);
+  text-transform: none;
+}
+.int-ring-card.is-enabler .int-ring-kicker { color: var(--brand-teal); }
+
+/* الحلقة: مربع مرن يحمل SVG والمركز النصي فوقه */
+.int-ring-wrap {
+  position: relative;
+  inline-size: clamp(104px, 8.6vw, 148px);
+  block-size: clamp(104px, 8.6vw, 148px);
+  flex: 0 0 auto;
+}
+.int-ring {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  overflow: visible;
+}
+.int-ring-track {
+  fill: none;
+  stroke: var(--surface-3);
+  stroke-width: 11;
+}
+.int-ring-fill {
+  fill: none;
+  stroke: var(--green);
+  stroke-width: 11;
+  stroke-linecap: round;
+  transition: stroke-dashoffset var(--dur-major) var(--ease);
+}
+/* صفر منجز: القوس معدوم أصلاً، والمسار وحده يبقى — لا قوس كامل مضلِّل */
+.int-ring.is-zero .int-ring-track { stroke: var(--surface-3); }
+
+.int-ring-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  pointer-events: none;
+}
+.int-ring-pct {
+  font-family: var(--f-display);
+  font-size: clamp(19px, 1.8vw, 29px);
+  font-weight: 300;
+  line-height: 1.05;
+  color: var(--ink);
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+/* العدّ الظاهر الملزم («1 من 6») — لا يُخفى على أي مقاس */
+.int-ring-count {
+  font-size: clamp(11px, 0.82vw, 13px);
+  font-weight: 600;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+
+.int-ring-title {
+  font-family: var(--f-display);
+  font-size: clamp(12.5px, 0.95vw, 15px);
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--ink);
+  min-width: 0;
+}
+/* التسمية الحرفية الملزمة: «المنجز من مبادرات الركيزة» */
+.int-ring-cap {
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--ink-3);
+}
+
+.int-ring-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 8px 11px 10px;
+  border-block-start: 1px solid var(--line);
+  background: var(--surface-2);
+  min-width: 0;
+}
+
+/* خليط حالات الركيزة: نقطة + نص + عدد لكل حالة ذات رصيد */
+.int-mix {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 9px;
+  min-width: 0;
+}
+.int-mix-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10.5px;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+.int-mix-num {
+  font-family: var(--f-display);
+  font-weight: 700;
+  color: var(--ink-2);
+}
+
+.int-ring-more {
+  flex: 0 0 auto;
+  padding: 4px 11px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink-2);
+  font-size: 11.5px;
+  font-weight: 600;
+  transition: color var(--dur-micro) var(--ease),
+              border-color var(--dur-micro) var(--ease),
+              background var(--dur-micro) var(--ease);
+}
+.int-ring-more:hover,
+.int-ring-more:focus-visible {
+  color: var(--brand);
+  border-color: var(--brand);
+  background: var(--accent-softer);
+}
+.int-ring-more:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+/* ══ ٢) سطر النطاق ومفتاح الحالات ═════════════════════════════════════════ */
+.int-scope {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+.int-scope-txt {
+  font-size: 12.5px;
+  color: var(--ink-2);
+  min-width: 0;
+}
+.int-legend {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+}
+/* تصريح نطاق الأعداد: المفتاح يعدّ المحفظة كاملة حتى مع التصفية */
+.int-legend-cap {
+  font-size: 11.5px;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
+.int-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  max-inline-size: 100%;
+  padding: 5px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink-2);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+  transition: border-color var(--dur-micro) var(--ease),
+              background var(--dur-micro) var(--ease),
+              color var(--dur-micro) var(--ease);
+}
+.int-chip:hover,
+.int-chip:focus-visible {
+  background: var(--surface-2);
+  border-color: var(--brand);
+  color: var(--ink);
+}
+.int-chip:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.int-chip-num {
+  font-family: var(--f-display);
+  font-weight: 700;
+  color: var(--ink);
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+.int-chip.is-clear { border-color: var(--brand); background: var(--accent-soft); }
+.int-chip.is-quiet { background: none; color: var(--ink-3); }
+
+/* ══ ٣) نقاط الحالة الدلالية — تخدم الرقاقة والخليط وصف المبادرة معاً ════
+   اللون تعزيز: النص ملازم للنقطة في كل موضع (‎.int-chip-txt‎/‎.int-mix-txt‎/
+   ‎.int-st-txt‎) فلا يُحمل المعنى على اللون وحده. */
+.int-st-dot {
+  flex: 0 0 auto;
+  inline-size: 9px;
+  block-size: 9px;
+  border-radius: 3px;
+  background: var(--ink-4);
+}
+.int-st.is-done .int-st-dot,
+.int-chip.is-done .int-st-dot,
+.int-mix-item.is-done .int-st-dot { background: var(--green); }
+.int-st.is-run .int-st-dot,
+.int-chip.is-run .int-st-dot,
+.int-mix-item.is-run .int-st-dot { background: var(--collar-blue); }
+.int-st.is-late .int-st-dot,
+.int-chip.is-late .int-st-dot,
+.int-mix-item.is-late .int-st-dot { background: var(--coral); }
+.int-st.is-idle .int-st-dot,
+.int-chip.is-idle .int-st-dot,
+.int-mix-item.is-idle .int-st-dot { background: var(--ink-4); }
+
+.int-st {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+.int-st.is-late .int-st-txt { color: var(--coral); }
+.int-st.is-done .int-st-txt { color: var(--green); }
+
+/* ══ ٤) بطاقتا الخط الزمني والقوائم ═══════════════════════════════════════ */
+.int-card .tabcard-note { max-inline-size: 46ch; }
+.int-card .tabcard-body { display: flex; flex-direction: column; gap: 10px; }
+
+.int-empty {
+  padding: 34px 18px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--ink-3);
+}
+
+/* ══ ٥) قوائم مبادرات الركائز ═════════════════════════════════════════════
+   عمودان على الشاشات الواسعة كي لا يطول اللوح بأربع قوائم متتالية؛ وعمود
+   واحد عند التصفية على ركيزة (‎.is-single‎) فتأخذ القائمة عرضها كاملاً. */
+.int-groups {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(10px, 1.1vw, 18px);
+  padding-inline: 8px;
+  padding-block-end: 6px;
+}
+.int-groups.is-single { grid-template-columns: minmax(0, 1fr); }
+@media (max-width: 1100px) {
+  .int-groups { grid-template-columns: minmax(0, 1fr); }
+}
+.int-groups > * { min-width: 0; }
+
+.int-group {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  overflow: hidden;
+}
+.int-group-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px 12px;
+  flex-wrap: wrap;
+  padding: 10px 13px;
+  border-block-end: 1px solid var(--line);
+  background: var(--surface-2);
+  min-width: 0;
+}
+.int-group-title {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-width: 0;
+  font-family: var(--f-display);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.int-group-kicker {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--brand);
+  white-space: nowrap;
+}
+.int-group.is-enabler .int-group-kicker { color: var(--brand-teal); }
+.int-group-name { min-width: 0; }
+.int-group-count {
+  margin-inline-start: auto;
+  font-family: var(--f-display);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+  direction: ltr;
+  unicode-bidi: isolate;
+  white-space: nowrap;
+}
+.int-group-cap {
+  flex: 1 0 100%;
+  font-size: 10.5px;
+  color: var(--ink-3);
+}
+
+.int-inis { display: flex; flex-direction: column; }
+.int-ini-li { min-width: 0; }
+.int-ini-li + .int-ini-li { border-block-start: 1px solid var(--line); }
+
+/* صف المبادرة زرٌّ حقيقي: يُقرأ كصف ويُفعَّل بالنقر وبلوحة المفاتيح */
+.int-ini {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) minmax(120px, 0.72fr);
+  align-items: center;
+  gap: 6px 12px;
+  inline-size: 100%;
+  padding: 9px 13px;
+  text-align: start;
+  color: var(--ink-2);
+  /* شعيرة الحالة على الحافة الداخلية — الإشارة الثالثة بعد النقطة والنص */
+  border-inline-start: 3px solid var(--surface);
+  transition: background var(--dur-micro) var(--ease);
+}
+.int-ini:hover { background: var(--surface-2); }
+.int-ini:focus-visible { outline: 2px solid var(--gold); outline-offset: -2px; }
+.int-ini.is-done { border-inline-start-color: var(--green); }
+.int-ini.is-run { border-inline-start-color: var(--collar-blue); }
+.int-ini.is-late { border-inline-start-color: var(--coral); }
+.int-ini.is-idle { border-inline-start-color: var(--ink-4); }
+
+.int-ini-id {
+  flex: 0 0 auto;
+  font-family: var(--f-display);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-3);
+  direction: ltr;
+  unicode-bidi: isolate;
+  white-space: nowrap;
+}
+.int-ini-main { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.int-ini-name {
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.55;
+  color: var(--ink);
+  min-width: 0;
+}
+.int-ini-st { align-self: flex-start; }
+
+/* ── الشريط الزمني المسمّى حرفياً ───────────────────────────────────────── */
+.int-bar { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.int-bar-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+}
+.int-bar-cap {
+  font-size: 10.5px;
+  color: var(--ink-3);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.int-bar-val {
+  font-family: var(--f-display);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-2);
+  direction: ltr;
+  unicode-bidi: isolate;
+  white-space: nowrap;
+}
+.int-bar-track {
+  display: block;
+  inline-size: 100%;
+  block-size: 7px;
+  border-radius: 999px;
+  background: var(--surface-3);
+  overflow: hidden;
+}
+.int-bar-fill {
+  display: block;
+  block-size: 100%;
+  border-radius: 999px;
+  background: var(--ink-4);
+  transition: inline-size var(--dur-std) var(--ease);
+}
+/* المنجزة وحدها يجوز أن تُصبغ بلون الإنجاز (أخضر) بامتلاء كامل */
+.int-bar.is-done .int-bar-fill { background: var(--green); }
+.int-bar.is-done .int-bar-val { color: var(--green); }
+/* «مضي المدة الزمنية»: لون محايد لا يوحي بإنجاز، ومرجاني عند التأخر */
+.int-ini.is-run .int-bar.is-elapsed .int-bar-fill { background: var(--collar-blue); }
+.int-ini.is-late .int-bar.is-elapsed .int-bar-fill { background: var(--coral); }
+.int-ini.is-late .int-bar.is-elapsed .int-bar-val { color: var(--coral); }
+/* بلا تواريخ: لا مسار ولا امتلاء — الغياب مُعلن نصاً وحده */
+.int-bar.is-none .int-bar-cap { font-style: italic; }
+.int-bar.is-none .int-bar-val { color: var(--ink-4); }
+
+@media (max-width: 620px) {
+  .int-ini { grid-template-columns: auto minmax(0, 1fr); }
+  .int-bar { grid-column: 1 / -1; }
+}
+
+/* ══ ٦) سطر الصدق أسفل اللوح ══════════════════════════════════════════════ */
+.int-foot {
+  margin-block-start: 2px;
+  font-size: 11.5px;
+  line-height: 1.9;
+  color: var(--ink-3);
+}
+.int-foot-src { color: var(--ink-2); }
+
+/* ══ ٧) احترام تقليل الحركة ═══════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  .int-ring-fill,
+  .int-bar-fill,
+  .int-ring-card,
+  .int-ring-more,
+  .int-chip,
+  .int-ini { transition: none; }
+}
+
+/* ══ ٨) الطباعة: الكروم التفاعلي يُخفى والمحتوى يُسطَّح ═══════════════════ */
+@media print {
+  .int-rings { background: none; }
+  .int-ring-card { box-shadow: none; }
+  .int-legend,
+  .int-ring-more { display: none; }
+  .int-group,
+  .int-ring-card { break-inside: avoid; }
+}

@@ -6,6 +6,19 @@
 <meta name="robots" content="noindex">
 <title>لوحة معلومات السكن الجماعي للأفراد في مدينة الرياض</title>
 <link rel="icon" href="__FAVICON__">
+<meta name="color-scheme" content="light dark">
+<script>
+/* تمهيد السمة قبل أول طلاء — يمنع ومضة اللون الخاطئ عند تحميل اختيار محفوظ.
+   نسخة مصغّرة من عقد RH.core.themeMode: المفتاح والحالات الثلاث نفسها. */
+(function () {
+  try {
+    var v = window.localStorage.getItem("rh:theme");
+    if (v === "light" || v === "dark") {
+      document.documentElement.setAttribute("data-theme", v);
+    }
+  } catch (e) { /* بلا تخزين: يحكم prefers-color-scheme وحده */ }
+})();
+</script>
 <style>
 /*__FONTS__*/
 </style>
@@ -13,9 +26,10 @@
 /*__CSS__*/
 </style>
 </head>
-<body class="mode-presenter">
+<body class="mode-tabs">
 
-<!-- مسرح المقدِّم: مشهد واحد يملأ الإطار — لا تمرير -->
+<!-- المسرح: يستضيف الملاحق ووضع العرض الاختياري بالكليكر (V3_SPEC §6).
+     في الوضع الافتراضي (mode-tabs) يبقى مخفياً ولا يشغل مساحة. -->
 <div id="stage" class="stage" role="main" aria-label="العرض التقديمي">
   <div id="scene-host" class="scene-host"></div>
   <div id="scene-next" class="scene-host scene-incoming" aria-hidden="true"></div>

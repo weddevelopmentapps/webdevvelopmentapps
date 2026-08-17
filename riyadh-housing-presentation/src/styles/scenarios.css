@@ -84,7 +84,7 @@
   padding: calc(var(--su) * 8) calc(var(--su) * 18);
   border: 1px solid var(--hair-d2);
   border-radius: 999px;
-  background: rgba(16, 32, 26, 0.6);
+  background: rgba(var(--surf-2-rgb), 0.6);
   color: var(--ink2-d);
   font-family: var(--f-body);
   font-size: calc(var(--su) * 14);
@@ -131,8 +131,8 @@
   display: flex;
   flex-direction: column;
   gap: calc(var(--su) * 5);
-  background: rgba(214, 171, 76, 0.06);
-  border: 1px dashed rgba(214, 171, 76, 0.4);
+  background: rgba(var(--gold-rgb), 0.06);
+  border: 1px dashed rgba(var(--gold-rgb), 0.4);
   border-radius: var(--r-sm);
   padding: calc(var(--su) * 8) calc(var(--su) * 14) calc(var(--su) * 9);
 }
@@ -154,10 +154,10 @@
   font-size: calc(var(--su) * 13);
   font-weight: 700;
   color: var(--gold-hi);
-  border: 1px solid rgba(214, 171, 76, 0.45);
+  border: 1px solid rgba(var(--gold-rgb), 0.45);
   border-radius: 999px;
   padding: calc(var(--su) * 3) calc(var(--su) * 12);
-  background: rgba(214, 171, 76, 0.07);
+  background: rgba(var(--gold-rgb), 0.07);
   white-space: nowrap;
 }
 .axs-caveat-title {
@@ -177,7 +177,7 @@
   align-items: center;
   gap: calc(var(--su) * 8);
   padding: calc(var(--su) * 4) calc(var(--su) * 12);
-  border: 1px solid rgba(214, 171, 76, 0.4);
+  border: 1px solid rgba(var(--gold-rgb), 0.4);
   border-radius: 999px;
   background: transparent;
   color: var(--gold-hi);
@@ -190,8 +190,8 @@
     border-color var(--dur-micro) var(--ease);
 }
 .axs-caveat-btn:hover {
-  background: rgba(214, 171, 76, 0.12);
-  border-color: rgba(214, 171, 76, 0.65);
+  background: rgba(var(--gold-rgb), 0.12);
+  border-color: rgba(var(--gold-rgb), 0.65);
 }
 .axs-arrow {
   color: var(--faint-d);
@@ -217,7 +217,7 @@
   flex-direction: column;
   justify-content: center;
   gap: 0;
-  background: rgba(16, 32, 26, 0.55);
+  background: rgba(var(--surf-2-rgb), 0.55);
   border: 1px solid var(--hair-d2);
   border-radius: var(--r-sm);
   padding: calc(var(--su) * 3) calc(var(--su) * 10) calc(var(--su) * 4);
@@ -257,7 +257,7 @@
   display: flex;
   flex-direction: column;
   gap: calc(var(--su) * 7);
-  background: rgba(16, 32, 26, 0.5);
+  background: rgba(var(--surf-2-rgb), 0.5);
   border: 1px solid var(--hair-d2);
   border-radius: var(--r-sm);
   padding: calc(var(--su) * 8) calc(var(--su) * 14) calc(var(--su) * 10);
@@ -311,12 +311,12 @@
 .axs-slider::-webkit-slider-runnable-track {
   height: calc(var(--su) * 6);
   border-radius: 999px;
-  background: rgba(244, 241, 230, 0.12);
+  background: rgba(var(--ink-rgb), 0.12);
 }
 .axs-slider::-moz-range-track {
   height: calc(var(--su) * 6);
   border-radius: 999px;
-  background: rgba(244, 241, 230, 0.12);
+  background: rgba(var(--ink-rgb), 0.12);
 }
 .axs-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
@@ -348,7 +348,7 @@
   font-size: calc(var(--su) * 12.5);
   font-weight: 700;
   color: var(--ink2-d);
-  background: rgba(16, 32, 26, 0.6);
+  background: rgba(var(--surf-2-rgb), 0.6);
   border: 1px solid var(--hair-d2);
   border-radius: 999px;
   padding: calc(var(--su) * 6) calc(var(--su) * 14);
@@ -415,7 +415,7 @@
   font-size: calc(var(--su) * 12);
   font-weight: 600;
   color: var(--mut-d);
-  background: rgba(16, 32, 26, 0.6);
+  background: rgba(var(--surf-2-rgb), 0.6);
   border: 1px solid var(--hair-d2);
   border-radius: 999px;
   padding: calc(var(--su) * 4) calc(var(--su) * 13);
@@ -430,7 +430,7 @@
 .axs-toggle-btn.now {
   color: var(--ivory);
   background: var(--stage-3);
-  border-color: rgba(214, 171, 76, 0.45);
+  border-color: rgba(var(--gold-rgb), 0.45);
 }
 .axs-toggle-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 .axs-basis { margin-top: calc(var(--su) * 2); }
@@ -539,16 +539,16 @@
   display: flex;
   flex-direction: column;
   gap: calc(var(--su) * 5);
-  background: rgba(16, 32, 26, 0.58);
+  background: rgba(var(--surf-2-rgb), 0.58);
   border: 1px solid var(--hair-d2);
   border-radius: var(--r-sm);
   padding: calc(var(--su) * 8) calc(var(--su) * 13) calc(var(--su) * 9);
   min-width: 0;
 }
 /* درجات ترتيبية من صبغة العجز الواحدة — لا صبغة جديدة */
-.axs-card.conservative { border-top: 2px solid rgba(214, 106, 80, 0.85); }
-.axs-card.base { border-top: 2px solid rgba(214, 106, 80, 0.55); }
-.axs-card.optimistic { border-top: 2px solid rgba(214, 106, 80, 0.3); }
+.axs-card.conservative { border-top: 2px solid rgba(var(--coral-rgb), 0.85); }
+.axs-card.base { border-top: 2px solid rgba(var(--coral-rgb), 0.55); }
+.axs-card.optimistic { border-top: 2px solid rgba(var(--coral-rgb), 0.3); }
 
 .axs-card-head {
   display: flex;
@@ -669,7 +669,7 @@
 }
 .axs-jump:hover {
   color: var(--ivory);
-  background: rgba(244, 241, 230, 0.05);
+  background: rgba(var(--ink-rgb), 0.05);
   border-color: var(--hair-d2);
 }
 .axs-jump:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
@@ -683,8 +683,8 @@
   white-space: nowrap;
 }
 .axs-kind.raw { color: var(--ink2-d); }
-.axs-kind.derived { color: var(--green-hi); border-color: rgba(49, 162, 109, 0.35); }
-.axs-kind.supplied { color: var(--gold-hi); border-color: rgba(214, 171, 76, 0.4); }
+.axs-kind.derived { color: var(--green-hi); border-color: rgba(var(--green-rgb), 0.35); }
+.axs-kind.supplied { color: var(--gold-hi); border-color: rgba(var(--gold-rgb), 0.4); }
 .axs-origin {
   font-size: calc(var(--su) * 11.5);
   color: var(--mut-d);
@@ -748,7 +748,7 @@
   align-self: flex-start;
   max-width: 100%;
   color: var(--gold-hi);
-  background: rgba(214, 171, 76, 0.06);
+  background: rgba(var(--gold-rgb), 0.06);
   border-radius: calc(var(--su) * 6);
   padding: calc(var(--su) * 3) calc(var(--su) * 8);
   overflow-x: auto;
@@ -762,8 +762,8 @@
 .axs-worked {
   margin-top: calc(var(--su) * 8);
   padding: calc(var(--su) * 8) calc(var(--su) * 11);
-  background: rgba(49, 162, 109, 0.06);
-  border: 1px solid rgba(49, 162, 109, 0.22);
+  background: rgba(var(--green-rgb), 0.06);
+  border: 1px solid rgba(var(--green-rgb), 0.22);
   border-radius: calc(var(--su) * 9);
 }
 .axs-worked-k {

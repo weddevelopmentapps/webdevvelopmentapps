@@ -21,13 +21,13 @@
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: thin;
-  scrollbar-color: rgba(244, 241, 230, 0.18) transparent;
+  scrollbar-color: rgba(var(--ink-rgb), 0.18) transparent;
 }
 [data-section="forecast"] .dash-body::-webkit-scrollbar {
   width: calc(var(--su) * 8);
 }
 [data-section="forecast"] .dash-body::-webkit-scrollbar-thumb {
-  background: rgba(244, 241, 230, 0.16);
+  background: rgba(var(--ink-rgb), 0.16);
   border-radius: 999px;
 }
 [data-section="forecast"] .dash-body::-webkit-scrollbar-track {
@@ -53,7 +53,7 @@
     background-color var(--dur-micro) var(--ease);
 }
 [data-section="forecast"] .kpi.fct-act:hover {
-  background: rgba(22, 41, 31, 0.72);
+  background: rgba(var(--surf-3-rgb), 0.72);
   border-color: var(--hair-d);
   transform: translateY(calc(var(--su) * -2));
 }
@@ -72,7 +72,7 @@
   flex: none;
   position: relative;
   z-index: 1;
-  background: rgba(16, 32, 26, 0.92);
+  background: rgba(var(--surf-2-rgb), 0.92);
   padding: calc(var(--su) * 6) calc(var(--su) * 18) calc(var(--su) * 11);
   border-top: 1px solid var(--hair-d2);
   font-size: calc(var(--su) * 12.5);
@@ -104,7 +104,7 @@
   text-align: start;
 }
 [data-section="forecast"] .fct-table-card .table-dense tr:hover td {
-  background: rgba(22, 41, 31, 0.5);
+  background: rgba(var(--surf-3-rgb), 0.5);
 }
 [data-section="forecast"] .fct-month-btn {
   display: inline-block;
@@ -125,8 +125,8 @@
     color var(--dur-micro) var(--ease);
 }
 [data-section="forecast"] .fct-month-btn:hover {
-  background: rgba(214, 106, 80, 0.12);
-  border-color: rgba(214, 106, 80, 0.4);
+  background: rgba(var(--coral-rgb), 0.12);
+  border-color: rgba(var(--coral-rgb), 0.4);
   color: var(--ivory);
 }
 [data-section="forecast"] .fct-month-btn:focus-visible {
@@ -158,7 +158,7 @@
 [data-section="forecast"] .fct-sc {
   border: 1px solid var(--hair-d2);
   border-radius: calc(var(--su) * 10);
-  background: rgba(11, 21, 18, 0.5);
+  background: rgba(var(--surf-1-rgb), 0.5);
   padding: calc(var(--su) * 4) calc(var(--su) * 10) calc(var(--su) * 4);
   display: flex;
   flex-direction: column;
@@ -178,8 +178,8 @@
 }
 [data-section="forecast"] .fct-sc.fct-act:hover,
 [data-section="forecast"] .fct-sc.hl {
-  background: rgba(22, 41, 31, 0.7);
-  border-color: rgba(214, 106, 80, 0.4);
+  background: rgba(var(--surf-3-rgb), 0.7);
+  border-color: rgba(var(--coral-rgb), 0.4);
   transform: translateY(calc(var(--su) * -1));
 }
 [data-section="forecast"] .fct-sc.fct-act:focus-visible {
@@ -222,7 +222,7 @@
 [data-section="forecast"] .fct-sc-track {
   height: calc(var(--su) * 6);
   border-radius: 999px;
-  background: rgba(244, 241, 230, 0.07);
+  background: rgba(var(--ink-rgb), 0.07);
   overflow: hidden;
 }
 [data-section="forecast"] .fct-sc-fill {
@@ -278,7 +278,7 @@
   padding: calc(var(--su) * 5) calc(var(--su) * 11);
   border: 1px solid var(--hair-d2);
   border-radius: calc(var(--su) * 9);
-  background: rgba(11, 21, 18, 0.5);
+  background: rgba(var(--surf-1-rgb), 0.5);
   color: var(--ink2-d);
   font-family: var(--f-body);
   font-size: calc(var(--su) * 12);
@@ -292,8 +292,8 @@
     color var(--dur-micro) var(--ease);
 }
 [data-section="forecast"] .fct-band-btn:hover {
-  background: rgba(214, 106, 80, 0.1);
-  border-color: rgba(214, 106, 80, 0.38);
+  background: rgba(var(--coral-rgb), 0.1);
+  border-color: rgba(var(--coral-rgb), 0.38);
   color: var(--ivory);
 }
 [data-section="forecast"] .fct-band-btn:focus-visible {
@@ -312,8 +312,8 @@
    ساكنة الحركة عند reduced-motion. */
 [data-section="forecast"] .fct-caveat {
   flex: none;
-  background: rgba(214, 171, 76, 0.06);
-  border: 1px dashed rgba(214, 171, 76, 0.4);
+  background: rgba(var(--gold-rgb), 0.06);
+  border: 1px dashed rgba(var(--gold-rgb), 0.4);
   border-radius: var(--r-sm);
   padding: calc(var(--su) * 10) calc(var(--su) * 14) calc(var(--su) * 9);
   display: flex;
@@ -337,10 +337,10 @@
   font-size: calc(var(--su) * 12.5);
   font-weight: 700;
   color: var(--gold-hi);
-  border: 1px solid rgba(214, 171, 76, 0.45);
+  border: 1px solid rgba(var(--gold-rgb), 0.45);
   border-radius: 999px;
   padding: calc(var(--su) * 3) calc(var(--su) * 11);
-  background: rgba(214, 171, 76, 0.07);
+  background: rgba(var(--gold-rgb), 0.07);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -362,7 +362,7 @@
   align-items: center;
   gap: calc(var(--su) * 8);
   padding: calc(var(--su) * 5) calc(var(--su) * 11);
-  border: 1px solid rgba(214, 171, 76, 0.4);
+  border: 1px solid rgba(var(--gold-rgb), 0.4);
   border-radius: 999px;
   background: transparent;
   color: var(--gold-hi);
@@ -375,8 +375,8 @@
     border-color var(--dur-micro) var(--ease);
 }
 [data-section="forecast"] .fct-caveat-btn:hover {
-  background: rgba(214, 171, 76, 0.12);
-  border-color: rgba(214, 171, 76, 0.65);
+  background: rgba(var(--gold-rgb), 0.12);
+  border-color: rgba(var(--gold-rgb), 0.65);
 }
 [data-section="forecast"] .fct-caveat-btn:focus-visible {
   outline: 2px solid var(--gold);
@@ -386,7 +386,7 @@
 /* بطاقة «ترتيب نهاية الأفق» — قائمة أسوأ الحالات أولاً */
 [data-section="forecast"] .fct-rank {
   flex: none; /* صفوف الترتيب الثلاثة بيانات لا تُقص صمتاً (مراجعة الجولة 1) */
-  background: rgba(16, 32, 26, 0.58);
+  background: rgba(var(--surf-2-rgb), 0.58);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid var(--hair-d2);
@@ -432,8 +432,8 @@
 }
 [data-section="forecast"] .fct-rank-row:hover,
 [data-section="forecast"] .fct-rank-row.hl {
-  background: rgba(214, 106, 80, 0.09);
-  border-color: rgba(214, 106, 80, 0.35);
+  background: rgba(var(--coral-rgb), 0.09);
+  border-color: rgba(var(--coral-rgb), 0.35);
 }
 [data-section="forecast"] .fct-rank-row:focus-visible {
   outline: 2px solid var(--gold);
@@ -455,7 +455,7 @@
 [data-section="forecast"] .fct-rank-track {
   height: calc(var(--su) * 6);
   border-radius: 999px;
-  background: rgba(244, 241, 230, 0.07);
+  background: rgba(var(--ink-rgb), 0.07);
   overflow: hidden;
 }
 [data-section="forecast"] .fct-rank-fill {
@@ -493,7 +493,7 @@
   padding: calc(var(--su) * 10) calc(var(--su) * 14);
   border: 1px solid var(--hair-d2);
   border-radius: var(--r-sm);
-  background: rgba(16, 32, 26, 0.58);
+  background: rgba(var(--surf-2-rgb), 0.58);
   color: var(--ink2-d);
   font-family: var(--f-body);
   font-size: calc(var(--su) * 13);
@@ -506,7 +506,7 @@
     color var(--dur-micro) var(--ease);
 }
 [data-section="forecast"] .fct-appx:hover {
-  background: rgba(22, 41, 31, 0.75);
+  background: rgba(var(--surf-3-rgb), 0.75);
   border-color: var(--hair-d);
   color: var(--ivory);
 }
@@ -589,18 +589,18 @@
   border: 1px solid var(--hair-d2);
   border-radius: 999px;
   padding: calc(var(--su) * 4) calc(var(--su) * 12);
-  background: rgba(16, 32, 26, 0.55);
+  background: rgba(var(--surf-2-rgb), 0.55);
   white-space: nowrap;
 }
 [data-section="forecast"] .fct-badge.gold {
   color: var(--gold-hi);
-  border-color: rgba(214, 171, 76, 0.45);
-  background: rgba(214, 171, 76, 0.07);
+  border-color: rgba(var(--gold-rgb), 0.45);
+  background: rgba(var(--gold-rgb), 0.07);
 }
 [data-section="forecast"] .fct-badge.neg {
   color: var(--coral);
-  border-color: rgba(214, 106, 80, 0.45);
-  background: rgba(214, 106, 80, 0.07);
+  border-color: rgba(var(--coral-rgb), 0.45);
+  background: rgba(var(--coral-rgb), 0.07);
 }
 [data-section="forecast"] .fct-cap {
   font-size: calc(var(--su) * 13.5);
@@ -631,7 +631,7 @@
 [data-section="forecast"] .fct-cbar-track {
   height: calc(var(--su) * 9);
   border-radius: 999px;
-  background: rgba(244, 241, 230, 0.07);
+  background: rgba(var(--ink-rgb), 0.07);
   overflow: hidden;
 }
 [data-section="forecast"] .fct-cbar-fill {
@@ -644,7 +644,7 @@
 /* شريط «عجز اليوم» المرجعي: امتلاء عاجي محايد — الذهبي لا يلوّن مقدار
    بيانات، والمرجان محجوز لقيم السيناريوهات ذاتها */
 [data-section="forecast"] .fct-cbar.today .fct-cbar-fill {
-  background: rgba(244, 241, 230, 0.35);
+  background: rgba(var(--ink-rgb), 0.35);
 }
 [data-section="forecast"] .fct-cbar-v {
   font-family: var(--f-display);
@@ -692,10 +692,10 @@
   border: 1px solid var(--hair-d2);
   border-radius: calc(var(--su) * 10);
   scrollbar-width: thin;
-  scrollbar-color: rgba(244, 241, 230, 0.18) transparent;
+  scrollbar-color: rgba(var(--ink-rgb), 0.18) transparent;
 }
 [data-section="forecast"] .fct-table .table-dense th {
-  background: rgba(16, 32, 26, 0.96);
+  background: rgba(var(--surf-2-rgb), 0.96);
 }
 [data-section="forecast"] .fct-table .table-dense td {
   direction: ltr;
@@ -727,7 +727,7 @@
   color: var(--mut-d);
   margin: 0;
   padding-inline-start: calc(var(--su) * 12);
-  border-inline-start: 2px solid rgba(214, 171, 76, 0.45);
+  border-inline-start: 2px solid rgba(var(--gold-rgb), 0.45);
 }
 [data-section="forecast"] .fct-src {
   font-size: calc(var(--su) * 12);
@@ -750,7 +750,7 @@
   padding: calc(var(--su) * 7) calc(var(--su) * 14);
   border: 1px solid var(--hair-d2);
   border-radius: 999px;
-  background: rgba(16, 32, 26, 0.6);
+  background: rgba(var(--surf-2-rgb), 0.6);
   color: var(--ink2-d);
   font-family: var(--f-body);
   font-size: calc(var(--su) * 12.5);
@@ -762,7 +762,7 @@
     color var(--dur-micro) var(--ease);
 }
 [data-section="forecast"] .fct-btn:hover {
-  background: rgba(22, 41, 31, 0.85);
+  background: rgba(var(--surf-3-rgb), 0.85);
   border-color: var(--hair-d);
   color: var(--ivory);
 }
@@ -828,7 +828,7 @@
 /* ── إحصاءات العمود المدمجة (إصلاح فراغ أسفل العمود) ── */
 [data-section="forecast"] .fct-rail-stats {
   flex: none;
-  background: rgba(16, 32, 26, 0.58);
+  background: rgba(var(--surf-2-rgb), 0.58);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid var(--hair-d2);
@@ -866,7 +866,7 @@
 [data-section="forecast"] .fct-band-spark i {
   flex: 1;
   border-radius: 2px 2px 0 0;
-  background: rgba(214, 106, 80, 0.55);
+  background: rgba(var(--coral-rgb), 0.55);
 }
 [data-section="forecast"] .fct-band-ends {
   display: flex;

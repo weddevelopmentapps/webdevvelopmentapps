@@ -102,7 +102,7 @@
   display: flex;
   flex-direction: column;
   gap: calc(var(--su) * 9);
-  background: rgba(16, 32, 26, 0.5);
+  background: rgba(var(--surf-2-rgb), 0.5);
   border: 1px solid var(--hair-d2);
   border-radius: var(--r-sm);
   padding: calc(var(--su) * 12) calc(var(--su) * 12) calc(var(--su) * 10);
@@ -283,9 +283,9 @@
   padding: calc(var(--su) * 7) calc(var(--su) * 10);
   transition: background var(--dur-micro), border-color var(--dur-micro);
 }
-.atl-opt:hover { background: rgba(22, 41, 31, 0.6); }
+.atl-opt:hover { background: rgba(var(--surf-3-rgb), 0.6); }
 .atl-opt.is-active {
-  background: rgba(22, 41, 31, 0.8);
+  background: rgba(var(--surf-3-rgb), 0.8);
   border-color: var(--hair-d);
 }
 .atl-opt.is-sel {
@@ -332,8 +332,8 @@
   font-size: calc(var(--su) * 10.5);
   font-weight: 700;
   color: var(--green-hi);
-  background: rgba(49, 162, 109, 0.12);
-  border: 1px solid rgba(49, 162, 109, 0.34);
+  background: rgba(var(--green-rgb), 0.12);
+  border: 1px solid rgba(var(--green-rgb), 0.34);
   border-radius: 999px;
   padding: calc(var(--su) * 2) calc(var(--su) * 7);
   white-space: nowrap;
@@ -378,7 +378,7 @@
   display: flex;
   flex-direction: column;
   gap: calc(var(--su) * 10);
-  background: rgba(16, 32, 26, 0.42);
+  background: rgba(var(--surf-2-rgb), 0.42);
   border: 1px solid var(--hair-d2);
   border-radius: var(--r-sm);
   padding: calc(var(--su) * 14) calc(var(--su) * 16) calc(var(--su) * 12);
@@ -424,7 +424,7 @@
   font-size: calc(var(--su) * 12);
   font-weight: 600;
   color: var(--mut-d);
-  background: rgba(244, 241, 230, 0.05);
+  background: rgba(var(--ink-rgb), 0.05);
   border: 1px solid var(--hair-d2);
   border-radius: 999px;
   padding: calc(var(--su) * 3) calc(var(--su) * 10);
@@ -432,18 +432,18 @@
 }
 .atl-chip.t-pos {
   color: var(--green-hi);
-  border-color: rgba(49, 162, 109, 0.36);
-  background: rgba(49, 162, 109, 0.1);
+  border-color: rgba(var(--green-rgb), 0.36);
+  background: rgba(var(--green-rgb), 0.1);
 }
 .atl-chip.t-neg {
   color: var(--coral);
-  border-color: rgba(214, 106, 80, 0.36);
-  background: rgba(214, 106, 80, 0.1);
+  border-color: rgba(var(--coral-rgb), 0.36);
+  background: rgba(var(--coral-rgb), 0.1);
 }
 .atl-chip.t-demand {
   color: var(--demand);
-  border-color: rgba(156, 122, 46, 0.4);
-  background: rgba(156, 122, 46, 0.1);
+  border-color: rgba(var(--demand-rgb), 0.4);
+  background: rgba(var(--demand-rgb), 0.1);
 }
 .atl-chip.t-neu { color: var(--ink2-d); }
 .atl-chiprow {
@@ -559,7 +559,7 @@
   display: flex;
   flex-direction: column;
   gap: calc(var(--su) * 2);
-  background: rgba(11, 21, 18, 0.6);
+  background: rgba(var(--surf-1-rgb), 0.6);
   border: 1px solid var(--hair-d2);
   border-inline-start: 2px solid var(--hair-d);
   border-radius: calc(var(--su) * 9);
@@ -614,34 +614,34 @@
 
 /* حدود الأحياء: حبر واجهة محايد — الإبراز مؤشر تركيز لا لون قيمة */
 .atl-map-d {
-  fill: rgba(244, 241, 230, 0.09);
-  stroke: rgba(244, 241, 230, 0.34);
+  fill: rgba(var(--ink-rgb), 0.09);
+  stroke: rgba(var(--ink-rgb), 0.34);
   stroke-width: 0.9;
   cursor: pointer;
   transition: fill var(--dur-micro), stroke var(--dur-micro);
 }
-.atl-map-d:hover { fill: rgba(244, 241, 230, 0.24); }
+.atl-map-d:hover { fill: rgba(var(--ink-rgb), 0.24); }
 .atl-map-d.in-sec {
-  fill: rgba(244, 241, 230, 0.19);
-  stroke: rgba(244, 241, 230, 0.52);
+  fill: rgba(var(--ink-rgb), 0.19);
+  stroke: rgba(var(--ink-rgb), 0.52);
 }
 .atl-map-d.has-sample { stroke-dasharray: 3 2; }
 .atl-map-d.is-sel {
-  fill: rgba(244, 241, 230, 0.82);
+  fill: rgba(var(--ink-rgb), 0.82);
   stroke: var(--ivory);
   stroke-width: 2.2;
   stroke-dasharray: none;
 }
 /* نقاط التركّز الرقابي — المرجاني استخدامه الدلالي المسموح */
 .atl-map-hs {
-  fill: rgba(214, 106, 80, 0.5);
+  fill: rgba(var(--coral-rgb), 0.5);
   stroke: var(--coral);
   stroke-width: 0.7;
   pointer-events: none;
 }
 .atl-map-ring {
   fill: none;
-  stroke: rgba(244, 241, 230, 0.46);
+  stroke: rgba(var(--ink-rgb), 0.46);
   stroke-width: 1.3;
   stroke-dasharray: 6 4;
   pointer-events: none;
@@ -653,12 +653,12 @@
   pointer-events: none;
 }
 .atl-map-scale-line {
-  stroke: rgba(244, 241, 230, 0.4);
+  stroke: rgba(var(--ink-rgb), 0.4);
   stroke-width: 1.2;
   pointer-events: none;
 }
 .atl-map-scale-text {
-  fill: rgba(244, 241, 230, 0.55);
+  fill: rgba(var(--ink-rgb), 0.55);
   font-family: var(--f-display);
   font-size: 11px;
   pointer-events: none;
@@ -766,7 +766,7 @@
 .atl-empty {
   font-size: calc(var(--su) * 13);
   color: var(--mut-d);
-  background: rgba(244, 241, 230, 0.03);
+  background: rgba(var(--ink-rgb), 0.03);
   border: 1px dashed var(--hair-d2);
   border-radius: var(--r-sm);
   padding: calc(var(--su) * 12) calc(var(--su) * 14);
@@ -794,7 +794,7 @@
   display: flex;
   flex-direction: column;
   gap: calc(var(--su) * 3);
-  background: rgba(11, 21, 18, 0.62);
+  background: rgba(var(--surf-1-rgb), 0.62);
   border: 1px solid var(--hair-d2);
   border-inline-start: 2px solid var(--hair-d);
   border-radius: calc(var(--su) * 9);
@@ -879,7 +879,7 @@
   width: 100%;
   text-align: start;
   font-family: var(--f-body);
-  background: rgba(11, 21, 18, 0.55);
+  background: rgba(var(--surf-1-rgb), 0.55);
   border: 1px solid var(--hair-d2);
   border-radius: calc(var(--su) * 9);
   padding: calc(var(--su) * 7) calc(var(--su) * 12);
@@ -906,7 +906,7 @@
   font-size: calc(var(--su) * 10.5);
   font-weight: 700;
   color: var(--green-hi);
-  border: 1px solid rgba(49, 162, 109, 0.34);
+  border: 1px solid rgba(var(--green-rgb), 0.34);
   border-radius: 999px;
   padding: calc(var(--su) * 2) calc(var(--su) * 7);
   white-space: nowrap;
@@ -926,8 +926,8 @@
   flex-direction: column;
   align-items: flex-start;
   gap: calc(var(--su) * 7);
-  background: rgba(49, 162, 109, 0.06);
-  border: 1px solid rgba(49, 162, 109, 0.24);
+  background: rgba(var(--green-rgb), 0.06);
+  border: 1px solid rgba(var(--green-rgb), 0.24);
   border-radius: var(--r-sm);
   padding: calc(var(--su) * 10) calc(var(--su) * 13);
 }
@@ -955,7 +955,7 @@
   font-size: calc(var(--su) * 13.5);
   font-weight: 700;
   color: var(--ivory);
-  background: rgba(22, 41, 31, 0.55);
+  background: rgba(var(--surf-3-rgb), 0.55);
   border: 1px solid var(--hair-d);
   border-radius: 999px;
   padding: calc(var(--su) * 8) calc(var(--su) * 16);

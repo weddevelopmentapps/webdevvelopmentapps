@@ -1,5 +1,6 @@
 /* router.js — موجّه الهاش (آمن على GitHub Pages وfile:// معاً)
-   المسارات:  #/section/<id>[?step=n&…]   — أقسام لوحات V2 (داخلياً kind:"scene")
+   المسارات:  #/tab/<id>[?…]              — تبويبات V3 الخمسة (الافتراضي demand)
+              #/section/<id>[?step=n&…]   — أقسام V2 (وضع العرض بالكليكر)
               #/scene/00                   — الغلاف (المعرفات الرقمية القديمة تُحوَّل)
               #/appendix/<id>[?page=n&return=<حالة مرمّزة>]
               #/report[?pages=a,b,c]        — الموجز التنفيذي (يتجاوز المسرح)
@@ -29,6 +30,9 @@ RH.core.router = (function () {
     LEGACY["scene/" + old] = "/section/" + sec;
   }
 
+  /** الجذر الافتراضي في V3: التبويب الأول لا غلاف المسرح (V3_SPEC §4) */
+  const DEFAULT_PATH = "/tab/demand";
+
   let onChange = null;
 
   /** معالجة رجوع PKCE قبل أي توجيه: يزيل ?code= من العنوان (تفعيل Supabase) */
@@ -45,7 +49,7 @@ RH.core.router = (function () {
 
   function parse() {
     let raw = window.location.hash.replace(/^#/, "");
-    if (!raw || raw === "/") raw = "/scene/00";
+    if (!raw || raw === "/") raw = DEFAULT_PATH;
     // مسارات قديمة: ‎#/summary أو ‎#summary
     const legacyKey = raw.replace(/^\//, "").split("?")[0];
     if (LEGACY[legacyKey]) {
@@ -60,6 +64,10 @@ RH.core.router = (function () {
         const [k, v] = pair.split("=");
         if (k) params[decodeURIComponent(k)] = decodeURIComponent(v || "");
       }
+    }
+    // تبويبات V3: البنية الأساسية للمنصة
+    if (segments[0] === "tab" && segments[1] != null) {
+      return { kind: "tab", id: segments[1], params };
     }
     if (segments[0] === "scene" && segments[1] != null) {
       return { kind: "scene", id: segments[1], params };
@@ -80,11 +88,12 @@ RH.core.router = (function () {
     if (segments[0] === "admin") {
       return { kind: "admin", id: segments[1] || "home", params };
     }
-    return { kind: "scene", id: "00", params: {} };
+    return { kind: "tab", id: "demand", params: {} };
   }
 
   function serialize(route) {
     let h = "/" + route.kind + "/" + route.id;
+    if (route.kind === "tab") h = "/tab/" + route.id;
     // معرفات المشاهد الرقمية (الغلاف 00) تبقى /scene/، وأقسام V2 الاسمية /section/
     if (route.kind === "scene" && !/^\d+$/.test(route.id)) h = "/section/" + route.id;
     if (route.kind === "admin" && route.id === "home") h = "/admin";
