@@ -17,23 +17,65 @@
 
   /** تسميات عربية لبنود الحجر — المعرّفات تقنية والأسباب تُعرض حرفياً من الإصدار */
   const QUARANTINE_LABELS = {
-    inspector_level_records: "سجلات مستوى المفتشين",
+    /* المصطلح الموحد «مراقب» (معجم ARABIC_COPY_REVIEW §3) — تسمية الجدول
+       الأصلية في المصدر تُذكر مرة واحدة بين قوسين توثيقاً لا استعمالاً */
+    inspector_level_records: "سجلات مستوى المراقبين (المسمى في سجل المنصة: المفتشون)",
     hotspots: "النقاط الساخنة (الإحداثيات)",
   };
 
-  /* ── 1) النشاط الرقابي الشهري — زيارات ثم مخالفات، متراصفان عمودياً ── */
+  /* ── 1) النشاط الرقابي الشهري — لوحة كثيفة بعد المراجعة: شريط إجماليات
+        أعلى، رسمان متراصفان (خط المتوسط الشهري في كل منهما — من charts.js)
+        وإلى جانبهما جدول القيم الشهرية الكامل ── */
   function pgMonthly(el, ctx) {
     const rel = RH.data.store.release();
+    const m = rel.metrics;
+    const rows = rel.monthly.monitoring;
+    /* المتوسط الشهري من المشتقات المنشورة (مرآة بايثون) حصراً */
+    const avgVisits = RH.data.store.der().avg_monthly_visits;
 
+    /* شريط الإجماليات الثلاثة */
+    el.appendChild(h("div", { class: "ax-strip" },
+      h("div", { class: "ax-stat" },
+        h("span", { class: "ax-stat-k" }, "الزيارات الميدانية"),
+        h("b", { class: "ax-stat-v" }, fmt.int(m.total_visits.value)),
+      ),
+      h("div", { class: "ax-stat" },
+        h("span", { class: "ax-stat-k" }, "المخالفات المسجلة"),
+        h("b", { class: "ax-stat-v neg" }, fmt.int(m.total_violations.value)),
+      ),
+      h("div", { class: "ax-stat" },
+        h("span", { class: "ax-stat-k" }, "متوسط الزيارات شهرياً"),
+        h("b", { class: "ax-stat-v" }, fmt.int(avgVisits)),
+      ),
+    ));
+
+    const split = h("div", { class: "ax-split" });
+    const chartsCol = h("div", { class: "ax-charts-col" });
     const visits = chartArea();
     const violations = chartArea();
-    el.appendChild(visits.area);
-    el.appendChild(violations.area);
+    chartsCol.appendChild(visits.area);
+    chartsCol.appendChild(violations.area);
+    split.appendChild(chartsCol);
+
+    /* جدول القيم الشهرية الكامل بجانب الرسمين */
+    split.appendChild(h("table", { class: "ax-table ax-rank-table" },
+      h("thead", {}, h("tr", {},
+        ["الشهر", "زيارات", "مخالفات"].map((t) => h("th", { scope: "col" }, t)),
+      )),
+      h("tbody", {}, rows.map((r) => h("tr", {},
+        h("td", {}, r.label),
+        h("td", { class: "num" }, fmt.int(r.visits)),
+        h("td", { class: "num" }, fmt.int(r.violations)),
+      ))),
+    ));
+    el.appendChild(split);
+
     RH.viz.charts.monitoringMonthly(visits.chart, ctx.su, "visits");
     RH.viz.charts.monitoringMonthly(violations.chart, ctx.su, "violations");
 
     el.appendChild(h("div", { class: "ax-note" },
-      "يُعرض النشاطان في رسمين منفصلين لاختلاف نطاقي مقياسيهما — الفترة المرجعية: ",
+      "يُعرض النشاطان في رسمين منفصلين لاختلاف نطاقي مقياسيهما، وخط المتوسط",
+      " الشهري مرسوم في كل منهما — الفترة المرجعية: ",
       h("b", {}, rel.meta.monitoring_period_label), ".",
     ));
   }

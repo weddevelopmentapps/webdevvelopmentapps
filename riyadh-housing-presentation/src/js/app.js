@@ -12,6 +12,8 @@
   }
 
   RH.presenter.engine.init();
+  // V2: توصيل الأقسام المسجلة وبناء التسلسل الخطي قبل رسم مؤشر التقدم
+  if (RH.sections) RH.sections.boot();
   RH.presenter.nav.init();
   RH.presenter.chrome.init();
 

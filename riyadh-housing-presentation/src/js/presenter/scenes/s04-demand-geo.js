@@ -35,7 +35,7 @@
           h("button", {
             class: "dclose", "data-interactive": "1",
             onclick: () => ctx.update({ sector: null }),
-          }, "إغلاق التفصيل"),
+          }, "إغلاق التفاصيل"),
         );
       }
     }

@@ -1,18 +1,32 @@
 /* router.js — موجّه الهاش (آمن على GitHub Pages وfile:// معاً)
-   المسارات:  #/scene/<id>[?step=n&sector=x&layer=y]
+   المسارات:  #/section/<id>[?step=n&…]   — أقسام لوحات V2 (داخلياً kind:"scene")
+              #/scene/00                   — الغلاف (المعرفات الرقمية القديمة تُحوَّل)
               #/appendix/<id>[?page=n&return=<حالة مرمّزة>]
               #/admin[/<tab>]
    تحويلات المسارات القديمة تتم بالاستبدال (لا إدخال في التاريخ → لا حلقات). */
 "use strict";
 
 RH.core.router = (function () {
-  const LEGACY = {
-    "summary": "/scene/02",
-    "supply": "/scene/03",
-    "licenses": "/scene/05",
-    "control": "/scene/07",
-    "initiatives": "/scene/08",
+  /* مشاهد V1 الرقمية → أقسام V2 (خريطة الإحالة المعتمدة في V2_CONTRACTS §7) */
+  const LEGACY_SCENES = {
+    "01": "summary", "02": "summary",
+    "03": "demand", "04": "demand",
+    "05": "licensing", "06": "licensing",
+    "07": "control",
+    "08": "initiatives", "09": "initiatives",
+    "10": "kpis",
+    "11": "closing",
   };
+  const LEGACY = {
+    "summary": "/section/summary",
+    "supply": "/section/demand",
+    "licenses": "/section/licensing",
+    "control": "/section/control",
+    "initiatives": "/section/initiatives",
+  };
+  for (const [old, sec] of Object.entries(LEGACY_SCENES)) {
+    LEGACY["scene/" + old] = "/section/" + sec;
+  }
 
   let onChange = null;
 
@@ -49,6 +63,10 @@ RH.core.router = (function () {
     if (segments[0] === "scene" && segments[1] != null) {
       return { kind: "scene", id: segments[1], params };
     }
+    // أقسام V2: نوعها الداخلي "scene" ذاته — العنوان وحده يميزها (§7)
+    if (segments[0] === "section" && segments[1] != null) {
+      return { kind: "scene", id: segments[1], params };
+    }
     if (segments[0] === "appendix" && segments[1] != null) {
       return { kind: "appendix", id: segments.slice(1).join("/"), params };
     }
@@ -60,6 +78,8 @@ RH.core.router = (function () {
 
   function serialize(route) {
     let h = "/" + route.kind + "/" + route.id;
+    // معرفات المشاهد الرقمية (الغلاف 00) تبقى /scene/، وأقسام V2 الاسمية /section/
+    if (route.kind === "scene" && !/^\d+$/.test(route.id)) h = "/section/" + route.id;
     if (route.kind === "admin" && route.id === "home") h = "/admin";
     const q = Object.entries(route.params || {})
       .filter(([, v]) => v != null && v !== "")

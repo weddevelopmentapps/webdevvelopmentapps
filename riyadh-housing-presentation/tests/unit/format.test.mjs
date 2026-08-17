@@ -121,3 +121,28 @@ test("date: المفقود شرطة وغير المطابق يعاد كما هو
 test("iso: يغلّف أي مقطع مختلط بمحرفي LRI/PDI", () => {
   assert.deepStrictEqual(fmt.iso("V1"), LRI + "V1" + PDI);
 });
+
+/* ── monthsList: إفصاح تعادل الذروة (إصلاح مراجعة الجولة 4) ── */
+test("monthsList: شهر واحد يعود كما هو", () => {
+  assert.deepStrictEqual(fmt.monthsList(["يوليو 2026"]), "يوليو 2026");
+});
+
+test("monthsList: تعادل داخل السنة الواحدة يدمج السنة (يوليو وأغسطس 2026)", () => {
+  assert.deepStrictEqual(
+    fmt.monthsList(["يوليو 2026", "أغسطس 2026"]),
+    "يوليو وأغسطس" + NBSP + "2026");
+});
+
+test("monthsList: سنوات مختلفة تُعطف التسميات كاملة", () => {
+  assert.deepStrictEqual(
+    fmt.monthsList(["ديسمبر 2025", "أغسطس 2026"]),
+    "ديسمبر 2025 وأغسطس 2026");
+});
+
+test("monthsList: ثلاثة أشهر متعادلة والمفقود شرطة", () => {
+  assert.deepStrictEqual(
+    fmt.monthsList(["مارس 2026", "أبريل 2026", "مايو 2026"]),
+    "مارس وأبريل ومايو" + NBSP + "2026");
+  assert.deepStrictEqual(fmt.monthsList([]), "—");
+  assert.deepStrictEqual(fmt.monthsList(null), "—");
+});

@@ -14,6 +14,7 @@ build.py — يجمع src/ + vendor/ + data/ في ملف index.html واحد م�
   • data/release.json يجب أن يكون مولّداً من generate_data.py (بواباته هي حارس الصدق).
 """
 
+import glob
 import hashlib
 import json
 import os
@@ -23,7 +24,16 @@ import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
-# ترتيب الضم إلزامي: كل ملف يعتمد على ما قبله فقط
+
+def _globbed(pattern, exclude=()):
+    """glob مرتب حتمياً نسبةً إلى جذر المشروع (عقد V2_CONTRACTS §8)"""
+    paths = sorted(glob.glob(os.path.join(HERE, pattern)))
+    rels = [os.path.relpath(p, HERE).replace(os.sep, "/") for p in paths]
+    return [p for p in rels if os.path.basename(p) not in exclude]
+
+
+# ترتيب الضم إلزامي: كل ملف يعتمد على ما قبله فقط.
+# V2: مشاهد V1 (presenter/scenes/*) متقاعدة — خارج الضم والملفات باقية للمرجع.
 JS_ORDER = [
     "src/js/core/ns.js",
     "src/js/core/dom.js",
@@ -39,21 +49,15 @@ JS_ORDER = [
     "src/js/viz/map.js",
     "src/js/viz/rings.js",
     "src/js/viz/motion.js",
+    "src/js/viz/geomap.js",
     "src/js/presenter/engine.js",
     "src/js/presenter/nav.js",
     "src/js/presenter/chrome.js",
-    "src/js/presenter/scenes/s00-cover.js",
-    "src/js/presenter/scenes/s01-agenda.js",
-    "src/js/presenter/scenes/s02-hub-housing.js",
-    "src/js/presenter/scenes/s03-demand-city.js",
-    "src/js/presenter/scenes/s04-demand-geo.js",
-    "src/js/presenter/scenes/s05-lic-baseline.js",
-    "src/js/presenter/scenes/s06-lic-geo.js",
-    "src/js/presenter/scenes/s07-monitoring.js",
-    "src/js/presenter/scenes/s08-hub-strategy.js",
-    "src/js/presenter/scenes/s09-pillars.js",
-    "src/js/presenter/scenes/s10-kpis.js",
-    "src/js/presenter/scenes/s11-next-steps.js",
+    "src/js/presenter/layout.js",
+    "src/js/presenter/media-bg.js",
+    "src/js/presenter/sections/registry.js",
+] + _globbed("src/js/viz/charts/*.js") \
+  + _globbed("src/js/presenter/sections/*.js", exclude=("registry.js",)) + [
     "src/js/presenter/appendix/ax-shell.js",
     "src/js/presenter/appendix/ax-demand.js",
     "src/js/presenter/appendix/ax-licensing.js",
@@ -64,6 +68,8 @@ JS_ORDER = [
     "src/js/admin/shell.js",
     "src/js/admin/quality.js",
     "src/js/admin/editors.js",
+    "src/js/admin/editors-strategy.js",
+    "src/js/admin/editors-insights2.js",
     "src/js/admin/publish.js",
     "src/js/app.js",
 ]
@@ -72,8 +78,10 @@ CSS_ORDER = [
     "src/styles/tokens.css",
     "src/styles/base.css",
     "src/styles/presenter.css",
+    "src/styles/dashboard.css",
     "src/styles/scenes.css",
     "src/styles/appendix.css",
+] + _globbed("src/styles/sections/*.css") + [
     "src/styles/admin.css",
     "src/styles/print.css",
 ]
@@ -91,15 +99,70 @@ def read(path):
         return f.read()
 
 
+def _embed_data_uri(rel_path, mime, max_bytes=650_000):
+    """يضمّن ملف وسائط محلياً data URI إن وُجد وكان ≤ الحد — وإلا None.
+    (إصلاح المراجعة: ملصق الغلاف يُضمَّن وقت البناء كي يعرض file:// دون
+    اتصال صورة فوتوغرافية لا الصورة الظلية المرسومة — التضمين مشروط بوجود
+    الملف عبر tools/fetch_media.sh فلا يكسر بيئة بناء بلا وسائط.)"""
+    import base64
+    path = os.path.join(HERE, rel_path)
+    if not os.path.exists(path):
+        return None
+    size = os.path.getsize(path)
+    if size > max_bytes:
+        print(f"⚠ {rel_path} أكبر من حد التضمين ({size} بايت) — يُترك ملفاً شقيقاً")
+        return None
+    with open(path, "rb") as f:
+        b64 = base64.b64encode(f.read()).decode("ascii")
+    return f"data:{mime};base64,{b64}"
+
+
+def media_payload():
+    """window.MEDIA من data/media-v2-jobs.json (عقد V2_CONTRACTS §6)"""
+    path = os.path.join(HERE, "data", "media-v2-jobs.json")
+    if not os.path.exists(path):
+        return {"backdrops": {}, "cover": {}}
+    jobs = json.load(open(path, encoding="utf-8"))
+    backdrops = {row["section"]: row["url"]
+                 for row in jobs.get("v2_backdrops", []) if row.get("url")}
+    cov = jobs.get("cover_urls", {})
+    cover = {
+        "poster": cov.get("poster_2k"),
+        "video": cov.get("video_2k"),
+        "video_720": cov.get("video_720"),
+        "poster_1k": cov.get("poster_1k"),
+        "night_grid": cov.get("night_grid"),
+        "heritage": cov.get("heritage"),
+    }
+    # ملصق الغلاف المضمّن (إن جُلب عبر tools/fetch_media.sh) — الأولوية القصوى
+    embedded = (_embed_data_uri("assets/media/cover-poster.jpg", "image/jpeg")
+                or _embed_data_uri("assets/media/cover-poster-1k.jpg", "image/jpeg")
+                or _embed_data_uri("assets/media/cover-poster.png", "image/png"))
+    if embedded:
+        cover["poster_embedded"] = embedded
+        print("✓ ملصق الغلاف مضمّن data URI — يعمل من file:// دون اتصال")
+    return {"backdrops": backdrops, "cover": {k: v for k, v in cover.items() if v}}
+
+
 def main():
     release_path = os.path.join(HERE, "data", "release.json")
     if not os.path.exists(release_path):
         sys.exit("✗ شغّل generate_data.py أولاً — data/release.json غير موجود")
     release = json.load(open(release_path, encoding="utf-8"))
 
+    geo_path = os.path.join(HERE, "data", "riyadh-geo.json")
+    if not os.path.exists(geo_path):
+        sys.exit("✗ data/riyadh-geo.json غير موجود — حدود الأحياء لازمة للخرائط V2")
+    geo = json.load(open(geo_path, encoding="utf-8"))
+
     css = "\n".join(read(p) for p in CSS_ORDER)
     fonts = read("vendor/fonts-embedded.css") + "\n" + read("vendor/fonts-light.css")
     echarts = read("vendor/echarts.min.js")
+    # Leaflet مضمن (vendor/leaflet — منسوب لمصدره في LICENSE.txt):
+    # JS في وسم <script> منفصل قبل التطبيق حفاظاً على الوضع الصارم للتطبيق،
+    # وCSS قبل أنماط المشروع كي تتقدم عليها تحييدات الثيم.
+    leaflet_js = read("vendor/leaflet/leaflet.js")
+    css = read("vendor/leaflet/leaflet.css") + "\n" + css
 
     js_parts = []
     missing = []
@@ -121,11 +184,14 @@ def main():
     html = html.replace("__FAVICON__", FAVICON)
     html = html.replace("/*__FONTS__*/", fonts)
     html = html.replace("/*__CSS__*/", css)
-    # ترتيب الحقن: البيانات ثم ECharts ثم التطبيق
+    # ترتيب الحقن: البيانات (الإصدار + الحدود + الوسائط) ثم المكتبات ثم التطبيق
     html = html.replace("//__RELEASE__",
                         "window.RELEASE = " + json.dumps(release, ensure_ascii=False) + ";\n"
-                        + "window.WORKBOOK_MANIFEST = " + json.dumps(manifest, ensure_ascii=False) + ";")
+                        + "window.WORKBOOK_MANIFEST = " + json.dumps(manifest, ensure_ascii=False) + ";\n"
+                        + "window.GEO = " + json.dumps(geo, ensure_ascii=False) + ";\n"
+                        + "window.MEDIA = " + json.dumps(media_payload(), ensure_ascii=False) + ";")
     html = html.replace("//__ECHARTS__", echarts)
+    html = html.replace("//__LEAFLET__", leaflet_js)
     html = html.replace("//__APP__", js)
 
     out = os.path.join(HERE, "index.html")

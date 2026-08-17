@@ -86,7 +86,7 @@ RH.viz.rings = (function () {
       const pv = strat.pillars[p.id];
       const g = svg("g", {
         tabindex: "0", role: "button", "data-interactive": "1",
-        "aria-label": `${p.name} — نسبة إنجاز الركيزة: ${pv && pv.progress_pct != null ? fmt.pct(pv.progress_pct) : "غير متاحة"}`,
+        "aria-label": `${p.name} — نسبة إنجاز الركيزة: ${pv && pv.progress_pct != null ? fmt.pct(pv.progress_pct) : "غير متوفرة"}`,
         style: "cursor:pointer",
         onclick: () => o.onSelect && o.onSelect(p.id),
         onkeydown: (e) => {
@@ -119,7 +119,7 @@ RH.viz.rings = (function () {
   /**
    * قوس مؤشر واحد (مشهد 10/ملحق المؤشرات): يعرض كل الحقول المعتمدة.
    * kpi: {name, unit, baseline, target, current_value, direction, as_of, source}
-   * لا يحوَّل الغياب إلى صفر أبداً — يُرسم قوس فارغ بحالة «غير متاح».
+   * لا يحوَّل الغياب إلى صفر أبداً — يُرسم قوس فارغ بحالة «غير متوفرة».
    */
   function kpiArc(container, kpi, su) {
     const { h } = RH.core.dom;
@@ -128,7 +128,7 @@ RH.viz.rings = (function () {
     const root = svg("svg", {
       viewBox: `0 0 ${W} ${H}`, role: "img",
       "aria-label": kpi.name + " — " + (kpi.current_value == null
-        ? "القيمة الحالية غير متاحة" : "القيمة الحالية " + kpi.current_value + " " + (kpi.unit || "")),
+        ? "القيمة الحالية غير متوفرة" : "القيمة الحالية " + kpi.current_value + " " + (kpi.unit || "")),
     });
     root.appendChild(svg("path", {
       d: arcPath(cx, cy, r, -105, 105),
@@ -161,7 +161,7 @@ RH.viz.rings = (function () {
     root.appendChild(svg("text", {
       x: cx, y: cy + 2, "text-anchor": "middle", fill: "#93A096",
       "font-family": "Cairo", "font-size": 18,
-    }, kpi.current_value == null ? "القيمة الحالية غير متاحة" : (kpi.unit || "")));
+    }, kpi.current_value == null ? "القيمة الحالية غير متوفرة" : (kpi.unit || "")));
 
     const wrap = h("div", { class: "kpi-card", dataset: { kpi: kpi.id } });
     wrap.appendChild(h("div", { class: "kpi-name" }, kpi.name));

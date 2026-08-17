@@ -1,0 +1,607 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   demand.css — تخصيصات قسم «العرض والطلب» (s02-demand)
+   ────────────────────────────────────────────────────────────────────────────
+   كل الأصناف مسبوقة بـ [data-section="demand"] منعاً للتسرب (عقد §5)،
+   وكل المقاسات بوحدة ‎--su‎ (عرض المسرح ÷ 1920)، والألوان من رموز tokens.css
+   حصراً. منظومة المعنى سارية: الأخضر طاقة مرخصة، الرملي طلب، المرجاني عجز
+   ومخالفات حصراً، الذهبي مستهدفات/خط أساس/لكنة كروم مقننة (حلقة التركيز)،
+   الأزرق فئة تصنيفية ثانوية.
+   البنية: جسم اللوحة يقبل تمريراً رأسياً داخلياً في وضع اللوحة فقط —
+   عند 1920×1080 تتسع اللوحة كاملة دون تمرير (حدود دنيا للصفوف تضمن أن
+   الانكماش يتوقف ويبدأ التمرير الداخلي بدل سحق الرسوم).
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* ── 1) جسم اللوحة: التمرير الداخلي المسموح الوحيد ──
+   المسرح لا يتمرر أفقياً أبداً؛ الفيضان الرأسي (شاشات أقصر نسبةً) يُحل
+   داخل جسم القسم حصراً — الترويسة وشريط المؤشرات يتحركان مع المحتوى. */
+[data-section="demand"] .dash-body {
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(244, 241, 230, 0.18) transparent;
+}
+[data-section="demand"] .dash-body::-webkit-scrollbar {
+  width: calc(var(--su) * 8);
+}
+[data-section="demand"] .dash-body::-webkit-scrollbar-thumb {
+  background: rgba(244, 241, 230, 0.16);
+  border-radius: 999px;
+}
+[data-section="demand"] .dash-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* ── 2) شبكة اللوحة: صفان — الأول أطول قليلاً للرسم البطل ──
+   حدود دنيا للصفوف: دونها يتدخل تمرير الجسم بدل سحق الرسوم عمودياً. */
+[data-section="demand"] .dmd-grid {
+  grid-template-rows:
+    minmax(calc(var(--su) * 330), 1.12fr)
+    minmax(calc(var(--su) * 295), 1fr);
+}
+
+/* ── 3) شريط المؤشرات القابلة للنقر ──
+   كل بطاقة رقم زر حقيقي الوظيفة (role=button): مؤشر يد، ارتفاع خفيف عند
+   التحويم، وحلقة تركيز ذهبية (لكنة الكروم المقننة — لا تلوّن بيانات). */
+[data-section="demand"] .kpi.dmd-act {
+  cursor: pointer;
+  transition:
+    transform var(--dur-micro) var(--ease),
+    border-color var(--dur-micro) var(--ease),
+    background-color var(--dur-micro) var(--ease);
+}
+[data-section="demand"] .kpi.dmd-act:hover {
+  background: rgba(22, 41, 31, 0.72);
+  border-color: var(--hair-d);
+  transform: translateY(calc(var(--su) * -2));
+}
+[data-section="demand"] .kpi.dmd-act:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+[data-section="demand"] .kpi.dmd-act:active {
+  transform: translateY(0);
+}
+
+/* ── 4) شريط رقاقات القطاعات أسفل الرسم البطل ── */
+[data-section="demand"] .dmd-chipbar {
+  display: flex;
+  gap: calc(var(--su) * 8);
+  padding: calc(var(--su) * 2) calc(var(--su) * 18) calc(var(--su) * 10);
+  flex: none;
+}
+[data-section="demand"] .dmd-chip {
+  flex: 1 1 0;
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--su) * 8);
+  padding: calc(var(--su) * 6) calc(var(--su) * 8);
+  border: 1px solid var(--hair-d2);
+  border-radius: 999px;
+  background: rgba(11, 21, 18, 0.55);
+  color: var(--ink2-d);
+  font-family: var(--f-body);
+  font-size: calc(var(--su) * 12.5);
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background-color var(--dur-micro) var(--ease),
+    border-color var(--dur-micro) var(--ease),
+    color var(--dur-micro) var(--ease);
+}
+[data-section="demand"] .dmd-chip:hover,
+[data-section="demand"] .dmd-chip.hl {
+  background: rgba(49, 162, 109, 0.14);
+  border-color: rgba(49, 162, 109, 0.5);
+  color: var(--ivory);
+}
+[data-section="demand"] .dmd-chip:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+[data-section="demand"] .dmd-chip-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+[data-section="demand"] .dmd-chip-val {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  color: var(--green-hi);
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+/* ── 5) ذيل قراءة موجز أسفل بطاقات الرسوم ── */
+[data-section="demand"] .dmd-cardfoot {
+  flex: none;
+  padding: calc(var(--su) * 6) calc(var(--su) * 18) calc(var(--su) * 11);
+  border-top: 1px solid var(--hair-d2);
+  font-size: calc(var(--su) * 12.5);
+  line-height: 1.6;
+  color: var(--mut-d);
+}
+[data-section="demand"] .dmd-cardfoot b {
+  color: var(--ink2-d);
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+/* ── 6) عمود الرؤى الممتد ──
+   إصلاح مراجعة الجولة 3 (بنيوي): كل عنصر في العمود flex:none بمقاس محتواه —
+   لا انكماش يسحق صف «الشرق» تحت زر الملحق بعد اليوم؛ نصوص الرؤى مقصوصة
+   بسطرين معلنين … (النص الكامل في التلميح) فيتسع العمود كاملاً فوق شريط
+   الشارة المحجوز مركزياً في .dash-body. */
+[data-section="demand"] .dmd-rail-cell {
+  gap: calc(var(--su) * 8);
+  overflow: hidden;
+}
+[data-section="demand"] .dmd-rail-cell .rail {
+  flex: none;
+  gap: calc(var(--su) * 7);
+}
+[data-section="demand"] .dmd-rail-cell .rail-item {
+  padding: calc(var(--su) * 7) calc(var(--su) * 13);
+}
+[data-section="demand"] .dmd-rail-cell .rail-item-text {
+  font-size: calc(var(--su) * 12.5);
+  line-height: 1.55;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* بطاقة «ترتيب القطاعات بنسبة التغطية» — قائمة الأولوية التدخلية:
+   flex:none — صفوفها الخمسة بيانات لا تُسحق ولا تُقص أبداً */
+[data-section="demand"] .dmd-rank {
+  flex: none;
+  background: rgba(16, 32, 26, 0.58);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--hair-d2);
+  border-radius: var(--r-sm);
+  padding: calc(var(--su) * 10) calc(var(--su) * 14) calc(var(--su) * 8);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 5);
+}
+[data-section="demand"] .dmd-rank-title {
+  font-size: calc(var(--su) * 14);
+  font-weight: 700;
+  color: var(--ink2-d);
+}
+[data-section="demand"] .dmd-rank-sub {
+  font-size: calc(var(--su) * 11.5);
+  color: var(--faint-d);
+  margin-bottom: calc(var(--su) * 4);
+}
+[data-section="demand"] .dmd-rank-row {
+  display: grid;
+  grid-template-columns:
+    calc(var(--su) * 52)
+    minmax(0, 1fr)
+    calc(var(--su) * 52)
+    calc(var(--su) * 88);
+  align-items: center;
+  gap: calc(var(--su) * 10);
+  padding: calc(var(--su) * 7) calc(var(--su) * 9);
+  border: 1px solid transparent;
+  border-radius: calc(var(--su) * 9);
+  background: transparent;
+  color: var(--ink2-d);
+  font-family: var(--f-body);
+  font-size: calc(var(--su) * 13);
+  text-align: start;
+  cursor: pointer;
+  transition:
+    background-color var(--dur-micro) var(--ease),
+    border-color var(--dur-micro) var(--ease);
+}
+[data-section="demand"] .dmd-rank-row:hover,
+[data-section="demand"] .dmd-rank-row.hl {
+  background: rgba(49, 162, 109, 0.1);
+  border-color: rgba(49, 162, 109, 0.38);
+}
+[data-section="demand"] .dmd-rank-row:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 1px;
+}
+[data-section="demand"] .dmd-rank-name {
+  font-weight: 700;
+  color: var(--ivory);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* مسار التغطية: امتلاء أخضر (طاقة مرخصة) على أرضية خيطية — RTL يبدأ يميناً */
+[data-section="demand"] .dmd-rank-track {
+  display: block;
+  height: calc(var(--su) * 8);
+  border-radius: 999px;
+  background: rgba(244, 241, 230, 0.08);
+  overflow: hidden;
+}
+[data-section="demand"] .dmd-rank-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(270deg, var(--green), var(--green-hi));
+}
+[data-section="demand"] .dmd-rank-pct {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-size: calc(var(--su) * 13.5);
+  font-weight: 700;
+  color: var(--green-hi);
+  text-align: end;
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+/* نص العجز: المرجاني للعجز حصراً — قيمة بيانات لا زخرفة */
+[data-section="demand"] .dmd-rank-deficit {
+  font-size: calc(var(--su) * 11.5);
+  color: var(--coral);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: end;
+}
+
+/* زر الملحق التحليلي — تعمق قانوني بحفظ الحالة (لا لون بيانات) */
+[data-section="demand"] .dmd-appx {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(var(--su) * 10);
+  padding: calc(var(--su) * 9) calc(var(--su) * 14);
+  border: 1px solid var(--hair-d2);
+  border-radius: var(--r-sm);
+  background: rgba(16, 32, 26, 0.58);
+  color: var(--ink2-d);
+  font-family: var(--f-body);
+  font-size: calc(var(--su) * 13.5);
+  font-weight: 700;
+  cursor: pointer;
+  text-align: start;
+  transition:
+    background-color var(--dur-micro) var(--ease),
+    border-color var(--dur-micro) var(--ease),
+    color var(--dur-micro) var(--ease);
+}
+[data-section="demand"] .dmd-appx:hover {
+  background: rgba(22, 41, 31, 0.78);
+  border-color: var(--hair-d);
+  color: var(--ivory);
+}
+[data-section="demand"] .dmd-appx:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* سطر حداثة البيانات أسفل العمود — سطر واحد بقصّ معلن عند الضيق */
+[data-section="demand"] .dmd-meta {
+  flex: none;
+  font-size: calc(var(--su) * 12);
+  color: var(--faint-d);
+  padding-inline-start: calc(var(--su) * 4);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+[data-section="demand"] .dmd-meta b {
+  color: var(--mut-d);
+  font-weight: 700;
+}
+
+/* ── 7) بطاقات التفاصيل الزجاجية (تفتح داخل .detail-body من dashboard.css) ── */
+[data-section="demand"] .dmd-detail {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 16);
+}
+
+/* البطولة: رقم ضخم tabular + وحدة + تسمية */
+[data-section="demand"] .dmd-hero {
+  display: flex;
+  align-items: baseline;
+  gap: calc(var(--su) * 10);
+  flex-wrap: wrap;
+}
+[data-section="demand"] .dmd-hero-num {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-size: calc(var(--su) * 54);
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: calc(var(--su) * -1.4);
+  color: var(--ivory);
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+[data-section="demand"] .dmd-hero-num.pos { color: var(--green-hi); }
+[data-section="demand"] .dmd-hero-num.neg { color: var(--coral); }
+[data-section="demand"] .dmd-hero-num.gold { color: var(--gold); }
+[data-section="demand"] .dmd-hero-unit {
+  font-size: calc(var(--su) * 17);
+  font-weight: 600;
+  color: var(--mut-d);
+}
+[data-section="demand"] .dmd-hero-label {
+  flex-basis: 100%;
+  font-size: calc(var(--su) * 14.5);
+  font-weight: 600;
+  color: var(--ink2-d);
+}
+
+/* أوسمة الترتيب/الاعتماد: خيطية بنغمة دلالية — الذهبي لوسوم الاعتماد حصراً */
+[data-section="demand"] .dmd-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--su) * 8);
+}
+[data-section="demand"] .dmd-badge {
+  font-size: calc(var(--su) * 12);
+  font-weight: 700;
+  color: var(--mut-d);
+  border: 1px solid var(--hair-d);
+  border-radius: 999px;
+  padding: calc(var(--su) * 4) calc(var(--su) * 12);
+  white-space: nowrap;
+}
+[data-section="demand"] .dmd-badge.pos {
+  color: var(--green-hi);
+  border-color: rgba(49, 162, 109, 0.45);
+  background: rgba(49, 162, 109, 0.07);
+}
+[data-section="demand"] .dmd-badge.neg {
+  color: var(--coral);
+  border-color: rgba(214, 106, 80, 0.45);
+  background: rgba(214, 106, 80, 0.07);
+}
+[data-section="demand"] .dmd-badge.gold {
+  color: var(--gold);
+  border-color: rgba(214, 171, 76, 0.45);
+  background: rgba(214, 171, 76, 0.07);
+}
+
+/* سطر السياق */
+[data-section="demand"] .dmd-cap {
+  font-size: calc(var(--su) * 14);
+  line-height: 1.75;
+  color: var(--ink2-d);
+}
+
+/* أشرطة المقارنة: التسمية + مسار بامتلاء نسبي + القيمة الكاملة.
+   ألوان الامتلاء دلالية صارمة: رملي=طلب، أخضر=طاقة، مرجاني=عجز، أزرق=ياقات */
+[data-section="demand"] .dmd-cbars {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 8);
+}
+[data-section="demand"] .dmd-cbar {
+  display: grid;
+  grid-template-columns: calc(var(--su) * 150) minmax(0, 1fr) calc(var(--su) * 140);
+  align-items: center;
+  gap: calc(var(--su) * 12);
+}
+[data-section="demand"] .dmd-cbar-k {
+  font-size: calc(var(--su) * 13);
+  font-weight: 600;
+  color: var(--mut-d);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+[data-section="demand"] .dmd-cbar-track {
+  display: block;
+  height: calc(var(--su) * 12);
+  border-radius: 999px;
+  background: rgba(244, 241, 230, 0.07);
+  overflow: hidden;
+}
+[data-section="demand"] .dmd-cbar-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--faint-d);
+}
+[data-section="demand"] .dmd-cbar.demand .dmd-cbar-fill { background: var(--demand); }
+[data-section="demand"] .dmd-cbar.supply .dmd-cbar-fill { background: var(--green); }
+[data-section="demand"] .dmd-cbar.deficit .dmd-cbar-fill { background: var(--coral); }
+[data-section="demand"] .dmd-cbar.blue .dmd-cbar-fill { background: var(--collar-blue); }
+[data-section="demand"] .dmd-cbar-v {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-size: calc(var(--su) * 13.5);
+  font-weight: 700;
+  color: var(--ivory);
+  text-align: end;
+  white-space: nowrap;
+}
+
+/* شبكة صفوف «بيان ← قيمة» — عمودان كثيفان */
+[data-section="demand"] .dmd-rows {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: calc(var(--su) * 8) calc(var(--su) * 22);
+}
+[data-section="demand"] .dmd-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: calc(var(--su) * 12);
+  padding-bottom: calc(var(--su) * 7);
+  border-bottom: 1px solid var(--hair-d2);
+  min-width: 0;
+}
+[data-section="demand"] .dmd-row-k {
+  font-size: calc(var(--su) * 13);
+  color: var(--mut-d);
+  line-height: 1.5;
+}
+[data-section="demand"] .dmd-row-v {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-size: calc(var(--su) * 14.5);
+  font-weight: 700;
+  color: var(--ivory);
+  white-space: nowrap;
+}
+[data-section="demand"] .dmd-row.pos .dmd-row-v { color: var(--green-hi); }
+[data-section="demand"] .dmd-row.neg .dmd-row-v { color: var(--coral); }
+[data-section="demand"] .dmd-row.gold .dmd-row-v { color: var(--gold); }
+
+/* جدول التفاصيل: تمرير داخلي خاص كي لا تفيض البطاقة */
+[data-section="demand"] .dmd-table {
+  max-height: calc(var(--su) * 300);
+  overflow: auto;
+  border: 1px solid var(--hair-d2);
+  border-radius: var(--r-sm);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(244, 241, 230, 0.18) transparent;
+}
+[data-section="demand"] .dmd-table::-webkit-scrollbar {
+  width: calc(var(--su) * 7);
+}
+[data-section="demand"] .dmd-table::-webkit-scrollbar-thumb {
+  background: rgba(244, 241, 230, 0.16);
+  border-radius: 999px;
+}
+[data-section="demand"] .dmd-table .table-dense th:first-child,
+[data-section="demand"] .dmd-table .table-dense td:first-child {
+  padding-inline-start: calc(var(--su) * 14);
+}
+[data-section="demand"] .dmd-table .table-dense tbody th {
+  position: static;
+  background: transparent;
+  color: var(--ink2-d);
+  font-size: calc(var(--su) * 13.5);
+  font-weight: 600;
+  text-align: start;
+  border-bottom: 1px solid var(--hair-d2);
+  white-space: nowrap;
+  padding: calc(var(--su) * 6.5) calc(var(--su) * 10);
+}
+
+/* الملاحظات والمصادر */
+[data-section="demand"] .dmd-notes,
+[data-section="demand"] .dmd-sources {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 5);
+}
+[data-section="demand"] .dmd-note {
+  font-size: calc(var(--su) * 12.5);
+  line-height: 1.7;
+  color: var(--mut-d);
+}
+[data-section="demand"] .dmd-src {
+  font-size: calc(var(--su) * 12);
+  line-height: 1.7;
+  color: var(--faint-d);
+}
+
+/* أزرار الإجراءات داخل البطاقة */
+[data-section="demand"] .dmd-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--su) * 10);
+}
+[data-section="demand"] .dmd-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--su) * 9);
+  padding: calc(var(--su) * 9) calc(var(--su) * 16);
+  border: 1px solid var(--hair-d);
+  border-radius: 999px;
+  background: rgba(244, 241, 230, 0.05);
+  color: var(--ivory);
+  font-family: var(--f-body);
+  font-size: calc(var(--su) * 13.5);
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background-color var(--dur-micro) var(--ease),
+    border-color var(--dur-micro) var(--ease);
+}
+[data-section="demand"] .dmd-btn:hover {
+  background: rgba(244, 241, 230, 0.1);
+  border-color: rgba(244, 241, 230, 0.35);
+}
+[data-section="demand"] .dmd-btn:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+[data-section="demand"] .dmd-btn-arrow {
+  font-size: calc(var(--su) * 13);
+  color: var(--mut-d);
+}
+[data-section="demand"] .dmd-btn:hover .dmd-btn-arrow,
+[data-section="demand"] .dmd-appx:hover .dmd-btn-arrow {
+  color: var(--ivory);
+}
+
+/* ── 8) الملخص الناطق — مخفي بصرياً حاضر لقارئات الشاشة ── */
+[data-section="demand"] .dmd-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+}
+
+/* ── 9) احترام تقليل الحركة: تصفير كل الانتقالات التزيينية ── */
+@media (prefers-reduced-motion: reduce) {
+  [data-section="demand"] .kpi.dmd-act,
+  [data-section="demand"] .dmd-chip,
+  [data-section="demand"] .dmd-rank-row,
+  [data-section="demand"] .dmd-appx,
+  [data-section="demand"] .dmd-btn {
+    transition: none;
+  }
+  [data-section="demand"] .kpi.dmd-act:hover {
+    transform: none;
+  }
+}
+
+/* ── جدول التركيبة المصغر تحت شريطي الإشغال/الياقات (إصلاح الكثافة) ── */
+[data-section="demand"] .dmd-mini-table {
+  width: calc(100% - var(--su) * 28);
+  margin: 0 calc(var(--su) * 14) calc(var(--su) * 10);
+  border-collapse: collapse;
+  font-size: calc(var(--su) * 11.5);
+  color: var(--ink2-d);
+}
+[data-section="demand"] .dmd-mini-table th,
+[data-section="demand"] .dmd-mini-table td {
+  padding: calc(var(--su) * 3) calc(var(--su) * 6);
+  border-top: 1px solid var(--hair-d2);
+  text-align: start;
+  font-weight: 400;
+}
+[data-section="demand"] .dmd-mini-table thead th {
+  border-top: 0;
+  color: var(--faint-d);
+  font-size: calc(var(--su) * 10.5);
+  font-weight: 600;
+}
+[data-section="demand"] .dmd-mini-table td {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+}
+[data-section="demand"] .dmd-mini-table tbody tr:last-child th,
+[data-section="demand"] .dmd-mini-table tbody tr:last-child td {
+  color: var(--ivory);
+  font-weight: 700;
+}

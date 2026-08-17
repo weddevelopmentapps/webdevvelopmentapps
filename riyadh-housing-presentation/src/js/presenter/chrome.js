@@ -36,7 +36,10 @@ RH.presenter.chrome = (function () {
       seg.classList.toggle("done", iCur >= 0 && i < iCur);
     });
     const agendaBtn = document.getElementById("hud-agenda");
-    agendaBtn.hidden = current.kind === "scene" && (current.id === "00" || current.id === "01");
+    // يختفي على الغلاف وعلى وجهته ذاتها (أول لوحة — الملخص التنفيذي)
+    const firstSection = RH.presenter.engine.LINEAR[1];
+    agendaBtn.hidden = current.kind === "scene"
+      && (current.id === "00" || current.id === firstSection);
   }
 
   /** طلب ملء الشاشة — من إيماءة مستخدم حصراً، مع استمرار رشيق عند الرفض */

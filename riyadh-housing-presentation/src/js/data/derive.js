@@ -4,6 +4,14 @@
    كل رسم وكل عنوان يقرأ من هنا أو من release — لا حساب متناثر في المشاهد. */
 "use strict";
 
+/** الحكم الموحد الوحيد على اعتماد طبقة الاستراتيجية (إصلاح المراجعة —
+    انجراف السلاسل النصية): "approved" اعتماد V1 الكامل، و"approved_source_mirror"
+    اعتماد V2 نقلاً حرفياً عن مصدر معتمد. كل بوابة عرض/اشتقاق تمر من هنا حصراً —
+    لا مقارنة نصية متناثرة بعد اليوم. */
+RH.data.strategyApproved = function (st) {
+  return !!st && (st.status === "approved" || st.status === "approved_source_mirror");
+};
+
 RH.data.derive = (function () {
 
   /** تقريب نصف-لأعلى حتمي بمنازل محددة — مطابق لـ round_half_up في بايثون */
@@ -94,18 +102,27 @@ RH.data.derive = (function () {
       لا تحويل تعسفياً لـ«قيد التنفيذ» إلى 50٪ — القيم من الحقول الصريحة فقط. */
   function computeStrategy(strategy) {
     const out = { publishable: false, pillars: {}, overall_pct: null, status_counts: null };
-    if (!strategy || strategy.status !== "approved" || !strategy.pillars.length) return out;
+    // بوابة الاعتماد عبر الحكم الموحد حصراً (لا مقارنة نصية محلية):
+    // مرآة V2 (approved_source_mirror) تمر من البوابة لكنها بلا حقول
+    // execution_status/progress_percent فيبقى كل ما يليها محجوباً بصدق.
+    if (!RH.data.strategyApproved(strategy) || !strategy.pillars || !strategy.pillars.length) return out;
 
     const counts = { execution: {}, schedule: {} };
+    let counted = 0;
     let allHaveProgress = true;
     for (const ini of strategy.initiatives) {
-      counts.execution[ini.execution_status] = (counts.execution[ini.execution_status] || 0) + 1;
+      if (ini.execution_status) {
+        counts.execution[ini.execution_status] = (counts.execution[ini.execution_status] || 0) + 1;
+        counted += 1;
+      }
       if (ini.schedule_status) {
         counts.schedule[ini.schedule_status] = (counts.schedule[ini.schedule_status] || 0) + 1;
+        counted += 1;
       }
       if (typeof ini.progress_percent !== "number") allHaveProgress = false;
     }
-    out.status_counts = counts;
+    // لا حقول حالة V1 في المصدر إطلاقاً → لا توزيع يُدّعى (غياب صادق لا كائن فارغ)
+    out.status_counts = counted ? counts : null;
 
     if (!allHaveProgress) return out; // توزيع الحالات فقط — النسبة الدقيقة محجوبة
 

@@ -1,17 +1,18 @@
 /* theme.js — أساس ECharts والمنظومة اللونية المتحقق منها
    ─────────────────────────────────────────────────────────
    المنظومة اجتازت مدقق اللوحات (فحوص CVD والفصل والتباين) على سطح ‎#0B1512:
-     main3    = أخضر ‎#31A26D + رملي نحاسي ‎#AA8A3E + مرجاني ‎#D66A50   (كل الأزواج ✓)
-     collar2  = أزرق ‎#3F7FB0 + رملي ‎#AA8A3E                            (✓)
+     main3    = أخضر ‎#31A26D + برونزي صحراوي ‎#9C7A2E + مرجاني ‎#D66A50 (مدقق الجولة 1)
+     collar2  = أزرق ‎#3F7FB0 + برونزي ‎#9C7A2E                           (✓)
      facility3= أخضر + أزرق + رملي                                       (✓)
-   الذهبي ‎#D6AB4C لون تعليق (خطوط مستهدف/خط أساس) لا خانة تصنيفية — تباينه نصياً 8.7:1.
+   الذهبي ‎#D6AB4C لون تعليق (مستهدف/خط أساس) حصراً — فُصل عن سلسلة الطلب عمداً
+   (إصلاح مراجعة الجولة 1: ‎ΔE‎ ذهبي↔طلب 16.6 بعد أن كان 11.6 فلا تمييع للدلالة).
    قاعدة: لون واحد لكل مقياس؛ لا تدرّج موقعي متعدد الصبغات في أعمدة التصنيف. */
 "use strict";
 
 RH.viz.theme = (function () {
   const C = {
     green: "#31A26D", greenHi: "#4CC18C",
-    demand: "#AA8A3E",
+    demand: "#9C7A2E",
     coral: "#D66A50",
     gold: "#D6AB4C",
     blue: "#3F7FB0",
@@ -28,33 +29,57 @@ RH.viz.theme = (function () {
   /* مقاس خط مدرّج مع المسرح (المشاهد تمرر su وقت البناء) */
   const fs = (su, n) => Math.max(11, Math.round(n * su));
 
+  /** كسر العرض الضيق (فئة 1366): تُشدَّد فيه ضوابط العلامات تلقائياً */
+  const narrow = () => window.innerWidth <= 1440;
+
+  /* انضباط العلامات المعمم — إصلاح مراجعة الجولة 2: كانت علامات المحاور
+     تندمج في الرسوم المصغرة عند 1366 (60→10٪ و1,200/900/600/300 وأشهر
+     «نوفمبريناير») — hideOverlap يقصي كل تسمية تتقاطع مع سابقتها فلا
+     يُطبع رقمان فوق بعضهما أبداً، ودمج axisLabel عميق كي لا تفقد
+     التخصيصات المحلية هذا الضابط. */
+  function mergeAxis(base, extra) {
+    if (!extra) return base;
+    const out = Object.assign({}, base, extra);
+    if (extra.axisLabel) {
+      out.axisLabel = Object.assign({}, base.axisLabel, extra.axisLabel);
+    }
+    return out;
+  }
+
   /** محاور رأسية RTL: الفئات تُقرأ من اليمين لليسار والقيم على اليمين */
   function catXAxis(su, data, extra) {
-    return Object.assign({
+    return mergeAxis({
       type: "category", data, inverse: true,
       axisLine: { lineStyle: { color: C.axLine } },
       axisTick: { show: false },
-      axisLabel: { color: C.mut, fontFamily: "Cairo", fontSize: fs(su, 14) },
-    }, extra || {});
+      axisLabel: {
+        color: C.mut, fontFamily: "Cairo", fontSize: fs(su, 14),
+        hideOverlap: true,
+      },
+    }, extra);
   }
   function valAxis(su, fmt, extra) {
-    return Object.assign({
+    return mergeAxis({
       type: "value", position: "right",
       splitLine: { lineStyle: { color: C.axSplit } },
+      splitNumber: narrow() ? 2 : undefined,
       axisLabel: {
         color: C.faint, fontFamily: "IBM Plex Sans Arabic",
         fontSize: fs(su, 12.5), formatter: fmt,
+        hideOverlap: true,
       },
-    }, extra || {});
+    }, extra);
   }
   /** أعمدة أفقية RTL: تنمو يميناً→يساراً، التسميات على اليمين، الأول أعلى */
   function hValAxis(su, fmt, max) {
     const a = {
       type: "value", inverse: true,
       splitLine: { lineStyle: { color: C.axSplit } },
+      splitNumber: narrow() ? 2 : undefined,
       axisLabel: {
         color: C.faint, fontFamily: "IBM Plex Sans Arabic",
         fontSize: fs(su, 12.5), formatter: fmt,
+        hideOverlap: true,
       },
     };
     if (max != null) a.max = max;
@@ -68,6 +93,7 @@ RH.viz.theme = (function () {
       axisLabel: {
         color: C.ink2, fontFamily: "Cairo", fontSize: fs(su, 15),
         width: labelWidth || null, overflow: labelWidth ? "truncate" : "none",
+        hideOverlap: true,
       },
     };
   }
@@ -142,7 +168,7 @@ RH.viz.theme = (function () {
   });
 
   return {
-    C, REDUCED, fs, base, catXAxis, valAxis, hValAxis, hCatAxis,
+    C, REDUCED, fs, narrow, base, catXAxis, valAxis, hValAxis, hCatAxis,
     tooltip, ttRow, ttTitle, esc, targetLine, chart, disposeAll, resizeAll,
   };
 })();

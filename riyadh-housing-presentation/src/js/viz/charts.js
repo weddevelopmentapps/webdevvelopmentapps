@@ -244,9 +244,15 @@ RH.viz.charts = (function () {
     const color = isVisits ? T.C.green : T.C.coral;
     const label = isVisits ? "الزيارات الميدانية" : "المخالفات المسجلة";
     const unit = isVisits ? "زيارة" : "مخالفة";
+    /* متوسط الشهر — خط مرجعي متقطع محايد (لا ذهبي: ليس مستهدفاً ولا خط أساس) */
+    let sum = 0;
+    for (const r of rows) sum += isVisits ? r.visits : r.violations;
+    const avg = Math.round(sum / rows.length);
     const c = T.chart("monm-" + which, el);
     c.setOption(Object.assign(T.base(su), {
-      grid: { top: T.fs(su, 30), bottom: T.fs(su, 40), left: T.fs(su, 40), right: T.fs(su, 70) },
+      /* containLabel: أول تسمية شهر دوارة كانت تُقص عند حافة البطاقة */
+      grid: { top: T.fs(su, 30), bottom: T.fs(su, 40), left: T.fs(su, 40),
+        right: T.fs(su, 70), containLabel: true },
       title: {
         text: label, right: 0, top: 0,
         textStyle: { color: T.C.ink2, fontFamily: "Cairo", fontSize: T.fs(su, 15), fontWeight: 600 },
@@ -262,6 +268,16 @@ RH.viz.charts = (function () {
       series: [{
         type: "bar", data: rows.map((r) => (isVisits ? r.visits : r.violations)),
         color, barWidth: "58%", itemStyle: { borderRadius: [4, 4, 0, 0] },
+        markLine: {
+          silent: true, symbol: "none",
+          lineStyle: { color: "rgba(244,241,230,.42)", width: 1.5, type: "dashed" },
+          label: {
+            show: true, position: "insideStartTop",
+            color: T.C.mut, fontFamily: "Cairo", fontSize: T.fs(su, 11),
+            formatter: () => "المتوسط الشهري " + fmt.int(avg),
+          },
+          data: [{ yAxis: avg }],
+        },
       }],
     }), true);
     return c;

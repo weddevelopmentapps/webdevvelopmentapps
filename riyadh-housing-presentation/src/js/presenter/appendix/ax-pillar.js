@@ -1,223 +1,189 @@
-/* ax-pillar.js — ملحق تفصيل الركيزة (appendix/pillar/<pillarId>)
-   ثلاث صفحات عند اعتماد المصدر: 1) حلقة نسبة إنجاز الركيزة 2) جدول المبادرات
-   حسب الحالة 3) الانحرافات الرئيسة (متأخرة/متعثرة فقط). عند غياب الاعتماد أو
-   ركيزة غير موجودة: صفحة حالة اعتماد شريفة — لا ركائز ملفّقة ولا أصفار زائفة.
-   كل قيمة من store.release()/der() حصراً وكل رقم ظاهر عبر RH.core.fmt. */
+/* ax-pillar.js — ملحق المبادرات والركائز (appendix/pillar[/<pillarId>])
+   عقد V2 (مرآة المصدر): المحاور الأربعة والمبادرات الثماني عشرة منقولة
+   حرفياً من خطة عمل المشروع V.1.0.0 بحقولها المنشورة {المحور، المبادرة،
+   البداية، النهاية} والحالة محسوبة بقاعدة خطة العمل ذاتها (مرآة قسم
+   المبادرات حرفياً): حالة صريحة في المصدر تُنقل كما هي، وإلا فمَن تجاوزت
+   نهايتها المخططة دون تسجيل إنجاز «متأخرة» حكماً، ومَن بدأت ولم تنته
+   «جاري العمل»، وإلا «لم يتم البدء». لا نسب إنجاز مختلقة — الأوزان
+   والنسب غير واردة في المصدر فلا تُعرض حلقة تقدم أصلاً (غياب صادق).
+   بوابة الاعتماد عبر الحكم الموحد RH.data.strategyApproved حصراً
+   (إصلاح مراجعة الجولة 1: البوابة النصية القديمة كانت تحجب الملحق رغم
+   اعتماد المصدر مرآةً، وتدّعي أن الوثيقة «لم تُرفَق بعد» — وهو غير صحيح).
+   دون معرف ركيزة: سجل المحفظة كاملاً بصفحاته + صفحة المتأخرات. */
 "use strict";
 
 (function () {
   const { h, svg } = RH.core.dom;
   const fmt = RH.core.fmt;
 
-  /** المسار يصل كـ appendix/pillar/<pillarId> */
+  /** المسار يصل كـ appendix/pillar[/<pillarId>] */
   const pillarId = (ctx) => (ctx.route.id.split("/")[1] || "");
 
   const pillarOf = (st, id) =>
     st.pillars ? st.pillars.find((p) => p.id === id) : null;
 
-  const initiativesOf = (st, id) =>
-    (st.initiatives || []).filter((i) => i.pillar_id === id);
+  /* مفردات الحالة المقفلة — مرآة s06-initiatives حرفياً */
+  const ST_DONE = "منجزة";
+  const ST_RUN = "جاري العمل";
+  const ST_LATE = "متأخرة";
+  const ST_IDLE = "لم يتم البدء";
 
-  /** حالات الجدول المعدودة انحرافاً — حصراً */
-  const DEVIATION_STATUSES = ["متأخرة", "متعثرة"];
+  /** قاعدة الحالة المحسوبة — مرآة statusOf في قسم المبادرات حرفياً */
+  function statusOf(ini, calcDate) {
+    if (ini.status) return ini.status;
+    if (ini.end && ini.end < calcDate) return ST_LATE;
+    if (ini.start && ini.start <= calcDate) return ST_RUN;
+    return ST_IDLE;
+  }
 
-  function pendingGlyph() {
-    return svg("svg", {
-      viewBox: "0 0 24 24", fill: "none", stroke: "currentColor",
-      "stroke-width": 1.1, "stroke-linecap": "round", "stroke-linejoin": "round",
-      "aria-hidden": "true",
-    },
-      svg("circle", { cx: 12, cy: 12, r: 9, "stroke-dasharray": "4 3" }),
-      svg("path", { d: "M12 7v5l3 3" }),
-    );
+  /** صفوف المحفظة بترتيب المحور فالمعرف (مرآة ترتيب القسم والمكتبة) */
+  function portfolioRows(st, calc) {
+    const pIdx = {};
+    st.pillars.forEach((p, i) => { pIdx[p.id] = i; });
+    return (st.initiatives || []).slice().sort((a, b) => {
+      const d = (pIdx[a.pillar_id] || 0) - (pIdx[b.pillar_id] || 0);
+      if (d !== 0) return d;
+      return String(a.id).localeCompare(String(b.id), "en", { numeric: true });
+    }).map((ini) => ({
+      ini,
+      pillar: st.pillars[pIdx[ini.pillar_id]] || null,
+      status: statusOf(ini, calc),
+    }));
+  }
+
+  const ROWS_PER_PAGE = 9;
+
+  function statusCell(status) {
+    if (status === ST_LATE) {
+      return h("td", {}, h("span", {
+        style: { color: "var(--coral)", fontWeight: "700" },
+      }, status + " حكماً"));
+    }
+    if (status === ST_DONE) {
+      return h("td", {}, h("span", {
+        style: { color: "var(--green-hi)", fontWeight: "700" },
+      }, status));
+    }
+    return h("td", {}, status);
+  }
+
+  /** تاريخ عربي كامل — نص RTL طبيعي (لا عزل ltr: يقلب ترتيب اليوم والشهر) */
+  function dateCell(iso) {
+    return h("td", {}, iso ? fmt.date(iso) : "—");
+  }
+
+  /** جدول مبادرات موحد (شريحة صفوف جاهزة) + ذيل المصدر والقاعدة */
+  function buildTable(el, rows, footNote) {
+    const st = RH.data.store.release().strategy;
+    el.appendChild(h("table", { class: "ax-table" },
+      h("thead", {}, h("tr", {},
+        ["#", "المبادرة", "المحور", "البداية المخططة", "النهاية المخططة",
+          "الحالة"].map((t) => h("th", { scope: "col" }, t)))),
+      h("tbody", {}, rows.map((r) => h("tr", {},
+        h("td", { class: "num" }, h("span", { class: "ltr" }, String(r.ini.id))),
+        h("td", {}, String(r.ini.name)),
+        h("td", {}, r.pillar ? String(r.pillar.name) : "—"),
+        dateCell(r.ini.start),
+        dateCell(r.ini.end),
+        statusCell(r.status),
+      ))),
+    ));
+    const note = h("div", { class: "ax-note" },
+      h("b", {}, fmt.noun(rows.length, "initiative")),
+      " في هذه الصفحة · المصدر: ", String(st.source), ".");
+    if (footNote) note.appendChild(document.createTextNode(" " + footNote));
+    el.appendChild(note);
   }
 
   /* ── صفحة الحالة الشريفة: مصدر غير معتمد أو ركيزة غير موجودة ─────────── */
   function pagePending(el, ctx) {
     const st = RH.data.store.release().strategy;
     const id = pillarId(ctx);
-    const notApproved = st.status !== "approved" || !(st.pillars || []).length;
+    const notApproved = !RH.data.strategyApproved(st) || !(st.pillars || []).length;
 
     el.appendChild(h("div", { class: "pending-scene" },
-      h("div", { class: "glyph" }, pendingGlyph()),
+      h("div", { class: "glyph" },
+        svg("svg", {
+          viewBox: "0 0 24 24", fill: "none", stroke: "currentColor",
+          "stroke-width": 1.1, "stroke-linecap": "round", "stroke-linejoin": "round",
+          "aria-hidden": "true",
+        },
+          svg("circle", { cx: 12, cy: 12, r: 9, "stroke-dasharray": "4 3" }),
+          svg("path", { d: "M12 7v5l3 3" }),
+        )),
       notApproved
         ? h("h2", {}, "تُستكمل تفاصيل الركائز فور اعتماد مصدرها الرسمي")
         : h("h2", {}, "الركيزة المطلوبة غير مدرجة في الإصدار المنشور"),
       notApproved
         ? h("p", {},
-          "تعريفات الركائز والمبادرات وأوزانها ونسب إنجازها مملوكة للوثيقة المعتمدة ",
-          h("span", { class: "src-name" }, "«" + st.source_required + "»"),
-          "، ولم تُرفَق بعد. تعرض هذه الشاشة الحالة بأمانة بدل أي أرقام تقديرية، ويُستكمل النشر من الإدارة فور ورود الوثيقة.")
+          "تعريفات الركائز والمبادرات مملوكة للوثيقة المعتمدة ",
+          h("span", { class: "src-name" }, "«" + String(st.source || "خطة عمل المشروع") + "»"),
+          ". تعرض هذه الشاشة الحالة بأمانة بدل أي أرقام تقديرية، ويُستكمل النشر من الإدارة فور اعتماد المصدر.")
         : h("p", {},
           "المعرّف ", h("span", { class: "ltr" }, id),
-          " غير موجود ضمن ركائز الإصدار الحالي. يمكن العودة إلى المبادرات واختيار ركيزة من الكوكبة."),
+          " غير موجود ضمن ركائز الإصدار الحالي. يمكن العودة إلى المبادرات واختيار ركيزة أخرى."),
     ));
   }
 
-  /* ── الصفحة 1: نسبة إنجاز الركيزة — حلقة كبيرة ────────────────────────── */
-  function pageRing(el, ctx) {
+  /* ── صفحة المتأخرات حكماً — حصراً من الحالة المحسوبة ─────────────────── */
+  function pageLate(el, rows) {
     const st = RH.data.store.release().strategy;
-    const id = pillarId(ctx);
-    const p = pillarOf(st, id);
-    const pv = RH.data.store.der().strategy.pillars[id] || null;
-    const pctVal = pv && pv.progress_pct != null ? pv.progress_pct : null;
-    const inis = initiativesOf(st, id);
-
-    const W = 1500, H = 620;
-    const cx = W / 2, cy = H / 2;
-    const root = svg("svg", {
-      class: "constellation", viewBox: `0 0 ${W} ${H}`, role: "img",
-      "aria-label": p.name + " — نسبة إنجاز الركيزة: " +
-        (pctVal != null ? fmt.pct(pctVal) : "غير متاحة"),
-    });
-    root.appendChild(svg("circle", { cx, cy, r: 236, class: "ring-core" }));
-    RH.viz.rings.ring(root, cx, cy, 210, pctVal, { stroke: 22, animate: true });
-    root.appendChild(svg("text", {
-      x: cx, y: cy - 52, class: "pname", "font-size": 30, fill: "#93A096",
-    }, "نسبة إنجاز الركيزة"));
-    root.appendChild(svg("text", {
-      x: cx, y: cy + 62, class: "ppct", "font-size": 116,
-    }, pctVal != null ? fmt.pct(pctVal) : "—"));
-    root.appendChild(svg("text", {
-      x: cx, y: cy + 316, class: "pname", "font-size": 38,
-    }, p.name));
-    el.appendChild(h("div", { class: "chart-area" }, root));
-
-    // سطر الاسم والحالة: حالة الركيزة إن اعتُمدت، وإلا توزيع حالات التنفيذ الفعلي
-    const note = h("div", { class: "ax-note" },
-      "الركيزة: ", h("b", {}, p.name), " · ",
-      fmt.noun(inis.length, "initiative"), " ضمن الركيزة");
-    if (p.status) {
-      note.appendChild(document.createTextNode(" · الحالة: "));
-      note.appendChild(h("b", {}, p.status));
-    } else if (inis.length) {
-      const counts = {};
-      for (const i of inis) {
-        if (i.execution_status) counts[i.execution_status] = (counts[i.execution_status] || 0) + 1;
-      }
-      const entries = Object.entries(counts);
-      if (entries.length) {
-        note.appendChild(document.createTextNode(" · حالات التنفيذ: "));
-        entries.forEach(([k, v], idx) => {
-          if (idx > 0) note.appendChild(document.createTextNode("، "));
-          note.appendChild(document.createTextNode(k + " "));
-          note.appendChild(h("b", {}, fmt.int(v)));
-        });
-      }
-    }
-    if (pctVal == null) {
-      note.appendChild(document.createTextNode(
-        " · النسبة الدقيقة محجوبة حتى اعتماد الأوزان ونسب الإنجاز لكل مبادرة."));
-    }
-    el.appendChild(note);
-  }
-
-  /* ── الصفحة 2: المبادرات حسب الحالة — جدول ────────────────────────────── */
-  function pageInitiatives(el, ctx) {
-    const st = RH.data.store.release().strategy;
-    const id = pillarId(ctx);
-    const p = pillarOf(st, id);
-    const rows = initiativesOf(st, id);
-
-    if (!rows.length) {
+    const late = rows.filter((r) => r.status === ST_LATE);
+    if (!late.length) {
       el.appendChild(h("div", {
         class: "ax-note",
         style: { flex: "1", display: "flex", alignItems: "center",
           justifyContent: "center", fontSize: "calc(var(--su)*24)" },
-      }, "لا مبادرات مسجلة ضمن هذه الركيزة في الإصدار المنشور."));
+      }, "لا مبادرات متأخرة حكماً ضمن هذا النطاق."));
       return;
     }
-
-    // العمودان الاختياريان يظهران فقط إذا اعتُمدت حقولهما في الإصدار
-    const hasOwner = rows.some((r) => r.owner);
-    const hasDue = rows.some((r) => r.due_date);
-    const heads = ["المبادرة", "نسبة الإنجاز", "حالة التنفيذ", "حالة الجدول"]
-      .concat(hasOwner ? ["الجهة المسؤولة"] : [])
-      .concat(hasDue ? ["تاريخ الاستحقاق"] : []);
-
-    el.appendChild(h("table", { class: "ax-table" },
-      h("thead", {}, h("tr", {},
-        heads.map((t) => h("th", { scope: "col" }, t)))),
-      h("tbody", {}, rows.map((r) => h("tr", {},
-        h("td", {}, r.name),
-        h("td", { class: "num" },
-          typeof r.progress_percent === "number"
-            ? h("span", { class: "ltr" }, fmt.pct(r.progress_percent))
-            : "—"),
-        h("td", {}, r.execution_status || "—"),
-        h("td", {}, DEVIATION_STATUSES.includes(r.schedule_status)
-          ? h("span", { style: { color: "var(--coral)", fontWeight: "600" } }, r.schedule_status)
-          : (r.schedule_status || "—")),
-        hasOwner ? h("td", {}, r.owner || "—") : null,
-        hasDue ? h("td", { class: "num" }, r.due_date ? fmt.date(r.due_date) : "—") : null,
-      ))),
-    ));
-
-    el.appendChild(h("div", { class: "ax-note" },
-      h("b", {}, fmt.noun(rows.length, "initiative")),
-      " ضمن ركيزة «", p.name, "» · المصدر: ", st.source_required, ".",
-    ));
-  }
-
-  /* ── الصفحة 3: الانحرافات الرئيسة — متأخرة/متعثرة حصراً ──────────────── */
-  function pageDeviations(el, ctx) {
-    const st = RH.data.store.release().strategy;
-    const id = pillarId(ctx);
-    const rows = initiativesOf(st, id)
-      .filter((i) => DEVIATION_STATUSES.includes(i.schedule_status));
-
-    if (!rows.length) {
-      el.appendChild(h("div", {
-        class: "ax-note",
-        style: { flex: "1", display: "flex", alignItems: "center",
-          justifyContent: "center", fontSize: "calc(var(--su)*24)" },
-      }, "لا انحرافات مسجلة ضمن هذه الركيزة."));
-      return;
-    }
-
-    const hasOwner = rows.some((r) => r.owner);
-    const heads = ["المبادرة", "حالة الجدول", "حالة التنفيذ", "نسبة الإنجاز"]
-      .concat(hasOwner ? ["الجهة المسؤولة"] : []);
-
-    el.appendChild(h("table", { class: "ax-table" },
-      h("thead", {}, h("tr", {},
-        heads.map((t) => h("th", { scope: "col" }, t)))),
-      h("tbody", {}, rows.map((r) => h("tr", {},
-        h("td", {}, r.name),
-        h("td", {}, h("span", {
-          style: { color: "var(--coral)", fontWeight: "600" },
-        }, r.schedule_status)),
-        h("td", {}, r.execution_status || "—"),
-        h("td", { class: "num" },
-          typeof r.progress_percent === "number"
-            ? h("span", { class: "ltr" }, fmt.pct(r.progress_percent))
-            : "—"),
-        hasOwner ? h("td", {}, r.owner || "—") : null,
-      ))),
-    ));
-
-    el.appendChild(h("div", { class: "ax-note" },
-      h("b", {}, fmt.noun(rows.length, "initiative")),
-      " بحالة جدول متأخرة أو متعثرة ضمن هذه الركيزة — تتطلب متابعة تنفيذية.",
-    ));
+    buildTable(el, late,
+      "قاعدة «متأخرة حكماً»: " + String(st.status_rule
+        || "تجاوزت نهايتها المخططة دون تسجيل إنجاز في المصدر."));
   }
 
   RH.presenter.ax.register({
     id: "pillar",
     kicker: "ملحق الاستراتيجية",
-    title: "تفصيل الركيزة",
+    title: "المبادرات والركائز — السجل الكامل",
     returnLabel: "العودة إلى المبادرات",
     pages: (ctx) => {
-      const st = RH.data.store.release().strategy;
-      const approved = st.status === "approved" && (st.pillars || []).length;
-      if (!approved || !pillarOf(st, pillarId(ctx))) {
+      const rel = RH.data.store.release();
+      const st = rel.strategy;
+      const calc = rel.meta.calculation_date;
+      const id = pillarId(ctx);
+      const approved = RH.data.strategyApproved(st) && (st.pillars || []).length;
+      if (!approved || (id && !pillarOf(st, id))) {
         return [{ name: "حالة الاعتماد", build: pagePending }];
       }
-      return [
-        { name: "نسبة إنجاز الركيزة", build: pageRing },
-        { name: "المبادرات حسب الحالة", build: pageInitiatives },
-        { name: "الانحرافات الرئيسة", build: pageDeviations },
-      ];
+
+      const all = portfolioRows(st, calc);
+      const rows = id ? all.filter((r) => r.ini.pillar_id === id) : all;
+      const scopeName = id ? String(pillarOf(st, id).name) : "المحفظة الكاملة";
+
+      const pages = [];
+      if (rows.length <= ROWS_PER_PAGE) {
+        pages.push({
+          name: "مبادرات " + scopeName,
+          build: (el) => buildTable(el, rows,
+            "الحالة محسوبة بقاعدة خطة العمل حتى " + fmt.date(calc) + "."),
+        });
+      } else {
+        const chunks = [];
+        for (let i = 0; i < rows.length; i += ROWS_PER_PAGE) {
+          chunks.push(rows.slice(i, i + ROWS_PER_PAGE));
+        }
+        chunks.forEach((chunk, i) => pages.push({
+          name: "سجل المحفظة (" + fmt.int(i + 1) + " من " + fmt.int(chunks.length) + ")",
+          build: (el) => buildTable(el, chunk,
+            "الحالة محسوبة بقاعدة خطة العمل حتى " + fmt.date(calc) + "."),
+        }));
+      }
+      pages.push({
+        name: "المتأخرة حكماً",
+        build: (el) => pageLate(el, rows),
+      });
+      return pages;
     },
   });
 })();

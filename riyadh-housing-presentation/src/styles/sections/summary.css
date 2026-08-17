@@ -1,0 +1,591 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   summary.css — تخصيصات قسم «الملخص التنفيذي» (s01-summary.js)
+   ────────────────────────────────────────────────────────────────────────────
+   عقد V2_CONTRACTS §5: كل الأصناف مسبوقة بـ [data-section="summary"] منعاً
+   للتسرب؛ الأصناف المشتركة (dash-*, kpi-*, rail-*, geomap-*) ملك dashboard.css
+   ولا تُعاد كتابتها هنا — هذا الملف يضيف فقط:
+     • هندسة الشبكة 12 عموداً × صفين متساويين + فيضان داخلي صادق لجسم القسم
+     • تفاعلية بطاقات المؤشرات (كلها أزرار «الأصل والمنهجية») + وسم الامتثال
+       الذهبي (وسم اعتماد حصراً — لا يلوّن قيمة بيانات)
+     • أزرار التعمق في ترويسات البطاقات (اللوحة الكاملة/الملحق)
+     • بطاقة 2/7/9 لحالات المبادرات (ألوان دلالية: أخضر/أزرق/مرجاني/رمادي)
+     • مبدل طبقات الخريطة المصغرة + مضيفها
+     • عمود الرؤى الموسع: نبض الرقابة وسطر بوابات التحقق
+     • بطاقة التفاصيل الزجاجية (الأصل والمنهجية/الملفات القطاعية والشهرية)
+   كل المقاسات calc(var(--su) * n) — تتدرج مع مسرح 16:9 (عقد المحرك)،
+   والألوان من رموز tokens.css حصراً. prefers-reduced-motion يصفّر الانتقالات.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* ── جسم القسم: يملأ 16:9 دون تمرير عند 1920×1080؛ عند ضيق استثنائي يتمرر
+      رأسياً داخلياً فقط (المسرح لا يتمرر أفقياً أبداً — قاعدة صلبة) ── */
+[data-section="summary"] .dash-body {
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(244, 241, 230, 0.18) transparent;
+}
+[data-section="summary"] .dash-body::-webkit-scrollbar { width: 8px; }
+[data-section="summary"] .dash-body::-webkit-scrollbar-thumb {
+  background: rgba(244, 241, 230, 0.16);
+  border-radius: 8px;
+}
+[data-section="summary"] .dash-body::-webkit-scrollbar-track { background: transparent; }
+
+/* ── الشبكة: صفان متساويان بحد أدنى يحفظ مقروئية الرسوم عند الانضغاط ── */
+[data-section="summary"] .sum-grid {
+  grid-template-rows: repeat(2, minmax(calc(var(--su) * 296), 1fr));
+  grid-auto-flow: row;
+}
+[data-section="summary"] .sum-cell { min-height: 0; }
+
+/* ── الملخص الناطق: مخفي بصرياً، حاضر لقارئات الشاشة ── */
+[data-section="summary"] .sum-sr-summary {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   1) شريط المؤشرات الكبرى — كل بطاقة زر «الأصل والمنهجية»
+   ════════════════════════════════════════════════════════════════════════════ */
+[data-section="summary"] .sum-kpi {
+  cursor: pointer;
+  transition: transform var(--dur-micro) var(--ease),
+    border-color var(--dur-micro) var(--ease),
+    background var(--dur-micro) var(--ease);
+}
+[data-section="summary"] .sum-kpi:hover {
+  transform: translateY(calc(var(--su) * -2));
+  border-color: var(--hair-d);
+  background: rgba(22, 41, 31, 0.66);
+}
+[data-section="summary"] .sum-kpi:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+[data-section="summary"] .sum-kpi:active {
+  transform: translateY(0);
+}
+
+/* وسم الامتثال: إطار ذهبي متقطع + ملاحظة ذهبية — «قيمة مورّدة بانتظار
+   اعتماد المنهجية». الذهبي هنا وسم اعتماد (كروم) لا لون قيمة: الرقم يبقى
+   عاجياً كسائر القيم المحايدة. */
+[data-section="summary"] .sum-kpi-flag {
+  border: 1px dashed rgba(214, 171, 76, 0.45);
+  background: rgba(214, 171, 76, 0.05);
+}
+[data-section="summary"] .sum-kpi-flag .kpi-note {
+  color: var(--gold);
+  font-weight: 600;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   2) أزرار التعمق في ترويسات البطاقات — «اللوحة الكاملة» و«الملحق»
+   ════════════════════════════════════════════════════════════════════════════ */
+[data-section="summary"] .sum-card-actions {
+  margin-inline-start: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--su) * 6);
+  flex: none;
+}
+[data-section="summary"] .sum-link {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--su) * 5);
+  padding: calc(var(--su) * 3) calc(var(--su) * 11);
+  border: 1px solid var(--hair-d2);
+  border-radius: 999px;
+  background: rgba(11, 21, 18, 0.5);
+  color: var(--mut-d);
+  font-family: var(--f-body);
+  font-size: calc(var(--su) * 12);
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color var(--dur-micro) var(--ease),
+    border-color var(--dur-micro) var(--ease),
+    background var(--dur-micro) var(--ease);
+}
+[data-section="summary"] .sum-link:hover {
+  color: var(--ivory);
+  border-color: var(--hair-d);
+  background: rgba(22, 41, 31, 0.8);
+}
+[data-section="summary"] .sum-link:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+  color: var(--ivory);
+}
+[data-section="summary"] .sum-link.ghost {
+  border-color: transparent;
+  background: transparent;
+}
+[data-section="summary"] .sum-link.ghost:hover {
+  border-color: var(--hair-d2);
+  background: rgba(11, 21, 18, 0.5);
+}
+[data-section="summary"] .sum-link-arrow {
+  font-size: calc(var(--su) * 12);
+  line-height: 1;
+  transition: transform var(--dur-micro) var(--ease);
+}
+[data-section="summary"] .sum-link:hover .sum-link-arrow {
+  transform: translateX(calc(var(--su) * -2));
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   3) بطاقة محفظة المبادرات: donut + بطاقة 2/7/9
+   ════════════════════════════════════════════════════════════════════════════ */
+[data-section="summary"] .sum-donut-host {
+  flex: 1;
+  min-height: calc(var(--su) * 130);
+}
+[data-section="summary"] .sum-chips {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 6);
+  margin-top: calc(var(--su) * 8);
+}
+[data-section="summary"] .sum-chip {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--su) * 8);
+  width: 100%;
+  padding: calc(var(--su) * 5) calc(var(--su) * 10);
+  border: 1px solid var(--hair-d2);
+  border-radius: calc(var(--su) * 9);
+  background: rgba(11, 21, 18, 0.5);
+  cursor: pointer;
+  text-align: start;
+  font-family: var(--f-body);
+  transition: border-color var(--dur-micro) var(--ease),
+    background var(--dur-micro) var(--ease),
+    transform var(--dur-micro) var(--ease);
+}
+[data-section="summary"] .sum-chip:hover {
+  background: rgba(22, 41, 31, 0.8);
+  transform: translateX(calc(var(--su) * -2));
+}
+[data-section="summary"] .sum-chip:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+[data-section="summary"] .sum-chip-dot {
+  width: calc(var(--su) * 9);
+  height: calc(var(--su) * 9);
+  border-radius: 50%;
+  flex: none;
+}
+[data-section="summary"] .sum-chip-count {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-size: calc(var(--su) * 19);
+  font-weight: 600;
+  color: var(--ivory);
+  line-height: 1;
+  direction: ltr;
+  unicode-bidi: isolate;
+  min-width: calc(var(--su) * 22);
+}
+[data-section="summary"] .sum-chip-label {
+  font-size: calc(var(--su) * 12.5);
+  font-weight: 600;
+  color: var(--mut-d);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* الألوان الدلالية للحالات: منجزة=طاقة منجزة (أخضر)، جاري=فئة ثانوية (أزرق)،
+   متأخرة=خلل (مرجاني حصراً)، لم يبدأ=حياد خافت */
+[data-section="summary"] .sum-chip.pos .sum-chip-dot { background: var(--green); }
+[data-section="summary"] .sum-chip.pos:hover { border-color: rgba(49, 162, 109, 0.5); }
+[data-section="summary"] .sum-chip.run .sum-chip-dot { background: var(--collar-blue); }
+[data-section="summary"] .sum-chip.run:hover { border-color: rgba(63, 127, 176, 0.5); }
+[data-section="summary"] .sum-chip.late .sum-chip-dot { background: var(--coral); }
+[data-section="summary"] .sum-chip.late:hover { border-color: rgba(214, 106, 80, 0.5); }
+[data-section="summary"] .sum-chip.late .sum-chip-count { color: var(--coral); }
+[data-section="summary"] .sum-chip.idle .sum-chip-dot { background: var(--faint-d); }
+
+[data-section="summary"] .sum-ini-foot {
+  margin-top: calc(var(--su) * 7);
+  font-size: calc(var(--su) * 11.5);
+  color: var(--faint-d);
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   4) بطاقة الخريطة المصغرة: المضيف + مبدل الطبقات
+   ════════════════════════════════════════════════════════════════════════════ */
+[data-section="summary"] .sum-map-card .card-body { padding: 0; }
+[data-section="summary"] .sum-map-host {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  margin: calc(var(--su) * 6) calc(var(--su) * 10) calc(var(--su) * 10);
+}
+[data-section="summary"] .sum-layerbar {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--su) * 5);
+  margin-inline-start: calc(var(--su) * 8);
+  flex: none;
+}
+[data-section="summary"] .sum-layer-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--su) * 6);
+  padding: calc(var(--su) * 3) calc(var(--su) * 10);
+  border: 1px solid var(--hair-d2);
+  border-radius: 999px;
+  background: rgba(11, 21, 18, 0.55);
+  color: var(--mut-d);
+  font-family: var(--f-body);
+  font-size: calc(var(--su) * 11.5);
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color var(--dur-micro) var(--ease),
+    border-color var(--dur-micro) var(--ease),
+    background var(--dur-micro) var(--ease);
+}
+[data-section="summary"] .sum-layer-btn:hover { color: var(--ivory); }
+[data-section="summary"] .sum-layer-btn:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+[data-section="summary"] .sum-layer-dot {
+  width: calc(var(--su) * 8);
+  height: calc(var(--su) * 8);
+  border-radius: 50%;
+  flex: none;
+}
+/* هوية الطبقة في النقطة وحدها — النص لا يلبس لون البيانات (قاعدة صارمة) */
+[data-section="summary"] .sum-layer-btn.cov .sum-layer-dot { background: var(--green); }
+[data-section="summary"] .sum-layer-btn.dem .sum-layer-dot { background: var(--demand); }
+[data-section="summary"] .sum-layer-btn.vio .sum-layer-dot { background: var(--coral); }
+[data-section="summary"] .sum-layer-btn.active {
+  color: var(--ivory);
+  background: rgba(22, 41, 31, 0.9);
+}
+[data-section="summary"] .sum-layer-btn.cov.active { border-color: rgba(49, 162, 109, 0.6); }
+[data-section="summary"] .sum-layer-btn.dem.active { border-color: rgba(170, 138, 62, 0.6); }
+[data-section="summary"] .sum-layer-btn.vio.active { border-color: rgba(214, 106, 80, 0.6); }
+
+/* ترويسة بطاقة الخريطة تزدحم (عنوان + مبدل + أزرار تعمق): تلتف بأمان */
+[data-section="summary"] .sum-map-card .card-head {
+  flex-wrap: wrap;
+  row-gap: calc(var(--su) * 5);
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   5) عمود الرؤى: الرؤى + نبض الرقابة + بوابات التحقق
+   ════════════════════════════════════════════════════════════════════════════ */
+[data-section="summary"] .sum-rail-cell {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 10);
+  min-height: 0;
+  overflow: hidden;
+}
+[data-section="summary"] .sum-rail-cell .rail {
+  flex: 0 1 auto;
+  min-height: 0;
+}
+[data-section="summary"] .sum-rail-cell .rail-item {
+  padding: calc(var(--su) * 9) calc(var(--su) * 13);
+}
+[data-section="summary"] .sum-rail-cell .rail-item-text {
+  font-size: calc(var(--su) * 12);
+  line-height: 1.6;
+}
+
+/* نبض الرقابة: كتلة قرارية مدمجة — كل صف زر يفتح السجل الشهري */
+[data-section="summary"] .sum-pulse {
+  flex: 0 1 auto;
+  min-height: 0;
+  padding: calc(var(--su) * 10) calc(var(--su) * 13) calc(var(--su) * 6);
+  overflow: hidden;
+}
+[data-section="summary"] .sum-pulse-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(var(--su) * 8);
+  margin-bottom: calc(var(--su) * 4);
+}
+[data-section="summary"] .sum-pulse-title {
+  font-size: calc(var(--su) * 13.5);
+  font-weight: 700;
+  color: var(--ink2-d);
+}
+[data-section="summary"] .sum-pulse-row {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--su) * 8);
+  padding: calc(var(--su) * 6) calc(var(--su) * 2);
+  border-top: 1px solid var(--hair-d2);
+  cursor: pointer;
+  transition: background var(--dur-micro) var(--ease);
+  border-radius: calc(var(--su) * 6);
+}
+[data-section="summary"] .sum-pulse-row:hover { background: rgba(22, 41, 31, 0.7); }
+[data-section="summary"] .sum-pulse-row:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 1px;
+}
+[data-section="summary"] .sum-pulse-dot {
+  width: calc(var(--su) * 8);
+  height: calc(var(--su) * 8);
+  border-radius: 50%;
+  flex: none;
+}
+/* دلالة الألوان: زيارات/مراقبون = قدرة نتحكم بها (أخضر بدرجتيه)،
+   مخالفات = خلل (مرجاني حصراً)، إغلاقات = إجراء إنفاذ (أزرق فئة ثانوية) */
+[data-section="summary"] .sum-pulse-row.v-visits .sum-pulse-dot { background: var(--green-hi); }
+[data-section="summary"] .sum-pulse-row.v-viol .sum-pulse-dot { background: var(--coral); }
+[data-section="summary"] .sum-pulse-row.v-clo .sum-pulse-dot { background: var(--collar-blue); }
+[data-section="summary"] .sum-pulse-row.v-mon .sum-pulse-dot { background: var(--green); }
+[data-section="summary"] .sum-pulse-row.v-viol .sum-pulse-value { color: var(--coral); }
+[data-section="summary"] .sum-pulse-body {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 1);
+  min-width: 0;
+  flex: 1;
+}
+[data-section="summary"] .sum-pulse-label {
+  font-size: calc(var(--su) * 12.5);
+  font-weight: 600;
+  color: var(--ink2-d);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+[data-section="summary"] .sum-pulse-meta {
+  font-size: calc(var(--su) * 11);
+  color: var(--faint-d);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+[data-section="summary"] .sum-pulse-value {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-size: calc(var(--su) * 17);
+  font-weight: 600;
+  color: var(--ivory);
+  direction: ltr;
+  unicode-bidi: isolate;
+  flex: none;
+}
+
+/* سطر بوابات التحقق: ثقة الإصدار — مثبت أسفل العمود */
+[data-section="summary"] .sum-gates {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: calc(var(--su) * 7);
+  font-size: calc(var(--su) * 11);
+  line-height: 1.5;
+  color: var(--faint-d);
+  padding: calc(var(--su) * 4) calc(var(--su) * 2) 0;
+  min-width: 0;
+}
+/* سطر واحد دائماً بقصّ معلن — لا التفاف يطبع سطراً ثانياً تحت الشارة
+   (إصلاح مراجعة الجولة 3؛ الجملة الكاملة في التلميح) */
+[data-section="summary"] .sum-gates-text {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+[data-section="summary"] .sum-gates-text b {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  color: var(--green-hi);
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+[data-section="summary"] .sum-gates-dot {
+  width: calc(var(--su) * 7);
+  height: calc(var(--su) * 7);
+  border-radius: 50%;
+  background: var(--gold);
+  flex: none;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   6) بطاقة التفاصيل «الأصل والمنهجية» (داخل detail-panel المشتركة)
+   ════════════════════════════════════════════════════════════════════════════ */
+[data-section="summary"] .sum-detail {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 10);
+}
+[data-section="summary"] .sum-detail-hero {
+  display: flex;
+  align-items: baseline;
+  gap: calc(var(--su) * 10);
+  flex-wrap: wrap;
+}
+[data-section="summary"] .sum-detail-num {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-size: calc(var(--su) * 46);
+  font-weight: 300;
+  line-height: 1.05;
+  letter-spacing: calc(var(--su) * -1);
+  color: var(--ivory);
+  unicode-bidi: plaintext;
+}
+[data-section="summary"] .sum-detail-num.pos { color: var(--green-hi); }
+[data-section="summary"] .sum-detail-num.neg { color: var(--coral); }
+[data-section="summary"] .sum-detail-num.warn { color: var(--gold-hi); }
+[data-section="summary"] .sum-detail-unit {
+  font-size: calc(var(--su) * 15);
+  font-weight: 600;
+  color: var(--mut-d);
+}
+[data-section="summary"] .sum-detail-cap {
+  font-size: calc(var(--su) * 14);
+  line-height: 1.7;
+  color: var(--ink2-d);
+}
+[data-section="summary"] .sum-detail-rows {
+  display: flex;
+  flex-direction: column;
+}
+[data-section="summary"] .sum-detail-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: calc(var(--su) * 18);
+  padding: calc(var(--su) * 6.5) 0;
+  border-bottom: 1px solid var(--hair-d2);
+}
+[data-section="summary"] .sum-detail-row:last-child { border-bottom: none; }
+[data-section="summary"] .sum-detail-k {
+  font-size: calc(var(--su) * 13);
+  color: var(--mut-d);
+  flex: 1;
+}
+[data-section="summary"] .sum-detail-v {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-size: calc(var(--su) * 14);
+  font-weight: 600;
+  color: var(--ivory);
+  text-align: end;
+  unicode-bidi: plaintext;
+}
+[data-section="summary"] .sum-detail-row.pos .sum-detail-v { color: var(--green-hi); }
+[data-section="summary"] .sum-detail-row.neg .sum-detail-v { color: var(--coral); }
+[data-section="summary"] .sum-detail-row.warn .sum-detail-v { color: var(--gold-hi); }
+
+/* جدول التفاصيل: تمرير داخلي مستقل كي لا يبتلع البطاقة */
+[data-section="summary"] .sum-detail-table {
+  max-height: calc(var(--su) * 320);
+  overflow: auto;
+  border: 1px solid var(--hair-d2);
+  border-radius: calc(var(--su) * 10);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(244, 241, 230, 0.18) transparent;
+}
+[data-section="summary"] .sum-detail-table .table-dense th {
+  background: rgba(16, 32, 26, 0.96);
+}
+
+/* ملاحظات التحفظ: ذهبية — وسوم «بانتظار الاعتماد» (كروم حصراً) */
+[data-section="summary"] .sum-detail-note {
+  display: flex;
+  align-items: flex-start;
+  gap: calc(var(--su) * 7);
+  font-size: calc(var(--su) * 12.5);
+  line-height: 1.65;
+  color: var(--gold);
+  background: rgba(214, 171, 76, 0.06);
+  border: 1px dashed rgba(214, 171, 76, 0.35);
+  border-radius: calc(var(--su) * 9);
+  padding: calc(var(--su) * 8) calc(var(--su) * 12);
+}
+[data-section="summary"] .sum-detail-note-dot {
+  width: calc(var(--su) * 7);
+  height: calc(var(--su) * 7);
+  border-radius: 50%;
+  background: var(--gold);
+  flex: none;
+  margin-top: calc(var(--su) * 5);
+}
+[data-section="summary"] .sum-detail-src {
+  font-size: calc(var(--su) * 11.5);
+  line-height: 1.6;
+  color: var(--faint-d);
+  border-top: 1px solid var(--hair-d2);
+  padding-top: calc(var(--su) * 8);
+}
+[data-section="summary"] .sum-detail-src + .sum-detail-src {
+  border-top: none;
+  padding-top: 0;
+}
+
+/* أزرار الانتقال داخل البطاقة: تعمق نحو الأقسام الكاملة والملاحق */
+[data-section="summary"] .sum-detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--su) * 8);
+  margin-top: calc(var(--su) * 4);
+}
+[data-section="summary"] .sum-detail-go {
+  padding: calc(var(--su) * 7) calc(var(--su) * 16);
+  border: 1px solid rgba(49, 162, 109, 0.5);
+  border-radius: 999px;
+  background: rgba(49, 162, 109, 0.09);
+  color: var(--green-hi);
+  font-family: var(--f-body);
+  font-size: calc(var(--su) * 13);
+  font-weight: 700;
+  cursor: pointer;
+  transition: background var(--dur-micro) var(--ease),
+    border-color var(--dur-micro) var(--ease);
+}
+[data-section="summary"] .sum-detail-go:hover {
+  background: rgba(49, 162, 109, 0.18);
+  border-color: var(--green);
+}
+[data-section="summary"] .sum-detail-go:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   7) احترام prefers-reduced-motion: لا انتقالات ولا إزاحات تحويم
+   ════════════════════════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  [data-section="summary"] .sum-kpi,
+  [data-section="summary"] .sum-link,
+  [data-section="summary"] .sum-link-arrow,
+  [data-section="summary"] .sum-chip,
+  [data-section="summary"] .sum-layer-btn,
+  [data-section="summary"] .sum-pulse-row,
+  [data-section="summary"] .sum-detail-go {
+    transition: none;
+  }
+  [data-section="summary"] .sum-kpi:hover,
+  [data-section="summary"] .sum-chip:hover,
+  [data-section="summary"] .sum-link:hover .sum-link-arrow {
+    transform: none;
+  }
+}
+
+/* ── إصلاح مراجعة الجولة 3: حشوة ترقيع 1366 القديمة لسطر البوابات حُذفت —
+   الشريط السفلي لشارة الإصدار محجوز مركزياً في .dash-body لكل الأقسام
+   والمقاسات، والسطر ذاته صار سطراً واحداً لا يلتف ── */

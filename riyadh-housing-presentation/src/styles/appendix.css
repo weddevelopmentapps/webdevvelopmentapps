@@ -132,3 +132,55 @@
   display: inline-block;
 }
 .ax-table .rank-note { color: var(--faint-d); font-size: calc(var(--su) * 13.5); }
+
+/* ── كثافة صفحات الملاحق (إصلاح المراجعة: لا صفحة برسم يتيم) ── */
+.ax-page .ax-strip {
+  display: flex;
+  gap: calc(var(--su) * 18);
+  margin-bottom: calc(var(--su) * 14);
+  flex: none;
+}
+.ax-page .ax-stat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 4);
+  background: rgba(16, 32, 26, 0.55);
+  border: 1px solid var(--hair-d2);
+  border-radius: calc(var(--su) * 10);
+  padding: calc(var(--su) * 10) calc(var(--su) * 16);
+}
+.ax-page .ax-stat-k {
+  font-size: calc(var(--su) * 12);
+  color: var(--mut-d);
+}
+.ax-page .ax-stat-v {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-size: calc(var(--su) * 22);
+  font-weight: 700;
+  color: var(--ivory);
+}
+.ax-page .ax-stat-v.neg { color: var(--coral); }
+.ax-page .ax-split {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  gap: calc(var(--su) * 20);
+  align-items: stretch;
+}
+.ax-page .ax-split .chart-area { min-height: 0; }
+.ax-page .ax-charts-col {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 8);
+  min-height: 0;
+}
+.ax-page .ax-charts-col .chart-area { flex: 1; min-height: 0; }
+.ax-page .ax-rank-table {
+  align-self: start;
+  max-height: 100%;
+  overflow: hidden;
+  font-size: calc(var(--su) * 12.5);
+}

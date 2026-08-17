@@ -108,5 +108,11 @@ body.mode-admin :focus-visible { outline-color: var(--accent); }
   letter-spacing: 0.2px;
   pointer-events: none;
   transition: opacity var(--dur-std) var(--ease);
+  /* إصلاح مراجعة الجولة 2: خلفية حبة معتمة — كان سطر الإصدار يطبع فوق
+     نصوص أسفل الأقسام عند 1366 فيندمج السطران في نص غير مقروء؛ الحبة
+     تضمن مقروئية الشارة في كل قسم ومقاس مهما كان خلفها. */
+  background: rgba(6, 19, 12, 0.82);
+  padding: calc(var(--su) * 3) calc(var(--su) * 10);
+  border-radius: 999px;
 }
 .release-badge.warn { color: var(--gold); }

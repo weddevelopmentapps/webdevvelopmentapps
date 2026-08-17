@@ -75,7 +75,7 @@ RH.admin.editors = (function () {
       ),
       h("div", { class: "frow" },
         h("div", { class: "fitem locked" },
-          h("label", {}, "تاريخ الاحتساب (calculation_date)"),
+          h("label", {}, "تاريخ الحساب (calculation_date)"),
           h("input", { type: "text", value: m.calculation_date, readonly: "" }),
           h("div", { class: "hint" }, "يأتي من ملف الورقة حصراً — يُحدَّث بالاستيراد")),
         field("", checkbox(!!m.presentation_date_needs_confirmation,
