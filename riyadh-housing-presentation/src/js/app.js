@@ -60,6 +60,16 @@
     el("release-badge").hidden = true;
   }
 
+  /** إخفاء قشرة التبويبات عند دخول وضع مستندي.
+      الأوضاع الأربعة **حصرية**: إبقاء جذر التبويبات مركّباً تحت الإدارة أو
+      الموجز يترك شريط الرأس والمتتبّع في التخطيط وفي شجرة التركيز خلف المستند
+      — فيقفز Tab إلى أزرار محور غير مرئي، ويطول تمرير الصفحة بارتفاع قشرة
+      كاملة لا يراها أحد. المسرح يفعل هذا في ‎enterStage‎؛ الوضعان المستنديان
+      كانا يغفلانه. */
+  function hideTabsShell() {
+    if (RH.tabs && typeof RH.tabs.hide === "function") RH.tabs.hide();
+  }
+
   /** إخفاء الجذور المستندية (إدارة/موجز) — لا يتعايشان مع غيرهما أبداً */
   function hideDocumentRoots() {
     const adminRoot = el("admin-root");
@@ -92,6 +102,7 @@
       }
       document.body.className = "mode-admin";
       hidePresenterChrome();
+      hideTabsShell();
       const rptRoot = el("report-root");
       if (rptRoot) rptRoot.hidden = true;   // الوضعان المستنديان لا يتعايشان
       const adminRoot = el("admin-root");
@@ -111,6 +122,7 @@
       }
       document.body.className = "mode-report";
       hidePresenterChrome();
+      hideTabsShell();
       const adminRoot = el("admin-root");
       if (adminRoot) adminRoot.hidden = true;
       const root = reportRoot();
