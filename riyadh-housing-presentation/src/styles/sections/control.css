@@ -120,6 +120,47 @@
   cursor: not-allowed;
 }
 
+/* صف رقاقات طبقات الخريطة: يلتف عند الضيق ولا يُقص أي زر أبداً
+   (إصلاح مراجعة الجولة 1: كانت رقاقة «التركّز» تُبتر عند حافة البطاقة) */
+[data-section="control"] .ctl-maplayers {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  row-gap: calc(var(--su) * 4);
+  min-width: 0;
+}
+[data-section="control"] .ctl-maplayers .ctl-tbtn {
+  padding: calc(var(--su) * 3) calc(var(--su) * 9);
+  font-size: calc(var(--su) * 11.5);
+}
+
+/* مبدّل مقياس الأعمدة القطاعية — صف كروم في ترويسة البطاقة (لا فوق الرسم):
+   نقاط الهوية دلالية صارمة: مرجاني=مخالفات، أخضر=مراقبون، أزرق=إغلاقات */
+[data-section="control"] .ctl-measures {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  row-gap: calc(var(--su) * 4);
+  min-width: 0;
+}
+[data-section="control"] .ctl-measures .ctl-tbtn {
+  padding: calc(var(--su) * 3) calc(var(--su) * 9);
+  font-size: calc(var(--su) * 11.5);
+}
+[data-section="control"] .ctl-measure-btn.vio .ctl-layer-dot { background: var(--coral); }
+[data-section="control"] .ctl-measure-btn.ins .ctl-layer-dot { background: var(--green); }
+[data-section="control"] .ctl-measure-btn.enf .ctl-layer-dot { background: var(--collar-blue); }
+[data-section="control"] .ctl-measure-btn.vio.active {
+  border-color: rgba(214, 106, 80, 0.5);
+  background: rgba(214, 106, 80, 0.12);
+}
+[data-section="control"] .ctl-measure-btn.ins.active {
+  border-color: rgba(49, 162, 109, 0.5);
+  background: rgba(49, 162, 109, 0.12);
+}
+[data-section="control"] .ctl-measure-btn.enf.active {
+  border-color: rgba(63, 127, 176, 0.5);
+  background: rgba(63, 127, 176, 0.12);
+}
+
 /* نقاط هوية طبقات الخريطة: مرجاني للمخالفات حصراً، أخضر للمراقبين (قدرة) */
 [data-section="control"] .ctl-layer-dot {
   display: inline-block;
@@ -186,15 +227,15 @@
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
-  gap: calc(var(--su) * 4);
-  padding: calc(var(--su) * 6) calc(var(--su) * 14) 0;
+  gap: calc(var(--su) * 3);
+  padding: calc(var(--su) * 3) calc(var(--su) * 14) 0;
 }
 [data-section="control"] .ctl-top-row {
   display: grid;
   grid-template-columns: calc(var(--su) * 26) minmax(0, 1fr) calc(var(--su) * 52);
   align-items: center;
   gap: calc(var(--su) * 10);
-  padding: calc(var(--su) * 6) calc(var(--su) * 8);
+  padding: calc(var(--su) * 4) calc(var(--su) * 8);
   border: 1px solid transparent;
   border-radius: calc(var(--su) * 9);
   cursor: pointer;
@@ -267,10 +308,13 @@
 }
 [data-section="control"] .ctl-top-note {
   flex: none;
-  /* هامش علوي صريح + سطر واحد — إصلاح المراجعة: كان الصف الخامس يلامس
-     ملاحظة المنهجية عند أسفل البطاقة */
-  margin-top: calc(var(--su) * 12);
-  padding: calc(var(--su) * 6) calc(var(--su) * 16) calc(var(--su) * 11);
+  /* صف خاص معزول للوسم — إصلاح مراجعة الجولة 2: كان شريط الصف الخامس
+     يخترق سطر الوسم؛ خلفية معتمة + رفع طبقي يضمنان حزاماً نظيفاً دائماً */
+  position: relative;
+  z-index: 1;
+  background: rgba(16, 32, 26, 0.92);
+  margin-top: calc(var(--su) * 7);
+  padding: calc(var(--su) * 5) calc(var(--su) * 16) calc(var(--su) * 8);
   border-top: 1px solid var(--hair-d2);
   font-size: calc(var(--su) * 11.5);
   line-height: 1.6;
@@ -280,28 +324,51 @@
   text-overflow: ellipsis;
 }
 
-/* ── 9) عمود الرؤى الممتد ── */
+/* ── 9) عمود الرؤى الممتد ──
+   ترتيب الانكماش محسوم (إصلاح مراجعة الجولة 1): بطاقة «توزيع القدرة
+   الرقابية» لا تنكمش أبداً (صفوفها الخمسة بيانات لا تُقص صمتاً)، وعمود
+   الرؤى النصي هو المرن — يتمرر داخلياً بشريط ظاهر عند الضيق. */
 [data-section="control"] .ctl-rail-cell {
-  gap: calc(var(--su) * 12);
+  gap: calc(var(--su) * 9);
   overflow: hidden;
 }
 [data-section="control"] .ctl-rail-cell .rail {
-  flex: none;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(244, 241, 230, 0.18) transparent;
+}
+[data-section="control"] .ctl-rail-cell .rail::-webkit-scrollbar {
+  width: calc(var(--su) * 6);
+}
+[data-section="control"] .ctl-rail-cell .rail::-webkit-scrollbar-thumb {
+  background: rgba(244, 241, 230, 0.16);
+  border-radius: 999px;
+}
+[data-section="control"] .ctl-rail-cell .rail-item {
+  padding: calc(var(--su) * 9) calc(var(--su) * 13);
+}
+[data-section="control"] .ctl-rail-cell .rail-item-text {
+  font-size: calc(var(--su) * 12.5);
+  line-height: 1.55;
 }
 
-/* بطاقة «توزيع القدرة الرقابية» — نقاط خضراء (قدرة) وعبء مرجاني (خلل) */
+/* بطاقة «توزيع القدرة الرقابية» — نقاط خضراء (قدرة) وعبء مرجاني (خلل).
+   flex:none إلزامي: الصفوف القطاعية الخمسة بيانات لا تُقص صمتاً أبداً
+   (إصلاح مراجعة الجولة 1: كان صف الجنوب — الأثقل عبئاً — يُقص بالفيضان). */
 [data-section="control"] .ctl-mon {
+  flex: none;
   background: rgba(16, 32, 26, 0.58);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid var(--hair-d2);
   border-radius: var(--r-sm);
-  padding: calc(var(--su) * 10) calc(var(--su) * 14) calc(var(--su) * 8);
+  padding: calc(var(--su) * 9) calc(var(--su) * 14) calc(var(--su) * 7);
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  gap: calc(var(--su) * 6);
-  min-height: 0;
+  gap: calc(var(--su) * 4);
 }
 [data-section="control"] .ctl-mon-title {
   font-size: calc(var(--su) * 14);
@@ -397,6 +464,7 @@
 
 /* زر الملحق — تعمق قانوني بحفظ الحالة (لا لون بيانات؛ وسم المطابقة نصي) */
 [data-section="control"] .ctl-appx {
+  flex: none;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -440,9 +508,13 @@
 
 /* سطر حداثة البيانات أسفل العمود */
 [data-section="control"] .ctl-meta {
+  flex: none;
   font-size: calc(var(--su) * 12);
   color: var(--faint-d);
   padding-inline-start: calc(var(--su) * 4);
+  /* إصلاح مراجعة الجولة 2: حشوة سفلية تفصل السطر عن حبة شارة الإصدار
+     الثابتة في الزاوية نفسها */
+  padding-bottom: calc(var(--su) * 22);
 }
 [data-section="control"] .ctl-meta b {
   color: var(--mut-d);

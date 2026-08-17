@@ -1,0 +1,13 @@
+import { chromium } from "playwright";
+const ROOT = "/home/user/webdevvelopmentapps/riyadh-housing-presentation";
+const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH });
+const page = await browser.newPage({ viewport: { width: 1920, height: 1080 } });
+await page.goto("file://" + ROOT + "/index.html#/admin", { waitUntil: "load" });
+await page.waitForTimeout(1200);
+await page.fill(".adm-gate-card input[type=text]", "مدقق الجودة");
+await page.fill(".adm-gate-card input[type=password]", "عبارة-مرور-اختبارية-قوية");
+await page.click(".adm-gate-card button[type=submit]");
+await page.waitForTimeout(1600);
+await page.screenshot({ path: ROOT + "/tools/qa/shots/admin_1920x1080.png" });
+await browser.close();
+console.log("admin shot done");

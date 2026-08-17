@@ -32,7 +32,7 @@
      ▸ عمود رؤى insight_panels.sections.control + بطاقة «توزيع القدرة
        الرقابية» (مراقبو كل قطاع نقاطاً خضراء + عبء المخالفات لكل مراقب
        شريطاً مرجانياً — المسار المفاتيحي الكامل إلى ملفات القطاعات) +
-       زر ملحق الرقابة (سجل المفتشين الـ18 يعيش في الملحق حصراً بوسم
+       زر ملحق الرقابة (سجل المراقبين الـ18 يعيش في الملحق حصراً بوسم
        «قيد المطابقة» — لا يظهر في هذه اللوحة إطلاقاً) + سطر الحداثة.
 
      ▸ وصول عميق عبر معاملات المسار (عقد ctx.params — تُقرأ ولا تُكتب):
@@ -60,7 +60,7 @@
      مخالفات/خلل حصراً، ذهبي=وسوم «بانتظار الاعتماد» حصراً، أزرق=فئة
      ثانوية (قرارات الإغلاق — إجراء إنفاذ لا خلل). لا gauges دائرية،
      لا KPI بأيقونات، لا محاور مزدوجة.
-   • جدول المفتشين (18 اسماً — مجاميعه تخالف الإجماليات المعتمدة) لا يُدرج
+   • جدول المراقبين (18 اسماً — مجاميعه تخالف الإجماليات المعتمدة) لا يُدرج
      هنا إطلاقاً: زر الملحق يقود إليه بوسم «قيد المطابقة» (قرار §2 من
      REVAMP_SPEC حرفياً).
    • كل الرسوم عبر مُنشئي RH.viz.charts2 القانونيين بمفتاح مثيلات "control"
@@ -533,7 +533,7 @@
     );
   }
 
-  /** ملف المراقبين — التوزيع القطاعي كاملاً، وسجل المفتشين في الملحق حصراً */
+  /** ملف المراقبين — التوزيع القطاعي كاملاً، وسجل المراقبين في الملحق حصراً */
   function monitorsDetail(ctx, model) {
     const met = model.rel.metrics.total_monitors;
     return h("div", { class: "ctl-detail" },
@@ -553,12 +553,12 @@
       ]),
       notesBlock([
         "عبء المخالفات لكل مراقب " + transparentLine("violations ÷ monitors لكل قطاع"),
-        "سجل المفتشين الثمانية عشر بأسمائهم يعيش في الملحق حصراً بوسم "
+        "سجل المراقبين الثمانية عشر بأسمائهم يعيش في الملحق حصراً بوسم "
           + "«أرقام تشغيلية من سجل المنصة — قيد المطابقة مع الإجماليات المعتمدة».",
       ]),
       notesBlock([rawSourceLine(model.rel, met)], "ctl-sources"),
       actionsBlock([{
-        label: "فتح ملحق الرقابة — سجل المفتشين",
+        label: "فتح ملحق الرقابة — سجل المراقبين",
         onAct: () => ctx.openAppendix("monitoring"),
       }]),
     );
@@ -1144,11 +1144,55 @@
     const measure = VALID_MEASURES.includes(ctx.params.measure)
       ? ctx.params.measure : "violations";
 
+    /* مبدّل المقياس في ترويسة البطاقة (صف كروم مخصص) لا داخل مساحة الرسم —
+       إصلاح مراجعة الجولة 1: كانت رقاقات المبدّل المدمجة تطفو فوق عمود
+       الجنوب فتحجب قيمته 1,367؛ الرسم يبدأ الآن أسفل الترويسة حصراً. */
     const chart = RH.viz.charts2.sectorViolationsBars(res.body, ctx.su, {
       key: "control",
-      toggle: true,
+      toggle: false,
       measure,
     });
+
+    const MEASURE_DEFS = [
+      { id: "violations", label: "المخالفات", cls: "vio" },
+      { id: "monitors", label: "المراقبون", cls: "ins" },
+      { id: "closures", label: "قرارات الإغلاق", cls: "enf" },
+    ];
+    const head = res.card.querySelector(".card-head");
+    const mbar = h("div", {
+      class: "ctl-toolbar ctl-measures",
+      role: "group",
+      "aria-label": "اختيار مقياس الأعمدة القطاعية",
+    });
+    const mbtns = [];
+    function syncMeasureBtns() {
+      const cur = chart.measure ? chart.measure() : measure;
+      for (const b of mbtns) {
+        const active = b.dataset.measure === cur;
+        b.setAttribute("aria-pressed", active ? "true" : "false");
+        b.classList.toggle("active", active);
+      }
+    }
+    for (const d of MEASURE_DEFS) {
+      const b = h("button", {
+        class: "ctl-tbtn ctl-measure-btn " + d.cls,
+        type: "button",
+        dataset: { measure: d.id },
+        "data-interactive": "",
+        "aria-pressed": "false",
+        onclick: () => {
+          if (chart.setMeasure) chart.setMeasure(d.id);
+          syncMeasureBtns();
+        },
+      },
+        h("span", { class: "ctl-layer-dot", "aria-hidden": "true" }),
+        d.label,
+      );
+      mbtns.push(b);
+      mbar.appendChild(b);
+    }
+    if (head) head.appendChild(mbar);
+    syncMeasureBtns();
 
     /* الترتيب المعروض هو ترتيب الإصدار (لا sort=value) — dataIndex يطابق
        rel.sectors مباشرة في كل المقاييس */
@@ -1345,17 +1389,19 @@
     });
     res.body.appendChild(list);
 
-    /* الوسم الحرفي للعينة — سطر واحد بصرياً والنص الكامل في التلميح */
-    const noteText = model.sampleLabel + " — المقياس المرتب: المخالفات المسجلة";
+    /* وسم العينة — إصلاح مراجعة الجولة 2: النص الكامل كان يُقص في منتصف
+       الكلمة («المقيا…») ويطبع فوق شريط الصف الخامس — سطر مختصر يسع سطراً
+       واحداً دائماً، والوسم الحرفي الكامل من الإصدار في تلميح العنصر. */
+    const fullNote = model.sampleLabel + " — المقياس المرتب: المخالفات المسجلة";
     res.body.appendChild(h("div", {
       class: "ctl-top-note",
-      title: noteText,
-    }, noteText));
+      title: fullNote,
+    }, "عينة الأحياء الموثقة — المقياس: المخالفات المسجلة"));
   }
 
   /* ══════════════════════════════════════════════════════════════════════════
      15) عمود الرؤى الممتد — insight_panels.control + توزيع القدرة الرقابية
-         + زر الملحق (سجل المفتشين بوسم قيد المطابقة) + سطر الحداثة
+         + زر الملحق (سجل المراقبين بوسم قيد المطابقة) + سطر الحداثة
      ══════════════════════════════════════════════════════════════════════════ */
   function buildRail(cell, ctx, model) {
     cell.classList.add("ctl-rail-cell");
@@ -1377,7 +1423,12 @@
       h("div", { class: "ctl-mon-sub" },
         fmt.noun(model.totMon, "monitor") + " — العبء: مخالفات لكل مراقب"),
     );
-    for (const s of model.sectors) {
+    /* الترتيب التحليلي الصحيح لبطاقة عبء: الأثقل أولاً (الجنوب 456 يتصدر) —
+       لا ترتيب الإصدار الجغرافي؛ إصلاح مراجعة الجولة 1: كان صف الجنوب
+       آخر الصفوف فيُقص عند ضيق العمود وهو جوهر رؤية cd2 ذاتها. */
+    const byLoadDesc = model.sectors.slice()
+      .sort((a, b) => b.loadPerMonitor - a.loadPerMonitor);
+    for (const s of byLoadDesc) {
       const dots = h("span", { class: "ctl-mon-dots", "aria-hidden": "true" });
       for (let i = 0; i < s.row.monitors; i++) {
         dots.appendChild(h("i", { class: "ctl-mon-dot" }));
@@ -1404,7 +1455,7 @@
       "العبء " + transparentLine("violations ÷ monitors")));
     cell.appendChild(dist);
 
-    /* 15.3) زر الملحق: سجل المفتشين الـ18 يعيش هناك حصراً — قرار §2 */
+    /* 15.3) زر الملحق: سجل المراقبين الـ18 يعيش هناك حصراً — قرار §2 */
     const appx = h("button", {
       class: "ctl-appx",
       type: "button",
@@ -1413,7 +1464,7 @@
     },
       h("span", { class: "ctl-appx-main" },
         h("span", { class: "ctl-appx-label" }, "ملحق الرقابة الميدانية"),
-        h("span", { class: "ctl-appx-sub" }, "سجل المفتشين — قيد المطابقة"),
+        h("span", { class: "ctl-appx-sub" }, "سجل المراقبين الميدانيين — قيد المطابقة"),
       ),
       h("span", { class: "ctl-btn-arrow", "aria-hidden": "true" }, "←"),
     );

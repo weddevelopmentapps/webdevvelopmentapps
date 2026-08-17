@@ -640,8 +640,13 @@ RH.viz.charts2 = RH.viz.charts2 || {};
     }
 
     c.setOption(Object.assign(T.base(su), {
+      /* إصلاح مراجعة الجولة 2: كانت حبة «اليوم» الذهبية تطبع فوق مفتاح
+         الحالات وسط الترويسة («جاري العمل» مدفونة و«متأخرة» نصف مغطاة) —
+         المفتاح إلى أقصى يمين الترويسة فوق حاشية أسماء المبادرات (خارج
+         مدى مساحة الرسم الذي تسكنه الحبة) ووسم الحالة في أقصى اليسار،
+         فلا يتقاسم أي منهما نطاق الحبة الأفقي. */
       legend: legendBox(su, present, Object.assign(
-        { selectedMode: false },
+        { selectedMode: false, left: null, right: T.fs(su, 8) },
         compact ? { itemGap: T.fs(su, 12), textStyle: txtStyle(su, 12, T.C.ink2) } : {}
       )),
       graphic: graphics,
@@ -649,7 +654,7 @@ RH.viz.charts2 = RH.viz.charts2 || {};
         top: T.fs(su, compact ? 34 : 46),
         bottom: T.fs(su, compact ? 26 : 34),
         left: T.fs(su, 18),
-        right: T.fs(su, compact ? 214 : 282),
+        right: T.fs(su, compact ? 224 : 316),
         containLabel: false,
       },
       xAxis: {
@@ -672,7 +677,9 @@ RH.viz.charts2 = RH.viz.charts2 || {};
          القص (إصلاح المراجعة)؛ الاسم الكامل في التلميح دائماً. الالتفاف
          لسطرين مرفوض هنا: صفوف الثمانية عشر أقصر من سطرين فتتراكب. */
       yAxis: (() => {
-        const ax = T.hCatAxis(su, cats, T.fs(su, compact ? 200 : 262));
+        /* حاشية أوسع (إصلاح مراجعة الجولة 1): أسماء المبادرات الطويلة كانت
+           تُبتر منتصف الكلمة — الاسم الكامل يبقى في التلميح دائماً */
+        const ax = T.hCatAxis(su, cats, T.fs(su, compact ? 210 : 296));
         ax.axisLabel.fontSize = T.fs(su, compact ? 11 : 12);
         return ax;
       })(),
@@ -1324,7 +1331,10 @@ RH.viz.charts2 = RH.viz.charts2 || {};
       + ";color:var(--faint-d);padding-bottom:" + suPx(6) + ";caption-side:top;";
     table.appendChild(caption);
 
-    /* تعريف الأعمدة: sortKey يجعل العمود قابلاً للفرز (قيم رقمية خالصة) */
+    /* تعريف الأعمدة: sortKey يجعل العمود قابلاً للفرز (قيم رقمية خالصة).
+       إصلاح مراجعة الجولة 2: في المدمج ترويسة العمود الأخير «القيمة» —
+       كانت «القيمة الحالية» تدفع الجدول خارج البطاقة فتُقص حبات
+       «غير متوفرة» منتصف الكلمة عند الحافة. */
     const COLS = [
       { label: "#", sortKey: (k) => k.id },
       { label: "المؤشر", sortKey: null },
@@ -1332,7 +1342,7 @@ RH.viz.charts2 = RH.viz.charts2 || {};
       { label: "الصيغة", sortKey: null },
       { label: "خط الأساس", sortKey: (k) => k.baseline },
       { label: "المستهدف", sortKey: (k) => k.target },
-      { label: "القيمة الحالية", sortKey: null },
+      { label: compact ? "القيمة" : "القيمة الحالية", sortKey: null },
     ];
 
     /* حالة الفرز العرضية: الافتراضي الترتيب القانوني بالمعرف تصاعدياً */
@@ -1413,8 +1423,11 @@ RH.viz.charts2 = RH.viz.charts2 || {};
         const bName = document.createElement("b");
         bName.textContent = String(k.name);
         tdName.appendChild(bName);
+        /* إصلاح مراجعة الجولة 2: عمود المؤشر هو المرن (يلتف لأسطر) —
+           عرضه الأدنى في المدمج 96 (كان 140) كي يتسع عمود «القيمة»
+           بحبته الكاملة داخل البطاقة فلا تُقص «غير متوفرة» أبداً. */
         tdName.style.cssText = "white-space:normal;line-height:1.5;min-width:"
-          + suPx(compact ? 170 : 230) + ";";
+          + suPx(compact ? 96 : 230) + ";";
         tr.appendChild(tdName);
 
         const tdType = document.createElement("td");
@@ -1459,7 +1472,8 @@ RH.viz.charts2 = RH.viz.charts2 || {};
     const nAbs = kpis.length - nPct;
     const note = document.createElement("p");
     note.textContent = fmt.noun(kpis.length, "indicator") + " من النوع "
-      + String(kpis[0].type) + ": " + fmt.int(nPct) + " بصيغة نسبة مئوية و"
+      + String(kpis[0].type) + " — مرر داخل الجدول لاستعراضها كاملة: "
+      + fmt.int(nPct) + " بصيغة نسبة مئوية و"
       + fmt.int(nAbs) + " بصيغة عددية — " + String(kd.note) + ".";
     note.style.cssText = "font-size:" + suPx(12) + ";color:var(--faint-d);"
       + "line-height:1.6;margin:" + suPx(8) + " 0 0;flex:none;";

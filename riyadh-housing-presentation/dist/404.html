@@ -781,7 +781,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
   --green: #31A26D;            /* الطاقة المرخصة / الفعل */
   --green-hi: #4CC18C;         /* درجة مضيئة للتأكيد على الداكن */
   --green-dim: #23594397;      /* مساحات خضراء خافتة */
-  --demand: #AA8A3E;           /* سلسلة الطلب (رملي نحاسي صحراوي) */
+  --demand: #9C7A2E;           /* سلسلة الطلب (برونزي صحراوي — مفصول عن ذهبي المستهدف عمداً) */
   --coral: #D66A50;            /* العجز / الخلل حصراً */
   --coral-dim: #7A3A2D;
   --gold: #D6AB4C;             /* المستهدف / خط الأساس حصراً */
@@ -954,6 +954,12 @@ body.mode-admin :focus-visible { outline-color: var(--accent); }
   letter-spacing: 0.2px;
   pointer-events: none;
   transition: opacity var(--dur-std) var(--ease);
+  /* إصلاح مراجعة الجولة 2: خلفية حبة معتمة — كان سطر الإصدار يطبع فوق
+     نصوص أسفل الأقسام عند 1366 فيندمج السطران في نص غير مقروء؛ الحبة
+     تضمن مقروئية الشارة في كل قسم ومقاس مهما كان خلفها. */
+  background: rgba(6, 19, 12, 0.82);
+  padding: calc(var(--su) * 3) calc(var(--su) * 10);
+  border-radius: 999px;
 }
 .release-badge.warn { color: var(--gold); }
 
@@ -1728,47 +1734,58 @@ body.transitioning .stage { pointer-events: none; }
   color: var(--gold);
   font-size: calc(var(--su) * 11.5);
 }
+/* مفتاح الخريطة: حبة أفقية مدمجة أعلى الإطار خارج جسد المدينة —
+   إصلاح مراجعة الجولة 1: الصندوق السفلي القديم كان يحجب جنوب المدينة
+   (منطقة التركّز ذاتها) — لا كروم فوق البيانات بعد اليوم. */
 .geomap-legend {
   position: absolute;
   z-index: 15;
-  inset-inline-start: calc(var(--su) * 14);
-  bottom: calc(var(--su) * 34);
-  background: rgba(11, 21, 18, 0.82);
+  inset-inline-end: calc(var(--su) * 10);
+  top: calc(var(--su) * 10);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: calc(var(--su) * 4) calc(var(--su) * 10);
+  max-width: calc(100% - var(--su) * 20);
+  background: rgba(11, 21, 18, 0.78);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border: 1px solid var(--hair-d2);
-  border-radius: var(--r-sm);
-  padding: calc(var(--su) * 9) calc(var(--su) * 13);
+  border-radius: 999px;
+  padding: calc(var(--su) * 4) calc(var(--su) * 12);
   pointer-events: none;
 }
 .geomap-legend-title {
-  font-size: calc(var(--su) * 12.5);
+  font-size: calc(var(--su) * 11.5);
   font-weight: 700;
   color: var(--ink2-d);
-  margin-bottom: calc(var(--su) * 6);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .geomap-scale {
   display: flex;
   align-items: center;
-  gap: calc(var(--su) * 8);
-  font-size: calc(var(--su) * 11);
+  gap: calc(var(--su) * 6);
+  font-size: calc(var(--su) * 10.5);
   color: var(--mut-d);
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 .geomap-swatches { display: flex; }
 .geomap-swatch {
-  width: calc(var(--su) * 16);
-  height: calc(var(--su) * 9);
+  width: calc(var(--su) * 13);
+  height: calc(var(--su) * 8);
 }
 .geomap-swatch:first-child { border-radius: 3px 0 0 3px; }
 .geomap-swatch:last-child { border-radius: 0 3px 3px 0; }
 .geomap-legend-hs {
   display: flex;
   align-items: center;
-  gap: calc(var(--su) * 7);
-  margin-top: calc(var(--su) * 7);
-  font-size: calc(var(--su) * 11);
+  gap: calc(var(--su) * 6);
+  font-size: calc(var(--su) * 10.5);
   color: var(--mut-d);
+  white-space: nowrap;
 }
 .geomap-hs-dot {
   width: calc(var(--su) * 10);
@@ -2793,7 +2810,7 @@ body.transitioning .stage { pointer-events: none; }
 }
 [data-section="closing"] .cls-chip.pos { color: var(--green-hi); border-color: rgba(49, 162, 109, 0.35); }
 [data-section="closing"] .cls-chip.neg { color: var(--coral); border-color: rgba(214, 106, 80, 0.35); }
-[data-section="closing"] .cls-chip.demand { color: var(--demand); border-color: rgba(170, 138, 62, 0.35); }
+[data-section="closing"] .cls-chip.demand { color: var(--demand); border-color: rgba(156, 122, 46, 0.35); }
 
 /* الرسم المصغر الحي */
 [data-section="closing"] .cls-fact-chartwrap {
@@ -2929,19 +2946,25 @@ body.transitioning .stage { pointer-events: none; }
 }
 [data-section="closing"] .cls-rec-title {
   flex: none;
-  font-size: calc(var(--su) * 14.5);
+  font-size: calc(var(--su) * 13.5);
   font-weight: 700;
   color: var(--ivory);
-  line-height: 1.4;
+  line-height: 1.35;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
+/* نص التوصية: قصّ على حدود الأسطر حصراً بعلامة … — لا بتر حرف في منتصفه
+   أبداً (إصلاح مراجعة الجولة 1: كانت flex:1 تسحق الصندوق دون سطر كامل).
+   السطران المعروضان + الاسم الكامل في بطاقة الأثر عند النقر. */
 [data-section="closing"] .cls-rec-text {
-  flex: 1;
-  min-height: 0;
-  font-size: calc(var(--su) * 12.5);
-  line-height: 1.6;
+  flex: none;
+  margin: 0;
+  font-size: calc(var(--su) * 12);
+  line-height: 1.5;
   color: var(--ink2-d);
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -3390,6 +3413,15 @@ body.transitioning .stage { pointer-events: none; }
   }
 }
 
+/* ── إصلاح مراجعة الجولة 2 (تحصين): عند فئة العرض 1366 كانت حبة شارة
+   الإصدار الثابتة تطبع فوق زر «العودة إلى الملخص التنفيذي» في ذيل
+   اللوحة — حشوة سفلية ترفع الذيل فوق نطاق الشارة ── */
+@media (max-width: 1440px) {
+  [data-section="closing"] .cls-footer {
+    padding-bottom: calc(var(--su) * 20);
+  }
+}
+
 /* ════════════════════════════════════════════════════════════════════════════
    control.css — تخصيصات قسم «الرقابة الميدانية» (s04-control)
    ────────────────────────────────────────────────────────────────────────────
@@ -3512,6 +3544,47 @@ body.transitioning .stage { pointer-events: none; }
   cursor: not-allowed;
 }
 
+/* صف رقاقات طبقات الخريطة: يلتف عند الضيق ولا يُقص أي زر أبداً
+   (إصلاح مراجعة الجولة 1: كانت رقاقة «التركّز» تُبتر عند حافة البطاقة) */
+[data-section="control"] .ctl-maplayers {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  row-gap: calc(var(--su) * 4);
+  min-width: 0;
+}
+[data-section="control"] .ctl-maplayers .ctl-tbtn {
+  padding: calc(var(--su) * 3) calc(var(--su) * 9);
+  font-size: calc(var(--su) * 11.5);
+}
+
+/* مبدّل مقياس الأعمدة القطاعية — صف كروم في ترويسة البطاقة (لا فوق الرسم):
+   نقاط الهوية دلالية صارمة: مرجاني=مخالفات، أخضر=مراقبون، أزرق=إغلاقات */
+[data-section="control"] .ctl-measures {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  row-gap: calc(var(--su) * 4);
+  min-width: 0;
+}
+[data-section="control"] .ctl-measures .ctl-tbtn {
+  padding: calc(var(--su) * 3) calc(var(--su) * 9);
+  font-size: calc(var(--su) * 11.5);
+}
+[data-section="control"] .ctl-measure-btn.vio .ctl-layer-dot { background: var(--coral); }
+[data-section="control"] .ctl-measure-btn.ins .ctl-layer-dot { background: var(--green); }
+[data-section="control"] .ctl-measure-btn.enf .ctl-layer-dot { background: var(--collar-blue); }
+[data-section="control"] .ctl-measure-btn.vio.active {
+  border-color: rgba(214, 106, 80, 0.5);
+  background: rgba(214, 106, 80, 0.12);
+}
+[data-section="control"] .ctl-measure-btn.ins.active {
+  border-color: rgba(49, 162, 109, 0.5);
+  background: rgba(49, 162, 109, 0.12);
+}
+[data-section="control"] .ctl-measure-btn.enf.active {
+  border-color: rgba(63, 127, 176, 0.5);
+  background: rgba(63, 127, 176, 0.12);
+}
+
 /* نقاط هوية طبقات الخريطة: مرجاني للمخالفات حصراً، أخضر للمراقبين (قدرة) */
 [data-section="control"] .ctl-layer-dot {
   display: inline-block;
@@ -3578,15 +3651,15 @@ body.transitioning .stage { pointer-events: none; }
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
-  gap: calc(var(--su) * 4);
-  padding: calc(var(--su) * 6) calc(var(--su) * 14) 0;
+  gap: calc(var(--su) * 3);
+  padding: calc(var(--su) * 3) calc(var(--su) * 14) 0;
 }
 [data-section="control"] .ctl-top-row {
   display: grid;
   grid-template-columns: calc(var(--su) * 26) minmax(0, 1fr) calc(var(--su) * 52);
   align-items: center;
   gap: calc(var(--su) * 10);
-  padding: calc(var(--su) * 6) calc(var(--su) * 8);
+  padding: calc(var(--su) * 4) calc(var(--su) * 8);
   border: 1px solid transparent;
   border-radius: calc(var(--su) * 9);
   cursor: pointer;
@@ -3659,10 +3732,13 @@ body.transitioning .stage { pointer-events: none; }
 }
 [data-section="control"] .ctl-top-note {
   flex: none;
-  /* هامش علوي صريح + سطر واحد — إصلاح المراجعة: كان الصف الخامس يلامس
-     ملاحظة المنهجية عند أسفل البطاقة */
-  margin-top: calc(var(--su) * 12);
-  padding: calc(var(--su) * 6) calc(var(--su) * 16) calc(var(--su) * 11);
+  /* صف خاص معزول للوسم — إصلاح مراجعة الجولة 2: كان شريط الصف الخامس
+     يخترق سطر الوسم؛ خلفية معتمة + رفع طبقي يضمنان حزاماً نظيفاً دائماً */
+  position: relative;
+  z-index: 1;
+  background: rgba(16, 32, 26, 0.92);
+  margin-top: calc(var(--su) * 7);
+  padding: calc(var(--su) * 5) calc(var(--su) * 16) calc(var(--su) * 8);
   border-top: 1px solid var(--hair-d2);
   font-size: calc(var(--su) * 11.5);
   line-height: 1.6;
@@ -3672,28 +3748,51 @@ body.transitioning .stage { pointer-events: none; }
   text-overflow: ellipsis;
 }
 
-/* ── 9) عمود الرؤى الممتد ── */
+/* ── 9) عمود الرؤى الممتد ──
+   ترتيب الانكماش محسوم (إصلاح مراجعة الجولة 1): بطاقة «توزيع القدرة
+   الرقابية» لا تنكمش أبداً (صفوفها الخمسة بيانات لا تُقص صمتاً)، وعمود
+   الرؤى النصي هو المرن — يتمرر داخلياً بشريط ظاهر عند الضيق. */
 [data-section="control"] .ctl-rail-cell {
-  gap: calc(var(--su) * 12);
+  gap: calc(var(--su) * 9);
   overflow: hidden;
 }
 [data-section="control"] .ctl-rail-cell .rail {
-  flex: none;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(244, 241, 230, 0.18) transparent;
+}
+[data-section="control"] .ctl-rail-cell .rail::-webkit-scrollbar {
+  width: calc(var(--su) * 6);
+}
+[data-section="control"] .ctl-rail-cell .rail::-webkit-scrollbar-thumb {
+  background: rgba(244, 241, 230, 0.16);
+  border-radius: 999px;
+}
+[data-section="control"] .ctl-rail-cell .rail-item {
+  padding: calc(var(--su) * 9) calc(var(--su) * 13);
+}
+[data-section="control"] .ctl-rail-cell .rail-item-text {
+  font-size: calc(var(--su) * 12.5);
+  line-height: 1.55;
 }
 
-/* بطاقة «توزيع القدرة الرقابية» — نقاط خضراء (قدرة) وعبء مرجاني (خلل) */
+/* بطاقة «توزيع القدرة الرقابية» — نقاط خضراء (قدرة) وعبء مرجاني (خلل).
+   flex:none إلزامي: الصفوف القطاعية الخمسة بيانات لا تُقص صمتاً أبداً
+   (إصلاح مراجعة الجولة 1: كان صف الجنوب — الأثقل عبئاً — يُقص بالفيضان). */
 [data-section="control"] .ctl-mon {
+  flex: none;
   background: rgba(16, 32, 26, 0.58);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid var(--hair-d2);
   border-radius: var(--r-sm);
-  padding: calc(var(--su) * 10) calc(var(--su) * 14) calc(var(--su) * 8);
+  padding: calc(var(--su) * 9) calc(var(--su) * 14) calc(var(--su) * 7);
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  gap: calc(var(--su) * 6);
-  min-height: 0;
+  gap: calc(var(--su) * 4);
 }
 [data-section="control"] .ctl-mon-title {
   font-size: calc(var(--su) * 14);
@@ -3789,6 +3888,7 @@ body.transitioning .stage { pointer-events: none; }
 
 /* زر الملحق — تعمق قانوني بحفظ الحالة (لا لون بيانات؛ وسم المطابقة نصي) */
 [data-section="control"] .ctl-appx {
+  flex: none;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -3832,9 +3932,13 @@ body.transitioning .stage { pointer-events: none; }
 
 /* سطر حداثة البيانات أسفل العمود */
 [data-section="control"] .ctl-meta {
+  flex: none;
   font-size: calc(var(--su) * 12);
   color: var(--faint-d);
   padding-inline-start: calc(var(--su) * 4);
+  /* إصلاح مراجعة الجولة 2: حشوة سفلية تفصل السطر عن حبة شارة الإصدار
+     الثابتة في الزاوية نفسها */
+  padding-bottom: calc(var(--su) * 22);
 }
 [data-section="control"] .ctl-meta b {
   color: var(--mut-d);
@@ -4865,9 +4969,14 @@ body.transitioning .stage { pointer-events: none; }
   transform: translateY(0);
 }
 
-/* ── 4) ذيل قراءة موجز أسفل بطاقات الرسوم والمقارنة ── */
+/* ── 4) ذيل قراءة موجز أسفل بطاقات الرسوم والمقارنة ──
+   إصلاح مراجعة الجولة 2: حزام محجوز معتم بطبقة مرفوعة — كانت سطور بطاقة
+   «المتفائل» الوصفية تخترق الذيل ويظهر خطه عبر «1,419 سرير شهرياً». */
 [data-section="forecast"] .fct-cardfoot {
   flex: none;
+  position: relative;
+  z-index: 1;
+  background: rgba(16, 32, 26, 0.92);
   padding: calc(var(--su) * 6) calc(var(--su) * 18) calc(var(--su) * 11);
   border-top: 1px solid var(--hair-d2);
   font-size: calc(var(--su) * 12.5);
@@ -4932,7 +5041,13 @@ body.transitioning .stage { pointer-events: none; }
 
 /* ── 6) بطاقات المقارنة الصغيرة الثلاث ── */
 [data-section="forecast"] .fct-compare-card .card-body {
-  gap: calc(var(--su) * 8);
+  gap: calc(var(--su) * 5);
+  padding-bottom: calc(var(--su) * 6);
+}
+/* سطر البطاقة الثانوي بسطر واحد هنا — يحرر ارتفاع صف وصفي كامل
+   لبطاقات السيناريوهات الثلاث (إصلاح مراجعة الجولة 2) */
+[data-section="forecast"] .fct-compare-card .card-sub {
+  -webkit-line-clamp: 1;
 }
 [data-section="forecast"] .fct-sc-list {
   flex: 1;
@@ -4940,18 +5055,24 @@ body.transitioning .stage { pointer-events: none; }
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
-  gap: calc(var(--su) * 8);
+  /* إصلاح مراجعة الجولة 2: تكثيف فجوات القائمة وبطاقاتها كي تتسع صفوف
+     البطاقات الثلاث الوصفية كاملة فوق حزام الذيل في المقاسين */
+  gap: calc(var(--su) * 4);
 }
 [data-section="forecast"] .fct-sc {
   border: 1px solid var(--hair-d2);
   border-radius: calc(var(--su) * 10);
   background: rgba(11, 21, 18, 0.5);
-  padding: calc(var(--su) * 9) calc(var(--su) * 12) calc(var(--su) * 8);
+  padding: calc(var(--su) * 4) calc(var(--su) * 10) calc(var(--su) * 4);
   display: flex;
   flex-direction: column;
-  gap: calc(var(--su) * 6);
-  min-height: 0;
+  gap: calc(var(--su) * 3);
+  /* flex:none: رأس البطاقة ومسارها وسطرها الوصفي بيانات لا تُسحق —
+     إصلاح مراجعة الجولة 1: كانت المسارات تنهار إلى صفر ارتفاع وتطفو
+     السطور الوصفية فوق حدود البطاقات المجاورة */
+  flex: none;
 }
+[data-section="forecast"] .fct-sc > * { flex: none; }
 [data-section="forecast"] .fct-sc.fct-act {
   cursor: pointer;
   transition:
@@ -4995,7 +5116,7 @@ body.transitioning .stage { pointer-events: none; }
   margin-inline-start: auto;
   font-family: var(--f-display);
   font-variant-numeric: tabular-nums;
-  font-size: calc(var(--su) * 17);
+  font-size: calc(var(--su) * 14);
   font-weight: 700;
   color: var(--coral);
   white-space: nowrap;
@@ -5003,7 +5124,7 @@ body.transitioning .stage { pointer-events: none; }
   unicode-bidi: isolate;
 }
 [data-section="forecast"] .fct-sc-track {
-  height: calc(var(--su) * 7);
+  height: calc(var(--su) * 6);
   border-radius: 999px;
   background: rgba(244, 241, 230, 0.07);
   overflow: hidden;
@@ -5020,7 +5141,7 @@ body.transitioning .stage { pointer-events: none; }
   align-items: baseline;
   justify-content: space-between;
   gap: calc(var(--su) * 10);
-  font-size: calc(var(--su) * 12);
+  font-size: calc(var(--su) * 11);
   color: var(--mut-d);
 }
 [data-section="forecast"] .fct-sc-delta {
@@ -5037,22 +5158,34 @@ body.transitioning .stage { pointer-events: none; }
 
 /* زر قراءة النطاق في ذيل بطاقة المقارنة */
 [data-section="forecast"] .fct-band-foot {
-  padding-top: calc(var(--su) * 8);
-  padding-bottom: calc(var(--su) * 8);
+  padding-top: calc(var(--su) * 5);
+  padding-bottom: calc(var(--su) * 6);
 }
+/* إصلاح مراجعة الجولة 2: نص الزر يُحذف بعلامة … عند الضيق بدل الالتفاف
+   الذي كان يفصل سهم الزر ويتركه معزولاً في زاوية اللوحة — النص الكامل
+   في aria-label، والسهم ملاصق للنص دائماً */
+[data-section="forecast"] .fct-band-btn > span:first-child {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+[data-section="forecast"] .fct-band-btn .fct-btn-arrow { flex: none; }
 [data-section="forecast"] .fct-band-btn {
   width: 100%;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: calc(var(--su) * 10);
-  padding: calc(var(--su) * 7) calc(var(--su) * 11);
+  /* السهم ملاصق للنص (لا في الطرف المقابل) — كان يُقرأ محرفاً معزولاً
+     في زاوية اللوحة (إصلاح مراجعة الجولة 2) */
+  justify-content: flex-start;
+  gap: calc(var(--su) * 8);
+  padding: calc(var(--su) * 5) calc(var(--su) * 11);
   border: 1px solid var(--hair-d2);
   border-radius: calc(var(--su) * 9);
   background: rgba(11, 21, 18, 0.5);
   color: var(--ink2-d);
   font-family: var(--f-body);
-  font-size: calc(var(--su) * 12.5);
+  font-size: calc(var(--su) * 12);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
   text-align: start;
@@ -5074,7 +5207,7 @@ body.transitioning .stage { pointer-events: none; }
 
 /* ── 7) عمود التحفظ والترتيب الممتد ── */
 [data-section="forecast"] .fct-rail-cell {
-  gap: calc(var(--su) * 12);
+  gap: calc(var(--su) * 9);
   overflow: hidden;
 }
 
@@ -5086,10 +5219,10 @@ body.transitioning .stage { pointer-events: none; }
   background: rgba(214, 171, 76, 0.06);
   border: 1px dashed rgba(214, 171, 76, 0.4);
   border-radius: var(--r-sm);
-  padding: calc(var(--su) * 12) calc(var(--su) * 15) calc(var(--su) * 11);
+  padding: calc(var(--su) * 10) calc(var(--su) * 14) calc(var(--su) * 9);
   display: flex;
   flex-direction: column;
-  gap: calc(var(--su) * 7);
+  gap: calc(var(--su) * 6);
 }
 [data-section="forecast"] .fct-caveat-head {
   display: flex;
@@ -5122,8 +5255,8 @@ body.transitioning .stage { pointer-events: none; }
   color: var(--ink2-d);
 }
 [data-section="forecast"] .fct-caveat-text {
-  font-size: calc(var(--su) * 12.5);
-  line-height: 1.7;
+  font-size: calc(var(--su) * 12);
+  line-height: 1.55;
   color: var(--mut-d);
   margin: 0;
 }
@@ -5156,16 +5289,16 @@ body.transitioning .stage { pointer-events: none; }
 
 /* بطاقة «ترتيب نهاية الأفق» — قائمة أسوأ الحالات أولاً */
 [data-section="forecast"] .fct-rank {
+  flex: none; /* صفوف الترتيب الثلاثة بيانات لا تُقص صمتاً (مراجعة الجولة 1) */
   background: rgba(16, 32, 26, 0.58);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid var(--hair-d2);
   border-radius: var(--r-sm);
-  padding: calc(var(--su) * 12) calc(var(--su) * 14) calc(var(--su) * 10);
+  padding: calc(var(--su) * 10) calc(var(--su) * 13) calc(var(--su) * 8);
   display: flex;
   flex-direction: column;
-  gap: calc(var(--su) * 6);
-  min-height: 0;
+  gap: calc(var(--su) * 5);
 }
 [data-section="forecast"] .fct-rank-title {
   font-size: calc(var(--su) * 14);
@@ -5178,6 +5311,7 @@ body.transitioning .stage { pointer-events: none; }
   margin-bottom: calc(var(--su) * 4);
 }
 [data-section="forecast"] .fct-rank-row {
+  flex: none;
   display: grid;
   grid-template-columns:
     calc(var(--su) * 12)
@@ -5187,7 +5321,7 @@ body.transitioning .stage { pointer-events: none; }
     calc(var(--su) * 96);
   align-items: center;
   gap: calc(var(--su) * 9);
-  padding: calc(var(--su) * 7) calc(var(--su) * 9);
+  padding: calc(var(--su) * 5) calc(var(--su) * 9);
   border: 1px solid transparent;
   border-radius: calc(var(--su) * 9);
   background: transparent;
@@ -5255,6 +5389,7 @@ body.transitioning .stage { pointer-events: none; }
 /* زر الملحق التحليلي وسطر حداثة البيانات */
 [data-section="forecast"] .fct-appx {
   margin-top: auto;
+  flex: none;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -5297,6 +5432,9 @@ body.transitioning .stage { pointer-events: none; }
   font-size: calc(var(--su) * 11.5);
   color: var(--faint-d);
   padding-inline-start: calc(var(--su) * 4);
+  /* إصلاح مراجعة الجولة 2: حشوة سفلية تفصل السطر عن حبة شارة الإصدار
+     الثابتة في الزاوية نفسها في المقاس الكامل */
+  padding-bottom: calc(var(--su) * 22);
 }
 [data-section="forecast"] .fct-meta b {
   color: var(--mut-d);
@@ -5589,15 +5727,16 @@ body.transitioning .stage { pointer-events: none; }
 
 /* ── إحصاءات العمود المدمجة (إصلاح فراغ أسفل العمود) ── */
 [data-section="forecast"] .fct-rail-stats {
+  flex: none;
   background: rgba(16, 32, 26, 0.58);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid var(--hair-d2);
   border-radius: var(--r-sm);
-  padding: calc(var(--su) * 10) calc(var(--su) * 13);
+  padding: calc(var(--su) * 8) calc(var(--su) * 12);
   display: flex;
   flex-direction: column;
-  gap: calc(var(--su) * 6);
+  gap: calc(var(--su) * 5);
 }
 [data-section="forecast"] .fct-rail-stats .fct-rank-title.band {
   margin-top: calc(var(--su) * 6);
@@ -5622,7 +5761,7 @@ body.transitioning .stage { pointer-events: none; }
   display: flex;
   align-items: flex-end;
   gap: calc(var(--su) * 3);
-  height: calc(var(--su) * 34);
+  height: calc(var(--su) * 24);
 }
 [data-section="forecast"] .fct-band-spark i {
   flex: 1;
@@ -5638,6 +5777,18 @@ body.transitioning .stage { pointer-events: none; }
   font-variant-numeric: tabular-nums;
   font-size: calc(var(--su) * 11.5);
   color: var(--mut-d);
+}
+[data-section="forecast"] .fct-band-to {
+  color: var(--faint-d);
+  font-family: var(--f-body);
+}
+
+/* ── إصلاح مراجعة الجولة 2: عند فئة العرض 1366 كان سطر حداثة القسم يطبع
+   فوق شارة الإصدار الثابتة (سطران متراكبان غير مقروءين) — المعلومة مكررة:
+   «البيانات حتى…» معلنة في شارة الإصدار نفسها، فيُحجب السطر المكرر عند
+   الضيق ويبقى في المقاس الكامل. ── */
+@media (max-width: 1440px) {
+  [data-section="forecast"] .fct-meta { display: none; }
 }
 
 /* ════════════════════════════════════════════════════════════════════════════
@@ -5678,7 +5829,7 @@ body.transitioning .stage { pointer-events: none; }
    الصف الثاني يأخذ كل المتبقي — «المخطط الزمني كامل الشاشة تقريباً». */
 [data-section="initiatives"] .ini-grid {
   grid-template-rows:
-    minmax(calc(var(--su) * 196), auto)
+    minmax(calc(var(--su) * 176), auto)
     minmax(calc(var(--su) * 470), 1fr);
 }
 
@@ -5980,22 +6131,23 @@ body.transitioning .stage { pointer-events: none; }
 
 /* ── 8) العمود الجانبي: donut + رقاقات + رؤى + مصدر + حداثة ── */
 [data-section="initiatives"] .ini-cell-side {
-  gap: calc(var(--su) * 12);
+  gap: calc(var(--su) * 8);
   overflow: hidden;
 }
 /* بطاقة الحلقة: ارتفاع ثابت يترك للرؤى بقية العمود */
 [data-section="initiatives"] .ini-donut-card {
   flex: none;
-  /* 240 لا 292: يترك لعمود الرؤى ارتفاعاً مقروءاً بدل شريحة مبتورة */
-  height: calc(var(--su) * 240);
+  /* 150: يترك لعمود الرؤى الثلاث الكاملة بنصوصها ارتفاعها الحقيقي
+     (إصلاح مراجعة الجولة 1: كانت الرؤى عناوين مبتورة بلا نصوص) */
+  height: calc(var(--su) * 150);
 }
 /* رقاقات الحالات أسفل الحلقة */
 [data-section="initiatives"] .ini-chips {
   flex: none;
   display: flex;
   flex-wrap: wrap;
-  gap: calc(var(--su) * 6);
-  padding: calc(var(--su) * 4) calc(var(--su) * 14) calc(var(--su) * 12);
+  gap: calc(var(--su) * 5);
+  padding: calc(var(--su) * 3) calc(var(--su) * 12) calc(var(--su) * 8);
 }
 [data-section="initiatives"] .ini-chip {
   display: inline-flex;
@@ -6037,7 +6189,8 @@ body.transitioning .stage { pointer-events: none; }
   color: var(--mut-d);
 }
 
-/* عمود الرؤى: يتمرر داخلياً عند الضيق بدل دفع المصدر خارج الشاشة */
+/* عمود الرؤى: الرؤى الثلاث كاملة بنصوصها — مقاسات مشدودة كي تسع العمود،
+   وتمرير داخلي بشريط ظاهر للضيق الاستثنائي فقط (لا بتر صامت) */
 [data-section="initiatives"] .ini-cell-side .rail {
   flex: 1;
   min-height: 0;
@@ -6045,6 +6198,22 @@ body.transitioning .stage { pointer-events: none; }
   overflow-x: hidden;
   scrollbar-width: thin;
   scrollbar-color: rgba(244, 241, 230, 0.18) transparent;
+  gap: calc(var(--su) * 7);
+}
+[data-section="initiatives"] .ini-cell-side .rail-item {
+  flex: none;
+  padding: calc(var(--su) * 6) calc(var(--su) * 11);
+}
+[data-section="initiatives"] .ini-cell-side .rail-item-title {
+  font-size: calc(var(--su) * 12.5);
+  margin-bottom: calc(var(--su) * 2);
+}
+[data-section="initiatives"] .ini-cell-side .rail-item-text {
+  font-size: calc(var(--su) * 11);
+  line-height: 1.4;
+}
+[data-section="initiatives"] .ini-cell-side .rail-title {
+  font-size: calc(var(--su) * 12.5);
 }
 [data-section="initiatives"] .ini-cell-side .rail::-webkit-scrollbar {
   width: calc(var(--su) * 6);
@@ -6057,17 +6226,20 @@ body.transitioning .stage { pointer-events: none; }
 /* بطاقة المصدر: الوسم الذهبي (وسم مصدر حصراً) + النص الحرفي من الإصدار */
 [data-section="initiatives"] .ini-source {
   flex: none;
+  min-width: 0;
+  flex-direction: row;
+  align-items: center;
   background: rgba(16, 32, 26, 0.58);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid var(--hair-d2);
   border-radius: var(--r-sm);
-  padding: calc(var(--su) * 10) calc(var(--su) * 14);
+  padding: calc(var(--su) * 7) calc(var(--su) * 12);
   display: flex;
-  flex-direction: column;
-  gap: calc(var(--su) * 6);
+  gap: calc(var(--su) * 9);
 }
 [data-section="initiatives"] .ini-source-head {
+  flex: none;
   display: flex;
   align-items: center;
   gap: calc(var(--su) * 9);
@@ -6089,17 +6261,24 @@ body.transitioning .stage { pointer-events: none; }
   color: var(--mut-d);
 }
 [data-section="initiatives"] .ini-source-text {
-  font-size: calc(var(--su) * 11);
-  line-height: 1.65;
+  min-width: 0;
+  font-size: calc(var(--su) * 10.5);
+  line-height: 1.4;
   color: var(--faint-d);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* سطر حداثة البيانات أسفل العمود */
+/* سطر حداثة البيانات أسفل العمود — إصلاح مراجعة الجولة 2: حشوة سفلية
+   تُبقي السطر (بسطريه عند الالتفاف) فوق حبة شارة الإصدار الثابتة في
+   الزاوية نفسها، فلا يتراكب النصان في أي مقاس */
 [data-section="initiatives"] .ini-meta {
   flex: none;
   font-size: calc(var(--su) * 12);
   color: var(--faint-d);
   padding-inline-start: calc(var(--su) * 4);
+  padding-bottom: calc(var(--su) * 22);
 }
 [data-section="initiatives"] .ini-meta b {
   color: var(--mut-d);
@@ -6661,14 +6840,19 @@ body.transitioning .stage { pointer-events: none; }
   background: rgba(244, 241, 230, 0.07);
   overflow: hidden;
 }
-/* منطقة التحسن المطلوب: خط الأساس ← المستهدف — صبغة ذهبية شفافة
-   (امتداد دلالة «مستهدف/خط أساس» لا فئة بيانات جديدة) */
+/* منطقة التحسن المطلوب: خط الأساس ← المستهدف — نطاق ذهبي مرئي بحق
+   (امتداد دلالة «مستهدف/خط أساس» لا فئة بيانات جديدة).
+   إصلاح مراجعة الجولة 1: كانت الصبغة 0.14 شبه خفية فتقرأ البطاقات
+   الأربع عشرة مسارات فارغة متطابقة — الآن طول النطاق يتغير مع البيانات
+   بصرياً (مؤشر مستهدفه 30٪ يختلف عن مستهدف 100٪ من نظرة). */
 [data-section="kpis"] .kpi7-gain {
   position: absolute;
   inset-inline-end: 0;
   top: 0;
   bottom: 0;
-  background: rgba(214, 171, 76, 0.14);
+  background: linear-gradient(270deg,
+    rgba(214, 171, 76, 0.5), rgba(214, 171, 76, 0.2));
+  border-inline-start: 1px solid rgba(214, 171, 76, 0.55);
   border-radius: 999px;
 }
 /* شاخص خط الأساس: دائرة ذهبية مجوفة على أرضية المسرح */
@@ -6795,10 +6979,32 @@ body.transitioning .stage { pointer-events: none; }
    ════════════════════════════════════════════════════════════════════════════ */
 [data-section="kpis"] .kpi7-matrix .card-body {
   padding-top: calc(var(--su) * 6);
+  min-height: 0;
+}
+/* سلسلة التمرير مكتملة حتى الجدول: القص يقع على حدود الصفوف داخل متمرر
+   ظاهر الشريط مع تلاشٍ سفلي يعلن وجود بقية — لا بتر صف في منتصفه أبداً
+   (إصلاح مراجعة الجولة 1) */
+[data-section="kpis"] .kpi7-matrix .kpi-matrix {
+  min-height: 0;
 }
 [data-section="kpis"] .kpi7-matrix .table-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
   scrollbar-width: thin;
-  scrollbar-color: rgba(244, 241, 230, 0.18) transparent;
+  scrollbar-color: rgba(244, 241, 230, 0.28) transparent;
+  scrollbar-gutter: stable;
+  -webkit-mask-image: linear-gradient(180deg,
+    #000 0%, #000 calc(100% - var(--su) * 34), transparent 100%);
+  mask-image: linear-gradient(180deg,
+    #000 0%, #000 calc(100% - var(--su) * 34), transparent 100%);
+}
+[data-section="kpis"] .kpi7-matrix .table-scroll::-webkit-scrollbar {
+  width: calc(var(--su) * 7);
+}
+[data-section="kpis"] .kpi7-matrix .table-scroll::-webkit-scrollbar-thumb {
+  background: rgba(244, 241, 230, 0.24);
+  border-radius: 999px;
 }
 [data-section="kpis"] .kpi7-matrix .table-dense th button:focus-visible {
   outline: 2px solid var(--gold);
@@ -6818,8 +7024,18 @@ body.transitioning .stage { pointer-events: none; }
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: thin;
-  scrollbar-color: rgba(244, 241, 230, 0.18) transparent;
+  scrollbar-color: rgba(244, 241, 230, 0.28) transparent;
+  scrollbar-gutter: stable;
+  /* تلاشٍ سفلي يعلن أن العمود يتمرر — لا قصّ صامتاً عند خط الطي
+     (مراجعة الجولة 1: بطاقة «مزيج الصيغ» كانت تبدو مبتورة بلا دليل) */
+  -webkit-mask-image: linear-gradient(180deg,
+    #000 0%, #000 calc(100% - var(--su) * 30), transparent 100%);
+  mask-image: linear-gradient(180deg,
+    #000 0%, #000 calc(100% - var(--su) * 30), transparent 100%);
   padding-inline-end: calc(var(--su) * 2);
+  /* إصلاح مراجعة الجولة 2: حشوة سفلية تُبقي آخر عناصر العمود فوق شريط
+     الإصدار الثابت — لا يتقاطع أي عنصر من العمود مع سطر الإصدار */
+  padding-bottom: calc(var(--su) * 26);
 }
 [data-section="kpis"] .kpi7-truth-col::-webkit-scrollbar { width: 7px; }
 [data-section="kpis"] .kpi7-truth-col::-webkit-scrollbar-thumb {
@@ -6881,51 +7097,8 @@ body.transitioning .stage { pointer-events: none; }
   text-overflow: ellipsis;
 }
 
-/* مزيج الصيغ: شريط مكدس — الأزرق فئة تصنيفية ثانوية، والحياد للعددية */
-[data-section="kpis"] .kpi7-mix {
-  background: rgba(16, 32, 26, 0.58);
-  border: 1px solid var(--hair-d2);
-  border-radius: var(--r-sm);
-  padding: calc(var(--su) * 11) calc(var(--su) * 15);
-  display: flex;
-  flex-direction: column;
-  gap: calc(var(--su) * 8);
-}
-[data-section="kpis"] .kpi7-mix-title {
-  font-size: calc(var(--su) * 13.5);
-  font-weight: 700;
-  color: var(--mut-d);
-}
-[data-section="kpis"] .kpi7-mix-bar {
-  display: flex;
-  height: calc(var(--su) * 12);
-  border-radius: 999px;
-  overflow: hidden;
-  background: rgba(244, 241, 230, 0.06);
-}
-[data-section="kpis"] .kpi7-mix-seg.pct { background: var(--collar-blue); }
-[data-section="kpis"] .kpi7-mix-seg.num { background: rgba(244, 241, 230, 0.32); }
-[data-section="kpis"] .kpi7-mix-legend {
-  display: flex;
-  flex-direction: column;
-  gap: calc(var(--su) * 4);
-}
-[data-section="kpis"] .kpi7-mix-key {
-  display: inline-flex;
-  align-items: center;
-  gap: calc(var(--su) * 7);
-  font-size: calc(var(--su) * 12);
-  color: var(--ink2-d);
-  font-variant-numeric: tabular-nums;
-}
-[data-section="kpis"] .kpi7-mix-key i {
-  flex: none;
-  width: calc(var(--su) * 10);
-  height: calc(var(--su) * 10);
-  border-radius: 3px;
-}
-[data-section="kpis"] .kpi7-mix-key.pct i { background: var(--collar-blue); }
-[data-section="kpis"] .kpi7-mix-key.num i { background: rgba(244, 241, 230, 0.32); }
+/* (بطاقة «مزيج الصيغ» حُذفت في إصلاح مراجعة الجولة 2 — كانت تُقص عند
+   طية 1080p ومعلومتها معلنة في بطاقتي الصف الرئيسي 11/3) */
 
 /* بطاقة المصدر الحرفي */
 [data-section="kpis"] .kpi7-src .card-body { gap: calc(var(--su) * 8); }
@@ -7106,6 +7279,17 @@ body.transitioning .stage { pointer-events: none; }
   font-size: calc(var(--su) * 13.5);
   line-height: 1.7;
   color: var(--ink2-d);
+}
+/* حاشية تعريف النطاق (المؤشر 5) — وسم ذهبي متقطع: تحفظ اعتماد لا بيانات */
+[data-section="kpis"] .kpi7-profile-scope {
+  font-size: calc(var(--su) * 12.5);
+  line-height: 1.7;
+  color: var(--gold-hi);
+  background: rgba(214, 171, 76, 0.06);
+  border: 1px dashed rgba(214, 171, 76, 0.4);
+  border-radius: var(--r-sm);
+  padding: calc(var(--su) * 9) calc(var(--su) * 13);
+  margin: 0;
 }
 [data-section="kpis"] .kpi7-profile-note {
   font-size: calc(var(--su) * 12.5);
@@ -7509,12 +7693,10 @@ body.transitioning .stage { pointer-events: none; }
 }
 /* وسيلة الإيضاح والإسناد أصغر داخل بطاقة القسم المدمجة (لا تطغى على الخريطة) */
 [data-section="licensing"] .lic-map-host .geomap-legend {
-  padding: calc(var(--su) * 6) calc(var(--su) * 10);
-  bottom: calc(var(--su) * 26);
+  padding: calc(var(--su) * 3) calc(var(--su) * 10);
 }
 [data-section="licensing"] .lic-map-host .geomap-legend-title {
   font-size: calc(var(--su) * 11);
-  margin-bottom: calc(var(--su) * 4);
 }
 [data-section="licensing"] .lic-map-host .geomap-scale {
   font-size: calc(var(--su) * 10);
@@ -8413,12 +8595,26 @@ body.transitioning .stage { pointer-events: none; }
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: thin;
-  scrollbar-color: rgba(244, 241, 230, 0.18) transparent;
+  scrollbar-color: rgba(244, 241, 230, 0.3) rgba(244, 241, 230, 0.06);
+  scrollbar-gutter: stable;
   padding-inline-end: calc(var(--su) * 2);
+  /* إصلاح مراجعة الجولة 2: البطاقات المطوية (الشمال/الشرق) كانت تُقص عند
+     الطي بلا أي دليل تمرير، وشارة الإصدار تطبع فوق آخر بطاقة ظاهرة —
+     تلاشٍ سفلي يعلن التمرير + شريط تمرير دائم الظهور بمسار مرئي +
+     حشوة سفلية تُبقي آخر بطاقة فوق شارة الإصدار الثابتة. */
+  padding-bottom: calc(var(--su) * 30);
+  -webkit-mask-image: linear-gradient(180deg,
+    #000 0%, #000 calc(100% - var(--su) * 28), transparent 100%);
+  mask-image: linear-gradient(180deg,
+    #000 0%, #000 calc(100% - var(--su) * 28), transparent 100%);
 }
-[data-section="map"] .map-rail::-webkit-scrollbar { width: 6px; }
+[data-section="map"] .map-rail::-webkit-scrollbar { width: 7px; }
+[data-section="map"] .map-rail::-webkit-scrollbar-track {
+  background: rgba(244, 241, 230, 0.06);
+  border-radius: 6px;
+}
 [data-section="map"] .map-rail::-webkit-scrollbar-thumb {
-  background: rgba(244, 241, 230, 0.16);
+  background: rgba(244, 241, 230, 0.3);
   border-radius: 6px;
 }
 
@@ -9536,6 +9732,14 @@ body.transitioning .stage { pointer-events: none; }
   }
 }
 
+/* ── إصلاح مراجعة الجولة 2 (تحصين): عند فئة العرض 1366 يُرفع سطر بوابات
+   التحقق فوق نطاق شارة الإصدار الثابتة كي لا تحجب حبة الشارة ذيله ── */
+@media (max-width: 1440px) {
+  [data-section="summary"] .sum-gates {
+    padding-bottom: calc(var(--su) * 20);
+  }
+}
+
 /* ════════════════════════════════════════════════════════════════════════════
    admin.css — تجربة الإدارة: «حكومي تحريري» فاتح، تمرير طبيعي
    لا يظهر أي عنصر من هذا في وضع المقدِّم — الفصل يفرضه الجذر #admin-root.
@@ -10185,6 +10389,14 @@ RH.core.bus = (function () {
    كل رسم وكل عنوان يقرأ من هنا أو من release — لا حساب متناثر في المشاهد. */
 "use strict";
 
+/** الحكم الموحد الوحيد على اعتماد طبقة الاستراتيجية (إصلاح المراجعة —
+    انجراف السلاسل النصية): "approved" اعتماد V1 الكامل، و"approved_source_mirror"
+    اعتماد V2 نقلاً حرفياً عن مصدر معتمد. كل بوابة عرض/اشتقاق تمر من هنا حصراً —
+    لا مقارنة نصية متناثرة بعد اليوم. */
+RH.data.strategyApproved = function (st) {
+  return !!st && (st.status === "approved" || st.status === "approved_source_mirror");
+};
+
 RH.data.derive = (function () {
 
   /** تقريب نصف-لأعلى حتمي بمنازل محددة — مطابق لـ round_half_up في بايثون */
@@ -10275,18 +10487,27 @@ RH.data.derive = (function () {
       لا تحويل تعسفياً لـ«قيد التنفيذ» إلى 50٪ — القيم من الحقول الصريحة فقط. */
   function computeStrategy(strategy) {
     const out = { publishable: false, pillars: {}, overall_pct: null, status_counts: null };
-    if (!strategy || strategy.status !== "approved" || !strategy.pillars.length) return out;
+    // بوابة الاعتماد عبر الحكم الموحد حصراً (لا مقارنة نصية محلية):
+    // مرآة V2 (approved_source_mirror) تمر من البوابة لكنها بلا حقول
+    // execution_status/progress_percent فيبقى كل ما يليها محجوباً بصدق.
+    if (!RH.data.strategyApproved(strategy) || !strategy.pillars || !strategy.pillars.length) return out;
 
     const counts = { execution: {}, schedule: {} };
+    let counted = 0;
     let allHaveProgress = true;
     for (const ini of strategy.initiatives) {
-      counts.execution[ini.execution_status] = (counts.execution[ini.execution_status] || 0) + 1;
+      if (ini.execution_status) {
+        counts.execution[ini.execution_status] = (counts.execution[ini.execution_status] || 0) + 1;
+        counted += 1;
+      }
       if (ini.schedule_status) {
         counts.schedule[ini.schedule_status] = (counts.schedule[ini.schedule_status] || 0) + 1;
+        counted += 1;
       }
       if (typeof ini.progress_percent !== "number") allHaveProgress = false;
     }
-    out.status_counts = counts;
+    // لا حقول حالة V1 في المصدر إطلاقاً → لا توزيع يُدّعى (غياب صادق لا كائن فارغ)
+    out.status_counts = counted ? counts : null;
 
     if (!allHaveProgress) return out; // توزيع الحالات فقط — النسبة الدقيقة محجوبة
 
@@ -11608,17 +11829,18 @@ RH.core.router = (function () {
 /* theme.js — أساس ECharts والمنظومة اللونية المتحقق منها
    ─────────────────────────────────────────────────────────
    المنظومة اجتازت مدقق اللوحات (فحوص CVD والفصل والتباين) على سطح ‎#0B1512:
-     main3    = أخضر ‎#31A26D + رملي نحاسي ‎#AA8A3E + مرجاني ‎#D66A50   (كل الأزواج ✓)
-     collar2  = أزرق ‎#3F7FB0 + رملي ‎#AA8A3E                            (✓)
+     main3    = أخضر ‎#31A26D + برونزي صحراوي ‎#9C7A2E + مرجاني ‎#D66A50 (مدقق الجولة 1)
+     collar2  = أزرق ‎#3F7FB0 + برونزي ‎#9C7A2E                           (✓)
      facility3= أخضر + أزرق + رملي                                       (✓)
-   الذهبي ‎#D6AB4C لون تعليق (خطوط مستهدف/خط أساس) لا خانة تصنيفية — تباينه نصياً 8.7:1.
+   الذهبي ‎#D6AB4C لون تعليق (مستهدف/خط أساس) حصراً — فُصل عن سلسلة الطلب عمداً
+   (إصلاح مراجعة الجولة 1: ‎ΔE‎ ذهبي↔طلب 16.6 بعد أن كان 11.6 فلا تمييع للدلالة).
    قاعدة: لون واحد لكل مقياس؛ لا تدرّج موقعي متعدد الصبغات في أعمدة التصنيف. */
 "use strict";
 
 RH.viz.theme = (function () {
   const C = {
     green: "#31A26D", greenHi: "#4CC18C",
-    demand: "#AA8A3E",
+    demand: "#9C7A2E",
     coral: "#D66A50",
     gold: "#D6AB4C",
     blue: "#3F7FB0",
@@ -11635,33 +11857,57 @@ RH.viz.theme = (function () {
   /* مقاس خط مدرّج مع المسرح (المشاهد تمرر su وقت البناء) */
   const fs = (su, n) => Math.max(11, Math.round(n * su));
 
+  /** كسر العرض الضيق (فئة 1366): تُشدَّد فيه ضوابط العلامات تلقائياً */
+  const narrow = () => window.innerWidth <= 1440;
+
+  /* انضباط العلامات المعمم — إصلاح مراجعة الجولة 2: كانت علامات المحاور
+     تندمج في الرسوم المصغرة عند 1366 (60→10٪ و1,200/900/600/300 وأشهر
+     «نوفمبريناير») — hideOverlap يقصي كل تسمية تتقاطع مع سابقتها فلا
+     يُطبع رقمان فوق بعضهما أبداً، ودمج axisLabel عميق كي لا تفقد
+     التخصيصات المحلية هذا الضابط. */
+  function mergeAxis(base, extra) {
+    if (!extra) return base;
+    const out = Object.assign({}, base, extra);
+    if (extra.axisLabel) {
+      out.axisLabel = Object.assign({}, base.axisLabel, extra.axisLabel);
+    }
+    return out;
+  }
+
   /** محاور رأسية RTL: الفئات تُقرأ من اليمين لليسار والقيم على اليمين */
   function catXAxis(su, data, extra) {
-    return Object.assign({
+    return mergeAxis({
       type: "category", data, inverse: true,
       axisLine: { lineStyle: { color: C.axLine } },
       axisTick: { show: false },
-      axisLabel: { color: C.mut, fontFamily: "Cairo", fontSize: fs(su, 14) },
-    }, extra || {});
+      axisLabel: {
+        color: C.mut, fontFamily: "Cairo", fontSize: fs(su, 14),
+        hideOverlap: true,
+      },
+    }, extra);
   }
   function valAxis(su, fmt, extra) {
-    return Object.assign({
+    return mergeAxis({
       type: "value", position: "right",
       splitLine: { lineStyle: { color: C.axSplit } },
+      splitNumber: narrow() ? 2 : undefined,
       axisLabel: {
         color: C.faint, fontFamily: "IBM Plex Sans Arabic",
         fontSize: fs(su, 12.5), formatter: fmt,
+        hideOverlap: true,
       },
-    }, extra || {});
+    }, extra);
   }
   /** أعمدة أفقية RTL: تنمو يميناً→يساراً، التسميات على اليمين، الأول أعلى */
   function hValAxis(su, fmt, max) {
     const a = {
       type: "value", inverse: true,
       splitLine: { lineStyle: { color: C.axSplit } },
+      splitNumber: narrow() ? 2 : undefined,
       axisLabel: {
         color: C.faint, fontFamily: "IBM Plex Sans Arabic",
         fontSize: fs(su, 12.5), formatter: fmt,
+        hideOverlap: true,
       },
     };
     if (max != null) a.max = max;
@@ -11675,6 +11921,7 @@ RH.viz.theme = (function () {
       axisLabel: {
         color: C.ink2, fontFamily: "Cairo", fontSize: fs(su, 15),
         width: labelWidth || null, overflow: labelWidth ? "truncate" : "none",
+        hideOverlap: true,
       },
     };
   }
@@ -11749,7 +11996,7 @@ RH.viz.theme = (function () {
   });
 
   return {
-    C, REDUCED, fs, base, catXAxis, valAxis, hValAxis, hCatAxis,
+    C, REDUCED, fs, narrow, base, catXAxis, valAxis, hValAxis, hCatAxis,
     tooltip, ttRow, ttTitle, esc, targetLine, chart, disposeAll, resizeAll,
   };
 })();
@@ -12389,7 +12636,7 @@ RH.viz.rings = (function () {
       const pv = strat.pillars[p.id];
       const g = svg("g", {
         tabindex: "0", role: "button", "data-interactive": "1",
-        "aria-label": `${p.name} — نسبة إنجاز الركيزة: ${pv && pv.progress_pct != null ? fmt.pct(pv.progress_pct) : "غير متاحة"}`,
+        "aria-label": `${p.name} — نسبة إنجاز الركيزة: ${pv && pv.progress_pct != null ? fmt.pct(pv.progress_pct) : "غير متوفرة"}`,
         style: "cursor:pointer",
         onclick: () => o.onSelect && o.onSelect(p.id),
         onkeydown: (e) => {
@@ -12422,7 +12669,7 @@ RH.viz.rings = (function () {
   /**
    * قوس مؤشر واحد (مشهد 10/ملحق المؤشرات): يعرض كل الحقول المعتمدة.
    * kpi: {name, unit, baseline, target, current_value, direction, as_of, source}
-   * لا يحوَّل الغياب إلى صفر أبداً — يُرسم قوس فارغ بحالة «غير متاح».
+   * لا يحوَّل الغياب إلى صفر أبداً — يُرسم قوس فارغ بحالة «غير متوفرة».
    */
   function kpiArc(container, kpi, su) {
     const { h } = RH.core.dom;
@@ -12431,7 +12678,7 @@ RH.viz.rings = (function () {
     const root = svg("svg", {
       viewBox: `0 0 ${W} ${H}`, role: "img",
       "aria-label": kpi.name + " — " + (kpi.current_value == null
-        ? "القيمة الحالية غير متاحة" : "القيمة الحالية " + kpi.current_value + " " + (kpi.unit || "")),
+        ? "القيمة الحالية غير متوفرة" : "القيمة الحالية " + kpi.current_value + " " + (kpi.unit || "")),
     });
     root.appendChild(svg("path", {
       d: arcPath(cx, cy, r, -105, 105),
@@ -12464,7 +12711,7 @@ RH.viz.rings = (function () {
     root.appendChild(svg("text", {
       x: cx, y: cy + 2, "text-anchor": "middle", fill: "#93A096",
       "font-family": "Cairo", "font-size": 18,
-    }, kpi.current_value == null ? "القيمة الحالية غير متاحة" : (kpi.unit || "")));
+    }, kpi.current_value == null ? "القيمة الحالية غير متوفرة" : (kpi.unit || "")));
 
     const wrap = h("div", { class: "kpi-card", dataset: { kpi: kpi.id } });
     wrap.appendChild(h("div", { class: "kpi-name" }, kpi.name));
@@ -12554,7 +12801,7 @@ RH.viz.geomap = (function () {
   const RAMPS = {
     seq: ["#1E4432", "#27573E", "#2F6E4E", "#31A26D", "#4CC18C"],
     viol: ["#4A241A", "#6B3222", "#8C4630", "#B0563C", "#D66A50"],
-    demand: ["#3A2F15", "#54431E", "#6F5827", "#8C7132", "#AA8A3E"],
+    demand: ["#33290F", "#4A3B16", "#63501E", "#7F6526", "#9C7A2E"],
   };
 
   /** تعريف الطبقات: القيمة قطاعية من الإصدار حصراً */
@@ -12888,6 +13135,19 @@ RH.viz.geomap = (function () {
     let lmap = null, lpolys = [], lhots = [];
     let effectiveMode = "svg";
     let tileWatch = 0;
+    /* مواءمة الإطار (إصلاح مراجعة الجولة 1): المحرك يبني القسم في مضيف
+       احتياطي ثم يبدّله، فيقع fitBounds الأول على مقاس صفري وتظهر المدينة
+       مقصوصة. الحل: مواءمة غير متحركة تُعاد بعد أول قياس حقيقي وعند كل
+       تغيّر مقاس ما لم يتدخل المستخدم بسحب/تكبير يدوي (فلا نصادر تحكمه). */
+    let fitting = false, userMoved = false;
+    function fitAll() {
+      if (!lmap) return;
+      fitting = true;
+      try {
+        lmap.invalidateSize({ animate: false });
+        lmap.fitBounds(GEO.bounds, { padding: [10, 10], animate: false });
+      } finally { fitting = false; }
+    }
 
     function tilesAvailable() {
       return !!window.L && navigator.onLine !== false;
@@ -12924,7 +13184,13 @@ RH.viz.geomap = (function () {
       tileWatch = setTimeout(() => {
         if (!sawTile && effectiveMode === "tiles") setMode("svg");
       }, 3000);
-      lmap.fitBounds(GEO.bounds, { padding: [8, 8] });
+      /* تتبع تدخل المستخدم: سحب/تكبير يدوي يوقف المواءمة التلقائية */
+      lmap.on("dragend", () => { userMoved = true; });
+      lmap.on("zoomend", () => { if (!fitting) userMoved = true; });
+      fitAll();
+      /* المواءمة بعد التخطيط الفعلي لا قبله: المضيف الاحتياطي يُبدَّل في
+         الإطار التالي فيصبح للمقاس قيمته الحقيقية عندها */
+      requestAnimationFrame(() => { if (!userMoved) fitAll(); });
 
       lpolys = [];
       districts.forEach((item, i) => {
@@ -13016,7 +13282,11 @@ RH.viz.geomap = (function () {
     }
 
     function refresh() {
-      if (lmap) lmap.invalidateSize();
+      if (!lmap) return;
+      lmap.invalidateSize();
+      /* إعادة المواءمة مع كل تغيّر مقاس ما لم يتدخل المستخدم — تضمن ظهور
+         القطاعات الخمسة كاملة في أي إطار بطاقة (قصير عريض أو ممتد) */
+      if (!userMoved) fitAll();
     }
 
     function destroy() {
@@ -14601,9 +14871,28 @@ RH.viz.charts2 = RH.viz.charts2 || {};
       "لا عدد سالب": rows.every((r) => r.count >= 0),
     });
 
+    /* إصلاح مراجعة الجولة 2: عند العرض الضيق (فئة 1366) كانت أعلى تسميتين
+       تُحذفان («الاكتظاظ وتجا…» و«اشتراطات السل…») — تسميات مختصرة معتمدة
+       لكل نوع تُعرض كاملة دون أي حذف، والاسم الحرفي الكامل من الإصدار يبقى
+       في التلميح وجدول قارئ الشاشة. */
+    const SHORT_NAMES = {
+      "overcrowding": "الاكتظاظ",
+      "fire-safety": "اشتراطات السلامة",
+      "hygiene": "النظافة والصحة",
+      "unlicensed": "نشاط دون ترخيص",
+      "electrical": "الكهرباء والسباكة",
+      "ventilation": "التهوية والعزل",
+    };
+    const shortMode = compact && T.narrow();
+    const axName = (r) => (shortMode && SHORT_NAMES[r.id]) || r.name;
+
     /* محور الفئات بتسميات كاملة: بلا width → overflow:none في مساعد الثيم.
        الوضع المدمج يصغّر الخط فقط — البتر ممنوع في الوضعين */
-    const yAx = T.hCatAxis(su, rows.map((r) => r.name));
+    const yAx = T.hCatAxis(su, rows.map(axName),
+      /* عرض أقصى للتسمية = الحاشية المحجوزة لها ناقص هامش: القص عند الضيق
+         يصير حذفاً منطقياً بعلامة … في نهاية العبارة (RTL سليم) لا بتراً
+         لأولها عند حافة البطاقة — إصلاح مراجعة الجولة 1 عند 1366×768 */
+      T.fs(su, compact ? 200 : 254));
     if (compact) yAx.axisLabel.fontSize = T.fs(su, 12);
 
     const c = T.chart(cid("violationTypes", opts), el);
@@ -14781,11 +15070,14 @@ RH.viz.charts2 = RH.viz.charts2 || {};
     c.setOption(Object.assign(T.base(su), {
       /* top ≥ 72px مع المبدّل: أعلى عمود ووسمه يخلوان من رقاقات المبدّل
          (إصلاح المراجعة: كانت الرقاقات تحجب قيمة عمود الجنوب) */
+      /* إصلاح مراجعة الجولة 2: قناة علامات القيم اليمنى في المدمج 70
+         (كانت 48) — «1,500» كانت تفقد رقمها الأخير عند حافة بطاقة
+         الخاتمة في 1366 */
       grid: gridBox(su, compact, {
         top: T.fs(su, compact ? 34 : (withToggle ? 80 : 40)),
         bottom: T.fs(su, compact ? 26 : 34),
         left: T.fs(su, 14),
-        right: T.fs(su, compact ? 48 : 66),
+        right: T.fs(su, compact ? 70 : 66),
       }),
       tooltip: Object.assign(T.tooltip(su), {
         trigger: "axis",
@@ -15626,19 +15918,17 @@ RH.viz.charts2 = RH.viz.charts2 || {};
       };
     }
 
+    /* إصلاح مراجعة الجولة 1: تسميات الأساس الثلاث داخل مساحة الرسم كانت
+       تتصادم مع بعضها ومع المفتاح («الأساس 64» فوق «الأساس 118») —
+       القيم تُرسى الآن خارج مساحة الرسم في عنواني الشبكتين حصراً،
+       ويبقى خطا الأساس الذهبيان المتقطعان صامتين (القيمة في التلميح أيضاً). */
     const sOper = cumLine(mO, dataO, 0, 0);
-    /* حبتا أساس الرخص خارج الشبكة عند طرف نهايتها (الفجوة الفاصلة بين
-       الشبكتين المتجاورتين — فضاء فارغ مضمون فلا تصادم مع الخطوط) */
-    Object.assign(sOper.markLine.label, pillLabel("end"), {
-      distance: T.fs(su, 4),
-    });
+    sOper.markLine.label.show = false;
     const sBldg = cumLine(mB, dataB, 0, 0);
-    Object.assign(sBldg.markLine.label, pillLabel("end"), {
-      distance: T.fs(su, 4),
-    });
+    sBldg.markLine.label.show = false;
 
     const sBeds = cumLine(mS, dataS, 1, 1);
-    Object.assign(sBeds.markLine.label, pillLabel("insideStartTop"));
+    sBeds.markLine.label.show = false;
     /* مساحة متدرجة من صبغة الطاقة الواحدة — تتلاشى نحو الأرضية */
     sBeds.areaStyle = {
       color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
@@ -15660,22 +15950,36 @@ RH.viz.charts2 = RH.viz.charts2 || {};
       legend: legendBox(su, [mO.disp, mB.disp, mS.disp], compact
         ? { itemGap: T.fs(su, 12), textStyle: txtStyle(su, 12, T.C.ink2) }
         : null),
-      /* العنوانان فوق الشبكتين (لا داخل مساحة الرسم) ويعلنان الإجماليات */
-      title: [
-        {
-          text: "الرخص التراكمية — بناء " + fmt.int(cd.cur.building)
-            + " · تشغيلية " + fmt.int(cd.cur.operational),
-          right: T.fs(su, 8),
-          top: T.fs(su, compact ? 24 : 30),
-          textStyle: txtStyle(su, compact ? 12 : 13.5, T.C.ink2, 600),
-        },
-        {
-          text: "الأسرّة المرخصة — " + fmt.compact(cd.cur.beds),
-          left: T.fs(su, 8),
-          top: T.fs(su, compact ? 24 : 30),
-          textStyle: txtStyle(su, compact ? 12 : 13.5, T.C.ink2, 600),
-        },
-      ],
+      /* العنوانان فوق الشبكتين (لا داخل مساحة الرسم) ويعلنان الإجماليات.
+         إصلاح مراجعة الجولة 2: عند فئة العرض 1366 كان العنوانان يعبران خط
+         الالتقاء بين الشبكتين ويطبعان فوق بعضهما — عند الضيق حصراً يُحصر
+         كل عنوان بعرض عموده (42٪ من عرض العنصر) مع قطع بعلامة الحذف بدل
+         التصادم؛ في المقاس الكامل يتسعان كاملين كما ثبت بالمعاينة. */
+      title: (() => {
+        const colW = T.narrow()
+          ? Math.max(150, Math.floor((el.clientWidth || 640) * 0.42))
+          : null;
+        const clampW = (ts) => (colW
+          ? Object.assign(ts, { width: colW, overflow: "truncate" })
+          : ts);
+        return [
+          {
+            text: "الرخص التراكمية — تشغيلية " + fmt.int(cd.cur.operational)
+              + " (الأساس " + fmt.int(cd.base.operational) + ") · بناء "
+              + fmt.int(cd.cur.building) + " (الأساس " + fmt.int(cd.base.building) + ")",
+            right: T.fs(su, 8),
+            top: T.fs(su, compact ? 24 : 30),
+            textStyle: clampW(txtStyle(su, compact ? 11 : 12.5, T.C.ink2, 600)),
+          },
+          {
+            text: "الأسرّة المرخصة — " + fmt.compact(cd.cur.beds)
+              + " (الأساس " + fmt.compact(cd.base.beds) + ")",
+            left: T.fs(su, 8),
+            top: T.fs(su, compact ? 24 : 30),
+            textStyle: clampW(txtStyle(su, compact ? 11 : 12.5, T.C.ink2, 600)),
+          },
+        ];
+      })(),
       grid: [
         { top: T.fs(su, compact ? 50 : 62), bottom: T.fs(su, compact ? 24 : 38),
           left: "57%", right: T.fs(su, 8), containLabel: true },
@@ -15697,11 +16001,16 @@ RH.viz.charts2 = RH.viz.charts2 || {};
         }),
       ],
       /* splitNumber صغير: علامات قليلة مقروءة في شبكتين قصيرتين */
+      /* علامتان إلى ثلاث كحد أقصى لكل شبكة مصغرة — إصلاح مراجعة الجولة 1:
+         كانت العلامات تتراكب (620/600/580 و140…60 مندمجة فلا تُقرأ) */
       yAxis: [
         T.valAxis(su, fmt.int, { gridIndex: 0, min: licLo, max: licHi,
-          minInterval: 1, splitNumber: 4 }),
+          minInterval: 1, splitNumber: 2 }),
+        /* إصلاح مراجعة الجولة 2: كانت علامتا «600 ألف/570 ألف» تطبعان فوق
+           بعضهما — علامتان عند طرفي الشبكة حصراً (المدى الكامل) بأقصى
+           تباعد رأسي ممكن، فلا تصادم في أي مقاس. */
         T.valAxis(su, axisK, { gridIndex: 1, min: bedLo, max: bedHi,
-          position: "left", splitNumber: 4 }),
+          position: "left", interval: bedHi - bedLo }),
       ],
       tooltip: Object.assign(T.tooltip(su), {
         trigger: "axis",
@@ -15842,10 +16151,12 @@ RH.viz.charts2 = RH.viz.charts2 || {};
           },
         }),
       ],
+      /* إصلاح مراجعة الجولة 2: علامتان كحد أقصى عند العرض الضيق (1366) */
       yAxis: [
-        T.valAxis(su, fmt.int, { gridIndex: 0, splitNumber: 3 }),
-        T.valAxis(su, fmt.int, { gridIndex: 1, minInterval: 1, splitNumber: 3,
-          position: "left" }),
+        T.valAxis(su, fmt.int, { gridIndex: 0,
+          splitNumber: T.narrow() ? 2 : 3 }),
+        T.valAxis(su, fmt.int, { gridIndex: 1, minInterval: 1,
+          splitNumber: T.narrow() ? 2 : 3, position: "left" }),
       ],
       tooltip: Object.assign(T.tooltip(su), {
         trigger: "axis",
@@ -16202,9 +16513,13 @@ RH.viz.charts2 = RH.viz.charts2 || {};
           },
         }),
       ],
+      /* إصلاح مراجعة الجولة 2: علامتان كحد أقصى عند العرض الضيق (1366)
+         بدل ثلاث كانت تندمج (150/100/50 ألف و30/20/10) */
       yAxis: [
-        T.valAxis(su, fmt.int, { gridIndex: 0, minInterval: 1, splitNumber: 3 }),
-        T.valAxis(su, axisK, { gridIndex: 1, splitNumber: 3, position: "left" }),
+        T.valAxis(su, fmt.int, { gridIndex: 0, minInterval: 1,
+          splitNumber: T.narrow() ? 2 : 3 }),
+        T.valAxis(su, axisK, { gridIndex: 1,
+          splitNumber: T.narrow() ? 2 : 3, position: "left" }),
       ],
       tooltip: Object.assign(T.tooltip(su), {
         trigger: "axis",
@@ -16428,7 +16743,7 @@ RH.viz.charts2 = RH.viz.charts2 || {};
         },
       }),
       yAxis: T.valAxis(su, isBeds ? axisK : fmt.int, Object.assign(
-        { min: yMin, max: yMax, splitNumber: 4 },
+        { min: yMin, max: yMax, splitNumber: 2 },
         isBeds ? null : { minInterval: 1 })),
       tooltip: Object.assign(T.tooltip(su), {
         trigger: "item",
@@ -16464,16 +16779,13 @@ RH.viz.charts2 = RH.viz.charts2 || {};
             ? plusInt(adds[p.dataIndex])
             : ""),
         },
-        /* خط الأساس الذهبي الرفيع المتقطع — تسمية حبة عند حافة بداية المحور */
+        /* خط الأساس الذهبي الرفيع المتقطع — صامت التسمية: القيمة معلنة في
+           إعلان الطرف الغني وفي التلميح (إصلاح مراجعة الجولة 1: كانت الحبة
+           داخل مساحة الرسم تغطي عموداً وتسمية شهر) */
         markLine: (() => {
-          const ml = T.targetLine(su, meta.base, "خط الأساس " + fV(meta.base));
+          const ml = T.targetLine(su, meta.base, "");
           ml.lineStyle.width = 1.5;
-          Object.assign(ml.label, {
-            position: "insideStartBottom",
-            backgroundColor: "rgba(11,21,18,.82)",
-            padding: [T.fs(su, 2), T.fs(su, 5)],
-            borderRadius: 6,
-          });
+          ml.label.show = false;
           return ml;
         })(),
         data: barData,
@@ -17159,8 +17471,13 @@ RH.viz.charts2 = RH.viz.charts2 || {};
     }
 
     c.setOption(Object.assign(T.base(su), {
+      /* إصلاح مراجعة الجولة 2: كانت حبة «اليوم» الذهبية تطبع فوق مفتاح
+         الحالات وسط الترويسة («جاري العمل» مدفونة و«متأخرة» نصف مغطاة) —
+         المفتاح إلى أقصى يمين الترويسة فوق حاشية أسماء المبادرات (خارج
+         مدى مساحة الرسم الذي تسكنه الحبة) ووسم الحالة في أقصى اليسار،
+         فلا يتقاسم أي منهما نطاق الحبة الأفقي. */
       legend: legendBox(su, present, Object.assign(
-        { selectedMode: false },
+        { selectedMode: false, left: null, right: T.fs(su, 8) },
         compact ? { itemGap: T.fs(su, 12), textStyle: txtStyle(su, 12, T.C.ink2) } : {}
       )),
       graphic: graphics,
@@ -17168,7 +17485,7 @@ RH.viz.charts2 = RH.viz.charts2 || {};
         top: T.fs(su, compact ? 34 : 46),
         bottom: T.fs(su, compact ? 26 : 34),
         left: T.fs(su, 18),
-        right: T.fs(su, compact ? 214 : 282),
+        right: T.fs(su, compact ? 224 : 316),
         containLabel: false,
       },
       xAxis: {
@@ -17191,7 +17508,9 @@ RH.viz.charts2 = RH.viz.charts2 || {};
          القص (إصلاح المراجعة)؛ الاسم الكامل في التلميح دائماً. الالتفاف
          لسطرين مرفوض هنا: صفوف الثمانية عشر أقصر من سطرين فتتراكب. */
       yAxis: (() => {
-        const ax = T.hCatAxis(su, cats, T.fs(su, compact ? 200 : 262));
+        /* حاشية أوسع (إصلاح مراجعة الجولة 1): أسماء المبادرات الطويلة كانت
+           تُبتر منتصف الكلمة — الاسم الكامل يبقى في التلميح دائماً */
+        const ax = T.hCatAxis(su, cats, T.fs(su, compact ? 210 : 296));
         ax.axisLabel.fontSize = T.fs(su, compact ? 11 : 12);
         return ax;
       })(),
@@ -17843,7 +18162,10 @@ RH.viz.charts2 = RH.viz.charts2 || {};
       + ";color:var(--faint-d);padding-bottom:" + suPx(6) + ";caption-side:top;";
     table.appendChild(caption);
 
-    /* تعريف الأعمدة: sortKey يجعل العمود قابلاً للفرز (قيم رقمية خالصة) */
+    /* تعريف الأعمدة: sortKey يجعل العمود قابلاً للفرز (قيم رقمية خالصة).
+       إصلاح مراجعة الجولة 2: في المدمج ترويسة العمود الأخير «القيمة» —
+       كانت «القيمة الحالية» تدفع الجدول خارج البطاقة فتُقص حبات
+       «غير متوفرة» منتصف الكلمة عند الحافة. */
     const COLS = [
       { label: "#", sortKey: (k) => k.id },
       { label: "المؤشر", sortKey: null },
@@ -17851,7 +18173,7 @@ RH.viz.charts2 = RH.viz.charts2 || {};
       { label: "الصيغة", sortKey: null },
       { label: "خط الأساس", sortKey: (k) => k.baseline },
       { label: "المستهدف", sortKey: (k) => k.target },
-      { label: "القيمة الحالية", sortKey: null },
+      { label: compact ? "القيمة" : "القيمة الحالية", sortKey: null },
     ];
 
     /* حالة الفرز العرضية: الافتراضي الترتيب القانوني بالمعرف تصاعدياً */
@@ -17932,8 +18254,11 @@ RH.viz.charts2 = RH.viz.charts2 || {};
         const bName = document.createElement("b");
         bName.textContent = String(k.name);
         tdName.appendChild(bName);
+        /* إصلاح مراجعة الجولة 2: عمود المؤشر هو المرن (يلتف لأسطر) —
+           عرضه الأدنى في المدمج 96 (كان 140) كي يتسع عمود «القيمة»
+           بحبته الكاملة داخل البطاقة فلا تُقص «غير متوفرة» أبداً. */
         tdName.style.cssText = "white-space:normal;line-height:1.5;min-width:"
-          + suPx(compact ? 170 : 230) + ";";
+          + suPx(compact ? 96 : 230) + ";";
         tr.appendChild(tdName);
 
         const tdType = document.createElement("td");
@@ -17978,7 +18303,8 @@ RH.viz.charts2 = RH.viz.charts2 || {};
     const nAbs = kpis.length - nPct;
     const note = document.createElement("p");
     note.textContent = fmt.noun(kpis.length, "indicator") + " من النوع "
-      + String(kpis[0].type) + ": " + fmt.int(nPct) + " بصيغة نسبة مئوية و"
+      + String(kpis[0].type) + " — مرر داخل الجدول لاستعراضها كاملة: "
+      + fmt.int(nPct) + " بصيغة نسبة مئوية و"
       + fmt.int(nAbs) + " بصيغة عددية — " + String(kd.note) + ".";
     note.style.cssText = "font-size:" + suPx(12) + ";color:var(--faint-d);"
       + "line-height:1.6;margin:" + suPx(8) + " 0 0;flex:none;";
@@ -18746,9 +19072,12 @@ RH.viz.charts2 = RH.viz.charts2 || {};
         silent: true,
         symbol: "none",
         lineStyle: { color: T.C.gold, width: 2, type: "dashed" },
+        /* إصلاح مراجعة الجولة 2: في المصغر (بطاقة الخاتمة) كان خط 60٪ قرب
+           سقف الشبكة وحبته فوقه تطبع على عنوان الرسم كصندوق شبحي —
+           تحت الخط في المدمج (السلسلة ≤43٪ فلا تصادم)، وفوقه في الموسع. */
         label: {
           show: true,
-          position: "insideStartTop",
+          position: compact ? "insideStartBottom" : "insideStartTop",
           color: T.C.gold,
           fontFamily: "Cairo",
           fontSize: T.fs(su, compact ? 11.5 : 13),
@@ -18873,8 +19202,14 @@ RH.viz.charts2 = RH.viz.charts2 || {};
       if (r.conservative > hi) hi = r.conservative;
     }
     if (withBaseline && deficitNow < lo) lo = deficitNow;
-    const yMin = Math.floor((lo * 0.985) / 1000) * 1000;
     const yMax = Math.ceil((hi * 1.01) / 1000) * 1000;
+    /* حزام سفلي محجوز تحت أدنى قيمة: يضمن أن حبة «العجز الحالي» أسفل خط
+       الأساس تبقى داخل مساحة الرسم ولا تغطي تسميات المحور الزمني أبداً.
+       إصلاح مراجعة الجولة 2: الحزام في المدمج 34٪ (كان 18٪) — عند 1366 كانت
+       الحبة تطبع فوق تسميات الأشهر (مارس/يناير/نوفمبر) لضيق الحزام، ورفعه
+       يرفع خط الأساس والحبة معه بعيداً عن حزام المحور. */
+    const belt = compact ? 0.34 : 0.18;
+    const yMin = Math.floor((lo - (yMax - lo) * belt) / 1000) * 1000;
 
     const cats = monthCats(rows, compact);
 
@@ -18935,6 +19270,7 @@ RH.viz.charts2 = RH.viz.charts2 || {};
         s.markLine = T.targetLine(su, deficitNow,
           "العجز الحالي " + fmt.compact(deficitNow) + " سرير");
         s.markLine.label.position = "insideStartBottom";
+        s.markLine.label.fontSize = T.fs(su, compact ? 10.5 : 12);
         s.markLine.label.backgroundColor = "rgba(11,21,18,.82)";
         s.markLine.label.padding = [T.fs(su, 2), T.fs(su, 5)];
         s.markLine.label.borderRadius = 6;
@@ -18959,11 +19295,16 @@ RH.viz.charts2 = RH.viz.charts2 || {};
         ? Object.assign(caveatBadge(su, "مورّدة — غير معتمدة"),
           { left: null, right: T.fs(su, 8) })
         : caveatBadge(su, "سيناريوهات مورّدة — غير معتمدة")],
+      /* هوامش المدمج موسعة (يسار/أسفل): علامات «ألف» وتسميات الأشهر كانت
+         تُقص عند 1366×768 — إصلاح مراجعة الجولة 1.
+         إصلاح مراجعة الجولة 2: قناة علامات القيم اليمنى في المدمج 78 (كانت
+         54) — «914 ألف» كانت تفقد رقمها الأخير عند حافة البطاقة في 1366
+         فتُقرأ «91 ألف» — لا يُقص أي رقم بعد الآن. */
       grid: gridBox(su, compact, {
         top: T.fs(su, compact ? 40 : 50),
-        bottom: T.fs(su, compact ? 30 : 42),
-        left: T.fs(su, compact ? 68 : 104),
-        right: T.fs(su, compact ? 50 : 72),
+        bottom: T.fs(su, compact ? 38 : 42),
+        left: T.fs(su, compact ? 88 : 104),
+        right: T.fs(su, compact ? 78 : 72),
       }),
       xAxis: T.catXAxis(su, cats, {
         axisLabel: {
@@ -23949,7 +24290,7 @@ RH.viz.charts2 = RH.viz.charts2 || {};
      ▸ عمود رؤى insight_panels.sections.control + بطاقة «توزيع القدرة
        الرقابية» (مراقبو كل قطاع نقاطاً خضراء + عبء المخالفات لكل مراقب
        شريطاً مرجانياً — المسار المفاتيحي الكامل إلى ملفات القطاعات) +
-       زر ملحق الرقابة (سجل المفتشين الـ18 يعيش في الملحق حصراً بوسم
+       زر ملحق الرقابة (سجل المراقبين الـ18 يعيش في الملحق حصراً بوسم
        «قيد المطابقة» — لا يظهر في هذه اللوحة إطلاقاً) + سطر الحداثة.
 
      ▸ وصول عميق عبر معاملات المسار (عقد ctx.params — تُقرأ ولا تُكتب):
@@ -23977,7 +24318,7 @@ RH.viz.charts2 = RH.viz.charts2 || {};
      مخالفات/خلل حصراً، ذهبي=وسوم «بانتظار الاعتماد» حصراً، أزرق=فئة
      ثانوية (قرارات الإغلاق — إجراء إنفاذ لا خلل). لا gauges دائرية،
      لا KPI بأيقونات، لا محاور مزدوجة.
-   • جدول المفتشين (18 اسماً — مجاميعه تخالف الإجماليات المعتمدة) لا يُدرج
+   • جدول المراقبين (18 اسماً — مجاميعه تخالف الإجماليات المعتمدة) لا يُدرج
      هنا إطلاقاً: زر الملحق يقود إليه بوسم «قيد المطابقة» (قرار §2 من
      REVAMP_SPEC حرفياً).
    • كل الرسوم عبر مُنشئي RH.viz.charts2 القانونيين بمفتاح مثيلات "control"
@@ -24450,7 +24791,7 @@ RH.viz.charts2 = RH.viz.charts2 || {};
     );
   }
 
-  /** ملف المراقبين — التوزيع القطاعي كاملاً، وسجل المفتشين في الملحق حصراً */
+  /** ملف المراقبين — التوزيع القطاعي كاملاً، وسجل المراقبين في الملحق حصراً */
   function monitorsDetail(ctx, model) {
     const met = model.rel.metrics.total_monitors;
     return h("div", { class: "ctl-detail" },
@@ -24470,12 +24811,12 @@ RH.viz.charts2 = RH.viz.charts2 || {};
       ]),
       notesBlock([
         "عبء المخالفات لكل مراقب " + transparentLine("violations ÷ monitors لكل قطاع"),
-        "سجل المفتشين الثمانية عشر بأسمائهم يعيش في الملحق حصراً بوسم "
+        "سجل المراقبين الثمانية عشر بأسمائهم يعيش في الملحق حصراً بوسم "
           + "«أرقام تشغيلية من سجل المنصة — قيد المطابقة مع الإجماليات المعتمدة».",
       ]),
       notesBlock([rawSourceLine(model.rel, met)], "ctl-sources"),
       actionsBlock([{
-        label: "فتح ملحق الرقابة — سجل المفتشين",
+        label: "فتح ملحق الرقابة — سجل المراقبين",
         onAct: () => ctx.openAppendix("monitoring"),
       }]),
     );
@@ -25061,11 +25402,55 @@ RH.viz.charts2 = RH.viz.charts2 || {};
     const measure = VALID_MEASURES.includes(ctx.params.measure)
       ? ctx.params.measure : "violations";
 
+    /* مبدّل المقياس في ترويسة البطاقة (صف كروم مخصص) لا داخل مساحة الرسم —
+       إصلاح مراجعة الجولة 1: كانت رقاقات المبدّل المدمجة تطفو فوق عمود
+       الجنوب فتحجب قيمته 1,367؛ الرسم يبدأ الآن أسفل الترويسة حصراً. */
     const chart = RH.viz.charts2.sectorViolationsBars(res.body, ctx.su, {
       key: "control",
-      toggle: true,
+      toggle: false,
       measure,
     });
+
+    const MEASURE_DEFS = [
+      { id: "violations", label: "المخالفات", cls: "vio" },
+      { id: "monitors", label: "المراقبون", cls: "ins" },
+      { id: "closures", label: "قرارات الإغلاق", cls: "enf" },
+    ];
+    const head = res.card.querySelector(".card-head");
+    const mbar = h("div", {
+      class: "ctl-toolbar ctl-measures",
+      role: "group",
+      "aria-label": "اختيار مقياس الأعمدة القطاعية",
+    });
+    const mbtns = [];
+    function syncMeasureBtns() {
+      const cur = chart.measure ? chart.measure() : measure;
+      for (const b of mbtns) {
+        const active = b.dataset.measure === cur;
+        b.setAttribute("aria-pressed", active ? "true" : "false");
+        b.classList.toggle("active", active);
+      }
+    }
+    for (const d of MEASURE_DEFS) {
+      const b = h("button", {
+        class: "ctl-tbtn ctl-measure-btn " + d.cls,
+        type: "button",
+        dataset: { measure: d.id },
+        "data-interactive": "",
+        "aria-pressed": "false",
+        onclick: () => {
+          if (chart.setMeasure) chart.setMeasure(d.id);
+          syncMeasureBtns();
+        },
+      },
+        h("span", { class: "ctl-layer-dot", "aria-hidden": "true" }),
+        d.label,
+      );
+      mbtns.push(b);
+      mbar.appendChild(b);
+    }
+    if (head) head.appendChild(mbar);
+    syncMeasureBtns();
 
     /* الترتيب المعروض هو ترتيب الإصدار (لا sort=value) — dataIndex يطابق
        rel.sectors مباشرة في كل المقاييس */
@@ -25262,17 +25647,19 @@ RH.viz.charts2 = RH.viz.charts2 || {};
     });
     res.body.appendChild(list);
 
-    /* الوسم الحرفي للعينة — سطر واحد بصرياً والنص الكامل في التلميح */
-    const noteText = model.sampleLabel + " — المقياس المرتب: المخالفات المسجلة";
+    /* وسم العينة — إصلاح مراجعة الجولة 2: النص الكامل كان يُقص في منتصف
+       الكلمة («المقيا…») ويطبع فوق شريط الصف الخامس — سطر مختصر يسع سطراً
+       واحداً دائماً، والوسم الحرفي الكامل من الإصدار في تلميح العنصر. */
+    const fullNote = model.sampleLabel + " — المقياس المرتب: المخالفات المسجلة";
     res.body.appendChild(h("div", {
       class: "ctl-top-note",
-      title: noteText,
-    }, noteText));
+      title: fullNote,
+    }, "عينة الأحياء الموثقة — المقياس: المخالفات المسجلة"));
   }
 
   /* ══════════════════════════════════════════════════════════════════════════
      15) عمود الرؤى الممتد — insight_panels.control + توزيع القدرة الرقابية
-         + زر الملحق (سجل المفتشين بوسم قيد المطابقة) + سطر الحداثة
+         + زر الملحق (سجل المراقبين بوسم قيد المطابقة) + سطر الحداثة
      ══════════════════════════════════════════════════════════════════════════ */
   function buildRail(cell, ctx, model) {
     cell.classList.add("ctl-rail-cell");
@@ -25294,7 +25681,12 @@ RH.viz.charts2 = RH.viz.charts2 || {};
       h("div", { class: "ctl-mon-sub" },
         fmt.noun(model.totMon, "monitor") + " — العبء: مخالفات لكل مراقب"),
     );
-    for (const s of model.sectors) {
+    /* الترتيب التحليلي الصحيح لبطاقة عبء: الأثقل أولاً (الجنوب 456 يتصدر) —
+       لا ترتيب الإصدار الجغرافي؛ إصلاح مراجعة الجولة 1: كان صف الجنوب
+       آخر الصفوف فيُقص عند ضيق العمود وهو جوهر رؤية cd2 ذاتها. */
+    const byLoadDesc = model.sectors.slice()
+      .sort((a, b) => b.loadPerMonitor - a.loadPerMonitor);
+    for (const s of byLoadDesc) {
       const dots = h("span", { class: "ctl-mon-dots", "aria-hidden": "true" });
       for (let i = 0; i < s.row.monitors; i++) {
         dots.appendChild(h("i", { class: "ctl-mon-dot" }));
@@ -25321,7 +25713,7 @@ RH.viz.charts2 = RH.viz.charts2 || {};
       "العبء " + transparentLine("violations ÷ monitors")));
     cell.appendChild(dist);
 
-    /* 15.3) زر الملحق: سجل المفتشين الـ18 يعيش هناك حصراً — قرار §2 */
+    /* 15.3) زر الملحق: سجل المراقبين الـ18 يعيش هناك حصراً — قرار §2 */
     const appx = h("button", {
       class: "ctl-appx",
       type: "button",
@@ -25330,7 +25722,7 @@ RH.viz.charts2 = RH.viz.charts2 || {};
     },
       h("span", { class: "ctl-appx-main" },
         h("span", { class: "ctl-appx-label" }, "ملحق الرقابة الميدانية"),
-        h("span", { class: "ctl-appx-sub" }, "سجل المفتشين — قيد المطابقة"),
+        h("span", { class: "ctl-appx-sub" }, "سجل المراقبين الميدانيين — قيد المطابقة"),
       ),
       h("span", { class: "ctl-btn-arrow", "aria-hidden": "true" }, "←"),
     );
@@ -26830,7 +27222,13 @@ RH.viz.charts2 = RH.viz.charts2 || {};
 
     const refs = []; // مراجع التحديث الحي: {sector, barEl, valEl}
 
-    for (const s of rel.sectors) {
+    /* الترتيب التنفيذي الصحيح: تصاعدياً بنسبة التغطية — الأسوأ أولاً،
+       فيتصدر الجنوب (34.8٪) العمود فوق خط الطي دائماً (مراجعة الجولة 1:
+       كان الترتيب جغرافياً فيغيب الجنوب تحت الطي وهو جواب السؤال الأول) */
+    const byCoverageAsc = rel.sectors.slice().sort((a, b) =>
+      der.sector[a.id].coverage_pct - der.sector[b.id].coverage_pct);
+
+    for (const s of byCoverageAsc) {
       const sd = der.sector[s.id];
       const gs = geoStats[s.id] || null;
 
@@ -26868,10 +27266,18 @@ RH.viz.charts2 = RH.viz.charts2 || {};
             h("b", {}, fmt.int(s.violations)),
             h("span", {}, "مخالفة"),
           ),
-          h("span", { class: "map-sec-cellv" },
-            h("b", {}, fmt.int(s.monitors)),
-            h("span", {}, "مراقب"),
-          ),
+          /* العدد والمعدود عبر fmt.noun حصراً (قاعدة رأس الملف): «3 مراقبين»
+             لا «3 مراقب» — إصلاح مراجعة الجولة 1 (المراجع اللغوي) */
+          (() => {
+            const full = fmt.noun(s.monitors, "monitor");
+            const prefix = fmt.int(s.monitors) + fmt.NBSP;
+            const unit = full.indexOf(prefix) === 0
+              ? full.slice(prefix.length) : full;
+            return h("span", { class: "map-sec-cellv" },
+              h("b", {}, fmt.int(s.monitors)),
+              h("span", {}, unit),
+            );
+          })(),
         ),
       );
 
@@ -28352,8 +28758,11 @@ RH.viz.charts2 = RH.viz.charts2 || {};
       sub: fmt.noun(model.rows.length, "initiative"),
       cls: "ini-donut-card",
     });
+    /* compact: ارتفاع البطاقة خُفض لإفساح عمود الرؤى الثلاث الكاملة —
+       النسخة المدمجة تلائم القطر الصغير دون تراكب تسميات (الجولة 1) */
     const donut = RH.viz.charts2.statusDonut(res.body, ctx.su, {
       key: "initiatives",
+      compact: true,
     });
     wireChartClick(ctx, donut, (p) => {
       if (!p || p.componentType !== "series" || !p.name) return;
@@ -28394,10 +28803,11 @@ RH.viz.charts2 = RH.viz.charts2 || {};
     res.card.appendChild(chips);
 
     /* 14.2) عمود الرؤى المحوكم (المفتاح القانوني "initiatives") — غيابه
-       الصادق بطاقة مدمجة لا اختلاق (عقد insightRail: null بصمت) */
-    /* compact: العمود الجانبي ضيق — العناوين وحدها تُعرض والنص الكامل في
-       الملحق/الملخص؛ دون ذلك تُبتر البطاقات بتمرير شريحة غير مقروءة */
-    const rail = RH.presenter.layout.insightRail(cell, "initiatives", { compact: true });
+       الصادق بطاقة مدمجة لا اختلاق (عقد insightRail: null بصمت).
+       الرؤى الثلاث كاملة بنصوصها (إصلاح مراجعة الجولة 1: الوضع المدمج كان
+       يخفي النصوص فتظهر بطاقة عنوان يتيمة) — القص عند الضيق الاستثنائي
+       على حدود الأسطر بعلامة … (ini-cell-side في initiatives.css). */
+    const rail = RH.presenter.layout.insightRail(cell, "initiatives");
     if (!rail) {
       RH.presenter.layout.pendingCard(cell, {
         label: "رؤى القسم قيد الاعتماد",
@@ -28411,7 +28821,7 @@ RH.viz.charts2 = RH.viz.charts2 || {};
         h("span", { class: "ini-source-badge", title: model.source }, SOURCE_BADGE),
         h("span", { class: "ini-source-label" }, "مصدر طبقة الاستراتيجية"),
       ),
-      h("div", { class: "ini-source-text" }, model.source),
+      h("div", { class: "ini-source-text", title: model.source }, model.source),
     ));
 
     /* 14.4) سطر الحداثة والاحتساب */
@@ -28623,10 +29033,11 @@ RH.viz.charts2 = RH.viz.charts2 || {};
      ▸ العمود الجانبي (4 من 12):
          صف 1: مصفوفة المؤشرات (kpiMatrix القانوني — جدول كثيف بفرز تفاعلي)
          صف 2: بطاقة الصدق «القيم الحالية تُسجَّل من المنصة» (بنص ملاحظة
-               الإصدار حرفياً) + مزيج الصيغ (شريط مكدس 11/3) + بطاقة المصدر
+               الإصدار حرفياً) + بطاقة المصدر
                بنصه الحرفي + عمود رؤى insight_panels.sections.initiatives
                (المفتاح القانوني الأقرب — موسوم بمرجعه بصدق) + سطر الحداثة
-               وبوابات التحقق.
+               وبوابات التحقق. (بطاقة «مزيج الصيغ» حُذفت في الجولة 2 —
+               معلومتها معلنة في بطاقتي الصف الرئيسي 11/3.)
 
      ▸ وصول عميق عبر معاملات المسار (عقد ctx.params — تُقرأ ولا تُكتب يدوياً):
          ‎#/section/kpis?kpi=13‎      يفتح ملف المؤشر 13 مباشرة
@@ -29288,6 +29699,18 @@ RH.viz.charts2 = RH.viz.charts2 || {};
         { k: "القيمة الحالية", v: "غير متوفرة", cls: "pending" },
       ]),
       h("p", { class: "kpi7-profile-ctx" }, contextLine),
+      /* حاشية تعريف نطاق للمؤشر 5 (قالب كود ثابت لا بيانات مختلقة —
+         مراجعة الشريك الجولة 1): خط أساسه 130 ألفاً ومستهدفه 260 ألفاً
+         بينما اللوحة تعلن 612,400 سرير مرخص اليوم — التوتر التعريفي يُعلن
+         للحاضر بدل أن يُترك سؤالاً مفتوحاً أمام الأمين */
+      (!k.pct && k.id === 5 && /الأسرة المرخصة/.test(String(k.name)))
+        ? h("p", { class: "kpi7-profile-scope" },
+          "تنبيه تعريفي: القيمتان (خط الأساس 130,000 والمستهدف 260,000) كما "
+          + "وردتا حرفياً في خطة عمل المشروع V.1.0.0 — نطاق قياس المؤشر يخص "
+          + "منظومة ترخيص السكن الجماعي المحدثة ويختلف تعريفياً عن إجمالي "
+          + "الطاقة الاستيعابية المرخصة المعلن في اللوحات (612,400 سرير)؛ "
+          + "توحيد التعريفين يُعتمد مع تسجيل القيم الحالية من المنصة.")
+        : null,
       h("p", { class: "kpi7-profile-note" }, String(k.current_note)),
       h("p", { class: "kpi7-profile-src" }, "المصدر: " + String(rel.strategy.source)),
       h("div", { class: "kpi7-profile-actions" },
@@ -29925,37 +30348,11 @@ RH.viz.charts2 = RH.viz.charts2 || {};
     });
     col.appendChild(baseRow);
 
-    /* ── 10.c مزيج الصيغ — شريط مكدس صغير (أزرق تصنيفي ثانوي + حياد) ── */
-    const pctShare = pctOf(model.pctList.length, model.kpis.length);
-    const absShare = pctOf(model.absList.length, model.kpis.length);
-    const mix = h("div", { class: "kpi7-mix" },
-      h("div", { class: "kpi7-mix-title" }, "مزيج الصيغ"),
-      h("div", { class: "kpi7-mix-bar", "aria-hidden": "true" },
-        (() => {
-          const a = h("span", { class: "kpi7-mix-seg pct" });
-          a.style.width = pctShare + "%";
-          return a;
-        })(),
-        (() => {
-          const b = h("span", { class: "kpi7-mix-seg num" });
-          b.style.width = absShare + "%";
-          return b;
-        })(),
-      ),
-      h("div", { class: "kpi7-mix-legend" },
-        h("span", { class: "kpi7-mix-key pct" },
-          h("i", { "aria-hidden": "true" }),
-          "نسبة مئوية — " + fmt.noun(model.pctList.length, "indicator")
-          + " (" + fmt.pct(pctShare) + ")",
-        ),
-        h("span", { class: "kpi7-mix-key num" },
-          h("i", { "aria-hidden": "true" }),
-          "قيمة عددية — " + fmt.noun(model.absList.length, "indicator")
-          + " (" + fmt.pct(absShare) + ")",
-        ),
-      ),
-    );
-    col.appendChild(mix);
+    /* ── 10.c (محذوف — إصلاح مراجعة الجولة 2): بطاقة «مزيج الصيغ» كانت
+       تُقص عند طية 1080p فلا يظهر منها إلا العنوان وشريط بلا وسوم، وسطر
+       إصدار المنصة يطبع فوقها — والمعلومة نفسها معلنة أصلاً في بطاقتي
+       الصف الرئيسي «بصيغة نسبة مئوية 11» و«بصيغة قيمة عددية 3»،
+       فحذفها يحرر العمود ولا يفقد اللوحة أي حقيقة. ── */
 
     /* ── 10.d بطاقة المصدر الحرفي + معبر إلى قسم المبادرات ── */
     const src = RH.presenter.layout.card(col, {
@@ -31500,9 +31897,11 @@ RH.viz.charts2 = RH.viz.charts2 || {};
     stats.appendChild(h("div", { class: "fct-rank-title band" },
       "نطاق عدم اليقين شهرياً"));
     stats.appendChild(spark);
+    /* طرفا النطاق بصياغة معنونة كاملة — لا رمز سهم يتيماً بلا تسمية
+       (إصلاح مراجعة الجولة 1) */
     stats.appendChild(h("div", { class: "fct-band-ends" },
-      h("span", {}, fmt.compact(model.bandFirst)),
-      h("span", { class: "arrow", "aria-hidden": "true" }, "←"),
+      h("span", {}, "من " + fmt.compact(model.bandFirst)),
+      h("span", { class: "fct-band-to" }, "إلى"),
       h("span", {}, fmt.compact(model.bandLast)),
     ));
     cell.appendChild(stats);
@@ -31702,7 +32101,7 @@ RH.viz.charts2 = RH.viz.charts2 || {};
            (2 منجزة / 9 جاري / 7 متأخرة حكماً — مرآة قاعدة status_rule)
            + صفوف الأفق (امتداد الجاري حتى 30 أبريل 2027، أفق السيناريوهات
            يونيو 2027، الهدف الاسترشادي 60٪ بوسمه الذهبي «غير معتمد»)
-           + بطاقة «الخطوات التالية» الصادقة قيد الاعتماد (layout.pendingCard
+           + بطاقة «الخطوات القادمة» الصادقة قيد الاعتماد (layout.pendingCard
            — بطاقة مدمجة لا شاشة كاملة، حكم العميل على V1 محفوظ).
 
      ▸ سطر التواريخ والاعتماد (ذيل اللوحة بعرضها الكامل): فترة الرصد،
@@ -32892,7 +33291,7 @@ RH.viz.charts2 = RH.viz.charts2 || {};
     const st = model.st;
     const rows = [
       {
-        k: "مبادرات جارٍ العمل عليها",
+        k: "مبادرات جاري العمل عليها",
         v: fmt.noun(st.counts[ST_RUN], "initiative"),
         tone: "run",
       },
@@ -33214,7 +33613,7 @@ RH.viz.charts2 = RH.viz.charts2 || {};
   /* ══════════════════════════════════════════════════════════════════════════
      14) بطاقة أفق المرحلة المقبلة — donut حالات المبادرات المصغر + صفوف
          الأفق (كلها من الإصدار) + زر السجل الكامل، ثم بطاقة «الخطوات
-         التالية» الصادقة قيد الاعتماد (بطاقة مدمجة — لا شاشة كاملة أبداً).
+         القادمة» الصادقة قيد الاعتماد (بطاقة مدمجة — لا شاشة كاملة أبداً).
      ══════════════════════════════════════════════════════════════════════════ */
   function buildHorizonCell(cell, ctx, model) {
     cell.classList.add("cls-cell-side");
@@ -33245,7 +33644,7 @@ RH.viz.charts2 = RH.viz.charts2 || {};
     }
 
     hzRow({
-      k: "جارٍ العمل عليها",
+      k: "جاري العمل عليها",
       v: fmt.noun(st.counts[ST_RUN], "initiative"),
       sub: st.maxRunningEnd
         ? "تمتد حتى " + fmt.date(st.maxRunningEnd) : null,
@@ -33305,10 +33704,10 @@ RH.viz.charts2 = RH.viz.charts2 || {};
     );
     res.card.appendChild(h("div", { class: "cls-cardfoot cls-hz-foot" }, btn));
 
-    /* الخطوات التالية — الحالة الصادقة قيد الاعتماد كبطاقة مدمجة */
+    /* الخطوات القادمة — الحالة الصادقة قيد الاعتماد كبطاقة مدمجة */
     if (model.nextSteps) {
       RH.presenter.layout.pendingCard(cell, {
-        label: "الخطوات التالية — " + statusBadgeText(model.nextSteps.status),
+        label: "الخطوات القادمة — " + statusBadgeText(model.nextSteps.status),
         note: String(model.nextSteps.note || ""),
       });
     }
@@ -33454,7 +33853,7 @@ RH.viz.charts2 = RH.viz.charts2 || {};
     /* الصف الأول: الحقائق الثلاث (4+4+4) */
     buildFactsRow(g, ctx, model);
 
-    /* الصف الثاني: التوصيات (7) + الأفق والخطوات التالية (5) */
+    /* الصف الثاني: التوصيات (7) + الأفق والخطوات القادمة (5) */
     const cRecs = g.cell({ span: 7, cls: "cls-cell-recs" });
     const cSide = g.cell({ span: 5 });
     buildRecsCell(cRecs, ctx, model);
@@ -33989,7 +34388,9 @@ RH.presenter.ax = (function () {
 
   /** تسميات عربية لبنود الحجر — المعرّفات تقنية والأسباب تُعرض حرفياً من الإصدار */
   const QUARANTINE_LABELS = {
-    inspector_level_records: "سجلات مستوى المفتشين",
+    /* المصطلح الموحد «مراقب» (معجم ARABIC_COPY_REVIEW §3) — تسمية الجدول
+       الأصلية في المصدر تُذكر مرة واحدة بين قوسين توثيقاً لا استعمالاً */
+    inspector_level_records: "سجلات مستوى المراقبين (المسمى في سجل المنصة: المفتشون)",
     hotspots: "النقاط الساخنة (الإحداثيات)",
   };
 
@@ -34234,237 +34635,207 @@ RH.presenter.ax = (function () {
 })();
 
 /* ═══ src/js/presenter/appendix/ax-pillar.js ═══ */
-/* ax-pillar.js — ملحق تفصيل الركيزة (appendix/pillar/<pillarId>)
-   ثلاث صفحات عند اعتماد المصدر: 1) حلقة نسبة إنجاز الركيزة 2) جدول المبادرات
-   حسب الحالة 3) الانحرافات الرئيسة (متأخرة/متعثرة فقط). عند غياب الاعتماد أو
-   ركيزة غير موجودة: صفحة حالة اعتماد شريفة — لا ركائز ملفّقة ولا أصفار زائفة.
-   كل قيمة من store.release()/der() حصراً وكل رقم ظاهر عبر RH.core.fmt. */
+/* ax-pillar.js — ملحق المبادرات والركائز (appendix/pillar[/<pillarId>])
+   عقد V2 (مرآة المصدر): المحاور الأربعة والمبادرات الثماني عشرة منقولة
+   حرفياً من خطة عمل المشروع V.1.0.0 بحقولها المنشورة {المحور، المبادرة،
+   البداية، النهاية} والحالة محسوبة بقاعدة خطة العمل ذاتها (مرآة قسم
+   المبادرات حرفياً): حالة صريحة في المصدر تُنقل كما هي، وإلا فمَن تجاوزت
+   نهايتها المخططة دون تسجيل إنجاز «متأخرة» حكماً، ومَن بدأت ولم تنته
+   «جاري العمل»، وإلا «لم يتم البدء». لا نسب إنجاز مختلقة — الأوزان
+   والنسب غير واردة في المصدر فلا تُعرض حلقة تقدم أصلاً (غياب صادق).
+   بوابة الاعتماد عبر الحكم الموحد RH.data.strategyApproved حصراً
+   (إصلاح مراجعة الجولة 1: البوابة النصية القديمة كانت تحجب الملحق رغم
+   اعتماد المصدر مرآةً، وتدّعي أن الوثيقة «لم تُرفَق بعد» — وهو غير صحيح).
+   دون معرف ركيزة: سجل المحفظة كاملاً بصفحاته + صفحة المتأخرات. */
 "use strict";
 
 (function () {
   const { h, svg } = RH.core.dom;
   const fmt = RH.core.fmt;
 
-  /** المسار يصل كـ appendix/pillar/<pillarId> */
+  /** المسار يصل كـ appendix/pillar[/<pillarId>] */
   const pillarId = (ctx) => (ctx.route.id.split("/")[1] || "");
 
   const pillarOf = (st, id) =>
     st.pillars ? st.pillars.find((p) => p.id === id) : null;
 
-  const initiativesOf = (st, id) =>
-    (st.initiatives || []).filter((i) => i.pillar_id === id);
+  /* مفردات الحالة المقفلة — مرآة s06-initiatives حرفياً */
+  const ST_DONE = "منجزة";
+  const ST_RUN = "جاري العمل";
+  const ST_LATE = "متأخرة";
+  const ST_IDLE = "لم يتم البدء";
 
-  /** حالات الجدول المعدودة انحرافاً — حصراً */
-  const DEVIATION_STATUSES = ["متأخرة", "متعثرة"];
+  /** قاعدة الحالة المحسوبة — مرآة statusOf في قسم المبادرات حرفياً */
+  function statusOf(ini, calcDate) {
+    if (ini.status) return ini.status;
+    if (ini.end && ini.end < calcDate) return ST_LATE;
+    if (ini.start && ini.start <= calcDate) return ST_RUN;
+    return ST_IDLE;
+  }
 
-  function pendingGlyph() {
-    return svg("svg", {
-      viewBox: "0 0 24 24", fill: "none", stroke: "currentColor",
-      "stroke-width": 1.1, "stroke-linecap": "round", "stroke-linejoin": "round",
-      "aria-hidden": "true",
-    },
-      svg("circle", { cx: 12, cy: 12, r: 9, "stroke-dasharray": "4 3" }),
-      svg("path", { d: "M12 7v5l3 3" }),
-    );
+  /** صفوف المحفظة بترتيب المحور فالمعرف (مرآة ترتيب القسم والمكتبة) */
+  function portfolioRows(st, calc) {
+    const pIdx = {};
+    st.pillars.forEach((p, i) => { pIdx[p.id] = i; });
+    return (st.initiatives || []).slice().sort((a, b) => {
+      const d = (pIdx[a.pillar_id] || 0) - (pIdx[b.pillar_id] || 0);
+      if (d !== 0) return d;
+      return String(a.id).localeCompare(String(b.id), "en", { numeric: true });
+    }).map((ini) => ({
+      ini,
+      pillar: st.pillars[pIdx[ini.pillar_id]] || null,
+      status: statusOf(ini, calc),
+    }));
+  }
+
+  const ROWS_PER_PAGE = 9;
+
+  function statusCell(status) {
+    if (status === ST_LATE) {
+      return h("td", {}, h("span", {
+        style: { color: "var(--coral)", fontWeight: "700" },
+      }, status + " حكماً"));
+    }
+    if (status === ST_DONE) {
+      return h("td", {}, h("span", {
+        style: { color: "var(--green-hi)", fontWeight: "700" },
+      }, status));
+    }
+    return h("td", {}, status);
+  }
+
+  /** تاريخ عربي كامل — نص RTL طبيعي (لا عزل ltr: يقلب ترتيب اليوم والشهر) */
+  function dateCell(iso) {
+    return h("td", {}, iso ? fmt.date(iso) : "—");
+  }
+
+  /** جدول مبادرات موحد (شريحة صفوف جاهزة) + ذيل المصدر والقاعدة */
+  function buildTable(el, rows, footNote) {
+    const st = RH.data.store.release().strategy;
+    el.appendChild(h("table", { class: "ax-table" },
+      h("thead", {}, h("tr", {},
+        ["#", "المبادرة", "المحور", "البداية المخططة", "النهاية المخططة",
+          "الحالة"].map((t) => h("th", { scope: "col" }, t)))),
+      h("tbody", {}, rows.map((r) => h("tr", {},
+        h("td", { class: "num" }, h("span", { class: "ltr" }, String(r.ini.id))),
+        h("td", {}, String(r.ini.name)),
+        h("td", {}, r.pillar ? String(r.pillar.name) : "—"),
+        dateCell(r.ini.start),
+        dateCell(r.ini.end),
+        statusCell(r.status),
+      ))),
+    ));
+    const note = h("div", { class: "ax-note" },
+      h("b", {}, fmt.noun(rows.length, "initiative")),
+      " في هذه الصفحة · المصدر: ", String(st.source), ".");
+    if (footNote) note.appendChild(document.createTextNode(" " + footNote));
+    el.appendChild(note);
   }
 
   /* ── صفحة الحالة الشريفة: مصدر غير معتمد أو ركيزة غير موجودة ─────────── */
   function pagePending(el, ctx) {
     const st = RH.data.store.release().strategy;
     const id = pillarId(ctx);
-    const notApproved = st.status !== "approved" || !(st.pillars || []).length;
+    const notApproved = !RH.data.strategyApproved(st) || !(st.pillars || []).length;
 
     el.appendChild(h("div", { class: "pending-scene" },
-      h("div", { class: "glyph" }, pendingGlyph()),
+      h("div", { class: "glyph" },
+        svg("svg", {
+          viewBox: "0 0 24 24", fill: "none", stroke: "currentColor",
+          "stroke-width": 1.1, "stroke-linecap": "round", "stroke-linejoin": "round",
+          "aria-hidden": "true",
+        },
+          svg("circle", { cx: 12, cy: 12, r: 9, "stroke-dasharray": "4 3" }),
+          svg("path", { d: "M12 7v5l3 3" }),
+        )),
       notApproved
         ? h("h2", {}, "تُستكمل تفاصيل الركائز فور اعتماد مصدرها الرسمي")
         : h("h2", {}, "الركيزة المطلوبة غير مدرجة في الإصدار المنشور"),
       notApproved
         ? h("p", {},
-          "تعريفات الركائز والمبادرات وأوزانها ونسب إنجازها مملوكة للوثيقة المعتمدة ",
-          h("span", { class: "src-name" }, "«" + st.source_required + "»"),
-          "، ولم تُرفَق بعد. تعرض هذه الشاشة الحالة بأمانة بدل أي أرقام تقديرية، ويُستكمل النشر من الإدارة فور ورود الوثيقة.")
+          "تعريفات الركائز والمبادرات مملوكة للوثيقة المعتمدة ",
+          h("span", { class: "src-name" }, "«" + String(st.source || "خطة عمل المشروع") + "»"),
+          ". تعرض هذه الشاشة الحالة بأمانة بدل أي أرقام تقديرية، ويُستكمل النشر من الإدارة فور اعتماد المصدر.")
         : h("p", {},
           "المعرّف ", h("span", { class: "ltr" }, id),
-          " غير موجود ضمن ركائز الإصدار الحالي. يمكن العودة إلى المبادرات واختيار ركيزة من الكوكبة."),
+          " غير موجود ضمن ركائز الإصدار الحالي. يمكن العودة إلى المبادرات واختيار ركيزة أخرى."),
     ));
   }
 
-  /* ── الصفحة 1: نسبة إنجاز الركيزة — حلقة كبيرة ────────────────────────── */
-  function pageRing(el, ctx) {
+  /* ── صفحة المتأخرات حكماً — حصراً من الحالة المحسوبة ─────────────────── */
+  function pageLate(el, rows) {
     const st = RH.data.store.release().strategy;
-    const id = pillarId(ctx);
-    const p = pillarOf(st, id);
-    const pv = RH.data.store.der().strategy.pillars[id] || null;
-    const pctVal = pv && pv.progress_pct != null ? pv.progress_pct : null;
-    const inis = initiativesOf(st, id);
-
-    const W = 1500, H = 620;
-    const cx = W / 2, cy = H / 2;
-    const root = svg("svg", {
-      class: "constellation", viewBox: `0 0 ${W} ${H}`, role: "img",
-      "aria-label": p.name + " — نسبة إنجاز الركيزة: " +
-        (pctVal != null ? fmt.pct(pctVal) : "غير متاحة"),
-    });
-    root.appendChild(svg("circle", { cx, cy, r: 236, class: "ring-core" }));
-    RH.viz.rings.ring(root, cx, cy, 210, pctVal, { stroke: 22, animate: true });
-    root.appendChild(svg("text", {
-      x: cx, y: cy - 52, class: "pname", "font-size": 30, fill: "#93A096",
-    }, "نسبة إنجاز الركيزة"));
-    root.appendChild(svg("text", {
-      x: cx, y: cy + 62, class: "ppct", "font-size": 116,
-    }, pctVal != null ? fmt.pct(pctVal) : "—"));
-    root.appendChild(svg("text", {
-      x: cx, y: cy + 316, class: "pname", "font-size": 38,
-    }, p.name));
-    el.appendChild(h("div", { class: "chart-area" }, root));
-
-    // سطر الاسم والحالة: حالة الركيزة إن اعتُمدت، وإلا توزيع حالات التنفيذ الفعلي
-    const note = h("div", { class: "ax-note" },
-      "الركيزة: ", h("b", {}, p.name), " · ",
-      fmt.noun(inis.length, "initiative"), " ضمن الركيزة");
-    if (p.status) {
-      note.appendChild(document.createTextNode(" · الحالة: "));
-      note.appendChild(h("b", {}, p.status));
-    } else if (inis.length) {
-      const counts = {};
-      for (const i of inis) {
-        if (i.execution_status) counts[i.execution_status] = (counts[i.execution_status] || 0) + 1;
-      }
-      const entries = Object.entries(counts);
-      if (entries.length) {
-        note.appendChild(document.createTextNode(" · حالات التنفيذ: "));
-        entries.forEach(([k, v], idx) => {
-          if (idx > 0) note.appendChild(document.createTextNode("، "));
-          note.appendChild(document.createTextNode(k + " "));
-          note.appendChild(h("b", {}, fmt.int(v)));
-        });
-      }
-    }
-    if (pctVal == null) {
-      note.appendChild(document.createTextNode(
-        " · النسبة الدقيقة محجوبة حتى اعتماد الأوزان ونسب الإنجاز لكل مبادرة."));
-    }
-    el.appendChild(note);
-  }
-
-  /* ── الصفحة 2: المبادرات حسب الحالة — جدول ────────────────────────────── */
-  function pageInitiatives(el, ctx) {
-    const st = RH.data.store.release().strategy;
-    const id = pillarId(ctx);
-    const p = pillarOf(st, id);
-    const rows = initiativesOf(st, id);
-
-    if (!rows.length) {
+    const late = rows.filter((r) => r.status === ST_LATE);
+    if (!late.length) {
       el.appendChild(h("div", {
         class: "ax-note",
         style: { flex: "1", display: "flex", alignItems: "center",
           justifyContent: "center", fontSize: "calc(var(--su)*24)" },
-      }, "لا مبادرات مسجلة ضمن هذه الركيزة في الإصدار المنشور."));
+      }, "لا مبادرات متأخرة حكماً ضمن هذا النطاق."));
       return;
     }
-
-    // العمودان الاختياريان يظهران فقط إذا اعتُمدت حقولهما في الإصدار
-    const hasOwner = rows.some((r) => r.owner);
-    const hasDue = rows.some((r) => r.due_date);
-    const heads = ["المبادرة", "نسبة الإنجاز", "حالة التنفيذ", "حالة الجدول"]
-      .concat(hasOwner ? ["الجهة المسؤولة"] : [])
-      .concat(hasDue ? ["تاريخ الاستحقاق"] : []);
-
-    el.appendChild(h("table", { class: "ax-table" },
-      h("thead", {}, h("tr", {},
-        heads.map((t) => h("th", { scope: "col" }, t)))),
-      h("tbody", {}, rows.map((r) => h("tr", {},
-        h("td", {}, r.name),
-        h("td", { class: "num" },
-          typeof r.progress_percent === "number"
-            ? h("span", { class: "ltr" }, fmt.pct(r.progress_percent))
-            : "—"),
-        h("td", {}, r.execution_status || "—"),
-        h("td", {}, DEVIATION_STATUSES.includes(r.schedule_status)
-          ? h("span", { style: { color: "var(--coral)", fontWeight: "600" } }, r.schedule_status)
-          : (r.schedule_status || "—")),
-        hasOwner ? h("td", {}, r.owner || "—") : null,
-        hasDue ? h("td", { class: "num" }, r.due_date ? fmt.date(r.due_date) : "—") : null,
-      ))),
-    ));
-
-    el.appendChild(h("div", { class: "ax-note" },
-      h("b", {}, fmt.noun(rows.length, "initiative")),
-      " ضمن ركيزة «", p.name, "» · المصدر: ", st.source_required, ".",
-    ));
-  }
-
-  /* ── الصفحة 3: الانحرافات الرئيسة — متأخرة/متعثرة حصراً ──────────────── */
-  function pageDeviations(el, ctx) {
-    const st = RH.data.store.release().strategy;
-    const id = pillarId(ctx);
-    const rows = initiativesOf(st, id)
-      .filter((i) => DEVIATION_STATUSES.includes(i.schedule_status));
-
-    if (!rows.length) {
-      el.appendChild(h("div", {
-        class: "ax-note",
-        style: { flex: "1", display: "flex", alignItems: "center",
-          justifyContent: "center", fontSize: "calc(var(--su)*24)" },
-      }, "لا انحرافات مسجلة ضمن هذه الركيزة."));
-      return;
-    }
-
-    const hasOwner = rows.some((r) => r.owner);
-    const heads = ["المبادرة", "حالة الجدول", "حالة التنفيذ", "نسبة الإنجاز"]
-      .concat(hasOwner ? ["الجهة المسؤولة"] : []);
-
-    el.appendChild(h("table", { class: "ax-table" },
-      h("thead", {}, h("tr", {},
-        heads.map((t) => h("th", { scope: "col" }, t)))),
-      h("tbody", {}, rows.map((r) => h("tr", {},
-        h("td", {}, r.name),
-        h("td", {}, h("span", {
-          style: { color: "var(--coral)", fontWeight: "600" },
-        }, r.schedule_status)),
-        h("td", {}, r.execution_status || "—"),
-        h("td", { class: "num" },
-          typeof r.progress_percent === "number"
-            ? h("span", { class: "ltr" }, fmt.pct(r.progress_percent))
-            : "—"),
-        hasOwner ? h("td", {}, r.owner || "—") : null,
-      ))),
-    ));
-
-    el.appendChild(h("div", { class: "ax-note" },
-      h("b", {}, fmt.noun(rows.length, "initiative")),
-      " بحالة جدول متأخرة أو متعثرة ضمن هذه الركيزة — تتطلب متابعة تنفيذية.",
-    ));
+    buildTable(el, late,
+      "قاعدة «متأخرة حكماً»: " + String(st.status_rule
+        || "تجاوزت نهايتها المخططة دون تسجيل إنجاز في المصدر."));
   }
 
   RH.presenter.ax.register({
     id: "pillar",
     kicker: "ملحق الاستراتيجية",
-    title: "تفصيل الركيزة",
+    title: "المبادرات والركائز — السجل الكامل",
     returnLabel: "العودة إلى المبادرات",
     pages: (ctx) => {
-      const st = RH.data.store.release().strategy;
-      const approved = st.status === "approved" && (st.pillars || []).length;
-      if (!approved || !pillarOf(st, pillarId(ctx))) {
+      const rel = RH.data.store.release();
+      const st = rel.strategy;
+      const calc = rel.meta.calculation_date;
+      const id = pillarId(ctx);
+      const approved = RH.data.strategyApproved(st) && (st.pillars || []).length;
+      if (!approved || (id && !pillarOf(st, id))) {
         return [{ name: "حالة الاعتماد", build: pagePending }];
       }
-      return [
-        { name: "نسبة إنجاز الركيزة", build: pageRing },
-        { name: "المبادرات حسب الحالة", build: pageInitiatives },
-        { name: "الانحرافات الرئيسة", build: pageDeviations },
-      ];
+
+      const all = portfolioRows(st, calc);
+      const rows = id ? all.filter((r) => r.ini.pillar_id === id) : all;
+      const scopeName = id ? String(pillarOf(st, id).name) : "المحفظة الكاملة";
+
+      const pages = [];
+      if (rows.length <= ROWS_PER_PAGE) {
+        pages.push({
+          name: "مبادرات " + scopeName,
+          build: (el) => buildTable(el, rows,
+            "الحالة محسوبة بقاعدة خطة العمل حتى " + fmt.date(calc) + "."),
+        });
+      } else {
+        const chunks = [];
+        for (let i = 0; i < rows.length; i += ROWS_PER_PAGE) {
+          chunks.push(rows.slice(i, i + ROWS_PER_PAGE));
+        }
+        chunks.forEach((chunk, i) => pages.push({
+          name: "سجل المحفظة (" + fmt.int(i + 1) + " من " + fmt.int(chunks.length) + ")",
+          build: (el) => buildTable(el, chunk,
+            "الحالة محسوبة بقاعدة خطة العمل حتى " + fmt.date(calc) + "."),
+        }));
+      }
+      pages.push({
+        name: "المتأخرة حكماً",
+        build: (el) => pageLate(el, rows),
+      });
+      return pages;
     },
   });
 })();
 
 /* ═══ src/js/presenter/appendix/ax-kpi.js ═══ */
 /* ax-kpi.js — ملحق المؤشرات الكامل (appendix/kpi)
-   جدول واحد بكل الحقول المعتمدة: المؤشر، القيمة الحالية (الغياب «—» بوسم
-   «غير متاحة» — لا يتحول صفراً أبداً)، خط الأساس، المستهدف، الفجوة
-   (derive.kpiVariance)، اتجاه التحسن، الوحدة، الجهة المسؤولة، تاريخ القياس،
-   مصدر البيانات. صفحات ديناميكية: أكثر من 8 مؤشرات → تقسيم بحجم الإطار.
-   عند غياب الاعتماد: صفحة حالة شريفة — لا قيم مصطنعة (بوابة R4/R5). */
+   جدول واحد بكل حقول عقد V2 المنشورة حرفياً من خطة عمل المشروع V.1.0.0:
+   المعرف، المؤشر، النوع، الصيغة (نسبة مئوية/قيمة عددية)، خط الأساس،
+   المستهدف، مدى التحسن المطلوب (مشتق شفاف = المستهدف − خط الأساس)،
+   والقيمة الحالية — الغياب يُعرض «غير متوفرة» بوسمه الصادق ولا يتحول
+   صفراً أبداً (ملاحظة المصدر الحرفية في ذيل كل صفحة).
+   بوابة الاعتماد عبر الحكم الموحد RH.data.strategyApproved حصراً —
+   "approved_source_mirror" اعتماد نقلاً حرفياً (إصلاح مراجعة الجولة 1:
+   كانت البوابة النصية القديمة تحجب الجدول رغم اعتماد المصدر).
+   صفحات ديناميكية: أكثر من 8 مؤشرات → تقسيم بحجم الإطار. */
 "use strict";
 
 (function () {
@@ -34475,31 +34846,31 @@ RH.presenter.ax = (function () {
   const ROWS_PER_PAGE = 8;
 
   const HEADS = [
-    "المؤشر", "القيمة الحالية", "خط الأساس", "المستهدف", "الفجوة",
-    "اتجاه التحسن", "الوحدة", "الجهة المسؤولة", "تاريخ القياس", "مصدر البيانات",
+    "#", "المؤشر", "النوع", "الصيغة", "خط الأساس", "المستهدف",
+    "مدى التحسن المطلوب", "القيمة الحالية",
   ];
 
-  /** قيمة مؤشر واحدة عبر fmt حصراً: ٪ من fmt.pct، وإلا صحيح/منزلة واحدة */
-  function fmtVal(v, unit) {
-    if (v == null) return "—";
-    if (unit === "٪") return fmt.pct(v);
-    return Number.isInteger(v) ? fmt.int(v) : fmt.dec1(v);
+  /* مرآة تنسيق قيم المؤشرات القانونية (kpiVal في s07/charts2 حرفياً):
+     النسبية ×100 بعلامة ٪ العربية المعزولة، والعددية بفاصل الآلاف */
+  const round1 = (v) => RH.data.derive.roundHalfUp(v, 1);
+  function kpiVal(k, v) {
+    if (v == null || !Number.isFinite(v)) return "—";
+    return k.pct ? fmt.pct(round1(v * 100)) : fmt.int(v);
   }
+  const spanVal = (k) => (k.pct
+    ? fmt.pct(round1((k.target - k.baseline) * 100))
+    : fmt.int(k.target - k.baseline));
 
-  /** خلية رقمية بعزل اتجاهي؛ الغياب «—» دون أي تحويل */
-  function numCell(v, unit) {
+  /** خلية رقمية بعزل اتجاهي */
+  function numCell(txt, gold) {
     return h("td", { class: "num" },
-      v == null ? "—" : h("span", { class: "ltr" }, fmtVal(v, unit)));
+      h("span", {
+        class: "ltr",
+        style: gold ? { color: "var(--gold)", fontWeight: "700" } : null,
+      }, txt));
   }
 
-  /** خلية نصية: عزل .ltr للمقاطع اللاتينية داخل النص العربي */
-  function textCell(s) {
-    if (s == null || s === "") return h("td", {}, "—");
-    const t = String(s);
-    return h("td", {}, /[A-Za-z]/.test(t) ? h("span", { class: "ltr" }, t) : t);
-  }
-
-  /* ── صفحة الحالة الشريفة عند غياب الاعتماد ───────────────────────────── */
+  /* ── صفحة الحالة الشريفة — لا تُسلك إلا إن غاب الاعتماد فعلاً ─────────── */
   function pagePending(el) {
     const st = RH.data.store.release().strategy;
     el.appendChild(h("div", { class: "pending-scene" },
@@ -34510,10 +34881,10 @@ RH.presenter.ax = (function () {
         },
           svg("path", { d: "M4 20V10 M10 20V4 M16 20v-7 M22 20H2", "stroke-dasharray": "3 3" })),
       ),
-      h("h2", {}, "يُستكمل جدول المؤشرات فور اعتماد مصدره وتسجيل قيمه الحالية"),
+      h("h2", {}, "يُستكمل جدول المؤشرات فور اعتماد مصدره"),
       h("p", {},
         "تعريفات المؤشرات وخطوط أساسها ومستهدفاتها مملوكة للوثيقة المعتمدة ",
-        h("span", { class: "src-name" }, "«" + st.source_required + "»"),
+        h("span", { class: "src-name" }, "«" + String(st.source || "خطة عمل المشروع") + "»"),
         "، وتُسجَّل القيم الحالية من الإدارة بمصدر وتاريخ قياس لكل مؤشر. ",
         "لا تعرض هذه المنصة قيماً مصطنعة ولا تحوّل الغياب إلى صفر."),
     ));
@@ -34526,36 +34897,32 @@ RH.presenter.ax = (function () {
     el.appendChild(h("table", { class: "ax-table" },
       h("thead", {}, h("tr", {},
         HEADS.map((t) => h("th", { scope: "col" }, t)))),
-      h("tbody", {}, kpis.map((k) => {
-        const variance = RH.data.derive.kpiVariance(k);
-        return h("tr", {},
-          h("td", {}, k.name),
-          k.current_value == null
-            ? h("td", { class: "num" }, "— ",
-              h("span", { class: "rank-note" }, "غير متاحة"))
-            : numCell(k.current_value, k.unit),
-          numCell(k.baseline, k.unit),
-          numCell(k.target, k.unit),
-          h("td", { class: "num" }, variance
-            ? h("span", { class: "ltr" }, fmtVal(Math.abs(variance.gap), k.unit))
-            : "—"),
-          h("td", {}, k.direction === "lower_better" ? "الانخفاض أفضل" : "الارتفاع أفضل"),
-          textCell(k.unit),
-          textCell(k.owner),
-          h("td", { class: "num" }, k.as_of ? fmt.date(k.as_of) : "—"),
-          textCell(k.source),
-        );
-      })),
+      h("tbody", {}, kpis.map((k) => h("tr", {},
+        h("td", { class: "num" }, fmt.int(k.id)),
+        h("td", {}, String(k.name)),
+        h("td", {}, String(k.type || "—")),
+        h("td", {}, k.pct ? "نسبة مئوية" : "قيمة عددية"),
+        numCell(kpiVal(k, k.baseline), true),
+        numCell(kpiVal(k, k.target), true),
+        numCell(spanVal(k)),
+        k.current == null
+          ? h("td", {}, "— ",
+            h("span", { class: "rank-note" }, "غير متوفرة"))
+          : numCell(kpiVal(k, k.current)),
+      ))),
     ));
 
-    const missing = kpis.filter((k) => k.current_value == null).length;
+    const missing = kpis.filter((k) => k.current == null).length;
     const note = h("div", { class: "ax-note" },
       h("b", {}, fmt.noun(kpis.length, "indicator")),
-      " في هذه الصفحة · المصدر: ", st.source_required, ".");
+      " في هذه الصفحة · المصدر: ", String(st.source), ".");
     if (missing) {
-      note.appendChild(document.createTextNode(" القيمة الحالية غير متاحة لعدد "));
+      note.appendChild(document.createTextNode(" القيمة الحالية غير متوفرة لعدد "));
       note.appendChild(h("b", {}, fmt.noun(missing, "indicator")));
-      note.appendChild(document.createTextNode(" — الغياب يُعرض بأمانة ولا يُحوَّل إلى صفر."));
+      note.appendChild(document.createTextNode(
+        " — " + String((kpis[0] && kpis[0].current_note)
+          || "تُسجَّل القيم الحالية من داخل المنصة")
+        + "، والغياب يُعرض بأمانة ولا يُحوَّل إلى صفر."));
     }
     el.appendChild(note);
   }
@@ -34567,10 +34934,10 @@ RH.presenter.ax = (function () {
     returnLabel: "العودة إلى مؤشرات الأداء",
     pages: () => {
       const st = RH.data.store.release().strategy;
-      if (st.status !== "approved" || !(st.kpis || []).length) {
+      if (!RH.data.strategyApproved(st) || !(st.kpis || []).length) {
         return [{ name: "حالة الاعتماد", build: pagePending }];
       }
-      const kpis = st.kpis;
+      const kpis = st.kpis.slice().sort((a, b) => a.id - b.id);
       if (kpis.length <= ROWS_PER_PAGE) {
         return [{
           name: "جدول المؤشرات الكامل",

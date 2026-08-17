@@ -275,14 +275,19 @@
   background: rgba(244, 241, 230, 0.07);
   overflow: hidden;
 }
-/* منطقة التحسن المطلوب: خط الأساس ← المستهدف — صبغة ذهبية شفافة
-   (امتداد دلالة «مستهدف/خط أساس» لا فئة بيانات جديدة) */
+/* منطقة التحسن المطلوب: خط الأساس ← المستهدف — نطاق ذهبي مرئي بحق
+   (امتداد دلالة «مستهدف/خط أساس» لا فئة بيانات جديدة).
+   إصلاح مراجعة الجولة 1: كانت الصبغة 0.14 شبه خفية فتقرأ البطاقات
+   الأربع عشرة مسارات فارغة متطابقة — الآن طول النطاق يتغير مع البيانات
+   بصرياً (مؤشر مستهدفه 30٪ يختلف عن مستهدف 100٪ من نظرة). */
 [data-section="kpis"] .kpi7-gain {
   position: absolute;
   inset-inline-end: 0;
   top: 0;
   bottom: 0;
-  background: rgba(214, 171, 76, 0.14);
+  background: linear-gradient(270deg,
+    rgba(214, 171, 76, 0.5), rgba(214, 171, 76, 0.2));
+  border-inline-start: 1px solid rgba(214, 171, 76, 0.55);
   border-radius: 999px;
 }
 /* شاخص خط الأساس: دائرة ذهبية مجوفة على أرضية المسرح */
@@ -409,10 +414,32 @@
    ════════════════════════════════════════════════════════════════════════════ */
 [data-section="kpis"] .kpi7-matrix .card-body {
   padding-top: calc(var(--su) * 6);
+  min-height: 0;
+}
+/* سلسلة التمرير مكتملة حتى الجدول: القص يقع على حدود الصفوف داخل متمرر
+   ظاهر الشريط مع تلاشٍ سفلي يعلن وجود بقية — لا بتر صف في منتصفه أبداً
+   (إصلاح مراجعة الجولة 1) */
+[data-section="kpis"] .kpi7-matrix .kpi-matrix {
+  min-height: 0;
 }
 [data-section="kpis"] .kpi7-matrix .table-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
   scrollbar-width: thin;
-  scrollbar-color: rgba(244, 241, 230, 0.18) transparent;
+  scrollbar-color: rgba(244, 241, 230, 0.28) transparent;
+  scrollbar-gutter: stable;
+  -webkit-mask-image: linear-gradient(180deg,
+    #000 0%, #000 calc(100% - var(--su) * 34), transparent 100%);
+  mask-image: linear-gradient(180deg,
+    #000 0%, #000 calc(100% - var(--su) * 34), transparent 100%);
+}
+[data-section="kpis"] .kpi7-matrix .table-scroll::-webkit-scrollbar {
+  width: calc(var(--su) * 7);
+}
+[data-section="kpis"] .kpi7-matrix .table-scroll::-webkit-scrollbar-thumb {
+  background: rgba(244, 241, 230, 0.24);
+  border-radius: 999px;
 }
 [data-section="kpis"] .kpi7-matrix .table-dense th button:focus-visible {
   outline: 2px solid var(--gold);
@@ -432,8 +459,18 @@
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: thin;
-  scrollbar-color: rgba(244, 241, 230, 0.18) transparent;
+  scrollbar-color: rgba(244, 241, 230, 0.28) transparent;
+  scrollbar-gutter: stable;
+  /* تلاشٍ سفلي يعلن أن العمود يتمرر — لا قصّ صامتاً عند خط الطي
+     (مراجعة الجولة 1: بطاقة «مزيج الصيغ» كانت تبدو مبتورة بلا دليل) */
+  -webkit-mask-image: linear-gradient(180deg,
+    #000 0%, #000 calc(100% - var(--su) * 30), transparent 100%);
+  mask-image: linear-gradient(180deg,
+    #000 0%, #000 calc(100% - var(--su) * 30), transparent 100%);
   padding-inline-end: calc(var(--su) * 2);
+  /* إصلاح مراجعة الجولة 2: حشوة سفلية تُبقي آخر عناصر العمود فوق شريط
+     الإصدار الثابت — لا يتقاطع أي عنصر من العمود مع سطر الإصدار */
+  padding-bottom: calc(var(--su) * 26);
 }
 [data-section="kpis"] .kpi7-truth-col::-webkit-scrollbar { width: 7px; }
 [data-section="kpis"] .kpi7-truth-col::-webkit-scrollbar-thumb {
@@ -495,51 +532,8 @@
   text-overflow: ellipsis;
 }
 
-/* مزيج الصيغ: شريط مكدس — الأزرق فئة تصنيفية ثانوية، والحياد للعددية */
-[data-section="kpis"] .kpi7-mix {
-  background: rgba(16, 32, 26, 0.58);
-  border: 1px solid var(--hair-d2);
-  border-radius: var(--r-sm);
-  padding: calc(var(--su) * 11) calc(var(--su) * 15);
-  display: flex;
-  flex-direction: column;
-  gap: calc(var(--su) * 8);
-}
-[data-section="kpis"] .kpi7-mix-title {
-  font-size: calc(var(--su) * 13.5);
-  font-weight: 700;
-  color: var(--mut-d);
-}
-[data-section="kpis"] .kpi7-mix-bar {
-  display: flex;
-  height: calc(var(--su) * 12);
-  border-radius: 999px;
-  overflow: hidden;
-  background: rgba(244, 241, 230, 0.06);
-}
-[data-section="kpis"] .kpi7-mix-seg.pct { background: var(--collar-blue); }
-[data-section="kpis"] .kpi7-mix-seg.num { background: rgba(244, 241, 230, 0.32); }
-[data-section="kpis"] .kpi7-mix-legend {
-  display: flex;
-  flex-direction: column;
-  gap: calc(var(--su) * 4);
-}
-[data-section="kpis"] .kpi7-mix-key {
-  display: inline-flex;
-  align-items: center;
-  gap: calc(var(--su) * 7);
-  font-size: calc(var(--su) * 12);
-  color: var(--ink2-d);
-  font-variant-numeric: tabular-nums;
-}
-[data-section="kpis"] .kpi7-mix-key i {
-  flex: none;
-  width: calc(var(--su) * 10);
-  height: calc(var(--su) * 10);
-  border-radius: 3px;
-}
-[data-section="kpis"] .kpi7-mix-key.pct i { background: var(--collar-blue); }
-[data-section="kpis"] .kpi7-mix-key.num i { background: rgba(244, 241, 230, 0.32); }
+/* (بطاقة «مزيج الصيغ» حُذفت في إصلاح مراجعة الجولة 2 — كانت تُقص عند
+   طية 1080p ومعلومتها معلنة في بطاقتي الصف الرئيسي 11/3) */
 
 /* بطاقة المصدر الحرفي */
 [data-section="kpis"] .kpi7-src .card-body { gap: calc(var(--su) * 8); }
@@ -720,6 +714,17 @@
   font-size: calc(var(--su) * 13.5);
   line-height: 1.7;
   color: var(--ink2-d);
+}
+/* حاشية تعريف النطاق (المؤشر 5) — وسم ذهبي متقطع: تحفظ اعتماد لا بيانات */
+[data-section="kpis"] .kpi7-profile-scope {
+  font-size: calc(var(--su) * 12.5);
+  line-height: 1.7;
+  color: var(--gold-hi);
+  background: rgba(214, 171, 76, 0.06);
+  border: 1px dashed rgba(214, 171, 76, 0.4);
+  border-radius: var(--r-sm);
+  padding: calc(var(--su) * 9) calc(var(--su) * 13);
+  margin: 0;
 }
 [data-section="kpis"] .kpi7-profile-note {
   font-size: calc(var(--su) * 12.5);

@@ -499,47 +499,58 @@
   color: var(--gold);
   font-size: calc(var(--su) * 11.5);
 }
+/* مفتاح الخريطة: حبة أفقية مدمجة أعلى الإطار خارج جسد المدينة —
+   إصلاح مراجعة الجولة 1: الصندوق السفلي القديم كان يحجب جنوب المدينة
+   (منطقة التركّز ذاتها) — لا كروم فوق البيانات بعد اليوم. */
 .geomap-legend {
   position: absolute;
   z-index: 15;
-  inset-inline-start: calc(var(--su) * 14);
-  bottom: calc(var(--su) * 34);
-  background: rgba(11, 21, 18, 0.82);
+  inset-inline-end: calc(var(--su) * 10);
+  top: calc(var(--su) * 10);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: calc(var(--su) * 4) calc(var(--su) * 10);
+  max-width: calc(100% - var(--su) * 20);
+  background: rgba(11, 21, 18, 0.78);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border: 1px solid var(--hair-d2);
-  border-radius: var(--r-sm);
-  padding: calc(var(--su) * 9) calc(var(--su) * 13);
+  border-radius: 999px;
+  padding: calc(var(--su) * 4) calc(var(--su) * 12);
   pointer-events: none;
 }
 .geomap-legend-title {
-  font-size: calc(var(--su) * 12.5);
+  font-size: calc(var(--su) * 11.5);
   font-weight: 700;
   color: var(--ink2-d);
-  margin-bottom: calc(var(--su) * 6);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .geomap-scale {
   display: flex;
   align-items: center;
-  gap: calc(var(--su) * 8);
-  font-size: calc(var(--su) * 11);
+  gap: calc(var(--su) * 6);
+  font-size: calc(var(--su) * 10.5);
   color: var(--mut-d);
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 .geomap-swatches { display: flex; }
 .geomap-swatch {
-  width: calc(var(--su) * 16);
-  height: calc(var(--su) * 9);
+  width: calc(var(--su) * 13);
+  height: calc(var(--su) * 8);
 }
 .geomap-swatch:first-child { border-radius: 3px 0 0 3px; }
 .geomap-swatch:last-child { border-radius: 0 3px 3px 0; }
 .geomap-legend-hs {
   display: flex;
   align-items: center;
-  gap: calc(var(--su) * 7);
-  margin-top: calc(var(--su) * 7);
-  font-size: calc(var(--su) * 11);
+  gap: calc(var(--su) * 6);
+  font-size: calc(var(--su) * 10.5);
   color: var(--mut-d);
+  white-space: nowrap;
 }
 .geomap-hs-dot {
   width: calc(var(--su) * 10);

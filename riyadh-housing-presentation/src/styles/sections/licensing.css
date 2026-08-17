@@ -172,12 +172,10 @@
 }
 /* وسيلة الإيضاح والإسناد أصغر داخل بطاقة القسم المدمجة (لا تطغى على الخريطة) */
 [data-section="licensing"] .lic-map-host .geomap-legend {
-  padding: calc(var(--su) * 6) calc(var(--su) * 10);
-  bottom: calc(var(--su) * 26);
+  padding: calc(var(--su) * 3) calc(var(--su) * 10);
 }
 [data-section="licensing"] .lic-map-host .geomap-legend-title {
   font-size: calc(var(--su) * 11);
-  margin-bottom: calc(var(--su) * 4);
 }
 [data-section="licensing"] .lic-map-host .geomap-scale {
   font-size: calc(var(--su) * 10);

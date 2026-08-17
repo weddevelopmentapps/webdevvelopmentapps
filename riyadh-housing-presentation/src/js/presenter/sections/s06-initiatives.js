@@ -1340,8 +1340,11 @@
       sub: fmt.noun(model.rows.length, "initiative"),
       cls: "ini-donut-card",
     });
+    /* compact: ارتفاع البطاقة خُفض لإفساح عمود الرؤى الثلاث الكاملة —
+       النسخة المدمجة تلائم القطر الصغير دون تراكب تسميات (الجولة 1) */
     const donut = RH.viz.charts2.statusDonut(res.body, ctx.su, {
       key: "initiatives",
+      compact: true,
     });
     wireChartClick(ctx, donut, (p) => {
       if (!p || p.componentType !== "series" || !p.name) return;
@@ -1382,10 +1385,11 @@
     res.card.appendChild(chips);
 
     /* 14.2) عمود الرؤى المحوكم (المفتاح القانوني "initiatives") — غيابه
-       الصادق بطاقة مدمجة لا اختلاق (عقد insightRail: null بصمت) */
-    /* compact: العمود الجانبي ضيق — العناوين وحدها تُعرض والنص الكامل في
-       الملحق/الملخص؛ دون ذلك تُبتر البطاقات بتمرير شريحة غير مقروءة */
-    const rail = RH.presenter.layout.insightRail(cell, "initiatives", { compact: true });
+       الصادق بطاقة مدمجة لا اختلاق (عقد insightRail: null بصمت).
+       الرؤى الثلاث كاملة بنصوصها (إصلاح مراجعة الجولة 1: الوضع المدمج كان
+       يخفي النصوص فتظهر بطاقة عنوان يتيمة) — القص عند الضيق الاستثنائي
+       على حدود الأسطر بعلامة … (ini-cell-side في initiatives.css). */
+    const rail = RH.presenter.layout.insightRail(cell, "initiatives");
     if (!rail) {
       RH.presenter.layout.pendingCard(cell, {
         label: "رؤى القسم قيد الاعتماد",
@@ -1399,7 +1403,7 @@
         h("span", { class: "ini-source-badge", title: model.source }, SOURCE_BADGE),
         h("span", { class: "ini-source-label" }, "مصدر طبقة الاستراتيجية"),
       ),
-      h("div", { class: "ini-source-text" }, model.source),
+      h("div", { class: "ini-source-text", title: model.source }, model.source),
     ));
 
     /* 14.4) سطر الحداثة والاحتساب */

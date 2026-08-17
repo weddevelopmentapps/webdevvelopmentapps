@@ -1388,9 +1388,11 @@
     stats.appendChild(h("div", { class: "fct-rank-title band" },
       "نطاق عدم اليقين شهرياً"));
     stats.appendChild(spark);
+    /* طرفا النطاق بصياغة معنونة كاملة — لا رمز سهم يتيماً بلا تسمية
+       (إصلاح مراجعة الجولة 1) */
     stats.appendChild(h("div", { class: "fct-band-ends" },
-      h("span", {}, fmt.compact(model.bandFirst)),
-      h("span", { class: "arrow", "aria-hidden": "true" }, "←"),
+      h("span", {}, "من " + fmt.compact(model.bandFirst)),
+      h("span", { class: "fct-band-to" }, "إلى"),
       h("span", {}, fmt.compact(model.bandLast)),
     ));
     cell.appendChild(stats);

@@ -422,19 +422,17 @@ RH.viz.charts2 = RH.viz.charts2 || {};
       };
     }
 
+    /* إصلاح مراجعة الجولة 1: تسميات الأساس الثلاث داخل مساحة الرسم كانت
+       تتصادم مع بعضها ومع المفتاح («الأساس 64» فوق «الأساس 118») —
+       القيم تُرسى الآن خارج مساحة الرسم في عنواني الشبكتين حصراً،
+       ويبقى خطا الأساس الذهبيان المتقطعان صامتين (القيمة في التلميح أيضاً). */
     const sOper = cumLine(mO, dataO, 0, 0);
-    /* حبتا أساس الرخص خارج الشبكة عند طرف نهايتها (الفجوة الفاصلة بين
-       الشبكتين المتجاورتين — فضاء فارغ مضمون فلا تصادم مع الخطوط) */
-    Object.assign(sOper.markLine.label, pillLabel("end"), {
-      distance: T.fs(su, 4),
-    });
+    sOper.markLine.label.show = false;
     const sBldg = cumLine(mB, dataB, 0, 0);
-    Object.assign(sBldg.markLine.label, pillLabel("end"), {
-      distance: T.fs(su, 4),
-    });
+    sBldg.markLine.label.show = false;
 
     const sBeds = cumLine(mS, dataS, 1, 1);
-    Object.assign(sBeds.markLine.label, pillLabel("insideStartTop"));
+    sBeds.markLine.label.show = false;
     /* مساحة متدرجة من صبغة الطاقة الواحدة — تتلاشى نحو الأرضية */
     sBeds.areaStyle = {
       color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
@@ -456,22 +454,36 @@ RH.viz.charts2 = RH.viz.charts2 || {};
       legend: legendBox(su, [mO.disp, mB.disp, mS.disp], compact
         ? { itemGap: T.fs(su, 12), textStyle: txtStyle(su, 12, T.C.ink2) }
         : null),
-      /* العنوانان فوق الشبكتين (لا داخل مساحة الرسم) ويعلنان الإجماليات */
-      title: [
-        {
-          text: "الرخص التراكمية — بناء " + fmt.int(cd.cur.building)
-            + " · تشغيلية " + fmt.int(cd.cur.operational),
-          right: T.fs(su, 8),
-          top: T.fs(su, compact ? 24 : 30),
-          textStyle: txtStyle(su, compact ? 12 : 13.5, T.C.ink2, 600),
-        },
-        {
-          text: "الأسرّة المرخصة — " + fmt.compact(cd.cur.beds),
-          left: T.fs(su, 8),
-          top: T.fs(su, compact ? 24 : 30),
-          textStyle: txtStyle(su, compact ? 12 : 13.5, T.C.ink2, 600),
-        },
-      ],
+      /* العنوانان فوق الشبكتين (لا داخل مساحة الرسم) ويعلنان الإجماليات.
+         إصلاح مراجعة الجولة 2: عند فئة العرض 1366 كان العنوانان يعبران خط
+         الالتقاء بين الشبكتين ويطبعان فوق بعضهما — عند الضيق حصراً يُحصر
+         كل عنوان بعرض عموده (42٪ من عرض العنصر) مع قطع بعلامة الحذف بدل
+         التصادم؛ في المقاس الكامل يتسعان كاملين كما ثبت بالمعاينة. */
+      title: (() => {
+        const colW = T.narrow()
+          ? Math.max(150, Math.floor((el.clientWidth || 640) * 0.42))
+          : null;
+        const clampW = (ts) => (colW
+          ? Object.assign(ts, { width: colW, overflow: "truncate" })
+          : ts);
+        return [
+          {
+            text: "الرخص التراكمية — تشغيلية " + fmt.int(cd.cur.operational)
+              + " (الأساس " + fmt.int(cd.base.operational) + ") · بناء "
+              + fmt.int(cd.cur.building) + " (الأساس " + fmt.int(cd.base.building) + ")",
+            right: T.fs(su, 8),
+            top: T.fs(su, compact ? 24 : 30),
+            textStyle: clampW(txtStyle(su, compact ? 11 : 12.5, T.C.ink2, 600)),
+          },
+          {
+            text: "الأسرّة المرخصة — " + fmt.compact(cd.cur.beds)
+              + " (الأساس " + fmt.compact(cd.base.beds) + ")",
+            left: T.fs(su, 8),
+            top: T.fs(su, compact ? 24 : 30),
+            textStyle: clampW(txtStyle(su, compact ? 11 : 12.5, T.C.ink2, 600)),
+          },
+        ];
+      })(),
       grid: [
         { top: T.fs(su, compact ? 50 : 62), bottom: T.fs(su, compact ? 24 : 38),
           left: "57%", right: T.fs(su, 8), containLabel: true },
@@ -493,11 +505,16 @@ RH.viz.charts2 = RH.viz.charts2 || {};
         }),
       ],
       /* splitNumber صغير: علامات قليلة مقروءة في شبكتين قصيرتين */
+      /* علامتان إلى ثلاث كحد أقصى لكل شبكة مصغرة — إصلاح مراجعة الجولة 1:
+         كانت العلامات تتراكب (620/600/580 و140…60 مندمجة فلا تُقرأ) */
       yAxis: [
         T.valAxis(su, fmt.int, { gridIndex: 0, min: licLo, max: licHi,
-          minInterval: 1, splitNumber: 4 }),
+          minInterval: 1, splitNumber: 2 }),
+        /* إصلاح مراجعة الجولة 2: كانت علامتا «600 ألف/570 ألف» تطبعان فوق
+           بعضهما — علامتان عند طرفي الشبكة حصراً (المدى الكامل) بأقصى
+           تباعد رأسي ممكن، فلا تصادم في أي مقاس. */
         T.valAxis(su, axisK, { gridIndex: 1, min: bedLo, max: bedHi,
-          position: "left", splitNumber: 4 }),
+          position: "left", interval: bedHi - bedLo }),
       ],
       tooltip: Object.assign(T.tooltip(su), {
         trigger: "axis",
@@ -638,10 +655,12 @@ RH.viz.charts2 = RH.viz.charts2 || {};
           },
         }),
       ],
+      /* إصلاح مراجعة الجولة 2: علامتان كحد أقصى عند العرض الضيق (1366) */
       yAxis: [
-        T.valAxis(su, fmt.int, { gridIndex: 0, splitNumber: 3 }),
-        T.valAxis(su, fmt.int, { gridIndex: 1, minInterval: 1, splitNumber: 3,
-          position: "left" }),
+        T.valAxis(su, fmt.int, { gridIndex: 0,
+          splitNumber: T.narrow() ? 2 : 3 }),
+        T.valAxis(su, fmt.int, { gridIndex: 1, minInterval: 1,
+          splitNumber: T.narrow() ? 2 : 3, position: "left" }),
       ],
       tooltip: Object.assign(T.tooltip(su), {
         trigger: "axis",
@@ -998,9 +1017,13 @@ RH.viz.charts2 = RH.viz.charts2 || {};
           },
         }),
       ],
+      /* إصلاح مراجعة الجولة 2: علامتان كحد أقصى عند العرض الضيق (1366)
+         بدل ثلاث كانت تندمج (150/100/50 ألف و30/20/10) */
       yAxis: [
-        T.valAxis(su, fmt.int, { gridIndex: 0, minInterval: 1, splitNumber: 3 }),
-        T.valAxis(su, axisK, { gridIndex: 1, splitNumber: 3, position: "left" }),
+        T.valAxis(su, fmt.int, { gridIndex: 0, minInterval: 1,
+          splitNumber: T.narrow() ? 2 : 3 }),
+        T.valAxis(su, axisK, { gridIndex: 1,
+          splitNumber: T.narrow() ? 2 : 3, position: "left" }),
       ],
       tooltip: Object.assign(T.tooltip(su), {
         trigger: "axis",
@@ -1224,7 +1247,7 @@ RH.viz.charts2 = RH.viz.charts2 || {};
         },
       }),
       yAxis: T.valAxis(su, isBeds ? axisK : fmt.int, Object.assign(
-        { min: yMin, max: yMax, splitNumber: 4 },
+        { min: yMin, max: yMax, splitNumber: 2 },
         isBeds ? null : { minInterval: 1 })),
       tooltip: Object.assign(T.tooltip(su), {
         trigger: "item",
@@ -1260,16 +1283,13 @@ RH.viz.charts2 = RH.viz.charts2 || {};
             ? plusInt(adds[p.dataIndex])
             : ""),
         },
-        /* خط الأساس الذهبي الرفيع المتقطع — تسمية حبة عند حافة بداية المحور */
+        /* خط الأساس الذهبي الرفيع المتقطع — صامت التسمية: القيمة معلنة في
+           إعلان الطرف الغني وفي التلميح (إصلاح مراجعة الجولة 1: كانت الحبة
+           داخل مساحة الرسم تغطي عموداً وتسمية شهر) */
         markLine: (() => {
-          const ml = T.targetLine(su, meta.base, "خط الأساس " + fV(meta.base));
+          const ml = T.targetLine(su, meta.base, "");
           ml.lineStyle.width = 1.5;
-          Object.assign(ml.label, {
-            position: "insideStartBottom",
-            backgroundColor: "rgba(11,21,18,.82)",
-            padding: [T.fs(su, 2), T.fs(su, 5)],
-            borderRadius: 6,
-          });
+          ml.label.show = false;
           return ml;
         })(),
         data: barData,

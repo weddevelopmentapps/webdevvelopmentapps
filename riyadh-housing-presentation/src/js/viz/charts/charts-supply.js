@@ -732,9 +732,12 @@ RH.viz.charts2 = RH.viz.charts2 || {};
         silent: true,
         symbol: "none",
         lineStyle: { color: T.C.gold, width: 2, type: "dashed" },
+        /* إصلاح مراجعة الجولة 2: في المصغر (بطاقة الخاتمة) كان خط 60٪ قرب
+           سقف الشبكة وحبته فوقه تطبع على عنوان الرسم كصندوق شبحي —
+           تحت الخط في المدمج (السلسلة ≤43٪ فلا تصادم)، وفوقه في الموسع. */
         label: {
           show: true,
-          position: "insideStartTop",
+          position: compact ? "insideStartBottom" : "insideStartTop",
           color: T.C.gold,
           fontFamily: "Cairo",
           fontSize: T.fs(su, compact ? 11.5 : 13),
@@ -859,8 +862,14 @@ RH.viz.charts2 = RH.viz.charts2 || {};
       if (r.conservative > hi) hi = r.conservative;
     }
     if (withBaseline && deficitNow < lo) lo = deficitNow;
-    const yMin = Math.floor((lo * 0.985) / 1000) * 1000;
     const yMax = Math.ceil((hi * 1.01) / 1000) * 1000;
+    /* حزام سفلي محجوز تحت أدنى قيمة: يضمن أن حبة «العجز الحالي» أسفل خط
+       الأساس تبقى داخل مساحة الرسم ولا تغطي تسميات المحور الزمني أبداً.
+       إصلاح مراجعة الجولة 2: الحزام في المدمج 34٪ (كان 18٪) — عند 1366 كانت
+       الحبة تطبع فوق تسميات الأشهر (مارس/يناير/نوفمبر) لضيق الحزام، ورفعه
+       يرفع خط الأساس والحبة معه بعيداً عن حزام المحور. */
+    const belt = compact ? 0.34 : 0.18;
+    const yMin = Math.floor((lo - (yMax - lo) * belt) / 1000) * 1000;
 
     const cats = monthCats(rows, compact);
 
@@ -921,6 +930,7 @@ RH.viz.charts2 = RH.viz.charts2 || {};
         s.markLine = T.targetLine(su, deficitNow,
           "العجز الحالي " + fmt.compact(deficitNow) + " سرير");
         s.markLine.label.position = "insideStartBottom";
+        s.markLine.label.fontSize = T.fs(su, compact ? 10.5 : 12);
         s.markLine.label.backgroundColor = "rgba(11,21,18,.82)";
         s.markLine.label.padding = [T.fs(su, 2), T.fs(su, 5)];
         s.markLine.label.borderRadius = 6;
@@ -945,11 +955,16 @@ RH.viz.charts2 = RH.viz.charts2 || {};
         ? Object.assign(caveatBadge(su, "مورّدة — غير معتمدة"),
           { left: null, right: T.fs(su, 8) })
         : caveatBadge(su, "سيناريوهات مورّدة — غير معتمدة")],
+      /* هوامش المدمج موسعة (يسار/أسفل): علامات «ألف» وتسميات الأشهر كانت
+         تُقص عند 1366×768 — إصلاح مراجعة الجولة 1.
+         إصلاح مراجعة الجولة 2: قناة علامات القيم اليمنى في المدمج 78 (كانت
+         54) — «914 ألف» كانت تفقد رقمها الأخير عند حافة البطاقة في 1366
+         فتُقرأ «91 ألف» — لا يُقص أي رقم بعد الآن. */
       grid: gridBox(su, compact, {
         top: T.fs(su, compact ? 40 : 50),
-        bottom: T.fs(su, compact ? 30 : 42),
-        left: T.fs(su, compact ? 68 : 104),
-        right: T.fs(su, compact ? 50 : 72),
+        bottom: T.fs(su, compact ? 38 : 42),
+        left: T.fs(su, compact ? 88 : 104),
+        right: T.fs(su, compact ? 78 : 72),
       }),
       xAxis: T.catXAxis(su, cats, {
         axisLabel: {

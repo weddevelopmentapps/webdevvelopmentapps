@@ -25,7 +25,7 @@ RH.viz.geomap = (function () {
   const RAMPS = {
     seq: ["#1E4432", "#27573E", "#2F6E4E", "#31A26D", "#4CC18C"],
     viol: ["#4A241A", "#6B3222", "#8C4630", "#B0563C", "#D66A50"],
-    demand: ["#3A2F15", "#54431E", "#6F5827", "#8C7132", "#AA8A3E"],
+    demand: ["#33290F", "#4A3B16", "#63501E", "#7F6526", "#9C7A2E"],
   };
 
   /** تعريف الطبقات: القيمة قطاعية من الإصدار حصراً */
@@ -359,6 +359,19 @@ RH.viz.geomap = (function () {
     let lmap = null, lpolys = [], lhots = [];
     let effectiveMode = "svg";
     let tileWatch = 0;
+    /* مواءمة الإطار (إصلاح مراجعة الجولة 1): المحرك يبني القسم في مضيف
+       احتياطي ثم يبدّله، فيقع fitBounds الأول على مقاس صفري وتظهر المدينة
+       مقصوصة. الحل: مواءمة غير متحركة تُعاد بعد أول قياس حقيقي وعند كل
+       تغيّر مقاس ما لم يتدخل المستخدم بسحب/تكبير يدوي (فلا نصادر تحكمه). */
+    let fitting = false, userMoved = false;
+    function fitAll() {
+      if (!lmap) return;
+      fitting = true;
+      try {
+        lmap.invalidateSize({ animate: false });
+        lmap.fitBounds(GEO.bounds, { padding: [10, 10], animate: false });
+      } finally { fitting = false; }
+    }
 
     function tilesAvailable() {
       return !!window.L && navigator.onLine !== false;
@@ -395,7 +408,13 @@ RH.viz.geomap = (function () {
       tileWatch = setTimeout(() => {
         if (!sawTile && effectiveMode === "tiles") setMode("svg");
       }, 3000);
-      lmap.fitBounds(GEO.bounds, { padding: [8, 8] });
+      /* تتبع تدخل المستخدم: سحب/تكبير يدوي يوقف المواءمة التلقائية */
+      lmap.on("dragend", () => { userMoved = true; });
+      lmap.on("zoomend", () => { if (!fitting) userMoved = true; });
+      fitAll();
+      /* المواءمة بعد التخطيط الفعلي لا قبله: المضيف الاحتياطي يُبدَّل في
+         الإطار التالي فيصبح للمقاس قيمته الحقيقية عندها */
+      requestAnimationFrame(() => { if (!userMoved) fitAll(); });
 
       lpolys = [];
       districts.forEach((item, i) => {
@@ -487,7 +506,11 @@ RH.viz.geomap = (function () {
     }
 
     function refresh() {
-      if (lmap) lmap.invalidateSize();
+      if (!lmap) return;
+      lmap.invalidateSize();
+      /* إعادة المواءمة مع كل تغيّر مقاس ما لم يتدخل المستخدم — تضمن ظهور
+         القطاعات الخمسة كاملة في أي إطار بطاقة (قصير عريض أو ممتد) */
+      if (!userMoved) fitAll();
     }
 
     function destroy() {

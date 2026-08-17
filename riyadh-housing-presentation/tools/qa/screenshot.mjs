@@ -18,9 +18,11 @@ const OUT = path.resolve(argOf("--out", path.join(ROOT, "tools", "qa", "shots"))
 const ROUTES = argOf("--routes",
   ["scene/00",
     "section/summary", "section/demand", "section/licensing", "section/control",
-    "section/map", "section/initiatives", "section/kpis", "section/forecast",
-    "section/closing",
-    "appendix/demand", "appendix/monitoring"].join(",")).split(",");
+    "section/map", "section/initiatives", "section/kpis",
+    "section/kpis?step=1", "section/kpis?step=2",
+    "section/forecast", "section/closing",
+    "appendix/demand", "appendix/monitoring", "appendix/kpi",
+    "appendix/pillar", "appendix/licensing"].join(",")).split(",");
 const SIZES = argOf("--sizes", "1920x1080,1366x768").split(",")
   .map((s) => s.split("x").map(Number));
 
@@ -45,9 +47,42 @@ for (const [w, hgt] of SIZES) {
   page.on("pageerror", (err) => consoleErrors.push(`[${w}x${hgt}] PAGEERROR ${err.message}`));
   for (const route of ROUTES) {
     await page.goto(indexUrl + "#/" + route, { waitUntil: "load" });
-    await page.waitForTimeout(1400); // استقرار الحركة والعد
+    // استقرار كامل: حركات الدخول والعد التصاعدي + مهلة سقوط بلاطات الخريطة
+    // إلى SVG (3 ثوانٍ) — فلا تُلتقط اللوحة في حالة انتقالية أبداً
+    await page.waitForTimeout(4000);
     const name = route.replace(/[\/?=&]/g, "_") + `_${w}x${hgt}.png`;
     await page.screenshot({ path: path.join(OUT, name) });
+
+    // بوابات «لا صف بيانات مقصوص»: عناصر معدودة يجب أن تكون كاملة داخل
+    // إطار العرض (مراجعة الجولة 1 — صف الجنوب وصف المتفائل المقصوصان)
+    const VISIBLE_COUNTS = {
+      "section/control": [[".ctl-mon-row", 5]],
+      "section/forecast": [[".fct-rank-row", 3], [".fct-sc", 3]],
+      "section/map": [[".map-sec", 1]], // الأسوأ تغطيةً يتصدر فوق خط الطي
+    };
+    const checks = VISIBLE_COUNTS[route];
+    if (checks) {
+      for (const [sel, wanted] of checks) {
+        const fullyVisible = await page.evaluate(([s, n]) => {
+          const els = Array.from(document.querySelectorAll(s));
+          const vh = window.innerHeight, vw = window.innerWidth;
+          const ok = els.filter((el) => {
+            const r = el.getBoundingClientRect();
+            if (r.width < 2 || r.height < 8) return false; // منهار = مقصوص فعلياً
+            if (r.top < -1 || r.bottom > vh + 1) return false;
+            if (r.left < -1 || r.right > vw + 1) return false;
+            // غير مقصوص بأسلاف overflow: نقطة مركزه تصله فعلاً
+            const cx = (r.left + r.right) / 2, cy = (r.top + r.bottom) / 2;
+            const hit = document.elementFromPoint(cx, cy);
+            return !!hit && (el === hit || el.contains(hit) || hit.contains(el));
+          });
+          return ok.length;
+        }, [sel, wanted]);
+        if (fullyVisible < wanted) {
+          consoleErrors.push(`[${w}x${hgt}] ${route}: ${sel} — الظاهر كاملاً ${fullyVisible} من ${wanted} (صف بيانات مقصوص!)`);
+        }
+      }
+    }
     // بوابة اللاتمرير على مستوى المسرح: لا تمرير في المضيف ولا في جذر
     // المشهد/اللوحة (.sc للغلاف والملاحق، .dash لأقسام V2). جسم اللوحة
     // .dash-body يجوز له التمرير الداخلي بعقد V2 (وضع اللوحة) — لا يُحتسب.

@@ -630,9 +630,28 @@ RH.viz.charts2 = RH.viz.charts2 || {};
       "لا عدد سالب": rows.every((r) => r.count >= 0),
     });
 
+    /* إصلاح مراجعة الجولة 2: عند العرض الضيق (فئة 1366) كانت أعلى تسميتين
+       تُحذفان («الاكتظاظ وتجا…» و«اشتراطات السل…») — تسميات مختصرة معتمدة
+       لكل نوع تُعرض كاملة دون أي حذف، والاسم الحرفي الكامل من الإصدار يبقى
+       في التلميح وجدول قارئ الشاشة. */
+    const SHORT_NAMES = {
+      "overcrowding": "الاكتظاظ",
+      "fire-safety": "اشتراطات السلامة",
+      "hygiene": "النظافة والصحة",
+      "unlicensed": "نشاط دون ترخيص",
+      "electrical": "الكهرباء والسباكة",
+      "ventilation": "التهوية والعزل",
+    };
+    const shortMode = compact && T.narrow();
+    const axName = (r) => (shortMode && SHORT_NAMES[r.id]) || r.name;
+
     /* محور الفئات بتسميات كاملة: بلا width → overflow:none في مساعد الثيم.
        الوضع المدمج يصغّر الخط فقط — البتر ممنوع في الوضعين */
-    const yAx = T.hCatAxis(su, rows.map((r) => r.name));
+    const yAx = T.hCatAxis(su, rows.map(axName),
+      /* عرض أقصى للتسمية = الحاشية المحجوزة لها ناقص هامش: القص عند الضيق
+         يصير حذفاً منطقياً بعلامة … في نهاية العبارة (RTL سليم) لا بتراً
+         لأولها عند حافة البطاقة — إصلاح مراجعة الجولة 1 عند 1366×768 */
+      T.fs(su, compact ? 200 : 254));
     if (compact) yAx.axisLabel.fontSize = T.fs(su, 12);
 
     const c = T.chart(cid("violationTypes", opts), el);
@@ -810,11 +829,14 @@ RH.viz.charts2 = RH.viz.charts2 || {};
     c.setOption(Object.assign(T.base(su), {
       /* top ≥ 72px مع المبدّل: أعلى عمود ووسمه يخلوان من رقاقات المبدّل
          (إصلاح المراجعة: كانت الرقاقات تحجب قيمة عمود الجنوب) */
+      /* إصلاح مراجعة الجولة 2: قناة علامات القيم اليمنى في المدمج 70
+         (كانت 48) — «1,500» كانت تفقد رقمها الأخير عند حافة بطاقة
+         الخاتمة في 1366 */
       grid: gridBox(su, compact, {
         top: T.fs(su, compact ? 34 : (withToggle ? 80 : 40)),
         bottom: T.fs(su, compact ? 26 : 34),
         left: T.fs(su, 14),
-        right: T.fs(su, compact ? 48 : 66),
+        right: T.fs(su, compact ? 70 : 66),
       }),
       tooltip: Object.assign(T.tooltip(su), {
         trigger: "axis",

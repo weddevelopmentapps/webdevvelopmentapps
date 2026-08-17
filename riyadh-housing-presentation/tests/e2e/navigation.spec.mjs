@@ -182,6 +182,48 @@ await settle(1100);
 check("قفل الانتقال يمنع القفز المزدوج", (await hash()).includes("/section/demand"),
   "الهاش: " + (await hash()));
 
+// ── حارس قصّ تسميات المحاور عند 1366×768 (إصلاح مراجعة الجولة 2) ──
+// بطاقة «سيناريوهات العجز المتوقع» في الملخص كانت تفقد الرقم الأخير من
+// علاماتها («91 ألف» بدل «914 ألف») — الحارس يقيس أعرض تسمية فعلية للمحور
+// ويؤكد أن قناة العلامات (grid.right ناقص هامش التسمية) تسعها كاملة.
+{
+  const page2 = await browser.newPage({ viewport: { width: 1366, height: 768 } });
+  await page2.goto(URL0 + "#/section/summary", { waitUntil: "load" });
+  await page2.waitForTimeout(1600);
+  const clip = await page2.evaluate(() => {
+    const cards = Array.from(document.querySelectorAll(".dash-card"));
+    const card = cards.find((c) =>
+      (c.textContent || "").includes("سيناريوهات العجز المتوقع"));
+    if (!card) return { err: "لم تُعثر بطاقة السيناريوهات" };
+    let inst = null;
+    for (const n of [card, ...card.querySelectorAll("*")]) {
+      inst = window.echarts.getInstanceByDom(n);
+      if (inst) break;
+    }
+    if (!inst) return { err: "لا مثيل ECharts على المضيف" };
+    const opt = inst.getOption();
+    const grid = opt.grid && opt.grid[0];
+    const yAxis = opt.yAxis && opt.yAxis[0];
+    if (!grid || !yAxis) return { err: "لا شبكة/محور في الخيار" };
+    let labels = [];
+    try {
+      labels = inst.getModel().getComponent("yAxis", 0).axis.getViewLabels()
+        .map((l) => l.formattedLabel);
+    } catch (e) { return { err: "getViewLabels: " + e.message }; }
+    const al = yAxis.axisLabel || {};
+    const ctx2d = document.createElement("canvas").getContext("2d");
+    ctx2d.font = (al.fontSize || 12) + "px '"
+      + (al.fontFamily || "IBM Plex Sans Arabic") + "'";
+    const maxW = Math.max(...labels.map((t) => ctx2d.measureText(t).width), 0);
+    const margin = al.margin == null ? 8 : al.margin;
+    const room = (typeof grid.right === "number" ? grid.right : 0) - margin;
+    return { labels, maxW: Math.round(maxW), room: Math.round(room) };
+  });
+  check("علامات محور سيناريوهات الملخص غير مقصوصة عند 1366×768",
+    !clip.err && clip.room >= clip.maxW, JSON.stringify(clip));
+  await page2.close();
+}
+
 // ── لا أخطاء صفحة ──
 check("لا أخطاء JavaScript في كل الجولة", errors.length === 0, errors.join(" | "));
 

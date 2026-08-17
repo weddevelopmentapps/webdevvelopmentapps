@@ -1341,7 +1341,13 @@
 
     const refs = []; // مراجع التحديث الحي: {sector, barEl, valEl}
 
-    for (const s of rel.sectors) {
+    /* الترتيب التنفيذي الصحيح: تصاعدياً بنسبة التغطية — الأسوأ أولاً،
+       فيتصدر الجنوب (34.8٪) العمود فوق خط الطي دائماً (مراجعة الجولة 1:
+       كان الترتيب جغرافياً فيغيب الجنوب تحت الطي وهو جواب السؤال الأول) */
+    const byCoverageAsc = rel.sectors.slice().sort((a, b) =>
+      der.sector[a.id].coverage_pct - der.sector[b.id].coverage_pct);
+
+    for (const s of byCoverageAsc) {
       const sd = der.sector[s.id];
       const gs = geoStats[s.id] || null;
 
@@ -1379,10 +1385,18 @@
             h("b", {}, fmt.int(s.violations)),
             h("span", {}, "مخالفة"),
           ),
-          h("span", { class: "map-sec-cellv" },
-            h("b", {}, fmt.int(s.monitors)),
-            h("span", {}, "مراقب"),
-          ),
+          /* العدد والمعدود عبر fmt.noun حصراً (قاعدة رأس الملف): «3 مراقبين»
+             لا «3 مراقب» — إصلاح مراجعة الجولة 1 (المراجع اللغوي) */
+          (() => {
+            const full = fmt.noun(s.monitors, "monitor");
+            const prefix = fmt.int(s.monitors) + fmt.NBSP;
+            const unit = full.indexOf(prefix) === 0
+              ? full.slice(prefix.length) : full;
+            return h("span", { class: "map-sec-cellv" },
+              h("b", {}, fmt.int(s.monitors)),
+              h("span", {}, unit),
+            );
+          })(),
         ),
       );
 

@@ -44,10 +44,11 @@
      ▸ العمود الجانبي (4 من 12):
          صف 1: مصفوفة المؤشرات (kpiMatrix القانوني — جدول كثيف بفرز تفاعلي)
          صف 2: بطاقة الصدق «القيم الحالية تُسجَّل من المنصة» (بنص ملاحظة
-               الإصدار حرفياً) + مزيج الصيغ (شريط مكدس 11/3) + بطاقة المصدر
+               الإصدار حرفياً) + بطاقة المصدر
                بنصه الحرفي + عمود رؤى insight_panels.sections.initiatives
                (المفتاح القانوني الأقرب — موسوم بمرجعه بصدق) + سطر الحداثة
-               وبوابات التحقق.
+               وبوابات التحقق. (بطاقة «مزيج الصيغ» حُذفت في الجولة 2 —
+               معلومتها معلنة في بطاقتي الصف الرئيسي 11/3.)
 
      ▸ وصول عميق عبر معاملات المسار (عقد ctx.params — تُقرأ ولا تُكتب يدوياً):
          ‎#/section/kpis?kpi=13‎      يفتح ملف المؤشر 13 مباشرة
@@ -709,6 +710,18 @@
         { k: "القيمة الحالية", v: "غير متوفرة", cls: "pending" },
       ]),
       h("p", { class: "kpi7-profile-ctx" }, contextLine),
+      /* حاشية تعريف نطاق للمؤشر 5 (قالب كود ثابت لا بيانات مختلقة —
+         مراجعة الشريك الجولة 1): خط أساسه 130 ألفاً ومستهدفه 260 ألفاً
+         بينما اللوحة تعلن 612,400 سرير مرخص اليوم — التوتر التعريفي يُعلن
+         للحاضر بدل أن يُترك سؤالاً مفتوحاً أمام الأمين */
+      (!k.pct && k.id === 5 && /الأسرة المرخصة/.test(String(k.name)))
+        ? h("p", { class: "kpi7-profile-scope" },
+          "تنبيه تعريفي: القيمتان (خط الأساس 130,000 والمستهدف 260,000) كما "
+          + "وردتا حرفياً في خطة عمل المشروع V.1.0.0 — نطاق قياس المؤشر يخص "
+          + "منظومة ترخيص السكن الجماعي المحدثة ويختلف تعريفياً عن إجمالي "
+          + "الطاقة الاستيعابية المرخصة المعلن في اللوحات (612,400 سرير)؛ "
+          + "توحيد التعريفين يُعتمد مع تسجيل القيم الحالية من المنصة.")
+        : null,
       h("p", { class: "kpi7-profile-note" }, String(k.current_note)),
       h("p", { class: "kpi7-profile-src" }, "المصدر: " + String(rel.strategy.source)),
       h("div", { class: "kpi7-profile-actions" },
@@ -1346,37 +1359,11 @@
     });
     col.appendChild(baseRow);
 
-    /* ── 10.c مزيج الصيغ — شريط مكدس صغير (أزرق تصنيفي ثانوي + حياد) ── */
-    const pctShare = pctOf(model.pctList.length, model.kpis.length);
-    const absShare = pctOf(model.absList.length, model.kpis.length);
-    const mix = h("div", { class: "kpi7-mix" },
-      h("div", { class: "kpi7-mix-title" }, "مزيج الصيغ"),
-      h("div", { class: "kpi7-mix-bar", "aria-hidden": "true" },
-        (() => {
-          const a = h("span", { class: "kpi7-mix-seg pct" });
-          a.style.width = pctShare + "%";
-          return a;
-        })(),
-        (() => {
-          const b = h("span", { class: "kpi7-mix-seg num" });
-          b.style.width = absShare + "%";
-          return b;
-        })(),
-      ),
-      h("div", { class: "kpi7-mix-legend" },
-        h("span", { class: "kpi7-mix-key pct" },
-          h("i", { "aria-hidden": "true" }),
-          "نسبة مئوية — " + fmt.noun(model.pctList.length, "indicator")
-          + " (" + fmt.pct(pctShare) + ")",
-        ),
-        h("span", { class: "kpi7-mix-key num" },
-          h("i", { "aria-hidden": "true" }),
-          "قيمة عددية — " + fmt.noun(model.absList.length, "indicator")
-          + " (" + fmt.pct(absShare) + ")",
-        ),
-      ),
-    );
-    col.appendChild(mix);
+    /* ── 10.c (محذوف — إصلاح مراجعة الجولة 2): بطاقة «مزيج الصيغ» كانت
+       تُقص عند طية 1080p فلا يظهر منها إلا العنوان وشريط بلا وسوم، وسطر
+       إصدار المنصة يطبع فوقها — والمعلومة نفسها معلنة أصلاً في بطاقتي
+       الصف الرئيسي «بصيغة نسبة مئوية 11» و«بصيغة قيمة عددية 3»،
+       فحذفها يحرر العمود ولا يفقد اللوحة أي حقيقة. ── */
 
     /* ── 10.d بطاقة المصدر الحرفي + معبر إلى قسم المبادرات ── */
     const src = RH.presenter.layout.card(col, {
