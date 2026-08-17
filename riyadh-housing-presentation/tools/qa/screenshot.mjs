@@ -22,12 +22,184 @@ const ROUTES = argOf("--routes",
     "section/kpis?step=1", "section/kpis?step=2",
     "section/forecast", "section/closing",
     "appendix/demand", "appendix/monitoring", "appendix/kpi",
-    "appendix/pillar", "appendix/licensing"].join(",")).split(",");
+    "appendix/pillar", "appendix/licensing",
+    // ── حزمة التوسعة: ملاحقها الأربعة الجديدة ──
+    "appendix/atlas", "appendix/scenarios",
+    "appendix/methodology", "appendix/decisions",
+    // ── مركز المقارنة القطاعية: صفحاته الخمس (المصفوفة، بطاقة القطاع،
+    //    الفجوة والتركّز، مطابقة المجاميع، الصيغ والمصادر) ──
+    "appendix/compare", "appendix/compare?page=1", "appendix/compare?page=2",
+    "appendix/compare?page=3", "appendix/compare?page=4",
+    // ── حالات لا يبلغها العنوان وحده (تفاعل لازم) — أسماء زائفة يحلّها
+    //    جدول PSEUDO أدناه: وضع الموجز، لوحة الأوامر مفتوحة، خطوة جولة ──
+    "state/report", "state/report-print",
+    "state/palette", "state/tour"].join(",")).split(",");
 const SIZES = argOf("--sizes", "1920x1080,1366x768").split(",")
   .map((s) => s.split("x").map(Number));
 
 fs.mkdirSync(OUT, { recursive: true });
 const indexUrl = "file://" + path.join(ROOT, "index.html");
+
+/* ════════════════════════════════════════════════════════════════════════════
+   المسارات الزائفة (state/*) — حالات حزمة التوسعة التي لا يبلغها الهاش وحده
+   ────────────────────────────────────────────────────────────────────────────
+   كلٌّ منها: هاش انطلاق + تهيئة تفاعلية + تأكيدات خاصة بالحالة. تُشغَّل داخل
+   حلقة المقاسات ذاتها فتخضع لفحص الكونسول نفسه، وتنتج لقطة مسمّاة كبقية
+   المسارات. تخرج التأكيدات بقائمة نصوص أخطاء (فارغة = خضراء).
+   ══════════════════════════════════════════════════════════════════════════ */
+const PSEUDO = {
+  /* وضع الموجز التنفيذي: مستند A4 يتجاوز المسرح كلياً */
+  "state/report": {
+    hash: "#/report",
+    settle: 5000,
+    async check(page) {
+      return page.evaluate(() => {
+        const errs = [];
+        if (!document.body.classList.contains("mode-report")) {
+          errs.push("وضع الموجز غير مفعّل على body");
+        }
+        const root = document.getElementById("report-root");
+        if (!root || root.hidden) errs.push("جذر الموجز غائب أو مخفي");
+        const pages = document.querySelectorAll(".rpt-page");
+        if (pages.length < 3) errs.push("صفحات الموجز " + pages.length + " (<3)");
+        const stage = document.getElementById("stage");
+        if (stage && !stage.hidden) errs.push("المسرح ظاهر في وضع الموجز");
+        const hud = document.getElementById("hud");
+        if (hud && !hud.hidden) errs.push("شريط HUD ظاهر في وضع الموجز");
+        const admin = document.getElementById("admin-root");
+        if (admin && !admin.hidden) errs.push("جذر الإدارة يتعايش مع الموجز");
+        return errs;
+      });
+    },
+  },
+
+  /* بوابة الطباعة (البند 5): محاكاة media:print على مسار الموجز — لا شيء
+     غير المستند مرئي، ولا شريط أدوات، ولا كروم مقدِّم. */
+  "state/report-print": {
+    hash: "#/report",
+    settle: 5000,
+    async before(page) { await page.emulateMedia({ media: "print" }); },
+    async after(page) { await page.emulateMedia({ media: null }); },
+    async check(page) {
+      return page.evaluate(() => {
+        const errs = [];
+        const vis = (el) => {
+          if (!el) return false;
+          if (el.hidden) return false;
+          const cs = getComputedStyle(el);
+          if (cs.display === "none" || cs.visibility === "hidden") return false;
+          return el.getBoundingClientRect().height > 1;
+        };
+        // (أ) كل ما ليس الموجز مخفيٌّ فعلياً عند الطباعة
+        for (const id of ["stage", "hud", "release-badge", "admin-root"]) {
+          if (vis(document.getElementById(id))) errs.push("ظاهر عند الطباعة: #" + id);
+        }
+        for (const sel of [".rpt-toolbar", ".hudx-palette", ".hudx-report",
+          ".tour-bar", ".tour-notes", ".pal-root"]) {
+          const el = document.querySelector(sel);
+          if (vis(el)) errs.push("ظاهر عند الطباعة: " + sel);
+        }
+        // (ب) المستند نفسه ظاهر بصفحاته
+        const root = document.getElementById("report-root");
+        if (!vis(root)) errs.push("مستند الموجز غير مرئي عند الطباعة");
+        const pages = Array.from(document.querySelectorAll(".rpt-page")).filter(vis);
+        if (pages.length < 3) errs.push("صفحات مرئية عند الطباعة " + pages.length + " (<3)");
+        // (ج) لا صفحة تفيض عرضياً عن ورقتها (كسر تخطيط الطباعة)
+        for (const p of pages) {
+          if (p.scrollWidth > p.clientWidth + 2) {
+            errs.push("صفحة موجز تفيض عرضياً: " + (p.className || ""));
+          }
+        }
+        return errs;
+      });
+    },
+  },
+
+  /* لوحة الأوامر مفتوحة فوق لوحة حية (Ctrl+K) */
+  "state/palette": {
+    hash: "#/section/demand",
+    settle: 2600,
+    async prepare(page) {
+      await page.keyboard.press("Control+KeyK");
+      await page.waitForTimeout(700);
+      await page.keyboard.type("الرياض");
+      await page.waitForTimeout(700);
+    },
+    async check(page) {
+      return page.evaluate(() => {
+        const errs = [];
+        const dlg = document.querySelector('[role="dialog"][aria-modal="true"]');
+        if (!dlg) { errs.push("لوحة الأوامر لم تُفتح بـ Ctrl+K"); return errs; }
+        const input = dlg.querySelector(".pal-input");
+        if (!input) errs.push("حقل بحث اللوحة غائب");
+        else if (document.activeElement !== input) {
+          errs.push("التركيز ليس في حقل البحث عند الفتح");
+        }
+        const r = dlg.getBoundingClientRect();
+        if (r.bottom > window.innerHeight + 1 || r.top < -1) {
+          errs.push("جذر اللوحة خارج إطار العرض رأسياً");
+        }
+        const list = dlg.querySelector(".pal-list");
+        if (list && list.scrollWidth > list.clientWidth + 2) {
+          errs.push("قائمة النتائج تفيض عرضياً");
+        }
+        return errs;
+      });
+    },
+    async after(page) {
+      await page.keyboard.press("Escape");
+      await page.waitForTimeout(400);
+    },
+  },
+
+  /* خطوة من الجولة الموجهة: تنطلق من زر الغلاف ثم تتقدم خطوتين */
+  "state/tour": {
+    hash: "#/scene/00",
+    settle: 3000,
+    /* التهيئة تُرجع أخطاءها بنفسها: زر الإطلاق يعيش على الغلاف وحده، وبدء
+       الجولة يغادر الغلاف فيُفكَّك مضيفه — فالتأكيد على وجود الزر يجب أن يقع
+       قبل النقر لا بعده (وإلا ظُنّ الغياب المشروع خللاً). */
+    async prepare(page) {
+      const errs = [];
+      const launch = page.locator(".tour-launch");
+      if (await launch.count() === 0) {
+        errs.push("زر إطلاق الجولة غير مركَّب على الغلاف");
+        return errs;
+      }
+      if (!await launch.first().isVisible()) {
+        errs.push("زر إطلاق الجولة مركَّب لكنه غير مرئي على الغلاف");
+      }
+      await launch.first().click();
+      await page.waitForTimeout(1600);
+      await page.keyboard.press("ArrowRight");
+      await page.waitForTimeout(1600);
+      return errs;
+    },
+    async check(page) {
+      return page.evaluate(() => {
+        const errs = [];
+        if (!document.body.classList.contains("tour-active")) {
+          errs.push("الجولة لم تُفعّل (tour-active غائب عن body)");
+          return errs;
+        }
+        const bar = document.querySelector(".tour-bar");
+        if (!bar) { errs.push("شريط الجولة غائب"); return errs; }
+        const r = bar.getBoundingClientRect();
+        if (r.bottom > window.innerHeight + 1) errs.push("شريط الجولة مقصوص أسفل الإطار");
+        if (r.left < -1 || r.right > window.innerWidth + 1) {
+          errs.push("شريط الجولة مقصوص أفقياً");
+        }
+        // الجولة قادت المحرك فعلاً: لم نعد على الغلاف
+        if (/scene\/00/.test(location.hash)) errs.push("الجولة لم تغادر الغلاف بعد خطوة");
+        return errs;
+      });
+    },
+    async after(page) {
+      await page.keyboard.press("Escape");
+      await page.waitForTimeout(400);
+    },
+  },
+};
 
 const browser = await chromium.launch({
   executablePath: process.env.CHROMIUM_PATH || undefined,
@@ -46,6 +218,24 @@ for (const [w, hgt] of SIZES) {
   });
   page.on("pageerror", (err) => consoleErrors.push(`[${w}x${hgt}] PAGEERROR ${err.message}`));
   for (const route of ROUTES) {
+    const pseudo = PSEUDO[route];
+    if (pseudo) {
+      // ── مسار زائف: هاش انطلاق + تهيئة تفاعلية + تأكيدات حالة ──
+      if (pseudo.before) await pseudo.before(page);
+      await page.goto(indexUrl + pseudo.hash, { waitUntil: "load" });
+      await page.waitForTimeout(pseudo.settle || 3000);
+      const prepErrs = pseudo.prepare ? (await pseudo.prepare(page)) || [] : [];
+      await page.waitForTimeout(600);
+      const pname = route.replace(/[\/?=&]/g, "_") + `_${w}x${hgt}.png`;
+      // الموجز مستند طويل — لقطة كاملة الصفحة كي تُرى كل أوراقه في الدليل
+      const full = route.startsWith("state/report");
+      await page.screenshot({ path: path.join(OUT, pname), fullPage: full });
+      const errs = prepErrs.concat(pseudo.check ? await pseudo.check(page) : []);
+      for (const e of errs) consoleErrors.push(`[${w}x${hgt}] ${route}: ${e}`);
+      if (pseudo.after) await pseudo.after(page);
+      continue;
+    }
+
     await page.goto(indexUrl + "#/" + route, { waitUntil: "load" });
     // استقرار كامل: حركات الدخول والعد التصاعدي + مهلة سقوط بلاطات الخريطة
     // إلى SVG (3 ثوانٍ) — فلا تُلتقط اللوحة في حالة انتقالية أبداً

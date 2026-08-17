@@ -1,0 +1,476 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   decisions.css — سجل القرارات المطلوبة (ملحق `decisions`)
+   بادئة الميزة: `dcs-`  ·  عقد V2_CONTRACTS_EXPANSION §8.2 و§0
+
+   قواعد ملزمة مطبَّقة هنا حرفياً:
+   • **لا لمس لملف مشترك**: كل صنف يبدأ بـ`dcs-`، ولا يُعاد تعريف صنف من
+     dashboard.css أو tokens.css أو appendix.css — تُستهلك أصنافها المشتركة
+     (`.dash-card`، `.card-body`، `.table-dense`، `.pending-card`) كما هي.
+   • **اللون من التصنيف وحده**: `pos/neg/warn/neu` هي مصدر اللون الوحيد في
+     هذا الملحق — المرجاني للخلل حصراً، الذهبي للتنبيه ووسوم الانتظار حصراً،
+     الأخضر للأثر الإيجابي، والمحايد للتنظيمي. لا صبغة خارج tokens.css.
+   • **كل مقاس بوحدة `--su`**: الصفحات الثلاث تتسع في إطار المسرح 16:9 عند
+     1920×1080 وعند 1366×768؛ الفيضان يُحل بتمرير داخل المكوّن لا في الصفحة.
+   • **حركة**: انتقالات دقيقة فقط، مصفَّرة عند `prefers-reduced-motion`.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* ── جذر الصفحة داخل هيكل الملاحق ─────────────────────────────────────── */
+.dcs-page {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 12);
+  overflow: hidden;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   1) شريط الإحصاءات
+   ════════════════════════════════════════════════════════════════════════ */
+.dcs-strip {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: calc(var(--su) * 12);
+  flex: none;
+}
+.dcs-stat {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 3);
+  background: rgba(16, 32, 26, 0.55);
+  border: 1px solid var(--hair-d2);
+  border-radius: var(--r-sm);
+  padding: calc(var(--su) * 10) calc(var(--su) * 14);
+  min-width: 0;
+}
+.dcs-stat.pos { border-top: 2px solid rgba(49, 162, 109, 0.55); }
+.dcs-stat.neg { border-top: 2px solid rgba(214, 106, 80, 0.55); }
+.dcs-stat.warn { border-top: 2px solid rgba(214, 171, 76, 0.5); }
+.dcs-stat-k {
+  font-size: calc(var(--su) * 12);
+  font-weight: 600;
+  color: var(--mut-d);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dcs-stat-v {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-size: calc(var(--su) * 21);
+  font-weight: 700;
+  color: var(--ivory);
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dcs-stat.pos .dcs-stat-v { color: var(--green-hi); }
+.dcs-stat.neg .dcs-stat-v { color: var(--coral); }
+.dcs-stat.warn .dcs-stat-v { color: var(--gold-hi); }
+.dcs-stat-f {
+  font-size: calc(var(--su) * 11.5);
+  color: var(--faint-d);
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   2) تبويبات التصنيف (role="tablist")
+   ════════════════════════════════════════════════════════════════════════ */
+.dcs-tabsrow { flex: none; }
+.dcs-tabs {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: calc(var(--su) * 6);
+  padding: calc(var(--su) * 4);
+  background: rgba(8, 16, 9, 0.5);
+  border: 1px solid var(--hair-d2);
+  border-radius: 999px;
+}
+.dcs-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--su) * 7);
+  font-size: calc(var(--su) * 13);
+  font-weight: 600;
+  color: var(--mut-d);
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: calc(var(--su) * 5) calc(var(--su) * 15);
+  transition: color var(--dur-micro), background var(--dur-micro),
+    border-color var(--dur-micro);
+}
+.dcs-tab:hover, .dcs-tab:focus-visible { color: var(--ivory); border-color: var(--hair-d); }
+.dcs-tab-n {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-size: calc(var(--su) * 12);
+  opacity: 0.8;
+}
+.dcs-tab.now { color: var(--stage-0); background: var(--ink2-d); }
+.dcs-tab.now.warn { background: var(--gold); }
+.dcs-tab.now.neg { background: var(--coral); }
+.dcs-tab.now.pos { background: var(--green); }
+.dcs-tab.now.neu { background: var(--ink2-d); }
+
+/* ════════════════════════════════════════════════════════════════════════
+   3) الوسوم والملاحظات
+   ════════════════════════════════════════════════════════════════════════ */
+.dcs-badge {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  font-size: calc(var(--su) * 11);
+  font-weight: 700;
+  line-height: 1;
+  padding: calc(var(--su) * 4) calc(var(--su) * 9);
+  border-radius: 999px;
+  border: 1px solid var(--hair-d);
+  color: var(--ink2-d);
+  background: rgba(244, 241, 230, 0.04);
+  white-space: nowrap;
+}
+.dcs-badge.warn {
+  color: var(--gold-hi);
+  border-color: rgba(214, 171, 76, 0.45);
+  background: rgba(214, 171, 76, 0.08);
+}
+.dcs-badge.neg {
+  color: var(--coral);
+  border-color: rgba(214, 106, 80, 0.45);
+  background: rgba(214, 106, 80, 0.08);
+}
+.dcs-badge.pos {
+  color: var(--green-hi);
+  border-color: rgba(49, 162, 109, 0.42);
+  background: rgba(49, 162, 109, 0.08);
+}
+.dcs-badge.neu { color: var(--mut-d); }
+
+.dcs-note {
+  flex: none;
+  margin: 0;
+  font-size: calc(var(--su) * 12);
+  color: var(--faint-d);
+  line-height: 1.7;
+}
+.dcs-note.wide { max-width: none; }
+
+/* ════════════════════════════════════════════════════════════════════════
+   4) الصفحة 1: الجدول + لوحة التفصيل + الخطوات
+   ════════════════════════════════════════════════════════════════════════ */
+.dcs-body {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+  gap: calc(var(--su) * 14);
+}
+.dcs-list-host {
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  background: rgba(16, 32, 26, 0.5);
+  border: 1px solid var(--hair-d2);
+  border-radius: var(--r-sm);
+  padding: calc(var(--su) * 6) calc(var(--su) * 8);
+  overflow: hidden;
+}
+.dcs-side {
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 10);
+  overflow: auto;
+}
+.dcs-tscroll { flex: 1; min-height: 0; overflow: auto; }
+.dcs-table td { vertical-align: top; white-space: normal; line-height: 1.6; }
+.dcs-table .dcs-td-dec { color: var(--ivory); font-weight: 600; min-width: calc(var(--su) * 280); }
+.dcs-table .dcs-td-imp { color: var(--mut-d); }
+.dcs-table .dcs-td-why { color: var(--faint-d); font-size: calc(var(--su) * 12.5); }
+.dcs-td-src { display: flex; flex-direction: column; gap: calc(var(--su) * 2); }
+.dcs-td-sec { font-size: calc(var(--su) * 11); color: var(--faint-d); }
+
+.dcs-tr { transition: background var(--dur-micro); }
+.dcs-tr[role="button"] { cursor: pointer; }
+.dcs-tr[role="button"]:hover { background: rgba(244, 241, 230, 0.035); }
+.dcs-tr[role="button"]:focus-visible { outline: 2px solid var(--gold); outline-offset: -2px; }
+.dcs-tr.now { background: rgba(214, 171, 76, 0.09); }
+.dcs-tr.warn td:first-child { box-shadow: inset 2px 0 0 var(--gold); }
+.dcs-tr.neg td:first-child { box-shadow: inset 2px 0 0 var(--coral); }
+.dcs-tr.pos td:first-child { box-shadow: inset 2px 0 0 var(--green); }
+.dcs-tr.neu td:first-child { box-shadow: inset 2px 0 0 var(--hair-d); }
+
+.dcs-tnote {
+  flex: none;
+  margin: 0;
+  padding-top: calc(var(--su) * 6);
+  font-size: calc(var(--su) * 11.5);
+  color: var(--faint-d);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   5) بطاقة القرار
+   ════════════════════════════════════════════════════════════════════════ */
+.dcs-card {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 8);
+  background: rgba(16, 32, 26, 0.58);
+  border: 1px solid var(--hair-d2);
+  border-radius: var(--r-sm);
+  padding: calc(var(--su) * 11) calc(var(--su) * 14);
+}
+.dcs-card.warn { border-inline-start: 3px solid var(--gold); }
+.dcs-card.neg { border-inline-start: 3px solid var(--coral); }
+.dcs-card.pos { border-inline-start: 3px solid var(--green); }
+.dcs-card.neu { border-inline-start: 3px solid var(--hair-d); }
+.dcs-card-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: calc(var(--su) * 8);
+}
+.dcs-card-src {
+  font-size: calc(var(--su) * 13);
+  font-weight: 700;
+  color: var(--ivory);
+  min-width: 0;
+}
+.dcs-card-id {
+  margin-inline-start: auto;
+  font-family: var(--f-display);
+  font-size: calc(var(--su) * 11);
+  color: var(--faint-d);
+}
+.dcs-field {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 3);
+}
+.dcs-field-k {
+  font-size: calc(var(--su) * 11);
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  color: var(--gold-hi);
+}
+.dcs-field-v {
+  margin: 0;
+  font-size: calc(var(--su) * 14);
+  color: var(--ivory);
+  line-height: 1.75;
+}
+.dcs-field-v.dim { color: var(--faint-d); font-size: calc(var(--su) * 12.5); }
+.dcs-field-impact .dcs-field-v { color: var(--ink2-d); }
+.dcs-field-sub {
+  margin: 0;
+  font-size: calc(var(--su) * 11.5);
+  color: var(--faint-d);
+}
+.dcs-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--su) * 8);
+  padding-top: calc(var(--su) * 2);
+}
+
+.dcs-linkbtn {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--su) * 8);
+  font-size: calc(var(--su) * 12.5);
+  font-weight: 700;
+  color: var(--ivory);
+  background: rgba(8, 16, 9, 0.5);
+  border: 1px solid var(--hair-d);
+  border-radius: 999px;
+  padding: calc(var(--su) * 6) calc(var(--su) * 15);
+  transition: background var(--dur-micro), border-color var(--dur-micro),
+    color var(--dur-micro);
+}
+.dcs-linkbtn:hover, .dcs-linkbtn:focus-visible {
+  background: var(--stage-3);
+  border-color: var(--gold);
+}
+.dcs-linkbtn.ghost {
+  color: var(--mut-d);
+  background: transparent;
+  border-style: dashed;
+}
+.dcs-linkbtn.ghost:hover, .dcs-linkbtn.ghost:focus-visible { color: var(--ivory); }
+.dcs-arrow { color: var(--gold); font-weight: 700; }
+
+.dcs-hintcard { flex: none; }
+.dcs-hint {
+  margin: 0;
+  padding-inline-start: calc(var(--su) * 16);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 6);
+  font-size: calc(var(--su) * 12.5);
+  color: var(--mut-d);
+  line-height: 1.65;
+}
+.dcs-hint li::marker { color: var(--gold); }
+
+.dcs-steps-host { flex: none; }
+.dcs-pending-extra {
+  margin: calc(var(--su) * 6) 0 0;
+  font-size: calc(var(--su) * 12);
+  color: var(--mut-d);
+  line-height: 1.65;
+}
+.dcs-steps {
+  margin: 0;
+  padding-inline-start: calc(var(--su) * 18);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 6);
+  font-size: calc(var(--su) * 13.5);
+  color: var(--ivory);
+  line-height: 1.7;
+}
+.dcs-steps li::marker { color: var(--gold); font-weight: 700; }
+
+.dcs-pagenav {
+  flex: none;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: calc(var(--su) * 10);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   6) الصفحة 2: التجميع بالأقسام
+   ════════════════════════════════════════════════════════════════════════ */
+.dcs-groups {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(calc(var(--su) * 420), 1fr));
+  gap: calc(var(--su) * 14);
+  overflow: auto;
+  align-content: start;
+  padding-inline-end: calc(var(--su) * 4);
+}
+.dcs-group { align-self: start; }
+.dcs-group .card-body { gap: calc(var(--su) * 10); }
+.dcs-group-item {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 6);
+}
+.dcs-reveal {
+  background: rgba(8, 16, 9, 0.5);
+  border: 1px dashed var(--hair-d);
+  border-radius: var(--r-sm);
+  padding: calc(var(--su) * 9) calc(var(--su) * 13);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 4);
+}
+.dcs-reveal[hidden] { display: none; }
+.dcs-reveal-k {
+  font-size: calc(var(--su) * 11);
+  font-weight: 700;
+  color: var(--mut-d);
+}
+.dcs-reveal-v {
+  margin: 0;
+  font-size: calc(var(--su) * 13);
+  color: var(--ink2-d);
+  line-height: 1.75;
+}
+.dcs-reveal-f {
+  margin: 0;
+  font-size: calc(var(--su) * 11);
+  color: var(--faint-d);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   7) الصفحة 3: الحدود والصدق
+   ════════════════════════════════════════════════════════════════════════ */
+.dcs-limits {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: calc(var(--su) * 14);
+}
+.dcs-col {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 12);
+  min-height: 0;
+  overflow: auto;
+  padding-inline-end: calc(var(--su) * 4);
+}
+.dcs-card-rule, .dcs-card-limit, .dcs-card-ex, .dcs-card-steps { flex: none; }
+.dcs-card-ex .card-body { min-height: 0; }
+.dcs-rules {
+  margin: 0;
+  padding-inline-start: calc(var(--su) * 18);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 7);
+}
+.dcs-rule {
+  font-size: calc(var(--su) * 12.5);
+  color: var(--ink2-d);
+  line-height: 1.75;
+}
+.dcs-rules li::marker { color: var(--gold); font-weight: 700; }
+.dcs-limitlist {
+  margin: 0;
+  padding-inline-start: calc(var(--su) * 16);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 6);
+  font-size: calc(var(--su) * 12.5);
+  color: var(--mut-d);
+  line-height: 1.7;
+}
+.dcs-limitlist li::marker { color: var(--coral); }
+
+/* ════════════════════════════════════════════════════════════════════════
+   8) نقطة الدخول في قسم الخاتمة تُنسَّق مع زر المنهجية في methodology.css
+      (الزران متجاوران داخل `.mth-entry-wrap` — لا صنف جديد هنا لتفادي
+      ازدواج التعريف بين ملفَّي الميزة الواحدة).
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* ════════════════════════════════════════════════════════════════════════
+   9) كسر العرض الضيق (1366×768)
+   ════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 1440px) {
+  .dcs-strip { gap: calc(var(--su) * 9); }
+  .dcs-stat { padding: calc(var(--su) * 8) calc(var(--su) * 11); }
+  .dcs-stat-v { font-size: calc(var(--su) * 19); }
+  .dcs-body { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); }
+  .dcs-groups { grid-template-columns: repeat(auto-fit, minmax(calc(var(--su) * 360), 1fr)); }
+  .dcs-field-v { font-size: calc(var(--su) * 13); }
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   10) طباعة
+   ════════════════════════════════════════════════════════════════════════ */
+@media print {
+  .dcs-tabsrow, .dcs-pagenav, .dcs-card-actions { display: none !important; }
+  .dcs-page, .dcs-col, .dcs-groups, .dcs-tscroll, .dcs-side {
+    overflow: visible !important;
+  }
+  .dcs-reveal[hidden] { display: flex !important; }
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   11) احترام تقليل الحركة
+   ════════════════════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  .dcs-tab, .dcs-tr, .dcs-linkbtn { transition: none !important; }
+}

@@ -1,0 +1,897 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   palette.css — لوحة الأوامر (Ctrl+K) · عقد V2_CONTRACTS_EXPANSION §7
+   بادئة الميزة: `pal-` حصراً — لا صنف واحد هنا خارجها، ولا لمس لـdashboard.css
+   ولا tokens.css ولا appendix.css ولا ملفات الأقسام. الصنف المشترك المعتمد
+   `.pending-card` يُستعمل كما هو لبطاقة الوسم الملازم دون إعادة تعريف
+   (يُضاف إليه `.pal-pv-caveat` لضبط المقاس داخل اللوح الضيق فقط).
+   ────────────────────────────────────────────────────────────────────────────
+   الموضع في كومة الطبقات:
+     50  عناصر تحكم المقدِّم (‎.hud-btn) و‎.hud-progress            — presenter.css
+     55…61  طبقات الجولة ودرج الملاحظات                            — tour.css
+     80  طبقات المشاهد الخاصة                                      — scenes.css
+     90  **لوحة الأوامر** — طبقة مشروطة تعلو كل ما سبق لأنها تحجب العرض عمداً
+     999 حاجز الأخطاء (يبقى فوق الجميع)                            — base.css
+
+   انضباط اللون في هذا الملف (يخضع للمنظومة الدلالية المقفلة في tokens.css):
+     • الذهبي `--gold`: حافة الصف النشط (موضع التركيز) ووسوم «بانتظار
+       الاعتماد» حصراً — وهو استعماله المرخص في كروم الواجهة، ولا يلوّن
+       قيمة بيانات هنا أبداً.
+     • المرجاني `--coral`: قيم العجز والمخالفات حصراً عبر `.t-neg`.
+     • الأخضر `--green`: قيم الطاقة والفعل عبر `.t-pos`.
+     • الرملي `--demand` للطلب، والأزرق `--collar-blue` للفئة الثانوية.
+     • رقاقات الأنواع ومفاتيح الاختصار **محايدة تماماً** (حبر لا لون بيانات)
+       كي لا يُقرأ لونها دلالةً.
+
+   ثلاثة أسطح تعمل عليها اللوحة، وهذا الملف وحده ما يجعلها تُقرأ في الثلاثة:
+     • مسرح المقدِّم الداكن (الأقسام والملاحق) → زجاج داكن وحبر عاجي
+     • وضع الموجز الورقي (‎body.mode-report)    → لوح ورقي وحبر داكن
+     • الطباعة                                   → اللوحة لا تُطبع إطلاقاً
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* ══════════════════════════════════════════════════════════════════════════
+   0) رموز موضعية للميزة — مشتقة من tokens.css ولا تعرّف لوناً جديداً
+   ──────────────────────────────────────────────────────────────────────────
+   `--pal-u` وحدة القياس المحلية: تتبع `--su` (عرض المسرح ÷ 1920) مع أرضية
+   دنيا تمنع انكماش النص إلى حدّ اللاقراءة على النوافذ الضيقة وفي وضع
+   الموجز حيث لا مسرح أصلاً.
+   ══════════════════════════════════════════════════════════════════════════ */
+.pal-veil {
+  --pal-u: max(0.66px, var(--su));
+  --pal-glass: rgba(9, 18, 15, 0.95);
+  --pal-glass-2: rgba(16, 32, 26, 0.82);
+  --pal-row: rgba(16, 32, 26, 0.5);
+  --pal-row-now: rgba(22, 41, 31, 0.92);
+  --pal-hair: var(--hair-d);
+  --pal-hair-2: var(--hair-d2);
+  --pal-ink: var(--ivory);
+  --pal-ink-2: var(--ink2-d);
+  --pal-mut: var(--mut-d);
+  --pal-faint: var(--faint-d);
+  --pal-accent: var(--gold);
+  --pal-veil-bg: rgba(4, 8, 6, 0.66);
+  --pal-radius: var(--r);
+  --pal-radius-sm: var(--r-sm);
+  --pal-shadow: 0 calc(var(--pal-u) * 40) calc(var(--pal-u) * 120) rgba(2, 6, 4, 0.62);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   1) الحجاب والجذر الطافي
+   الجذر يحمل role="dialog" aria-modal="true" (عقد §2.1) فيمنع nav.js مفاتيح
+   الكليكر ونقر الخلفية تلقائياً — وهذا الملف يضمن ألا يبقى شيء خلفه قابلاً
+   للنقر بصرياً كذلك.
+   ══════════════════════════════════════════════════════════════════════════ */
+.pal-veil {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: calc(var(--pal-u) * 92) calc(var(--pal-u) * 24) calc(var(--pal-u) * 40);
+  background: var(--pal-veil-bg);
+  backdrop-filter: blur(calc(var(--pal-u) * 3));
+  -webkit-backdrop-filter: blur(calc(var(--pal-u) * 3));
+  animation: pal-veil-in var(--dur-micro) var(--ease);
+}
+
+@keyframes pal-veil-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* منع تمرير المستند خلف اللوحة (يهمّ وضع الموجز الطويل تحديداً) */
+body.pal-open { overflow: hidden; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   2) اللوح
+   ══════════════════════════════════════════════════════════════════════════ */
+.pal-panel {
+  display: flex;
+  flex-direction: column;
+  width: min(94vw, calc(var(--pal-u) * 1120));
+  max-height: min(82vh, calc(var(--pal-u) * 780));
+  min-height: calc(var(--pal-u) * 260);
+  background:
+    linear-gradient(180deg, var(--pal-glass-2) 0%, var(--pal-glass) 42%, var(--pal-glass) 100%);
+  border: 1px solid var(--pal-hair);
+  border-radius: var(--pal-radius);
+  box-shadow: var(--pal-shadow);
+  overflow: hidden;
+  animation: pal-panel-in var(--dur-std) var(--ease);
+}
+
+@keyframes pal-panel-in {
+  from { opacity: 0; transform: translateY(calc(var(--pal-u) * -14)) scale(0.985); }
+  to { opacity: 1; transform: none; }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   3) صف البحث
+   ══════════════════════════════════════════════════════════════════════════ */
+.pal-search {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--pal-u) * 12);
+  padding: calc(var(--pal-u) * 16) calc(var(--pal-u) * 20);
+  border-bottom: 1px solid var(--pal-hair);
+  background: rgba(8, 16, 9, 0.42);
+}
+
+.pal-ico {
+  flex: 0 0 auto;
+  width: max(15px, calc(var(--pal-u) * 20));
+  height: max(15px, calc(var(--pal-u) * 20));
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.pal-ico-search { color: var(--pal-mut); }
+
+.pal-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  background: transparent;
+  border: 0;
+  outline: none;
+  color: var(--pal-ink);
+  font-family: var(--f-display);
+  font-size: max(15px, calc(var(--pal-u) * 23));
+  font-weight: 600;
+  line-height: 1.6;
+  padding: 0;
+}
+.pal-input::placeholder {
+  color: var(--pal-faint);
+  font-weight: 500;
+}
+/* زر المسح الأصلي في بعض المحركات يزاحم زرّنا — نخفيه ونبقي زرّنا الموسوم */
+.pal-input::-webkit-search-cancel-button { display: none; }
+
+.pal-count {
+  flex: 0 0 auto;
+  font-size: max(10px, calc(var(--pal-u) * 13));
+  color: var(--pal-mut);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.pal-clear,
+.pal-close {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  background: transparent;
+  color: var(--pal-mut);
+  line-height: 1;
+  cursor: pointer;
+  transition: color var(--dur-micro), border-color var(--dur-micro),
+    background var(--dur-micro);
+}
+/* زرّان متجاوران بمهمتين مختلفتين: «مسح النص» أخفت وبلا إطار، و«إغلاق
+   اللوحة» حبة مؤطَّرة يفصلها خط شعري — فلا يُقرآن زرّاً مكرراً. */
+.pal-clear {
+  width: max(20px, calc(var(--pal-u) * 24));
+  height: max(20px, calc(var(--pal-u) * 24));
+  border: 0;
+  border-radius: 50%;
+  color: var(--pal-faint);
+  font-size: max(10px, calc(var(--pal-u) * 12));
+}
+.pal-close {
+  width: max(24px, calc(var(--pal-u) * 30));
+  height: max(24px, calc(var(--pal-u) * 30));
+  border: 1px solid var(--pal-hair-2);
+  border-radius: 50%;
+  font-size: max(11px, calc(var(--pal-u) * 14));
+  margin-inline-start: calc(var(--pal-u) * 4);
+  position: relative;
+}
+.pal-close::before {
+  content: "";
+  position: absolute;
+  inset-inline-end: calc(var(--pal-u) * -9);
+  top: 15%;
+  bottom: 15%;
+  width: 1px;
+  background: var(--pal-hair-2);
+}
+.pal-clear:hover { color: var(--pal-ink-2); background: rgba(244, 241, 230, 0.06); }
+.pal-close:hover {
+  color: var(--pal-ink);
+  border-color: var(--pal-hair);
+  background: rgba(244, 241, 230, 0.06);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   4) شرائط المرشّح (role="tablist")
+   ══════════════════════════════════════════════════════════════════════════ */
+.pal-filters {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--pal-u) * 8);
+  padding: calc(var(--pal-u) * 10) calc(var(--pal-u) * 20);
+  border-bottom: 1px solid var(--pal-hair-2);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.pal-filters::-webkit-scrollbar { display: none; }
+
+.pal-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--pal-u) * 7);
+  padding: calc(var(--pal-u) * 5) calc(var(--pal-u) * 13);
+  border: 1px solid var(--pal-hair-2);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--pal-mut);
+  font-family: var(--f-body);
+  font-size: max(10px, calc(var(--pal-u) * 13.5));
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color var(--dur-micro), border-color var(--dur-micro),
+    background var(--dur-micro);
+}
+.pal-chip:hover { color: var(--pal-ink-2); border-color: var(--pal-hair); }
+.pal-chip.on {
+  color: var(--pal-ink);
+  border-color: rgba(244, 241, 230, 0.34);
+  background: rgba(244, 241, 230, 0.08);
+}
+/* مرشّح مقفل بنطاق مكتوب في الحقل: يبقى مقروءاً ويُعلن قفله بصرياً */
+.pal-chip.locked { opacity: 0.45; }
+/* مرشّح بلا مطابقات في الاستعلام الحالي: يخفت ويبقى قابلاً للنقر (صدق:
+   الصفر معلن، والزر لا يكذب بإخفاء نفسه) */
+.pal-chip.empty { opacity: 0.5; }
+
+.pal-chip-n {
+  font-variant-numeric: tabular-nums;
+  font-size: 0.92em;
+  color: var(--pal-faint);
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+.pal-chip.on .pal-chip-n { color: var(--pal-ink-2); }
+
+/* رقاقة مفتاح المرشّح (‏Alt+رقم): مخفية حتى يقترب المستخدم من الشريط أو
+   يصله بلوحة المفاتيح — فلا يزاحم رقمُ الاختصار عدادَ النتائج بجواره،
+   ويظهر حين يفيد فعلاً. مخفي عن قارئ الشاشة أصلاً (aria-hidden). */
+.pal-chip-key {
+  display: inline-grid;
+  place-items: center;
+  min-width: calc(var(--pal-u) * 15);
+  padding: 0 calc(var(--pal-u) * 3);
+  border: 1px solid var(--pal-hair-2);
+  border-radius: calc(var(--pal-u) * 4);
+  color: var(--pal-faint);
+  font-size: 0.8em;
+  line-height: 1.5;
+  direction: ltr;
+  unicode-bidi: isolate;
+  opacity: 0;
+  transition: opacity var(--dur-micro);
+}
+.pal-filters:hover .pal-chip-key,
+.pal-chip:focus-visible .pal-chip-key { opacity: 1; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   5) الجسم: قائمة النتائج + لوح الإسناد
+   ══════════════════════════════════════════════════════════════════════════ */
+.pal-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  min-height: 0;
+  flex: 1 1 auto;
+}
+
+.pal-results {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+  border-inline-end: 1px solid var(--pal-hair-2);
+}
+
+.pal-list {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: calc(var(--pal-u) * 8) calc(var(--pal-u) * 10);
+  margin: 0;
+  list-style: none;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(244, 241, 230, 0.18) transparent;
+}
+.pal-list::-webkit-scrollbar { width: calc(var(--pal-u) * 8); }
+.pal-list::-webkit-scrollbar-track { background: transparent; }
+.pal-list::-webkit-scrollbar-thumb {
+  background: rgba(244, 241, 230, 0.16);
+  border-radius: 999px;
+}
+
+/* ترويسة مجموعة في حالة البدء (ليست خياراً — role="presentation") */
+.pal-group {
+  padding: calc(var(--pal-u) * 12) calc(var(--pal-u) * 10) calc(var(--pal-u) * 6);
+  font-size: max(9px, calc(var(--pal-u) * 12));
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  color: var(--pal-faint);
+}
+.pal-group:first-child { padding-top: calc(var(--pal-u) * 4); }
+
+/* ── صف النتيجة ── */
+.pal-opt {
+  position: relative;
+  display: block;
+  padding: calc(var(--pal-u) * 9) calc(var(--pal-u) * 12);
+  border: 1px solid transparent;
+  border-radius: var(--pal-radius-sm);
+  cursor: pointer;
+  transition: background var(--dur-micro), border-color var(--dur-micro);
+}
+.pal-opt + .pal-opt { margin-top: calc(var(--pal-u) * 2); }
+.pal-opt:hover { background: var(--pal-row); }
+
+/* الصف النشط: خلفية مرتفعة وحافة ذهبية رفيعة (موضع تركيز — لا قيمة بيانات) */
+.pal-opt.now {
+  background: var(--pal-row-now);
+  border-color: var(--pal-hair-2);
+}
+.pal-opt.now::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: 0;
+  top: calc(var(--pal-u) * 8);
+  bottom: calc(var(--pal-u) * 8);
+  width: calc(var(--pal-u) * 3);
+  border-radius: 999px;
+  background: var(--pal-accent);
+}
+
+.pal-opt-head {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--pal-u) * 9);
+  min-width: 0;
+}
+
+.pal-opt-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-family: var(--f-display);
+  font-size: max(12px, calc(var(--pal-u) * 16.5));
+  font-weight: 600;
+  color: var(--pal-ink);
+  line-height: 1.5;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pal-opt-sub {
+  margin-top: calc(var(--pal-u) * 2);
+  font-size: max(9px, calc(var(--pal-u) * 12.5));
+  color: var(--pal-mut);
+  line-height: 1.6;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* رقاقة النوع — محايدة تماماً (لا تُقرأ دلالةً لونية) */
+.pal-kind {
+  flex: 0 0 auto;
+  display: inline-grid;
+  place-items: center;
+  min-width: calc(var(--pal-u) * 44);
+  padding: calc(var(--pal-u) * 2) calc(var(--pal-u) * 8);
+  border: 1px solid var(--pal-hair-2);
+  border-radius: 999px;
+  background: rgba(244, 241, 230, 0.04);
+  color: var(--pal-mut);
+  font-size: max(8px, calc(var(--pal-u) * 11.5));
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+.pal-opt.now .pal-kind { color: var(--pal-ink-2); border-color: var(--pal-hair); }
+
+/* إبراز موضع المطابقة — تسطير خفيف لا خلفية صارخة */
+.pal-hl {
+  background: transparent;
+  color: inherit;
+  font-weight: 800;
+  border-bottom: 1px solid rgba(214, 171, 76, 0.55);
+  padding-bottom: 1px;
+}
+
+/* وسم صدق مختصر داخل الصف (ذهبي — وسم اعتماد حصراً) */
+.pal-badge {
+  flex: 0 0 auto;
+  padding: calc(var(--pal-u) * 2) calc(var(--pal-u) * 9);
+  border: 1px dashed rgba(214, 171, 76, 0.45);
+  border-radius: 999px;
+  background: rgba(214, 171, 76, 0.07);
+  color: var(--gold);
+  font-size: max(8px, calc(var(--pal-u) * 11));
+  font-weight: 700;
+  white-space: nowrap;
+  max-width: calc(var(--pal-u) * 260);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── سطر الإجابة داخل الصف: القيمة + الوحدة + مرساة المصدر ── */
+.pal-answer {
+  display: flex;
+  align-items: baseline;
+  gap: calc(var(--pal-u) * 7);
+  margin-top: calc(var(--pal-u) * 4);
+  min-width: 0;
+}
+.pal-val {
+  font-family: var(--f-display);
+  font-size: max(12px, calc(var(--pal-u) * 17));
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.pal-unit {
+  font-size: max(9px, calc(var(--pal-u) * 12.5));
+  color: var(--pal-mut);
+  white-space: nowrap;
+}
+.pal-src {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: max(8px, calc(var(--pal-u) * 11.5));
+  color: var(--pal-faint);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pal-answer-tag {
+  margin-top: calc(var(--pal-u) * 3);
+  font-size: max(8px, calc(var(--pal-u) * 11));
+  font-weight: 700;
+  color: var(--gold);
+}
+
+/* ── النغمات الدلالية للقيم (مقفلة) ──
+   الأصناف `t-*` مفردات مشتركة مع مكتبة الرسوم المصغرة، فتُقصر هنا على جذر
+   اللوحة حصراً كي لا تتسرب قاعدة لون إلى أي سطح آخر في النظام. */
+.pal-veil .t-pos { color: var(--green-hi); }
+.pal-veil .t-neg { color: var(--coral); }
+.pal-veil .t-gold { color: var(--gold); }
+.pal-veil .t-demand { color: var(--demand); }
+.pal-veil .t-blue { color: var(--collar-blue); }
+.pal-veil .t-neu { color: var(--pal-ink-2); }
+
+/* ── الحالة الفارغة الصادقة ── */
+.pal-empty {
+  padding: calc(var(--pal-u) * 26) calc(var(--pal-u) * 22);
+  text-align: center;
+}
+.pal-empty-t {
+  font-family: var(--f-display);
+  font-size: max(12px, calc(var(--pal-u) * 17));
+  font-weight: 600;
+  color: var(--pal-ink-2);
+  margin-bottom: calc(var(--pal-u) * 8);
+}
+.pal-empty-n {
+  font-size: max(9px, calc(var(--pal-u) * 12.5));
+  line-height: 1.8;
+  color: var(--pal-mut);
+  max-width: calc(var(--pal-u) * 420);
+  margin: 0 auto;
+}
+
+/* ── الترقيم ── */
+.pal-pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--pal-u) * 12);
+  padding: calc(var(--pal-u) * 8) calc(var(--pal-u) * 14);
+  border-top: 1px solid var(--pal-hair-2);
+}
+.pal-page-btn {
+  padding: calc(var(--pal-u) * 4) calc(var(--pal-u) * 14);
+  border: 1px solid var(--pal-hair-2);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--pal-ink-2);
+  font-family: var(--f-body);
+  font-size: max(9px, calc(var(--pal-u) * 12.5));
+  font-weight: 700;
+  cursor: pointer;
+  transition: color var(--dur-micro), border-color var(--dur-micro);
+}
+.pal-page-btn:hover:not(:disabled) { color: var(--pal-ink); border-color: var(--pal-hair); }
+.pal-page-btn:disabled { opacity: 0.35; cursor: default; }
+.pal-page-n {
+  font-size: max(9px, calc(var(--pal-u) * 12));
+  color: var(--pal-mut);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   6) لوح الإسناد الجانبي
+   ══════════════════════════════════════════════════════════════════════════ */
+.pal-preview {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--pal-u) * 12);
+  min-height: 0;
+  min-width: 0;
+  padding: calc(var(--pal-u) * 16) calc(var(--pal-u) * 18);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: rgba(8, 16, 9, 0.34);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(244, 241, 230, 0.16) transparent;
+}
+.pal-preview::-webkit-scrollbar { width: calc(var(--pal-u) * 8); }
+.pal-preview::-webkit-scrollbar-thumb {
+  background: rgba(244, 241, 230, 0.14);
+  border-radius: 999px;
+}
+
+.pal-pv-hint {
+  margin: auto;
+  padding: calc(var(--pal-u) * 20);
+  text-align: center;
+  font-size: max(9px, calc(var(--pal-u) * 12.5));
+  color: var(--pal-faint);
+}
+
+.pal-pv-head { display: flex; flex-direction: column; gap: calc(var(--pal-u) * 6); }
+.pal-pv-head .pal-kind { align-self: flex-start; }
+.pal-pv-title {
+  font-family: var(--f-display);
+  font-size: max(13px, calc(var(--pal-u) * 20));
+  font-weight: 700;
+  line-height: 1.45;
+  color: var(--pal-ink);
+  text-wrap: balance;
+}
+.pal-pv-sub {
+  font-size: max(9px, calc(var(--pal-u) * 12.5));
+  color: var(--pal-mut);
+  line-height: 1.7;
+}
+
+/* ── كتلة الإجابة ── */
+.pal-pv-answer {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--pal-u) * 8);
+  padding: calc(var(--pal-u) * 12) calc(var(--pal-u) * 14);
+  border: 1px solid var(--pal-hair-2);
+  border-radius: var(--pal-radius-sm);
+  background: rgba(16, 32, 26, 0.46);
+}
+.pal-pv-value {
+  display: flex;
+  align-items: baseline;
+  gap: calc(var(--pal-u) * 8);
+  flex-wrap: wrap;
+}
+.pal-pv-num {
+  font-family: var(--f-display);
+  font-size: max(18px, calc(var(--pal-u) * 34));
+  font-weight: 700;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.3px;
+}
+.pal-pv-unit {
+  font-size: max(10px, calc(var(--pal-u) * 14));
+  color: var(--pal-mut);
+  font-weight: 600;
+}
+.pal-pv-compact,
+.pal-pv-status,
+.pal-pv-src,
+.pal-pv-extra,
+.pal-pv-attrib {
+  font-size: max(9px, calc(var(--pal-u) * 12));
+  line-height: 1.75;
+  color: var(--pal-mut);
+}
+.pal-pv-status { color: var(--pal-ink-2); font-weight: 700; }
+.pal-pv-src { color: var(--pal-faint); }
+.pal-pv-attrib { color: var(--pal-faint); font-size: max(8px, calc(var(--pal-u) * 11)); }
+
+/* بطاقة الوسم الملازم — ترث `.pending-card` المعتمدة وتضبط مقاسها هنا فقط */
+.pal-pv-caveat {
+  gap: calc(var(--pal-u) * 8);
+  padding: calc(var(--pal-u) * 10) calc(var(--pal-u) * 12);
+}
+.pal-pv-caveat-t {
+  font-size: max(9px, calc(var(--pal-u) * 12));
+  font-weight: 700;
+  color: var(--gold);
+  margin-bottom: calc(var(--pal-u) * 3);
+}
+.pal-pv-caveat-n {
+  font-size: max(9px, calc(var(--pal-u) * 11.5));
+  line-height: 1.75;
+  color: var(--pal-ink-2);
+}
+
+/* ── كتل التفاصيل (الحي/الوجهة) ── */
+.pal-pv-block {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--pal-u) * 8);
+}
+.pal-pv-block-t {
+  font-size: max(9px, calc(var(--pal-u) * 12));
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  color: var(--pal-faint);
+}
+
+.pal-figs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: calc(var(--pal-u) * 6) calc(var(--pal-u) * 12);
+}
+.pal-fig {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: calc(var(--pal-u) * 8);
+  padding-bottom: calc(var(--pal-u) * 4);
+  border-bottom: 1px solid var(--pal-hair-2);
+  min-width: 0;
+}
+.pal-fig-k {
+  font-size: max(8px, calc(var(--pal-u) * 11.5));
+  color: var(--pal-mut);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pal-fig-v {
+  font-family: var(--f-display);
+  font-size: max(10px, calc(var(--pal-u) * 14));
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.pal-fig-u {
+  font-size: max(8px, calc(var(--pal-u) * 10.5));
+  color: var(--pal-faint);
+  white-space: nowrap;
+}
+
+/* ── أزرار الإجراء ── */
+.pal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--pal-u) * 8);
+  margin-top: auto;
+  padding-top: calc(var(--pal-u) * 6);
+}
+.pal-act {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--pal-u) * 8);
+  padding: calc(var(--pal-u) * 7) calc(var(--pal-u) * 15);
+  border: 1px solid var(--pal-hair);
+  border-radius: 999px;
+  background: rgba(244, 241, 230, 0.04);
+  color: var(--pal-ink-2);
+  font-family: var(--f-body);
+  font-size: max(10px, calc(var(--pal-u) * 13));
+  font-weight: 700;
+  cursor: pointer;
+  transition: color var(--dur-micro), background var(--dur-micro),
+    border-color var(--dur-micro);
+}
+.pal-act:hover { color: var(--pal-ink); background: rgba(244, 241, 230, 0.09); }
+.pal-act-main {
+  border-color: rgba(49, 162, 109, 0.5);
+  background: rgba(49, 162, 109, 0.12);
+  color: var(--green-hi);
+}
+.pal-act-main:hover { background: rgba(49, 162, 109, 0.2); color: var(--green-hi); }
+.pal-act-key {
+  padding: 0 calc(var(--pal-u) * 5);
+  border: 1px solid var(--pal-hair-2);
+  border-radius: calc(var(--pal-u) * 5);
+  color: var(--pal-faint);
+  font-size: 0.82em;
+  line-height: 1.6;
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   6-ب) استرجاع نغمة الشريط النسبي داخل اللوحة
+   ──────────────────────────────────────────────────────────────────────────
+   `micro.css` (ملف المعمار — لا يعدّله وكيل ميزة) يعرّف نغمات `t-*` بمحدد
+   `:where(.mcr-ratio).t-neg` وزنه (0,1,0)، ثم يعيد تعريف `--mcr-tone` في
+   كتلة «حبر السياق» بمحدد `.mcr-ratio` وزنه (0,1,0) كذلك وموضعه **بعدها** —
+   فتفوز الكتلة المتأخرة ويخرج كل شريط أخضر مهما كانت نغمته المطلوبة. وهذا
+   يكسر المنظومة الدلالية على سطحنا: شريط عجز أو مخالفات يجب ألا يُرسم
+   أخضر أبداً، وقيمة موسومة بانتظار المنهجية يجب ألا تُرسم بلون طاقة.
+   الإصلاح هنا **مقصور على جذر اللوحة** (وزن 0,3,0) ولا يمس أي سطح آخر،
+   وقيمه هي رموز tokens ذاتها التي تقصدها المكتبة — فمتى صُحّح الترتيب في
+   الملف الأصلي بقيت النتيجة مطابقة بلا تعارض. (أُبلغ به معمار التوسعة.)
+   ══════════════════════════════════════════════════════════════════════════ */
+.pal-veil .mcr-ratio.t-pos { --mcr-tone: var(--green); --mcr-tone-hi: var(--green-hi); }
+.pal-veil .mcr-ratio.t-neg { --mcr-tone: var(--coral); --mcr-tone-hi: var(--coral); }
+.pal-veil .mcr-ratio.t-gold { --mcr-tone: var(--gold); --mcr-tone-hi: var(--gold-hi); }
+.pal-veil .mcr-ratio.t-demand { --mcr-tone: var(--demand); --mcr-tone-hi: var(--demand); }
+.pal-veil .mcr-ratio.t-blue { --mcr-tone: var(--collar-blue); --mcr-tone-hi: var(--collar-blue); }
+.pal-veil .mcr-ratio.t-neu { --mcr-tone: var(--mut-d); --mcr-tone-hi: var(--ink2-d); }
+body.mode-report .pal-veil .mcr-ratio.t-neu { --mcr-tone: var(--mut); --mcr-tone-hi: var(--ink2); }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   7) التذييل: مدى النتائج وتلميحات المفاتيح
+   ══════════════════════════════════════════════════════════════════════════ */
+.pal-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(var(--pal-u) * 14);
+  padding: calc(var(--pal-u) * 9) calc(var(--pal-u) * 18);
+  border-top: 1px solid var(--pal-hair);
+  background: rgba(8, 16, 9, 0.5);
+}
+.pal-range {
+  font-size: max(9px, calc(var(--pal-u) * 12));
+  color: var(--pal-mut);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.pal-hints {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--pal-u) * 14);
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.pal-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--pal-u) * 6);
+  color: var(--pal-faint);
+  font-size: max(8px, calc(var(--pal-u) * 11.5));
+  white-space: nowrap;
+}
+.pal-kbd {
+  padding: 0 calc(var(--pal-u) * 6);
+  border: 1px solid var(--pal-hair-2);
+  border-radius: calc(var(--pal-u) * 5);
+  color: var(--pal-mut);
+  font-family: var(--f-body);
+  font-size: 0.94em;
+  font-weight: 700;
+  line-height: 1.7;
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   8) التركيز المرئي — حلقة ذهبية موحدة (الاستعمال المرخص للذهبي في الكروم)
+   ══════════════════════════════════════════════════════════════════════════ */
+.pal-veil :focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+  border-radius: calc(var(--pal-u) * 6);
+}
+/* الحقل مركّز فور الفتح ويبقى كذلك طوال العمل، فحلقة حوله تُقرأ إطاراً
+   زخرفياً لا مؤشر تركيز. المؤشر الحقيقي هو خط صف البحث السفلي الذي يظهر مع
+   `:focus-within`. الوزن هنا (0,3,0) عمداً: القاعدة العامة في وضع الموجز
+   ‏`body.mode-report :focus-visible` وزنها (0,2,1) وكانت تتقدم على محدد
+   الحقل وحده فتعيد رسم الحلقة. */
+.pal-veil .pal-input:focus-visible { outline: none; }
+.pal-veil .pal-search:focus-within {
+  box-shadow: inset 0 calc(var(--pal-u) * -2) 0 rgba(214, 171, 76, 0.55);
+}
+body.mode-report .pal-veil .pal-search:focus-within {
+  box-shadow: inset 0 calc(var(--pal-u) * -2) 0 rgba(10, 122, 72, 0.5);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   9) وضع الموجز الورقي — اللوحة تتبع سطحها لا العكس
+   الموجز مستند نهاري (‏--paper/--ink)، فاللوح الداكن فوقه يقطع القراءة.
+   القلب هنا رموز فقط: لا صنف جديد ولا بنية مختلفة.
+   ══════════════════════════════════════════════════════════════════════════ */
+body.mode-report .pal-veil {
+  --pal-glass: rgba(255, 255, 255, 0.98);
+  --pal-glass-2: rgba(247, 248, 246, 0.98);
+  --pal-row: rgba(17, 24, 21, 0.04);
+  --pal-row-now: rgba(10, 122, 72, 0.08);
+  --pal-hair: var(--hair);
+  --pal-hair-2: var(--hair2);
+  --pal-ink: var(--ink);
+  --pal-ink-2: var(--ink2);
+  --pal-mut: var(--mut);
+  --pal-faint: var(--faint);
+  --pal-veil-bg: rgba(17, 24, 21, 0.42);
+  --pal-shadow: 0 calc(var(--pal-u) * 30) calc(var(--pal-u) * 90) rgba(17, 24, 21, 0.28);
+}
+body.mode-report .pal-search { background: rgba(17, 24, 21, 0.02); }
+body.mode-report .pal-preview { background: rgba(17, 24, 21, 0.02); }
+body.mode-report .pal-foot { background: rgba(17, 24, 21, 0.02); }
+body.mode-report .pal-pv-answer { background: rgba(17, 24, 21, 0.03); }
+body.mode-report .pal-list::-webkit-scrollbar-thumb,
+body.mode-report .pal-preview::-webkit-scrollbar-thumb {
+  background: rgba(17, 24, 21, 0.18);
+}
+body.mode-report .pal-clear:hover,
+body.mode-report .pal-close:hover,
+body.mode-report .pal-chip.on { background: rgba(17, 24, 21, 0.06); }
+body.mode-report .pal-act { background: rgba(17, 24, 21, 0.03); }
+body.mode-report .pal-act:hover { background: rgba(17, 24, 21, 0.07); }
+body.mode-report .pal-act-main {
+  border-color: rgba(10, 122, 72, 0.45);
+  background: rgba(10, 122, 72, 0.1);
+  color: var(--accent);
+}
+body.mode-report .pal-act-main:hover { background: rgba(10, 122, 72, 0.16); }
+/* النغمات على الورق: درجات أدكن تحفظ التباين مع بقاء الدلالة ذاتها */
+body.mode-report .pal-veil .t-pos { color: var(--ok); }
+body.mode-report .pal-veil .t-neg { color: var(--bad); }
+body.mode-report .pal-veil .t-gold { color: var(--warn); }
+body.mode-report .pal-veil .t-demand { color: #7A5E1F; }
+body.mode-report .pal-veil .t-blue { color: var(--info); }
+body.mode-report .pal-veil .t-neu { color: var(--ink2); }
+body.mode-report .pal-badge,
+body.mode-report .pal-answer-tag,
+body.mode-report .pal-pv-caveat-t { color: var(--warn); }
+body.mode-report .pal-hl { border-bottom-color: rgba(183, 122, 18, 0.6); }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   10) مقاسات ضيقة — اللوح يبقى قابلاً للتشغيل بلوحة المفاتيح كاملاً
+   ══════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 1180px) {
+  .pal-body { grid-template-columns: minmax(0, 1fr); }
+  .pal-results { border-inline-end: 0; border-bottom: 1px solid var(--pal-hair-2); }
+  .pal-preview { max-height: 38vh; }
+  .pal-panel { max-height: 88vh; }
+}
+
+@media (max-width: 820px) {
+  .pal-veil { padding: calc(var(--pal-u) * 40) calc(var(--pal-u) * 12); }
+  .pal-panel { width: 96vw; max-height: 92vh; }
+  .pal-hints .pal-hint:nth-child(n + 4) { display: none; }
+  .pal-figs { grid-template-columns: minmax(0, 1fr); }
+  .pal-opt-title { white-space: normal; }
+}
+
+@media (max-height: 620px) {
+  .pal-veil { padding-top: calc(var(--pal-u) * 28); }
+  .pal-panel { max-height: 94vh; }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   11) تقليل الحركة — لا انزلاق ولا تلاشٍ إطلاقاً
+   ══════════════════════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  .pal-veil,
+  .pal-panel { animation: none; }
+  .pal-opt,
+  .pal-chip,
+  .pal-act,
+  .pal-page-btn,
+  .pal-clear,
+  .pal-close { transition: none; }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   12) الطباعة — اللوحة أداة تشغيل لا محتوى مستند
+   ══════════════════════════════════════════════════════════════════════════ */
+@media print {
+  .pal-veil { display: none !important; }
+  body.pal-open { overflow: visible; }
+}

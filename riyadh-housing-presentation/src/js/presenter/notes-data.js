@@ -514,6 +514,11 @@ RH.presenter.notesData = (function () {
     }
   }
 
+  /** عدد بنيوي معلن (طول مجموعة منشورة) — الصفر ليس حقيقة منشورة فيُتجاهل */
+  function pushCount(set, n) {
+    if (typeof n === "number" && n > 0) pushNumber(set, n);
+  }
+
   /** يضيف كل أرقام نص منشور (النص نفسه حجة الاعتماد) */
   function pushText(pool, text) {
     if (text == null) return;
@@ -651,7 +656,7 @@ RH.presenter.notesData = (function () {
     const monthly = release.monthly || {};
     for (const key of Object.keys(monthly)) {
       src("monthly." + key);
-      pushNumber(pool.numbers, (monthly[key] || []).length);
+      pushCount(pool.numbers, (monthly[key] || []).length);
       for (const row of monthly[key] || []) {
         for (const k of Object.keys(row)) {
           if (typeof row[k] === "number") pushNumber(pool.numbers, row[k]);
@@ -662,7 +667,7 @@ RH.presenter.notesData = (function () {
     for (const key of ["facility_types", "economic_activities", "violation_types"]) {
       const arr = release[key] || [];
       src(key);
-      pushNumber(pool.numbers, arr.length);
+      pushCount(pool.numbers, arr.length);
       for (const row of arr) {
         for (const k of Object.keys(row)) {
           if (typeof row[k] === "number") pushNumber(pool.numbers, row[k]);
@@ -684,7 +689,7 @@ RH.presenter.notesData = (function () {
       src("neighbourhoods");
       pushText(pool, nb.label);
       pushText(pool, nb.ranking_note);
-      pushNumber(pool.numbers, (nb.rows || []).length);
+      pushCount(pool.numbers, (nb.rows || []).length);
       for (const row of nb.rows || []) {
         for (const k of Object.keys(row)) {
           if (typeof row[k] === "number") pushNumber(pool.numbers, row[k]);
@@ -699,7 +704,7 @@ RH.presenter.notesData = (function () {
       pushText(pool, sc.title);
       pushText(pool, sc.caveat);
       pushText(pool, sc.status);
-      pushNumber(pool.numbers, (sc.rows || []).length);
+      pushCount(pool.numbers, (sc.rows || []).length);
       for (const row of sc.rows || []) {
         for (const k of Object.keys(row)) {
           if (typeof row[k] === "number") pushNumber(pool.numbers, row[k]);
@@ -716,9 +721,9 @@ RH.presenter.notesData = (function () {
       pushText(pool, st.note);
       pushText(pool, st.status_rule);
       pushNumber(pool.numbers, st.required_pillars);
-      pushNumber(pool.numbers, (st.pillars || []).length);
-      pushNumber(pool.numbers, (st.initiatives || []).length);
-      pushNumber(pool.numbers, (st.kpis || []).length);
+      pushCount(pool.numbers, (st.pillars || []).length);
+      pushCount(pool.numbers, (st.initiatives || []).length);
+      pushCount(pool.numbers, (st.kpis || []).length);
       for (const p of st.pillars || []) pushText(pool, p.name);
       for (const ini of st.initiatives || []) {
         pushText(pool, ini.id);
@@ -742,7 +747,7 @@ RH.presenter.notesData = (function () {
       src("next_steps");
       pushText(pool, release.next_steps.note);
       pushText(pool, release.next_steps.status);
-      pushNumber(pool.numbers, (release.next_steps.items || []).length);
+      pushCount(pool.numbers, (release.next_steps.items || []).length);
     }
     if (release.validation) {
       src("validation");

@@ -16,3 +16,8 @@ require("./charts-micro.test.mjs");
 require("./scenarios-model.test.mjs");
 require("./atlas-model.test.mjs");
 require("./report-model.test.mjs");
+require("./notes-data.test.mjs");
+require("./palette-index.test.mjs");
+require("./diff-model.test.mjs");
+require("./methodology-model.test.mjs");
+require("./compare-model.test.mjs");

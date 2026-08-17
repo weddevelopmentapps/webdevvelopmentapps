@@ -1765,13 +1765,53 @@
     buildBokeh(el.closest ? el.closest(".dash") : null);
 
     /* الترويسة: سياق ذهبي + عنوان + وسم البوابات + سطر الفترة */
-    RH.presenter.layout.sectionHeader(el, {
+    const head = RH.presenter.layout.sectionHeader(el, {
       kicker: "الخاتمة",
       title: "الحقائق المتحقق منها والتوصيات",
       badge: "بوابات التحقق " + model.gatesText,
       meta: "بيانات حتى " + String(model.meta.data_as_of) + " — فترة الرصد "
         + String(model.meta.monitoring_period_label),
     });
+
+    /* نقطتا الدخول المرخصتان إلى ملحقَي الإسناد (عقد التوسعة §8): زران
+       يفتحان «منهجية البيانات ومصادرها» و«سجل القرارات المطلوبة» مع حفظ
+       حالة القسم كاملة (عقد §7) — ولا تغيير آخر في الخاتمة. موضعهما فراغُ
+       منتصف الترويسة (توزيعها space-between وارتفاعها الأدنى مضبوط سلفاً)
+       فلا يقتطعان بكسلاً من شبكة اللوحة المعتمدة: يُدرجان **قبل** كتلة
+       الوسم والسطر الثانوي فيبقى العنوان يميناً والوسم يساراً كما اعتمدهما
+       المجلس. كل زر يظهر فقط إذا كان ملحقه مضمّناً في هذا البناء (البناء
+       الجزئي أثناء التطوير لا يخلّف زراً معطلاً). أنماطهما `mth-` في
+       src/styles/methodology.css. */
+    const axEntries = [];
+    if (RH.explore && RH.explore.methodology) {
+      axEntries.push({
+        id: "methodology",
+        label: "منهجية البيانات",
+        aria: "فتح ملحق منهجية البيانات ومصادرها: هوية الإصدار وأصل كل مقياس "
+          + "وبوابات التحقق الحية وقرارات المطابقة",
+      });
+    }
+    if (RH.explore && typeof RH.explore.decisionsModel === "function") {
+      axEntries.push({
+        id: "decisions",
+        label: "سجل القرارات",
+        aria: "فتح ملحق سجل القرارات المطلوبة المشتق من لوحات الرؤى المعتمدة",
+      });
+    }
+    if (axEntries.length) {
+      const wrap = h("div", { class: "mth-entry-wrap" },
+        axEntries.map((e) => h("button", {
+          class: "mth-entry",
+          type: "button",
+          "data-interactive": "",
+          "aria-label": e.aria,
+          onclick: () => ctx.openAppendix(e.id),
+        },
+          h("span", {}, e.label),
+          h("span", { class: "mth-entry-arrow", "aria-hidden": "true" }, "←"),
+        )));
+      head.insertBefore(wrap, head.children[1] || null);
+    }
 
     /* الشبكة: 12 عموداً؛ قالب الصفوف في closing.css (صف الحقائق أطول).
        الترتيب البصري RTL: الخلية الأولى أقصى اليمين. */

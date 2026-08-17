@@ -13,8 +13,9 @@
    وفوق المسرح، وموضع ألواحنا محسوب كي لا يغطي أياً منها:
      • الشريط يبدأ من ارتفاع 70 وحدة فيعلو شارة الإصدار ومؤشر التقدم وزر
        «العودة إلى المحاور» دون تراكب.
-     • الدرج يقف عند 76 وحدة من الأسفل فيبقي زرّي «بحث وتنقّل» و«الموجز»
-       (أسفل يسار المسرح) ظاهرَين وقابلَين للنقر.
+     • الدرج يقف عند 108 وحدة من الأسفل: كومة زرّي «بحث وتنقّل» و«الموجز»
+       (أسفل يسار المسرح) تبلغ حافتها العليا 98 وحدة مقيسةً على 1920، فيبقى
+       الزران ظاهرَين وقابلَين للنقر بجوار الدرج لا تحته.
 
    انضباط اللون في هذا الملف (يخضع للمنظومة الدلالية المقفلة):
      • الذهبي `--gold` لحلقة التركيز الكاشفة ووسوم الصدق فقط — وهو استعماله
@@ -33,6 +34,9 @@
 .tour-notes,
 .tour-spot,
 .tour-spot-cap {
+  /* عرض الدرج يُعرَّف على اللوحين معاً لا على الدرج وحده: الشريط يحسب عرضه
+     بطرحه عند فتح الدرج، والخصائص المخصصة لا تُورَّث بين شقيقين */
+  --tour-notes-w: clamp(320px, calc(var(--su) * 430), 46vw);
   --tour-glass: rgba(8, 16, 9, 0.86);
   --tour-glass-2: rgba(16, 32, 26, 0.72);
   --tour-hair: var(--hair-d);
@@ -163,7 +167,7 @@ body.tour-active .tour-lit {
   left: 50%;
   transform: translateX(-50%);
   width: min(calc(var(--su) * 1180), calc(100vw - var(--su) * 96));
-  max-height: calc(var(--su) * 330);
+  max-height: calc(var(--su) * 472);
   display: flex;
   flex-direction: column;
   gap: calc(var(--su) * 10);
@@ -179,6 +183,17 @@ body.tour-active .tour-lit {
   animation: tour-bar-in var(--dur-std) var(--ease);
 }
 .tour-bar[hidden] { display: none; }
+
+/* توزيع المساحة داخل الشريط — تفصيل حاسم لا تجميلي:
+   الشريط عمود مرن ذو سقف ارتفاع و‎overflow:hidden. بالسلوك الافتراضي
+   (flex-shrink:1) تنكمش قائمة النقاط — وهي حاوية تمرير فحدّها الأدنى يصبح
+   صفراً — فتختفي نقاط الحديث كلياً بينما تبقى الزينة حولها. لذلك: كل الأبناء
+   ثابتة المقاس، والنقاط وحدها هي المنطقة المرنة بحد أدنى مضمون. */
+.tour-bar > * { flex: 0 0 auto; }
+.tour-bar > .tour-bar-points {
+  flex: 1 1 auto;
+  min-height: calc(var(--su) * 92);
+}
 
 @keyframes tour-bar-in {
   from { opacity: 0; transform: translate(-50%, calc(var(--su) * 16)); }
@@ -291,7 +306,7 @@ body.tour-notes-open .tour-bar {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: calc(var(--su) * 4) calc(var(--su) * 22);
   overflow-y: auto;
-  max-height: calc(var(--su) * 122);
+  max-height: calc(var(--su) * 210);
   scrollbar-width: thin;
 }
 .tour-bar-point {
@@ -347,6 +362,11 @@ body.tour-notes-open .tour-bar {
   display: flex;
   flex-wrap: wrap;
   gap: calc(var(--su) * 8);
+  /* منطقة تمرير خاصة بها: الوسم لا يُقصّ بحذف نصه (الصدق قبل الإيجاز)،
+     وإنما تُمرَّر المنطقة إن زاد عددها على سطرين في شريط ضيق */
+  max-height: calc(var(--su) * 68);
+  overflow-y: auto;
+  scrollbar-width: thin;
 }
 .tour-bar-caveats:empty { display: none; }
 .tour-caveat {
@@ -363,11 +383,9 @@ body.tour-notes-open .tour-bar {
   border-radius: var(--tour-radius-sm);
   padding: calc(var(--su) * 5) calc(var(--su) * 11);
 }
+/* داخل الشريط: النص كامل لا مقصوص — الوسم الذي يُقصّ يفقد وظيفته */
 .tour-bar .tour-caveat {
-  max-width: calc(var(--su) * 520);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  max-width: calc(var(--su) * 540);
 }
 .tour-caveat-dot {
   flex: 0 0 auto;
@@ -526,11 +544,10 @@ body.tour-notes-open .tour-bar {
    ══════════════════════════════════════════════════════════════════════════ */
 .tour-notes {
   --tour-notes-scale: 1;
-  --tour-notes-w: clamp(320px, calc(var(--su) * 430), 46vw);
   position: fixed;
   z-index: 61;
   inset-block-start: 0;
-  inset-block-end: calc(var(--su) * 76);
+  inset-block-end: calc(var(--su) * 108);
   inset-inline-end: 0;
   width: var(--tour-notes-w);
   display: flex;
@@ -911,10 +928,10 @@ body.tour-notes-open .tour-bar {
    ══════════════════════════════════════════════════════════════════════════ */
 @media (max-width: 1440px) {
   .tour-bar {
-    max-height: calc(var(--su) * 300);
+    max-height: calc(var(--su) * 500);
     padding: calc(var(--su) * 13) calc(var(--su) * 18) calc(var(--su) * 12);
   }
-  .tour-bar-points { max-height: calc(var(--su) * 104); }
+  .tour-bar-points { max-height: calc(var(--su) * 260); }
   .tour-notes { --tour-notes-w: clamp(300px, calc(var(--su) * 400), 48vw); }
 }
 
@@ -943,8 +960,8 @@ body.tour-notes-open .tour-bar {
 }
 
 @media (max-height: 720px) {
-  .tour-bar { bottom: calc(var(--su) * 52); max-height: calc(var(--su) * 250); }
-  .tour-bar-points { max-height: calc(var(--su) * 78); }
+  .tour-bar { bottom: calc(var(--su) * 52); max-height: calc(var(--su) * 300); }
+  .tour-bar-points { max-height: calc(var(--su) * 120); }
 }
 
 /* ══════════════════════════════════════════════════════════════════════════

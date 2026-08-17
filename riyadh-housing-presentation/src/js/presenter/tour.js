@@ -133,7 +133,7 @@ RH.tour = (function () {
       { key: "kpi", label: "الأرقام البارزة الستة", sel: ".kpi-strip" },
       { key: "coverage", label: "تطور نسبة تغطية الطلب", cardTitle: "تطور نسبة تغطية الطلب" },
       { key: "sectors", label: "العرض والطلب قطاعياً", cardTitle: "العرض والطلب قطاعياً" },
-      { key: "compliance", label: "بطاقة معدل الامتثال بوسمها", kpiLabel: "معدل الامتثال الرقابي" },
+      { key: "compliance", label: "بطاقة معدل الامتثال بوسمها", kpiLabel: "معدل الامتثال" },
       { key: "portfolio", label: "محفظة المبادرات", cardTitle: "محفظة المبادرات" },
       { key: "rail", label: "عمود الرؤى المعتمدة", sel: ".rail" },
     ],
@@ -422,12 +422,35 @@ RH.tour = (function () {
     return setTimeout(fn, 16);
   }
 
-  /** جذر القسم المعروض حالياً (مضيف المشهد الظاهر وحده) */
-  function activeRoot() {
+  /**
+   * جذر القسم المعروض حالياً.
+   *
+   * ⚠ نقطة دقيقة يجب ألا تُبسَّط: المحرك يبقي **مضيفين** ظاهرَين معاً طوال
+   * الانتقال (المغادر يُخفى بعد انقضاء مدته في `finishSwap`). فأخذ «أول مضيف
+   * غير مخفي» يعطي أثناء الانتقال جذرَ القسم **المغادر**، فيقع الضوء الكاشف
+   * على عنصر يوشك أن يُمحى — ويبدو الإبراز وكأنه اختفى. لذلك:
+   *   • يُستبعد أي مضيف يحمل صنف مغادرة (`leaving-*`)، و
+   *   • عند تمرير `expectId` يُطابَق الجذر بمعرّف قسمه حرفياً
+   *     (‏`data-section` الذي يكتبه سجل الأقسام، و`.sc-cover` للغلاف)،
+   *     وغيابه يعني «لم يُبنَ بعد» فتُعاد المحاولة لا أن يُقبل بديل خاطئ.
+   */
+  function activeRoot(expectId) {
     if (!CAN_DOM) return null;
     const hosts = D.qsa("#stage .scene-host");
-    for (const host of hosts) {
-      if (host.hidden) continue;
+    const visible = hosts.filter((h) => !h.hidden);
+    const settled = visible.filter((h) => !/\bleaving-/.test(h.className || ""));
+    const pool = settled.length ? settled : visible;
+    if (expectId != null) {
+      const sel = expectId === "00"
+        ? ".sc-cover"
+        : '.dash[data-section="' + expectId + '"]';
+      for (const host of pool) {
+        const el = host.querySelector(sel);
+        if (el) return el;
+      }
+      return null;
+    }
+    for (const host of pool) {
       const el = host.querySelector(".dash, .sc, .ax");
       if (el) return el;
     }
@@ -548,8 +571,21 @@ RH.tour = (function () {
       }
     }
 
+    /**
+     * كنس صنف الإبراز من المستند كله.
+     * لا يكفي نزعه عن `target` الأخير: تبديل الهدف داخل اللوحة ذاتها، وتبديل
+     * المضيفين أثناء الانتقال، يتركان أصنافاً معلّقة على عناصر أقسام معتمدة.
+     * الاستعلام محصور بالصنف الخاص بالميزة فكلفته لا تُذكر، والنتيجة عقدية:
+     * لا يبقى أثر للجولة على عنصر لا يملكه هذا الملف.
+     */
+    function clearLit() {
+      if (!CAN_DOM) return;
+      for (const el of D.qsa(".tour-lit")) el.classList.remove("tour-lit");
+    }
+
     function show(el, label) {
       if (!ensure()) return false;
+      clearLit();
       target = el;
       if (cap) cap.textContent = label || "";
       if (target && target.classList) target.classList.add("tour-lit");
@@ -561,7 +597,7 @@ RH.tour = (function () {
     function hide() {
       if (layer) layer.hidden = true;
       if (cap) { cap.hidden = true; cap.textContent = ""; }
-      if (target && target.classList) target.classList.remove("tour-lit");
+      clearLit();
       target = null;
       clearTimers();
       if (ro) { try { ro.disconnect(); } catch (_e) {} ro = null; }
@@ -1303,7 +1339,7 @@ RH.tour = (function () {
     function attempt() {
       state.pendingLocate = null;
       if (!state.active || seq !== state.locateSeq) return;
-      const root = activeRoot();
+      const root = activeRoot(step.id);
       const el = root ? findTarget(root, desc) : null;
       if (el && hasBox(el)) {
         state.lastTargetOk = true;
@@ -1480,7 +1516,9 @@ RH.tour = (function () {
     cancelLocate();
     stopTick();
     unbindResize();
-    spotlight.hide();
+    /* إزالة كاملة لا إخفاء: عقد §6.2 يوجب ألا يبقى للجولة أثر في DOM بعد
+       إنهائها — لا طبقة حجاب معلّقة ولا صنف إبراز على عنصر قسم معتمد */
+    spotlight.destroy();
     state.active = false;
     state.paused = false;
     state.collapsed = false;
@@ -1503,8 +1541,8 @@ RH.tour = (function () {
   function mountLaunch() {
     if (!CAN_DOM) return false;
     if (!inPresenterMode()) return false;
-    const root = activeRoot();
-    if (!root || !root.classList || !root.classList.contains("sc-cover")) return false;
+    const root = activeRoot("00");
+    if (!root) return false;
     const actions = root.querySelector(".cover-actions");
     if (!actions) return false;
     if (actions.querySelector(".tour-launch")) { syncLaunch(); return true; }

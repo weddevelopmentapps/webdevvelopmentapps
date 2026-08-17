@@ -224,6 +224,175 @@ check("قفل الانتقال يمنع القفز المزدوج", (await hash(
   await page2.close();
 }
 
+/* ════════════════════════════════════════════════════════════════════════════
+   حزمة التوسعة — الحالات التي أضافها التكامل
+   ────────────────────────────────────────────────────────────────────────────
+   القاعدة الحاكمة لكل ما يلي هي عقد §8 نفسه: أي طبقة جديدة (لوحة أوامر، درج
+   ملاحظات، وضع موجز، ملحق جديد) يجب ألا تسرق ضغطة جهاز التقديم بعد إغلاقها،
+   وألا تقلّب الأقسام خلفها وهي مفتوحة. كل فحص أدناه يثبت طرفَي هذه المعادلة.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+// ── لوحة الأوامر: فتح بالاختصار، حجب الكليكر، قفزة، ثم Escape يعيد التحكم ──
+await page.goto(URL0 + "#/section/demand", { waitUntil: "load" });
+await settle(1200);
+await page.keyboard.press("Control+KeyK");
+await settle(700);
+check("Ctrl+K يفتح لوحة الأوامر",
+  (await page.locator('[role="dialog"][aria-modal="true"] .pal-input').count()) === 1);
+check("التركيز داخل حقل بحث اللوحة",
+  await page.evaluate(() => !!document.activeElement
+    && document.activeElement.classList.contains("pal-input")));
+// الكليكر لا يقلّب القسم خلف اللوحة المفتوحة (§8): سهم داخل الحقل يتنقّل في
+// النتائج فقط، والهاش يبقى على القسم نفسه
+await page.keyboard.press("ArrowDown");
+await settle(400);
+check("لوحة مفتوحة: الكليكر لا يقلّب القسم خلفها",
+  (await hash()).includes("/section/demand"), "الهاش: " + (await hash()));
+await page.keyboard.press("Escape");
+await settle(600);
+check("Escape يغلق لوحة الأوامر",
+  (await page.locator('[role="dialog"][aria-modal="true"]').count()) === 0);
+check("الإغلاق لم يغيّر القسم", (await hash()).includes("/section/demand"));
+// أهم فحص: بعد الإغلاق يعود جهاز التقديم فوراً إلى قيادة الملاحة
+await page.keyboard.press("ArrowRight");
+await settle(1000);
+check("بعد Escape يستعيد الكليكر التحكم فوراً",
+  (await hash()).includes("/section/licensing"), "الهاش: " + (await hash()));
+
+// ── لوحة الأوامر: القفز إلى وجهة يغيّر المسار فعلاً ويغلق اللوحة ──
+await page.goto(URL0 + "#/section/summary", { waitUntil: "load" });
+await settle(1200);
+await page.keyboard.press("Control+KeyK");
+await settle(700);
+await page.keyboard.type("الخريطة");
+await settle(800);
+await page.keyboard.press("Enter");
+await settle(1300);
+check("Enter في اللوحة يقفز إلى الوجهة",
+  (await hash()).includes("/section/map"), "الهاش: " + (await hash()));
+check("القفزة أغلقت اللوحة",
+  (await page.locator('[role="dialog"][aria-modal="true"]').count()) === 0);
+check("الكليكر عامل بعد القفزة", await (async () => {
+  await page.keyboard.press("ArrowRight");
+  await settle(1000);
+  return (await hash()).includes("/section/initiatives");
+})(), "الهاش: " + (await hash()));
+
+// ── درج ملاحظات المتحدث: N يفتح ويغلق، والعرض يستمر خلفه (غير حواري) ──
+await page.goto(URL0 + "#/section/control", { waitUntil: "load" });
+await settle(1200);
+await page.keyboard.press("KeyN");
+await settle(700);
+check("مفتاح N يفتح درج الملاحظات",
+  await page.evaluate(() => !!RH.tour && RH.tour.notes.isOpen()));
+check("الدرج ليس حوارياً (لا aria-modal)",
+  (await page.locator('.tour-notes[aria-modal="true"]').count()) === 0);
+// الدرج مفتوح والتركيز خارجه: الكليكر يبقى قائداً للعرض (شرط المتحدث)
+await page.keyboard.press("ArrowRight");
+await settle(1100);
+check("الدرج مفتوح والعرض يستمر بالكليكر",
+  (await hash()).includes("/section/map"), "الهاش: " + (await hash()));
+check("الدرج تزامن مع القسم الجديد ولم يُغلق",
+  await page.evaluate(() => !!RH.tour && RH.tour.notes.isOpen()));
+await page.keyboard.press("KeyN");
+await settle(600);
+check("N يغلق الدرج",
+  await page.evaluate(() => !!RH.tour && !RH.tour.notes.isOpen()));
+
+// ── وضع الموجز التنفيذي: دخول من زر HUD، ثم خروج يعيد المقدِّم كاملاً ──
+await page.goto(URL0 + "#/section/summary", { waitUntil: "load" });
+await settle(1200);
+await page.click("#hud-report");
+await settle(2200);
+check("زر HUD يدخل وضع الموجز", (await hash()).includes("/report"));
+check("body في وضع الموجز",
+  await page.evaluate(() => document.body.classList.contains("mode-report")));
+check("المسرح وشريط HUD مخفيان في الموجز",
+  await page.evaluate(() => document.getElementById("stage").hidden
+    && document.getElementById("hud").hidden));
+check("صفحات الموجز مبنية", (await page.locator(".rpt-page").count()) >= 3);
+check("الموجز لا يتعايش مع جذر الإدارة",
+  await page.evaluate(() => {
+    const a = document.getElementById("admin-root");
+    return !a || a.hidden;
+  }));
+// مفاتيح العرض داخل الموجز لا تقلّب أقسام المسرح خلفه
+await page.keyboard.press("ArrowRight");
+await settle(700);
+check("مفاتيح العرض لا تقلّب المسرح من داخل الموجز",
+  (await hash()).includes("/report"), "الهاش: " + (await hash()));
+// الخروج: العودة إلى المقدِّم تعيد الكروم والحالة
+await page.goBack();
+await settle(1600);
+check("الخروج من الموجز يعيد المسار السابق",
+  (await hash()).includes("/section/summary"), "الهاش: " + (await hash()));
+check("العودة أعادت وضع المقدِّم وكروم المسرح",
+  await page.evaluate(() => document.body.classList.contains("mode-presenter")
+    && !document.getElementById("stage").hidden
+    && !document.getElementById("hud").hidden
+    && !document.getElementById("release-badge").hidden));
+check("الكليكر عامل بعد الخروج من الموجز", await (async () => {
+  await page.keyboard.press("ArrowRight");
+  await settle(1100);
+  return (await hash()).includes("/section/demand");
+})(), "الهاش: " + (await hash()));
+
+// ── ملاحق حزمة التوسعة الأربعة: دخول بحالة عودة مرمّزة ثم عودة حرفية ──
+for (const [sectionRoute, entrySel, appendixId, backRoute] of [
+  ["#/section/map", ".atl-entry", "/appendix/atlas", "/section/map"],
+  ["#/section/forecast", ".axs-entry", "/appendix/scenarios", "/section/forecast"],
+  ["#/section/closing", ".mth-entry", "/appendix/methodology", "/section/closing"],
+]) {
+  await page.goto(URL0 + sectionRoute, { waitUntil: "load" });
+  await settle(1500);
+  const n = await page.locator(entrySel).count();
+  check(`زر الدخول ${entrySel} موجود`, n >= 1, "العدد: " + n);
+  if (n < 1) continue;
+  await page.locator(entrySel).first().click();
+  await settle(1600);
+  const inAx = await hash();
+  check(`${appendixId} يفتح بحالة عودة مرمّزة`,
+    inAx.includes(appendixId) && inAx.includes("return="), "الهاش: " + inAx);
+  await page.keyboard.press("Backspace");
+  await settle(1500);
+  check(`العودة من ${appendixId} تعيد ${backRoute}`,
+    (await hash()).includes(backRoute), "الهاش: " + (await hash()));
+  check(`الكليكر عامل بعد العودة من ${appendixId}`, await (async () => {
+    await page.keyboard.press("ArrowRight");
+    await settle(1100);
+    return !(await hash()).includes(appendixId);
+  })(), "الهاش: " + (await hash()));
+}
+
+// ملحق القرارات: مدخله الثاني في ترويسة الخاتمة (زر mth-entry الثاني)
+await page.goto(URL0 + "#/section/closing", { waitUntil: "load" });
+await settle(1500);
+const dcsEntries = await page.locator(".mth-entry").count();
+check("ترويسة الخاتمة تحمل مدخلَي الإسناد", dcsEntries >= 2, "العدد: " + dcsEntries);
+if (dcsEntries >= 2) {
+  await page.locator(".mth-entry").nth(1).click();
+  await settle(1600);
+  const h2 = await hash();
+  check("/appendix/decisions يفتح بحالة عودة مرمّزة",
+    h2.includes("/appendix/decisions") && h2.includes("return="), "الهاش: " + h2);
+  await page.click(".btn-return");
+  await settle(1500);
+  check("زر العودة من سجل القرارات يعيد الخاتمة",
+    (await hash()).includes("/section/closing"), "الهاش: " + (await hash()));
+}
+
+// ── تراجع رشيق: مسار الموجز يظل صالحاً بلا وحدته (بناء جزئي محاكى) ──
+await page.goto(URL0 + "#/section/summary", { waitUntil: "load" });
+await settle(1200);
+await page.evaluate(() => { window.__rptShow = RH.report.show; delete RH.report.show; });
+await page.evaluate(() => RH.core.router.go({ kind: "report", id: "main", params: {} }));
+await settle(1200);
+check("غياب وحدة الموجز يحوّل استبدالياً إلى قسم حقيقي لا شاشة فارغة",
+  (await hash()).includes("/section/summary")
+  && await page.evaluate(() => document.body.classList.contains("mode-presenter")),
+  "الهاش: " + (await hash()));
+await page.evaluate(() => { RH.report.show = window.__rptShow; });
+
 // ── لا أخطاء صفحة ──
 check("لا أخطاء JavaScript في كل الجولة", errors.length === 0, errors.join(" | "));
 

@@ -73,6 +73,9 @@ JS_ORDER = [
     "src/js/presenter/appendix/ax-atlas.js",
     "src/js/presenter/appendix/ax-methodology.js",
     "src/js/presenter/appendix/ax-decisions.js",
+    # مركز المقارنة القطاعية: يعتمد على ax-shell وgeoutils وmicro وlayout —
+    # كلها قبله، ونموذجه النقي على RH.explore المُنشأ في ns.js.
+    "src/js/presenter/appendix/ax-compare.js",
     # الجولة الموجهة ولوحة الأوامر: جدول الملاحظات قبل الجولة، واللوحة تفهرس
     # الأقسام والملاحق فتأتي بعد تسجيلها جميعاً.
     "src/js/presenter/notes-data.js",
@@ -117,6 +120,7 @@ CSS_ORDER = [
     "src/styles/palette.css",
     "src/styles/methodology.css",
     "src/styles/decisions.css",
+    "src/styles/compare.css",
 ]
 
 FAVICON = ("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E"

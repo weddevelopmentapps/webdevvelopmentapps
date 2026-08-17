@@ -1441,12 +1441,34 @@
       const model = strategyModel(rel);
 
       /* الترويسة: سياق ذهبي + عنوان + وسم حداثة البيانات + فترة الرصد */
-      RH.presenter.layout.sectionHeader(el, {
+      const head = RH.presenter.layout.sectionHeader(el, {
         kicker: "القراءة التنفيذية الأولى",
         title: "الملخص التنفيذي",
         badge: "بيانات حتى " + String(rel.meta.data_as_of),
         meta: "فترة الرصد: " + String(rel.meta.monitoring_period_label),
       });
+
+      /* نقطة الدخول المرخصة الوحيدة إلى مركز المقارنة القطاعية: زر واحد
+         يفتح الملحق مع حفظ حالة القسم كاملة (عقد §7) — ولا تغيير آخر في
+         القسم. موضعه فراغ منتصف الترويسة (‎.dash-head‎ توزيعها space-between
+         وارتفاعها الأدنى مضبوط سلفاً) فلا يقتطع بكسلاً واحداً من الشبكة
+         المعتمدة: يُدرج **قبل** كتلة الوسم والسطر الثانوي فيبقى العنوان
+         يميناً والوسم يساراً كما اعتمدهما المجلس تماماً. الزر يظهر فقط إذا
+         كان الملحق مضمّناً في هذا البناء (بناء جزئي لا يخلّف زراً معطلاً). */
+      if (RH.explore && RH.explore.compare) {
+        head.insertBefore(h("button", {
+          class: "cmp-entry",
+          type: "button",
+          "data-interactive": "",
+          "aria-label": "فتح مركز المقارنة القطاعية: مصفوفة أربعة وعشرين "
+            + "مؤشراً على القطاعات الخمسة، وبطاقة كل قطاع، وبوابة مطابقة "
+            + "مجاميع القطاعات بالإجماليات المنشورة",
+          onclick: () => ctx.openAppendix("compare"),
+        },
+          h("span", {}, "مقارنة القطاعات"),
+          h("span", { class: "cmp-entry-arrow", "aria-hidden": "true" }, "←"),
+        ), head.children[1] || null);
+      }
 
       /* الملخص الناطق ثم شريط المؤشرات الكبرى الست ثم شبكة الرسوم والرؤى */
       buildSrSummary(el, ctx, model);

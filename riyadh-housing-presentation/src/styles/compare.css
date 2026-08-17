@@ -1,0 +1,1052 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   compare.css — مركز المقارنة القطاعية (ملحق `compare`)
+   بادئة الميزة: cmp-  ·  يملكه وكيل هذه الميزة وحده
+
+   قواعد الملكية والانضباط المطبَّقة هنا حرفياً:
+     • لا صنف من dashboard.css/tokens.css/appendix.css/ملفات الأقسام يُعاد
+       تعريفه. ما يُستهلك منها (.dash-card، .table-dense، .card-head،
+       .card-body، .card-note، .pending-card) يُستعمل كما هو، وما يلزم من
+       تخصيص يُقيَّد بجذر الميزة (`.cmp-*` سلفاً في المُحدِّد) فلا يتسرب.
+     • لا صبغة مكتوبة حرفياً: كل لون رمز من tokens.css. النغمات الدلالية
+       مقفلة — المرجاني للعجز والمخالفات حصراً، والذهبي للاعتماد والوسوم
+       حصراً، والأخضر للطاقة والفعل، والرملي **للعلامة البيانية لا للحبر**
+       (تباينه على المسرح الداكن دون عتبة النص، فحبر الطلب عاجي وشريطه رملي).
+     • كل مقاس بوحدة `--su` فيتدرّج مع المسرح — لا بكسل ثابت إلا للشعرات.
+     • `prefers-reduced-motion` يُصفّر كل انتقال في آخر الملف.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* ════════════════════════════════════════════════════════════════════════
+   0) نقطة الدخول في ترويسة الملخص التنفيذي
+   نمط مطابق لأزرار دخول الملاحق القائمة (نفس الحجم والحواف والسلوك) كي
+   لا تظهر في الترويسة المعتمدة لهجة بصرية جديدة.
+   ════════════════════════════════════════════════════════════════════════ */
+.cmp-entry {
+  align-self: flex-end;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--su) * 9);
+  margin-bottom: calc(var(--su) * 4);
+  padding: calc(var(--su) * 8) calc(var(--su) * 18);
+  border: 1px solid var(--hair-d2);
+  border-radius: 999px;
+  background: rgba(16, 32, 26, 0.6);
+  color: var(--ink2-d);
+  font-family: var(--f-body);
+  font-size: calc(var(--su) * 14);
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color var(--dur-micro) var(--ease),
+    border-color var(--dur-micro) var(--ease),
+    color var(--dur-micro) var(--ease);
+}
+.cmp-entry:hover {
+  background: var(--stage-3);
+  border-color: var(--hair-d);
+  color: var(--ivory);
+}
+.cmp-entry:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.cmp-entry-arrow {
+  color: var(--faint-d);
+  transition: transform var(--dur-micro) var(--ease);
+}
+.cmp-entry:hover .cmp-entry-arrow {
+  transform: translateX(calc(var(--su) * -3));
+  color: var(--ivory);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   1) جذر الصفحة: كل محتوى الصفحة داخل `.cmp-page` وحده
+   السبب بنيوي: `.ax-page` تعلن فجوة 24 وحدة بين أبنائها المباشرين، وهي
+   فجوة أقسام لا فجوة مصفوفة. جذر واحد ⇐ لا فجوة موروثة، والفجوة الداخلية
+   تُدار هنا بالكامل دون لمس appendix.css.
+   ════════════════════════════════════════════════════════════════════════ */
+.cmp-page {
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 12);
+}
+
+/* ملخص ناطق لقارئ الشاشة — خارج التدفق البصري تماماً ولا يقتطع مساحة */
+.cmp-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── نغمات الحبر: دلالية مقفلة ──
+   الرملي (الطلب) غائب عمداً عن حبر النص: تباينه على ‎#10201A دون عتبة
+   النص الصغير، فيُعرض حبره عاجياً ويبقى الرملي على العلامة البيانية. */
+.cmp-t-pos { color: var(--green-hi); }
+.cmp-t-neg { color: var(--coral); }
+.cmp-t-gold { color: var(--gold-hi); }
+.cmp-t-blue { color: var(--collar-blue); }
+.cmp-t-demand { color: var(--ivory); }
+.cmp-t-neu { color: var(--ivory); }
+
+/* ════════════════════════════════════════════════════════════════════════
+   2) شريط الأدوات: تبويبات العائلة ووضع العرض وزر الترتيب
+   ════════════════════════════════════════════════════════════════════════ */
+.cmp-toolbar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: calc(var(--su) * 10) calc(var(--su) * 14);
+}
+
+.cmp-tabs {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--su) * 3);
+  padding: calc(var(--su) * 3);
+  background: rgba(16, 32, 26, 0.55);
+  border: 1px solid var(--hair-d2);
+  border-radius: 999px;
+}
+.cmp-tab {
+  font-family: var(--f-body);
+  font-size: calc(var(--su) * 13.5);
+  font-weight: 600;
+  color: var(--mut-d);
+  padding: calc(var(--su) * 7) calc(var(--su) * 16);
+  border-radius: 999px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color var(--dur-micro) var(--ease),
+    color var(--dur-micro) var(--ease);
+}
+.cmp-tab:hover { color: var(--ivory); }
+.cmp-tab.now {
+  color: var(--ivory);
+  background: var(--stage-3);
+  box-shadow: inset 0 0 0 1px var(--hair-d);
+}
+.cmp-tab:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
+.cmp-tab:disabled { opacity: 0.35; cursor: default; }
+
+.cmp-tabs.sectors .cmp-tab { font-size: calc(var(--su) * 14.5); }
+
+.cmp-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--su) * 8);
+  font-family: var(--f-body);
+  font-size: calc(var(--su) * 13.5);
+  font-weight: 700;
+  color: var(--ink2-d);
+  background: rgba(16, 32, 26, 0.6);
+  border: 1px solid var(--hair-d2);
+  border-radius: 999px;
+  padding: calc(var(--su) * 8) calc(var(--su) * 16);
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color var(--dur-micro) var(--ease),
+    border-color var(--dur-micro) var(--ease),
+    color var(--dur-micro) var(--ease);
+}
+.cmp-btn:hover { background: var(--stage-3); color: var(--ivory); border-color: var(--hair-d); }
+.cmp-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.cmp-btn.ghost { background: transparent; }
+.cmp-btn.sort { margin-inline-start: auto; }
+
+.cmp-toolbar-meta {
+  margin-inline-start: auto;
+  font-size: calc(var(--su) * 13);
+  color: var(--mut-d);
+  white-space: nowrap;
+}
+.cmp-toolbar-meta b { color: var(--ivory); font-weight: 700; }
+
+/* رقاقات اختيار المؤشر (صفحة الفجوة) — صف قابل للتمرير أفقياً عند الفيض */
+.cmp-chiprow {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: calc(var(--su) * 6);
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: calc(var(--su) * 3);
+}
+.cmp-chip {
+  flex: none;
+  font-family: var(--f-body);
+  font-size: calc(var(--su) * 12.5);
+  font-weight: 600;
+  color: var(--mut-d);
+  background: rgba(16, 32, 26, 0.5);
+  border: 1px solid var(--hair-d2);
+  border-radius: 999px;
+  padding: calc(var(--su) * 5) calc(var(--su) * 13);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color var(--dur-micro) var(--ease), border-color var(--dur-micro) var(--ease);
+}
+.cmp-chip:hover { color: var(--ivory); }
+.cmp-chip.now {
+  color: var(--ivory);
+  border-color: var(--gold);
+  background: rgba(214, 171, 76, 0.08);
+}
+.cmp-chip:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+/* ════════════════════════════════════════════════════════════════════════
+   3) الصفحة 1 — المصفوفة ولوحة التركيز
+   ════════════════════════════════════════════════════════════════════════ */
+.cmp-matrix-main {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 2.25fr) minmax(0, 1fr);
+  gap: calc(var(--su) * 14);
+  align-items: stretch;
+}
+
+.cmp-matrix-card { overflow: hidden; }
+.cmp-matrix-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+.cmp-matrix { font-size: calc(var(--su) * 13); }
+.cmp-matrix th { padding: calc(var(--su) * 8) calc(var(--su) * 8); }
+.cmp-matrix td {
+  padding: calc(var(--su) * 6) calc(var(--su) * 8);
+  vertical-align: middle;
+}
+.cmp-matrix .cmp-th-ind { width: 23%; }
+.cmp-matrix .cmp-th-sec { text-align: center; }
+.cmp-matrix .cmp-th-city,
+.cmp-matrix .cmp-th-spread { text-align: center; width: 9%; }
+
+/* رأس عمود القطاع زرّ يفتح بطاقته — مظهره رأسُ عمود لا زرّ صاخب */
+.cmp-secbtn {
+  font-family: var(--f-body);
+  font-size: calc(var(--su) * 13);
+  font-weight: 700;
+  color: var(--mut-d);
+  padding: calc(var(--su) * 2) calc(var(--su) * 6);
+  border-radius: calc(var(--su) * 6);
+  cursor: pointer;
+  transition: color var(--dur-micro) var(--ease);
+}
+.cmp-secbtn:hover { color: var(--gold-hi); }
+.cmp-secbtn:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
+
+.cmp-row { transition: background-color var(--dur-micro) var(--ease); }
+.cmp-row:hover { background: rgba(22, 41, 31, 0.5); }
+.cmp-row.now { background: rgba(214, 171, 76, 0.07); }
+.cmp-row.now .cmp-ind-label { color: var(--gold-hi); }
+
+.cmp-td-ind { white-space: normal !important; }
+.cmp-indbtn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: calc(var(--su) * 3);
+  width: 100%;
+  text-align: start;
+  cursor: pointer;
+  padding: calc(var(--su) * 2) 0;
+}
+.cmp-indbtn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.cmp-ind-label {
+  font-size: calc(var(--su) * 13.5);
+  font-weight: 700;
+  color: var(--ivory);
+  line-height: 1.35;
+}
+.cmp-ind-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--su) * 6);
+}
+.cmp-ind-unit { font-size: calc(var(--su) * 11); color: var(--faint-d); }
+
+/* وسم نوع الأصل — محايد النغمة، ذهبيّه محجوز للتعريفي (وسم لا قيمة) */
+.cmp-tag {
+  display: inline-flex;
+  align-items: center;
+  font-size: calc(var(--su) * 10.5);
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  color: var(--mut-d);
+  border: 1px solid var(--hair-d2);
+  border-radius: 999px;
+  padding: calc(var(--su) * 1) calc(var(--su) * 7);
+  white-space: nowrap;
+}
+.cmp-tag.k-raw { color: var(--ink2-d); }
+.cmp-tag.k-derived { color: var(--green-hi); border-color: rgba(49, 162, 109, 0.35); }
+.cmp-tag.k-definitional { color: var(--gold-hi); border-color: rgba(214, 171, 76, 0.4); }
+.cmp-tag.k-geo { color: var(--collar-blue); border-color: rgba(63, 127, 176, 0.4); }
+.cmp-tag.k-unit, .cmp-tag.k-dir { color: var(--faint-d); }
+
+.cmp-td-cell { text-align: center; }
+.cmp-td-cell.best { box-shadow: inset 0 0 0 1px rgba(49, 162, 109, 0.28); }
+.cmp-td-cell.worst { box-shadow: inset 0 0 0 1px rgba(214, 106, 80, 0.28); }
+
+.cmp-cell-v {
+  display: block;
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-size: calc(var(--su) * 14);
+  font-weight: 600;
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+.cmp-cell-why {
+  display: block;
+  font-size: calc(var(--su) * 10.5);
+  color: var(--faint-d);
+  margin-top: calc(var(--su) * 1);
+}
+.cmp-dash { color: var(--faint-d); font-weight: 700; }
+
+/* شريط الخلية: علامة بيانية بحتة — لونها من النغمة الدلالية للصف */
+.cmp-cellbar {
+  display: block;
+  height: calc(var(--su) * 4);
+  margin: calc(var(--su) * 4) auto 0;
+  width: 82%;
+  background: var(--hair-d2);
+  border-radius: 999px;
+  overflow: hidden;
+  --cmp-bar: var(--mut-d);
+}
+.cmp-cellbar.cmp-t-pos { --cmp-bar: var(--green); }
+.cmp-cellbar.cmp-t-neg { --cmp-bar: var(--coral); }
+.cmp-cellbar.cmp-t-demand { --cmp-bar: var(--demand); }
+.cmp-cellbar.cmp-t-gold { --cmp-bar: var(--gold); }
+.cmp-cellbar.cmp-t-blue { --cmp-bar: var(--collar-blue); }
+.cmp-cellbar-fill {
+  display: block;
+  height: 100%;
+  background: var(--cmp-bar);
+  border-radius: 999px;
+}
+
+/* رتبة داخل الخلية */
+.cmp-rank {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-size: calc(var(--su) * 17);
+  font-weight: 600;
+  color: var(--ivory);
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+.cmp-rank.first { color: var(--green-hi); }
+.cmp-rank.last { color: var(--coral); }
+.cmp-rank-of { font-size: calc(var(--su) * 11); color: var(--faint-d); }
+
+.cmp-td-city, .cmp-td-spread { text-align: center; }
+.cmp-td-city b, .cmp-td-spread b {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-size: calc(var(--su) * 13.5);
+  color: var(--ivory);
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+/* ── لوحة تركيز المؤشر ── */
+.cmp-focus { overflow: hidden; }
+.cmp-focus-head {
+  padding: calc(var(--su) * 13) calc(var(--su) * 16) calc(var(--su) * 6);
+  border-bottom: 1px solid var(--hair-d2);
+}
+.cmp-focus-title {
+  font-size: calc(var(--su) * 16);
+  font-weight: 700;
+  color: var(--ivory);
+  line-height: 1.35;
+}
+.cmp-focus-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--su) * 5);
+  margin-top: calc(var(--su) * 6);
+}
+.cmp-focus-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 10);
+  padding: calc(var(--su) * 12) calc(var(--su) * 16) calc(var(--su) * 14);
+}
+.cmp-focus-bars { flex: none; }
+.cmp-focus-stats, .cmp-focus-prov {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 3);
+}
+.cmp-focus-acts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--su) * 8);
+  margin-top: calc(var(--su) * 2);
+}
+
+.cmp-kv {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: calc(var(--su) * 10);
+  font-size: calc(var(--su) * 12.5);
+  padding: calc(var(--su) * 3) 0;
+  border-bottom: 1px solid var(--hair-d2);
+}
+.cmp-kv:last-child { border-bottom: 0; }
+.cmp-kv-k { color: var(--mut-d); flex: none; }
+.cmp-kv-v {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: var(--ivory);
+  text-align: end;
+  min-width: 0;
+}
+.cmp-kv.wide { flex-direction: column; align-items: stretch; gap: calc(var(--su) * 2); }
+.cmp-kv.wide .cmp-kv-v { text-align: start; font-family: var(--f-body); font-weight: 500; }
+
+.cmp-formula, .cmp-origin {
+  font-size: calc(var(--su) * 11.5);
+  color: var(--ink2-d);
+  line-height: 1.6;
+  white-space: normal;
+}
+.cmp-origin { color: var(--mut-d); }
+
+/* سطر الصدق الملازم — لا يتوسط الشاشة ولا يتحول شاشة كاملة */
+.cmp-honest {
+  display: flex;
+  align-items: flex-start;
+  gap: calc(var(--su) * 7);
+  font-size: calc(var(--su) * 11.5);
+  line-height: 1.65;
+  color: var(--mut-d);
+}
+.cmp-honest-mark { color: var(--faint-d); font-size: calc(var(--su) * 8); margin-top: calc(var(--su) * 5); }
+.cmp-honest.warn { color: var(--gold-hi); }
+.cmp-honest.warn .cmp-honest-mark { color: var(--gold); }
+.cmp-honest.rank { color: var(--ink2-d); }
+
+/* تذييل الصفحة */
+.cmp-foot {
+  flex: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: calc(var(--su) * 6) calc(var(--su) * 10);
+  font-size: calc(var(--su) * 11.5);
+  color: var(--faint-d);
+  line-height: 1.6;
+}
+.cmp-foot-main { color: var(--mut-d); }
+.cmp-foot-sep { color: var(--hair-d); }
+.cmp-foot-honest {
+  display: block;
+  width: 100%;
+  color: var(--mut-d);
+}
+/* أسطر الصدق في التذييل تتوزع صفين متجاورين عند اتساع السطر، فتبقى
+   الصيغ الثلاث والتحفظ مرئية كلها بلا ابتلاع ارتفاع الجسم. */
+.cmp-foot .cmp-honest { flex: 1 1 calc(50% - var(--su) * 10); min-width: 0; }
+.cmp-foot .cmp-honest.warn { flex-basis: 100%; }
+
+/* ════════════════════════════════════════════════════════════════════════
+   4) الصفحة 2 — بطاقة القطاع (ثلاثة أعمدة)
+   ════════════════════════════════════════════════════════════════════════ */
+.cmp-profile {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, 1.02fr) minmax(0, 1fr);
+  gap: calc(var(--su) * 14);
+  align-items: stretch;
+}
+.cmp-prof-col {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 10);
+}
+.cmp-prof-col > .dash-card { min-height: 0; }
+/* شبكة الأرقام بارتفاعها الطبيعي، والميزان يمتص ما تبقّى من العمود:
+   فلا فراغ في المقاس العريض ولا قصّ لصف ميزان في الضيق. */
+.cmp-prof-col.figures > .cmp-balance { flex: 1 1 auto; min-height: 0; }
+.cmp-prof-col.map > .cmp-mapcard { flex: 1.15 1 0; }
+.cmp-prof-col.map > .cmp-samplecard { flex: 1 1 0; }
+.cmp-prof-col.ranks > .cmp-rankcard { flex: 1; }
+
+.cmp-card-title {
+  flex: none;
+  font-size: calc(var(--su) * 14);
+  font-weight: 700;
+  color: var(--mut-d);
+  letter-spacing: 0.3px;
+}
+
+/* شبكة أرقام القطاع */
+/* اثنا عشر رقماً في ثلاثة أعمدة = أربعة صفوف تامة بلا صف أعرج، وارتفاع
+   يسع عمودَ البطاقة مع ميزانه في المقاسين معاً بلا تمرير ولا قصّ. */
+.cmp-figgrid {
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: calc(var(--su) * 6);
+}
+
+.cmp-stat {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 1);
+  background: rgba(16, 32, 26, 0.55);
+  border: 1px solid var(--hair-d2);
+  border-radius: calc(var(--su) * 10);
+  padding: calc(var(--su) * 7) calc(var(--su) * 13);
+  min-width: 0;
+}
+.cmp-stat-k {
+  font-size: calc(var(--su) * 11.5);
+  color: var(--mut-d);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cmp-stat-v {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-size: calc(var(--su) * 19);
+  font-weight: 600;
+  color: var(--ivory);
+  line-height: 1.15;
+  direction: ltr;
+  unicode-bidi: isolate;
+  text-align: start;
+}
+.cmp-stat-f {
+  font-size: calc(var(--su) * 10.5);
+  color: var(--faint-d);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* البطاقة العريضة (نص لا رقم): حبر نصي بحجم مقروء بلا تدوير الأرقام */
+.cmp-stat.wide { grid-column: span 2; }
+.cmp-stat.wide .cmp-stat-v {
+  font-family: var(--f-body);
+  font-size: calc(var(--su) * 14);
+  font-weight: 700;
+  direction: rtl;
+  white-space: normal;
+  line-height: 1.45;
+}
+
+/* ميزان الاستحقاق */
+.cmp-balance .card-body {
+  gap: calc(var(--su) * 8);
+  overflow: auto;
+}
+.cmp-balrow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas: "k chip" "parts chip";
+  align-items: center;
+  gap: calc(var(--su) * 1) calc(var(--su) * 10);
+  padding: calc(var(--su) * 5) 0;
+  border-bottom: 1px solid var(--hair-d2);
+}
+.cmp-balrow:last-of-type { border-bottom: 0; }
+.cmp-balrow-k {
+  grid-area: k;
+  font-size: calc(var(--su) * 13);
+  font-weight: 700;
+  color: var(--ivory);
+}
+.cmp-balrow-parts {
+  grid-area: parts;
+  font-size: calc(var(--su) * 11);
+  color: var(--mut-d);
+}
+.cmp-balrow-chip { grid-area: chip; }
+
+/* الخريطة المصغرة */
+.cmp-mapbody { gap: calc(var(--su) * 8); min-height: 0; }
+.cmp-maphost {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cmp-map { width: 100%; height: 100%; display: block; }
+.cmp-map-d {
+  fill: rgba(38, 66, 53, 0.92);
+  stroke: rgba(244, 241, 230, 0.16);
+  stroke-width: 0.9;
+}
+.cmp-map-d.now {
+  fill: var(--green-dim);
+  stroke: var(--green-hi);
+  stroke-width: 1.4;
+}
+.cmp-map-hs circle {
+  fill: rgba(214, 106, 80, 0.42);
+  stroke: var(--coral);
+  stroke-width: 1.2;
+}
+.cmp-map-missing {
+  font-size: calc(var(--su) * 12.5);
+  color: var(--mut-d);
+  line-height: 1.7;
+  text-align: center;
+  padding: calc(var(--su) * 20);
+}
+.cmp-maplegend {
+  flex: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: calc(var(--su) * 5) calc(var(--su) * 12);
+  font-size: calc(var(--su) * 11);
+  color: var(--mut-d);
+}
+.cmp-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--su) * 6);
+  white-space: nowrap;
+}
+.cmp-legend-item::before {
+  content: "";
+  width: calc(var(--su) * 11);
+  height: calc(var(--su) * 8);
+  border-radius: calc(var(--su) * 3);
+  flex: none;
+}
+.cmp-legend-item.sel::before { background: var(--green-dim); box-shadow: inset 0 0 0 1px var(--green-hi); }
+.cmp-legend-item.base::before { background: rgba(30, 54, 43, 0.85); box-shadow: inset 0 0 0 1px var(--hair-d2); }
+.cmp-legend-item.hs::before {
+  border-radius: 50%;
+  width: calc(var(--su) * 9);
+  height: calc(var(--su) * 9);
+  background: rgba(214, 106, 80, 0.42);
+  box-shadow: inset 0 0 0 1px var(--coral);
+}
+.cmp-mapnote { line-height: 1.6; }
+
+/* عينة الأحياء */
+.cmp-scroll { flex: 1; min-height: 0; overflow: auto; }
+.cmp-sample { font-size: calc(var(--su) * 12.5); }
+.cmp-sample td.num {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  color: var(--ivory);
+  text-align: center;
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+.cmp-sample td.num.neg { color: var(--coral); }
+.cmp-sample th:not(:first-child) { text-align: center; }
+
+/* قائمة الرتب */
+.cmp-rank-summary {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 3);
+  margin-bottom: calc(var(--su) * 8);
+}
+.cmp-rank-summary .cmp-kv-v {
+  font-family: var(--f-body);
+  font-weight: 600;
+  font-size: calc(var(--su) * 12);
+  color: var(--ink2-d);
+}
+.cmp-ranklist { display: flex; flex-direction: column; gap: calc(var(--su) * 2); }
+.cmp-rankrow {
+  display: grid;
+  grid-template-columns: calc(var(--su) * 30) minmax(0, 1fr) auto;
+  grid-template-areas: "badge label val" "badge dir val";
+  align-items: center;
+  gap: 0 calc(var(--su) * 9);
+  width: 100%;
+  text-align: start;
+  padding: calc(var(--su) * 3) calc(var(--su) * 8);
+  border-radius: calc(var(--su) * 8);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background-color var(--dur-micro) var(--ease);
+}
+.cmp-rankrow:hover { background: rgba(22, 41, 31, 0.6); }
+.cmp-rankrow:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
+.cmp-rankrow-badge {
+  grid-area: badge;
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-size: calc(var(--su) * 14.5);
+  font-weight: 600;
+  color: var(--mut-d);
+  text-align: center;
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+.cmp-rankrow.first .cmp-rankrow-badge { color: var(--green-hi); }
+.cmp-rankrow.last .cmp-rankrow-badge { color: var(--coral); }
+.cmp-rankrow.na .cmp-rankrow-badge { color: var(--faint-d); }
+.cmp-rankrow-label {
+  grid-area: label;
+  font-size: calc(var(--su) * 12.5);
+  font-weight: 600;
+  color: var(--ivory);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cmp-rankrow-dir {
+  grid-area: dir;
+  font-size: calc(var(--su) * 9.5);
+  color: var(--faint-d);
+}
+.cmp-rankrow-val {
+  grid-area: val;
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-size: calc(var(--su) * 13);
+  font-weight: 600;
+  direction: ltr;
+  unicode-bidi: isolate;
+  white-space: nowrap;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   5) الصفحة 3 — الفجوة والتركّز
+   ════════════════════════════════════════════════════════════════════════ */
+.cmp-strip {
+  flex: none;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: calc(var(--su) * 10);
+}
+.cmp-strip .cmp-stat.wide { grid-column: span 2; }
+/* الشريط العلوي ليس شبكة أرقام القطاع: يحتفظ بحجمه البارز بعد تضييقها */
+.cmp-strip .cmp-stat { padding: calc(var(--su) * 9) calc(var(--su) * 14); }
+.cmp-strip .cmp-stat-v { font-size: calc(var(--su) * 22); }
+
+.cmp-gap-main {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.55fr);
+  gap: calc(var(--su) * 14);
+  align-items: stretch;
+}
+.cmp-gaprank .card-body {
+  gap: calc(var(--su) * 10);
+  overflow: auto;
+}
+/* بطاقة الميزان: جدول القطاعات الخمسة ومضاعفات الفجوات الثلاث كلاهما
+   بارتفاعه الطبيعي — لا صف قطاع يُقصّ لأن جاره ضغط عليه. الفائض (إن وقع
+   في مقاس أضيق) يُحل بتمرير البطاقة كلها، وهو متمرر معلن بشريطه. */
+.cmp-baltable .card-body {
+  gap: calc(var(--su) * 8);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.cmp-balscroll { flex: none; overflow-x: auto; }
+.cmp-baltable .mcr-sm { flex: none; }
+.cmp-baltable .card-body::-webkit-scrollbar { width: calc(var(--su) * 8); }
+.cmp-baltable .card-body::-webkit-scrollbar-thumb {
+  background: var(--faint-d);
+  border-radius: 999px;
+}
+.cmp-baltable .card-body::-webkit-scrollbar-track { background: transparent; }
+.cmp-baltbl { font-size: calc(var(--su) * 12.5); }
+.cmp-baltbl th { text-align: center; }
+.cmp-baltbl th:first-child { text-align: start; }
+.cmp-baltbl th.gapcol { color: var(--ink2-d); }
+.cmp-baltbl td { text-align: center; }
+.cmp-baltbl td:first-child { text-align: start; }
+.cmp-baltbl td.num {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+.cmp-balrow-tr { transition: background-color var(--dur-micro) var(--ease); }
+.cmp-balrow-tr:hover { background: rgba(22, 41, 31, 0.55); }
+.cmp-linkbtn {
+  font-family: var(--f-body);
+  font-size: calc(var(--su) * 12.5);
+  font-weight: 700;
+  color: var(--ivory);
+  cursor: pointer;
+  border-radius: calc(var(--su) * 5);
+  padding: calc(var(--su) * 1) calc(var(--su) * 4);
+  transition: color var(--dur-micro) var(--ease);
+}
+.cmp-linkbtn:hover { color: var(--gold-hi); }
+.cmp-linkbtn:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
+
+/* ════════════════════════════════════════════════════════════════════════
+   6) الصفحة 4 — مطابقة المجاميع وحدود التفكيك
+   ════════════════════════════════════════════════════════════════════════ */
+.cmp-rec-main {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  gap: calc(var(--su) * 14);
+  align-items: stretch;
+}
+.cmp-rectbl { font-size: calc(var(--su) * 12.5); }
+.cmp-rectbl td { vertical-align: middle; white-space: normal; }
+.cmp-rectbl td.num {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  direction: ltr;
+  unicode-bidi: isolate;
+  white-space: nowrap;
+}
+.cmp-rectbl td.cmp-origin { font-size: calc(var(--su) * 10.5); }
+.cmp-rectbl tr.bad { background: rgba(214, 106, 80, 0.07); }
+
+.cmp-gate {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--su) * 5);
+  font-size: calc(var(--su) * 11);
+  font-weight: 700;
+  border-radius: 999px;
+  padding: calc(var(--su) * 2) calc(var(--su) * 10);
+  white-space: nowrap;
+}
+.cmp-gate::before {
+  content: "";
+  width: calc(var(--su) * 7);
+  height: calc(var(--su) * 7);
+  border-radius: 50%;
+  flex: none;
+}
+.cmp-gate.ok { color: var(--green-hi); border: 1px solid rgba(49, 162, 109, 0.4); }
+.cmp-gate.ok::before { background: var(--green); }
+.cmp-gate.bad { color: var(--coral); border: 1px solid rgba(214, 106, 80, 0.45); }
+.cmp-gate.bad::before { background: var(--coral); }
+
+.cmp-limcard .card-body { gap: calc(var(--su) * 8); }
+.cmp-limit {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 3);
+  padding: calc(var(--su) * 8) calc(var(--su) * 12);
+  background: rgba(16, 32, 26, 0.5);
+  border: 1px solid var(--hair-d2);
+  border-inline-start: calc(var(--su) * 3) solid var(--faint-d);
+  border-radius: calc(var(--su) * 9);
+}
+/* الموسوم بوسم اعتماد (منهجية الامتثال، تحفظ السيناريوهات) يلبس الذهبي —
+   وسم اعتماد لا قيمة بيانات، تماماً كما في بطاقة «بانتظار الاعتماد». */
+.cmp-limit.tagged {
+  border-inline-start-color: var(--gold);
+  background: rgba(214, 171, 76, 0.05);
+}
+.cmp-limit-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: calc(var(--su) * 10);
+}
+.cmp-limit-head b { font-size: calc(var(--su) * 12.5); color: var(--ivory); font-weight: 700; }
+.cmp-limit-val {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-size: calc(var(--su) * 12.5);
+  color: var(--ink2-d);
+  white-space: nowrap;
+}
+.cmp-limit-why { font-size: calc(var(--su) * 11); color: var(--mut-d); line-height: 1.6; }
+.cmp-limit-badge {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 2);
+  margin-top: calc(var(--su) * 3);
+  padding-top: calc(var(--su) * 5);
+  border-top: 1px dashed rgba(214, 171, 76, 0.35);
+}
+.cmp-limit-status { font-size: calc(var(--su) * 10.5); font-weight: 700; color: var(--gold-hi); }
+.cmp-limit-note { font-size: calc(var(--su) * 10.5); color: var(--mut-d); line-height: 1.65; }
+
+/* ════════════════════════════════════════════════════════════════════════
+   7) الصفحة 5 — الصيغ والمصادر
+   ════════════════════════════════════════════════════════════════════════ */
+.cmp-provcard { flex: 1; min-height: 0; }
+.cmp-provtbl { font-size: calc(var(--su) * 12); }
+.cmp-provtbl td { white-space: normal; vertical-align: top; line-height: 1.55; }
+.cmp-provtbl td b { color: var(--ivory); }
+.cmp-provtbl tr.now { background: rgba(214, 171, 76, 0.07); }
+.cmp-prov-note {
+  font-size: calc(var(--su) * 10.5);
+  color: var(--faint-d);
+  margin-top: calc(var(--su) * 2);
+  line-height: 1.55;
+}
+.cmp-provtbl td.cmp-formula, .cmp-provtbl td.cmp-origin { font-size: calc(var(--su) * 11); }
+
+/* ════════════════════════════════════════════════════════════════════════
+   7.1) المتمررات الداخلية: شريطها **مرئي دائماً**
+   قاعدة المشروع تجيز القصّ داخل متمرر معلن بشريطه لا خارجه — فالشريط هنا
+   إعلانٌ بصري لا زينة: بدونه يُقرأ الصف النصفي في قاع القائمة قصّاً.
+   ════════════════════════════════════════════════════════════════════════ */
+.cmp-scroll, .cmp-focus-body, .cmp-matrix-scroll, .cmp-chiprow,
+.cmp-balance .card-body, .cmp-gaprank .card-body, .cmp-limcard .card-body {
+}
+/* ملاحظة تنفيذية مقصودة: هذا الملف لا يعلن الخاصية القياسية لعرض شريط
+   التمرير. في Chromium الحديث تُبطل تلك الخاصيةُ أنماطَ
+   `::-webkit-scrollbar` كلياً فيعود الشريط طافياً بعرض صفر — أي
+   إعلانَ قصٍّ غير مرئي. الاعتماد إذن على الشبه-عنصر وحده كي يحجز
+   الشريط عرضه فعلاً فيُرى دائماً وتصير حدود المتمرر معلنةً بصرياً. */
+.cmp-scroll::-webkit-scrollbar,
+.cmp-focus-body::-webkit-scrollbar,
+.cmp-matrix-scroll::-webkit-scrollbar,
+.cmp-chiprow::-webkit-scrollbar,
+.cmp-balance .card-body::-webkit-scrollbar,
+.cmp-gaprank .card-body::-webkit-scrollbar,
+.cmp-limcard .card-body::-webkit-scrollbar {
+  width: calc(var(--su) * 8);
+  height: calc(var(--su) * 8);
+}
+.cmp-scroll::-webkit-scrollbar-thumb,
+.cmp-focus-body::-webkit-scrollbar-thumb,
+.cmp-matrix-scroll::-webkit-scrollbar-thumb,
+.cmp-chiprow::-webkit-scrollbar-thumb,
+.cmp-balance .card-body::-webkit-scrollbar-thumb,
+.cmp-gaprank .card-body::-webkit-scrollbar-thumb,
+.cmp-limcard .card-body::-webkit-scrollbar-thumb {
+  background: var(--faint-d);
+  border-radius: 999px;
+}
+.cmp-scroll::-webkit-scrollbar-thumb:hover,
+.cmp-matrix-scroll::-webkit-scrollbar-thumb:hover,
+.cmp-limcard .card-body::-webkit-scrollbar-thumb:hover { background: var(--mut-d); }
+.cmp-scroll::-webkit-scrollbar-track,
+.cmp-focus-body::-webkit-scrollbar-track,
+.cmp-matrix-scroll::-webkit-scrollbar-track,
+.cmp-chiprow::-webkit-scrollbar-track,
+.cmp-limcard .card-body::-webkit-scrollbar-track { background: transparent; }
+
+/* ════════════════════════════════════════════════════════════════════════
+   7.2) كتل صفحة الفجوة الجديدة: جدول التفكيك ومضاعفات الفجوات
+   ════════════════════════════════════════════════════════════════════════ */
+.cmp-detailwrap { flex: none; max-height: 45%; margin-top: calc(var(--su) * 4); }
+.cmp-detailtbl { font-size: calc(var(--su) * 12); }
+.cmp-detailtbl th:not(:first-child), .cmp-detailtbl td:not(:first-child) {
+  text-align: center;
+}
+.cmp-detailtbl td.num {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+.cmp-detailtbl td:last-child {
+  font-family: var(--f-body);
+  direction: rtl;
+  color: var(--mut-d);
+  font-size: calc(var(--su) * 11);
+}
+
+.cmp-gapcell-t {
+  font-size: calc(var(--su) * 11.5);
+  font-weight: 700;
+  color: var(--mut-d);
+  margin-bottom: calc(var(--su) * 5);
+  padding-bottom: calc(var(--su) * 4);
+  border-bottom: 1px solid var(--hair-d2);
+  line-height: 1.35;
+}
+.cmp-gapline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(var(--su) * 8);
+  padding: calc(var(--su) * 1.5) 0;
+}
+.cmp-gapline-k {
+  font-size: calc(var(--su) * 11.5);
+  color: var(--ink2-d);
+  white-space: nowrap;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   7.3) تذييل بوابة المطابقة: هوية الإصدار المفحوص وما تثبته البوابة
+   ════════════════════════════════════════════════════════════════════════ */
+.cmp-recfoot {
+  flex: none;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+  gap: calc(var(--su) * 8) calc(var(--su) * 18);
+  margin-top: calc(var(--su) * 10);
+  padding-top: calc(var(--su) * 10);
+  border-top: 1px solid var(--hair-d2);
+}
+.cmp-recfoot-col {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 4);
+  min-width: 0;
+}
+.cmp-recfoot-col .cmp-kv { padding: calc(var(--su) * 2) 0; }
+.cmp-recfoot-col .cmp-card-title { margin-bottom: calc(var(--su) * 2); }
+
+/* ════════════════════════════════════════════════════════════════════════
+   8) كسر العرض الضيق (فئة 1366×768): تشديد الكثافة لا إخفاء المعلومة
+   الصفوف نفسها والأعمدة نفسها — تصغير معايرة فقط كي لا يُقصّ رقم.
+   ════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 1440px) {
+  .cmp-matrix { font-size: calc(var(--su) * 12.5); }
+  .cmp-matrix .cmp-th-ind { width: 26%; }
+  .cmp-cell-v { font-size: calc(var(--su) * 13); }
+  .cmp-ind-label { font-size: calc(var(--su) * 12.5); }
+  .cmp-matrix-main { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); }
+  .cmp-profile { grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr) minmax(0, 0.95fr); }
+  .cmp-stat-v { font-size: calc(var(--su) * 18); }
+  .cmp-figgrid { gap: calc(var(--su) * 5); }
+  .cmp-figgrid .cmp-stat { padding: calc(var(--su) * 6) calc(var(--su) * 10); }
+  .cmp-figgrid .cmp-stat-k { font-size: calc(var(--su) * 10.5); }
+  .cmp-figgrid .cmp-stat-v { font-size: calc(var(--su) * 16.5); }
+  .cmp-figgrid .cmp-stat-f { font-size: calc(var(--su) * 9.5); }
+  .cmp-tab { padding: calc(var(--su) * 6) calc(var(--su) * 13); }
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   9) تقليل الحركة: كل انتقال يُصفَّر — لا استثناء
+   ════════════════════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  .cmp-entry, .cmp-entry-arrow, .cmp-tab, .cmp-btn, .cmp-chip,
+  .cmp-row, .cmp-rankrow, .cmp-balrow-tr, .cmp-secbtn, .cmp-linkbtn {
+    transition: none;
+  }
+  .cmp-entry:hover .cmp-entry-arrow { transform: none; }
+}
