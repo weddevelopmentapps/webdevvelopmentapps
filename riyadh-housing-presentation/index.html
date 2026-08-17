@@ -3748,6 +3748,20 @@ body.transitioning .stage { pointer-events: none; }
   text-overflow: ellipsis;
 }
 
+/* إصلاح مراجعة الجولة 2 (استكمال): عند فئة العرض 1366 كان اسم الصف
+   الخامس «حي النسيم الشرقي» يفقد حرفه الأخير بعلامة الحذف — خط الاسم
+   والقطاع أصغر قليلاً وعمود القيمة أضيق عند الضيق فتتسع الأسماء الخمسة
+   كاملة بلا حذف. */
+@media (max-width: 1440px) {
+  [data-section="control"] .ctl-top-row {
+    grid-template-columns: calc(var(--su) * 22) minmax(0, 1fr) calc(var(--su) * 44);
+    gap: calc(var(--su) * 7);
+  }
+  [data-section="control"] .ctl-top-name { font-size: calc(var(--su) * 12); }
+  [data-section="control"] .ctl-top-sector { font-size: calc(var(--su) * 10); }
+  [data-section="control"] .ctl-top-val { font-size: calc(var(--su) * 13); }
+}
+
 /* ── 9) عمود الرؤى الممتد ──
    ترتيب الانكماش محسوم (إصلاح مراجعة الجولة 1): بطاقة «توزيع القدرة
    الرقابية» لا تنكمش أبداً (صفوفها الخمسة بيانات لا تُقص صمتاً)، وعمود
@@ -5432,6 +5446,10 @@ body.transitioning .stage { pointer-events: none; }
   font-size: calc(var(--su) * 11.5);
   color: var(--faint-d);
   padding-inline-start: calc(var(--su) * 4);
+  /* سطر واحد لا يلتف — الالتفاف كان يدس سطره الثاني تحت شارة الإصدار */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   /* إصلاح مراجعة الجولة 2: حشوة سفلية تفصل السطر عن حبة شارة الإصدار
      الثابتة في الزاوية نفسها في المقاس الكامل */
   padding-bottom: calc(var(--su) * 22);
@@ -8595,7 +8613,7 @@ body.transitioning .stage { pointer-events: none; }
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: thin;
-  scrollbar-color: rgba(244, 241, 230, 0.3) rgba(244, 241, 230, 0.06);
+  scrollbar-color: rgba(244, 241, 230, 0.45) rgba(244, 241, 230, 0.12);
   scrollbar-gutter: stable;
   padding-inline-end: calc(var(--su) * 2);
   /* إصلاح مراجعة الجولة 2: البطاقات المطوية (الشمال/الشرق) كانت تُقص عند
@@ -8610,11 +8628,11 @@ body.transitioning .stage { pointer-events: none; }
 }
 [data-section="map"] .map-rail::-webkit-scrollbar { width: 7px; }
 [data-section="map"] .map-rail::-webkit-scrollbar-track {
-  background: rgba(244, 241, 230, 0.06);
+  background: rgba(244, 241, 230, 0.12);
   border-radius: 6px;
 }
 [data-section="map"] .map-rail::-webkit-scrollbar-thumb {
-  background: rgba(244, 241, 230, 0.3);
+  background: rgba(244, 241, 230, 0.45);
   border-radius: 6px;
 }
 
@@ -8839,6 +8857,14 @@ body.transitioning .stage { pointer-events: none; }
   font-weight: 700;
   color: var(--mut-d);
   letter-spacing: 0.3px;
+}
+/* سطر إشارة التمرير أسفل الترويسة — يعلن عدد البطاقات الكامل */
+[data-section="map"] .map-rail-scrollhint {
+  flex: none;
+  font-size: calc(var(--su) * 10.5);
+  color: var(--faint-d);
+  padding: 0 calc(var(--su) * 2);
+  margin-top: calc(var(--su) * -6);
 }
 [data-section="map"] .map-rail-layer {
   font-size: calc(var(--su) * 11.5);
@@ -10329,6 +10355,7 @@ RH.core.fmt = (function () {
     initiative: { one: "مبادرة واحدة", two: "مبادرتان", few: "مبادرات", many: "مبادرة", hundred: "مبادرة" },
     pillar: { one: "ركيزة واحدة", two: "ركيزتان", few: "ركائز", many: "ركيزة", hundred: "ركيزة" },
     indicator: { one: "مؤشر واحد", two: "مؤشران", few: "مؤشرات", many: "مؤشراً", hundred: "مؤشر" },
+    sector: { one: "قطاع واحد", two: "قطاعان", few: "قطاعات", many: "قطاعاً", hundred: "قطاع" },
   };
   function noun(n, key) { return countNoun(n, NOUNS[key]); }
 
@@ -15956,24 +15983,35 @@ RH.viz.charts2 = RH.viz.charts2 || {};
          كل عنوان بعرض عموده (42٪ من عرض العنصر) مع قطع بعلامة الحذف بدل
          التصادم؛ في المقاس الكامل يتسعان كاملين كما ثبت بالمعاينة. */
       title: (() => {
-        const colW = T.narrow()
+        const nrw = T.narrow();
+        const colW = nrw
           ? Math.max(150, Math.floor((el.clientWidth || 640) * 0.42))
           : null;
         const clampW = (ts) => (colW
           ? Object.assign(ts, { width: colW, overflow: "truncate" })
           : ts);
+        /* عند الضيق: صيغة قصيرة كاملة الوحدات (لا اعتماد على علامة الحذف
+           التي كانت تبتر «ألف» فيُقرأ «612.4 …» بلا وحدة) — قيمتا الأساس
+           تبقيان في التلميح وخطّي الأساس الذهبيين */
+        const tLic = nrw
+          ? "الرخص — تشغيلية " + fmt.int(cd.cur.operational)
+            + " · بناء " + fmt.int(cd.cur.building)
+          : "الرخص التراكمية — تشغيلية " + fmt.int(cd.cur.operational)
+            + " (الأساس " + fmt.int(cd.base.operational) + ") · بناء "
+            + fmt.int(cd.cur.building) + " (الأساس " + fmt.int(cd.base.building) + ")";
+        const tBed = nrw
+          ? "الأسرّة — " + fmt.compact(cd.cur.beds)
+          : "الأسرّة المرخصة — " + fmt.compact(cd.cur.beds)
+            + " (الأساس " + fmt.compact(cd.base.beds) + ")";
         return [
           {
-            text: "الرخص التراكمية — تشغيلية " + fmt.int(cd.cur.operational)
-              + " (الأساس " + fmt.int(cd.base.operational) + ") · بناء "
-              + fmt.int(cd.cur.building) + " (الأساس " + fmt.int(cd.base.building) + ")",
+            text: tLic,
             right: T.fs(su, 8),
             top: T.fs(su, compact ? 24 : 30),
             textStyle: clampW(txtStyle(su, compact ? 11 : 12.5, T.C.ink2, 600)),
           },
           {
-            text: "الأسرّة المرخصة — " + fmt.compact(cd.cur.beds)
-              + " (الأساس " + fmt.compact(cd.base.beds) + ")",
+            text: tBed,
             left: T.fs(su, 8),
             top: T.fs(su, compact ? 24 : 30),
             textStyle: clampW(txtStyle(su, compact ? 11 : 12.5, T.C.ink2, 600)),
@@ -27215,6 +27253,13 @@ RH.viz.charts2 = RH.viz.charts2 || {};
       h("span", { class: "map-rail-title" }, "ملخص القطاعات"),
       layerChip,
     ));
+    /* إشارة تمرير صريحة — إصلاح مراجعة الجولة 2 (استكمال): التلاشي السفلي
+       وشريط التمرير وحدهما لم يكونا كافيين لإعلان البطاقات المطوية تحت
+       خط الطي (الشرق — الأعلى تغطية — قد يقبع أسفل)؛ سطر «5 قطاعات — مرر»
+       يعلن العدد الكامل نصاً في كل مقاس. */
+    rail.appendChild(h("div", { class: "map-rail-scrollhint", "aria-hidden": "true" },
+      (rel.sectors.length === 5 ? "القطاعات الخمسة" :
+        fmt.noun(rel.sectors.length, "sector")) + " — مرر لاستعراضها كاملة"));
 
     /* ── 6.3) خمس بطاقات قطاعية بأشرطة قياس متزامنة مع الطبقة ── */
     const secsWrap = h("div", { class: "map-secs" });
@@ -31935,10 +31980,13 @@ RH.viz.charts2 = RH.viz.charts2 || {};
       h("span", { class: "fct-btn-arrow", "aria-hidden": "true" }, "←"),
     ));
 
-    /* سطر حداثة البيانات وتاريخ الحساب — من meta الإصدار حصراً */
+    /* سطر تاريخ الحساب — من meta الإصدار حصراً. إصلاح مراجعة الجولة 2
+       (استكمال): «البيانات حتى…» محذوفة هنا حتى في المقاس الكامل — كانت
+       تطيل السطر فيلتف سطرين ويطبع سطره الثاني تحت حبة شارة الإصدار
+       (التي تعلن «البيانات حتى…» نصاً بذاتها)؛ يبقى هنا تاريخ الحساب
+       حصراً — المعلومة الوحيدة غير المكررة — سطراً واحداً لا يلتف. */
     cell.appendChild(h("div", { class: "fct-meta" },
-      "البيانات حتى ", h("b", {}, rel.meta.data_as_of),
-      " · تاريخ الحساب ", h("b", {}, fmt.date(rel.meta.calculation_date)),
+      "تاريخ الحساب ", h("b", {}, fmt.date(rel.meta.calculation_date)),
     ));
   }
 

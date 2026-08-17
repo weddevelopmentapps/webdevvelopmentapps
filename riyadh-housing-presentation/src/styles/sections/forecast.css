@@ -528,6 +528,10 @@
   font-size: calc(var(--su) * 11.5);
   color: var(--faint-d);
   padding-inline-start: calc(var(--su) * 4);
+  /* سطر واحد لا يلتف — الالتفاف كان يدس سطره الثاني تحت شارة الإصدار */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   /* إصلاح مراجعة الجولة 2: حشوة سفلية تفصل السطر عن حبة شارة الإصدار
      الثابتة في الزاوية نفسها في المقاس الكامل */
   padding-bottom: calc(var(--su) * 22);

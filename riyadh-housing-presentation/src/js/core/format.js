@@ -73,6 +73,7 @@ RH.core.fmt = (function () {
     initiative: { one: "مبادرة واحدة", two: "مبادرتان", few: "مبادرات", many: "مبادرة", hundred: "مبادرة" },
     pillar: { one: "ركيزة واحدة", two: "ركيزتان", few: "ركائز", many: "ركيزة", hundred: "ركيزة" },
     indicator: { one: "مؤشر واحد", two: "مؤشران", few: "مؤشرات", many: "مؤشراً", hundred: "مؤشر" },
+    sector: { one: "قطاع واحد", two: "قطاعان", few: "قطاعات", many: "قطاعاً", hundred: "قطاع" },
   };
   function noun(n, key) { return countNoun(n, NOUNS[key]); }
 

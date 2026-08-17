@@ -382,7 +382,7 @@
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: thin;
-  scrollbar-color: rgba(244, 241, 230, 0.3) rgba(244, 241, 230, 0.06);
+  scrollbar-color: rgba(244, 241, 230, 0.45) rgba(244, 241, 230, 0.12);
   scrollbar-gutter: stable;
   padding-inline-end: calc(var(--su) * 2);
   /* إصلاح مراجعة الجولة 2: البطاقات المطوية (الشمال/الشرق) كانت تُقص عند
@@ -397,11 +397,11 @@
 }
 [data-section="map"] .map-rail::-webkit-scrollbar { width: 7px; }
 [data-section="map"] .map-rail::-webkit-scrollbar-track {
-  background: rgba(244, 241, 230, 0.06);
+  background: rgba(244, 241, 230, 0.12);
   border-radius: 6px;
 }
 [data-section="map"] .map-rail::-webkit-scrollbar-thumb {
-  background: rgba(244, 241, 230, 0.3);
+  background: rgba(244, 241, 230, 0.45);
   border-radius: 6px;
 }
 
@@ -626,6 +626,14 @@
   font-weight: 700;
   color: var(--mut-d);
   letter-spacing: 0.3px;
+}
+/* سطر إشارة التمرير أسفل الترويسة — يعلن عدد البطاقات الكامل */
+[data-section="map"] .map-rail-scrollhint {
+  flex: none;
+  font-size: calc(var(--su) * 10.5);
+  color: var(--faint-d);
+  padding: 0 calc(var(--su) * 2);
+  margin-top: calc(var(--su) * -6);
 }
 [data-section="map"] .map-rail-layer {
   font-size: calc(var(--su) * 11.5);

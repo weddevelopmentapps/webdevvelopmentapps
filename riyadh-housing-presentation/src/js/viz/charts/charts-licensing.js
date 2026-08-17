@@ -460,24 +460,35 @@ RH.viz.charts2 = RH.viz.charts2 || {};
          كل عنوان بعرض عموده (42٪ من عرض العنصر) مع قطع بعلامة الحذف بدل
          التصادم؛ في المقاس الكامل يتسعان كاملين كما ثبت بالمعاينة. */
       title: (() => {
-        const colW = T.narrow()
+        const nrw = T.narrow();
+        const colW = nrw
           ? Math.max(150, Math.floor((el.clientWidth || 640) * 0.42))
           : null;
         const clampW = (ts) => (colW
           ? Object.assign(ts, { width: colW, overflow: "truncate" })
           : ts);
+        /* عند الضيق: صيغة قصيرة كاملة الوحدات (لا اعتماد على علامة الحذف
+           التي كانت تبتر «ألف» فيُقرأ «612.4 …» بلا وحدة) — قيمتا الأساس
+           تبقيان في التلميح وخطّي الأساس الذهبيين */
+        const tLic = nrw
+          ? "الرخص — تشغيلية " + fmt.int(cd.cur.operational)
+            + " · بناء " + fmt.int(cd.cur.building)
+          : "الرخص التراكمية — تشغيلية " + fmt.int(cd.cur.operational)
+            + " (الأساس " + fmt.int(cd.base.operational) + ") · بناء "
+            + fmt.int(cd.cur.building) + " (الأساس " + fmt.int(cd.base.building) + ")";
+        const tBed = nrw
+          ? "الأسرّة — " + fmt.compact(cd.cur.beds)
+          : "الأسرّة المرخصة — " + fmt.compact(cd.cur.beds)
+            + " (الأساس " + fmt.compact(cd.base.beds) + ")";
         return [
           {
-            text: "الرخص التراكمية — تشغيلية " + fmt.int(cd.cur.operational)
-              + " (الأساس " + fmt.int(cd.base.operational) + ") · بناء "
-              + fmt.int(cd.cur.building) + " (الأساس " + fmt.int(cd.base.building) + ")",
+            text: tLic,
             right: T.fs(su, 8),
             top: T.fs(su, compact ? 24 : 30),
             textStyle: clampW(txtStyle(su, compact ? 11 : 12.5, T.C.ink2, 600)),
           },
           {
-            text: "الأسرّة المرخصة — " + fmt.compact(cd.cur.beds)
-              + " (الأساس " + fmt.compact(cd.base.beds) + ")",
+            text: tBed,
             left: T.fs(su, 8),
             top: T.fs(su, compact ? 24 : 30),
             textStyle: clampW(txtStyle(su, compact ? 11 : 12.5, T.C.ink2, 600)),
