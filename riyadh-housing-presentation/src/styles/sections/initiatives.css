@@ -18,13 +18,13 @@
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: thin;
-  scrollbar-color: rgba(244, 241, 230, 0.18) transparent;
+  scrollbar-color: rgba(var(--ink-rgb), 0.18) transparent;
 }
 [data-section="initiatives"] .dash-body::-webkit-scrollbar {
   width: calc(var(--su) * 8);
 }
 [data-section="initiatives"] .dash-body::-webkit-scrollbar-thumb {
-  background: rgba(244, 241, 230, 0.16);
+  background: rgba(var(--ink-rgb), 0.16);
   border-radius: 999px;
 }
 [data-section="initiatives"] .dash-body::-webkit-scrollbar-track {
@@ -51,7 +51,7 @@
     background-color var(--dur-micro) var(--ease);
 }
 [data-section="initiatives"] .kpi.ini-act:hover {
-  background: rgba(22, 41, 31, 0.72);
+  background: rgba(var(--surf-3-rgb), 0.72);
   border-color: var(--hair-d);
   transform: translateY(calc(var(--su) * -2));
 }
@@ -77,7 +77,7 @@
     background-color var(--dur-micro) var(--ease);
 }
 [data-section="initiatives"] .ini-cell-pillars .pillar-card:hover {
-  background: rgba(22, 41, 31, 0.72);
+  background: rgba(var(--surf-3-rgb), 0.72);
   border-color: var(--hair-d);
   transform: translateY(calc(var(--su) * -2));
 }
@@ -124,7 +124,7 @@
   padding: calc(var(--su) * 4) calc(var(--su) * 12);
   border: 1px solid var(--hair-d2);
   border-radius: 999px;
-  background: rgba(11, 21, 18, 0.55);
+  background: rgba(var(--surf-1-rgb), 0.55);
   color: var(--mut-d);
   font-family: var(--f-body);
   font-size: calc(var(--su) * 12);
@@ -139,12 +139,12 @@
 [data-section="initiatives"] .ini-tbtn:hover {
   color: var(--ivory);
   border-color: var(--hair-d);
-  background: rgba(22, 41, 31, 0.72);
+  background: rgba(var(--surf-3-rgb), 0.72);
 }
 [data-section="initiatives"] .ini-tbtn.active {
   color: var(--ivory);
-  border-color: rgba(244, 241, 230, 0.35);
-  background: rgba(244, 241, 230, 0.08);
+  border-color: rgba(var(--ink-rgb), 0.35);
+  background: rgba(var(--ink-rgb), 0.08);
 }
 [data-section="initiatives"] .ini-tbtn:focus-visible {
   outline: 2px solid var(--gold);
@@ -183,7 +183,7 @@
   padding: calc(var(--su) * 5) calc(var(--su) * 13);
   border: 1px solid var(--hair-d2);
   border-radius: 999px;
-  background: rgba(11, 21, 18, 0.55);
+  background: rgba(var(--surf-1-rgb), 0.55);
   color: var(--ink2-d);
   font-family: var(--f-body);
   font-size: calc(var(--su) * 12.5);
@@ -198,12 +198,12 @@
 [data-section="initiatives"] .ini-fchip:hover {
   color: var(--ivory);
   border-color: var(--hair-d);
-  background: rgba(22, 41, 31, 0.72);
+  background: rgba(var(--surf-3-rgb), 0.72);
 }
 [data-section="initiatives"] .ini-fchip.active {
   color: var(--ivory);
-  border-color: rgba(244, 241, 230, 0.35);
-  background: rgba(244, 241, 230, 0.08);
+  border-color: rgba(var(--ink-rgb), 0.35);
+  background: rgba(var(--ink-rgb), 0.08);
 }
 [data-section="initiatives"] .ini-fchip:focus-visible {
   outline: 2px solid var(--gold);
@@ -218,10 +218,10 @@
   unicode-bidi: isolate;
 }
 /* هوية الحالة في نقطة الرقاقة فقط — النص لا يلبس لون السلسلة أبداً */
-[data-section="initiatives"] .ini-fchip.done.active { border-color: rgba(49, 162, 109, 0.5); background: rgba(49, 162, 109, 0.12); }
-[data-section="initiatives"] .ini-fchip.run.active { border-color: rgba(63, 127, 176, 0.5); background: rgba(63, 127, 176, 0.12); }
-[data-section="initiatives"] .ini-fchip.late.active { border-color: rgba(214, 106, 80, 0.5); background: rgba(214, 106, 80, 0.12); }
-[data-section="initiatives"] .ini-fchip.idle.active { border-color: rgba(94, 108, 99, 0.6); background: rgba(94, 108, 99, 0.16); }
+[data-section="initiatives"] .ini-fchip.done.active { border-color: rgba(var(--green-rgb), 0.5); background: rgba(var(--green-rgb), 0.12); }
+[data-section="initiatives"] .ini-fchip.run.active { border-color: rgba(var(--blue-rgb), 0.5); background: rgba(var(--blue-rgb), 0.12); }
+[data-section="initiatives"] .ini-fchip.late.active { border-color: rgba(var(--coral-rgb), 0.5); background: rgba(var(--coral-rgb), 0.12); }
+[data-section="initiatives"] .ini-fchip.idle.active { border-color: rgba(var(--ink-3-rgb), 0.6); background: rgba(var(--ink-3-rgb), 0.16); }
 
 /* مبدّل الفرز — يلتصق بنهاية سطر الرقاقات (margin-inline-start:auto) */
 [data-section="initiatives"] .ini-sortbar {
@@ -248,13 +248,13 @@
   border: 1px solid var(--hair-d2);
   border-radius: var(--r-sm);
   scrollbar-width: thin;
-  scrollbar-color: rgba(244, 241, 230, 0.18) transparent;
+  scrollbar-color: rgba(var(--ink-rgb), 0.18) transparent;
 }
 [data-section="initiatives"] .ini-sched-scroll::-webkit-scrollbar {
   width: calc(var(--su) * 7);
 }
 [data-section="initiatives"] .ini-sched-scroll::-webkit-scrollbar-thumb {
-  background: rgba(244, 241, 230, 0.16);
+  background: rgba(var(--ink-rgb), 0.16);
   border-radius: 999px;
 }
 [data-section="initiatives"] .ini-sched-foot {
@@ -270,7 +270,7 @@
   transition: background-color var(--dur-micro) var(--ease);
 }
 [data-section="initiatives"] .ini-trow:hover {
-  background: rgba(244, 241, 230, 0.05);
+  background: rgba(var(--ink-rgb), 0.05);
 }
 [data-section="initiatives"] .ini-trow:focus-visible {
   outline: 2px solid var(--gold);
@@ -370,7 +370,7 @@
   padding: calc(var(--su) * 4) calc(var(--su) * 11);
   border: 1px solid var(--hair-d2);
   border-radius: 999px;
-  background: rgba(11, 21, 18, 0.55);
+  background: rgba(var(--surf-1-rgb), 0.55);
   color: var(--ink2-d);
   font-family: var(--f-body);
   font-size: calc(var(--su) * 12);
@@ -385,7 +385,7 @@
 [data-section="initiatives"] .ini-chip:hover {
   color: var(--ivory);
   border-color: var(--hair-d);
-  background: rgba(22, 41, 31, 0.72);
+  background: rgba(var(--surf-3-rgb), 0.72);
 }
 [data-section="initiatives"] .ini-chip:focus-visible {
   outline: 2px solid var(--gold);
@@ -411,7 +411,7 @@
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: thin;
-  scrollbar-color: rgba(244, 241, 230, 0.18) transparent;
+  scrollbar-color: rgba(var(--ink-rgb), 0.18) transparent;
   /* 4 (كان 6): استرداد فراغ لصالح بطاقة الحلقة المرفوعة (الجولة 5) */
   gap: calc(var(--su) * 4);
 }
@@ -443,7 +443,7 @@
   width: calc(var(--su) * 6);
 }
 [data-section="initiatives"] .ini-cell-side .rail::-webkit-scrollbar-thumb {
-  background: rgba(244, 241, 230, 0.16);
+  background: rgba(var(--ink-rgb), 0.16);
   border-radius: 999px;
 }
 
@@ -453,7 +453,7 @@
   min-width: 0;
   flex-direction: row;
   align-items: center;
-  background: rgba(16, 32, 26, 0.58);
+  background: rgba(var(--surf-2-rgb), 0.58);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid var(--hair-d2);
@@ -473,11 +473,11 @@
   font-size: calc(var(--su) * 12.5);
   font-weight: 700;
   color: var(--gold);
-  border: 1px solid rgba(214, 171, 76, 0.45);
+  border: 1px solid rgba(var(--gold-rgb), 0.45);
   border-radius: 999px;
   padding: calc(var(--su) * 3) calc(var(--su) * 11);
   white-space: nowrap;
-  background: rgba(214, 171, 76, 0.07);
+  background: rgba(var(--gold-rgb), 0.07);
 }
 [data-section="initiatives"] .ini-source-label {
   font-size: calc(var(--su) * 11.5);
@@ -571,18 +571,18 @@
 }
 [data-section="initiatives"] .ini-badge.pos {
   color: var(--green-hi);
-  border-color: rgba(49, 162, 109, 0.45);
-  background: rgba(49, 162, 109, 0.07);
+  border-color: rgba(var(--green-rgb), 0.45);
+  background: rgba(var(--green-rgb), 0.07);
 }
 [data-section="initiatives"] .ini-badge.neg {
   color: var(--coral);
-  border-color: rgba(214, 106, 80, 0.45);
-  background: rgba(214, 106, 80, 0.07);
+  border-color: rgba(var(--coral-rgb), 0.45);
+  background: rgba(var(--coral-rgb), 0.07);
 }
 [data-section="initiatives"] .ini-badge.gold {
   color: var(--gold);
-  border-color: rgba(214, 171, 76, 0.45);
-  background: rgba(214, 171, 76, 0.07);
+  border-color: rgba(var(--gold-rgb), 0.45);
+  background: rgba(var(--gold-rgb), 0.07);
 }
 
 /* المسطرة الزمنية المصغرة: نطاق المحفظة + شريحة المبادرة + شاخص اليوم */
@@ -595,7 +595,7 @@
   position: relative;
   height: calc(var(--su) * 14);
   border-radius: 999px;
-  background: rgba(244, 241, 230, 0.07);
+  background: rgba(var(--ink-rgb), 0.07);
   overflow: hidden;
 }
 [data-section="initiatives"] .ini-tl-seg {
@@ -616,7 +616,7 @@
   width: calc(var(--su) * 2.5);
   border-radius: 999px;
   background: var(--gold);
-  box-shadow: 0 0 calc(var(--su) * 8) rgba(214, 171, 76, 0.55);
+  box-shadow: 0 0 calc(var(--su) * 8) rgba(var(--gold-rgb), 0.55);
 }
 [data-section="initiatives"] .ini-tl-scale {
   display: flex;
@@ -687,7 +687,7 @@
   display: block;
   height: calc(var(--su) * 12);
   border-radius: 999px;
-  background: rgba(244, 241, 230, 0.07);
+  background: rgba(var(--ink-rgb), 0.07);
   overflow: hidden;
 }
 [data-section="initiatives"] .ini-cbar-fill {
@@ -723,13 +723,13 @@
   border: 1px solid var(--hair-d2);
   border-radius: var(--r-sm);
   scrollbar-width: thin;
-  scrollbar-color: rgba(244, 241, 230, 0.18) transparent;
+  scrollbar-color: rgba(var(--ink-rgb), 0.18) transparent;
 }
 [data-section="initiatives"] .ini-table::-webkit-scrollbar {
   width: calc(var(--su) * 7);
 }
 [data-section="initiatives"] .ini-table::-webkit-scrollbar-thumb {
-  background: rgba(244, 241, 230, 0.16);
+  background: rgba(var(--ink-rgb), 0.16);
   border-radius: 999px;
 }
 [data-section="initiatives"] .ini-table .table-dense th:first-child,

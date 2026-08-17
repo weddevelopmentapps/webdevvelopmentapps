@@ -1,0 +1,184 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   brand.css — أنماط عدّة الهوية (بادئة ‎brand-‎)
+   كل لون هنا رمز حي: العلامة والنمط يتبعان مبدّل السمة بلا استثناء.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* ── طبقة النمط الهندسي ───────────────────────────────────────────────────── */
+.brand-pattern {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ── الشعار ───────────────────────────────────────────────────────────────── */
+.brand-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.brand-logo-img {
+  display: block;
+  height: 48px;
+  width: auto;
+  max-width: 260px;
+  object-fit: contain;
+}
+.brand-logo--asset.is-mark .brand-logo-img { height: 44px; }
+
+/* القفل الأفقي المعاد تركيبه من الأصل الرسمي (brand.js §0):
+   الرمز بارتفاعه الكامل وإلى جانبه كتلة الاسم. الأبعاد كلها inline من القياس
+   الحي — هنا التموضع والإخفاء المتجاوب فقط. */
+.brand-logo--row {
+  align-items: center;
+  gap: 12px;
+}
+.brand-lock-mark, .brand-lock-word { flex: 0 0 auto; }
+/* صحن الشعار: يملأ الفراغ الشفاف داخل القلعة والسماء فلا ينقلب سواداً على
+   السمة الداكنة. أبيض ثابت في السمتين — انظر ‎--brand-plate‎ في tokens.css. */
+.brand-lock-mark {
+  border-radius: 50%;
+  background-color: var(--brand-plate);
+  box-shadow: 0 0 0 2.5px var(--brand-plate);
+}
+/* الشاشات الأضيق: الرمز وحده يحمل الهوية، وكتلة الاسم تنسحب قبل أن تزاحم
+   عنوان المنصة أو أزرار الرأس (لا قصّ ولا تصغير إلى ما دون القراءة). */
+@media (max-width: 1180px) {
+  .brand-lock-word { display: none; }
+}
+
+.brand-mark {
+  display: inline-flex;
+  flex: 0 0 auto;
+  width: 42px;
+  height: 42px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 11px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+}
+.brand-logo.is-white .brand-mark {
+  background: rgba(var(--surf-1-rgb), 0.14);
+  border-color: rgba(var(--ink-rgb), 0.22);
+  color: var(--on-invert);
+}
+.brand-logo.is-mark .brand-mark,
+.brand-logo--coded.is-mark { border: 0; background: none; }
+.brand-mark-svg {
+  width: 30px;
+  height: 30px;
+  display: block;
+}
+.brand-logo--coded.is-mark .brand-mark-svg { width: 42px; height: 42px; }
+
+.brand-words {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.brand-name {
+  font-family: var(--f-display);
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: 0.1px;
+  color: var(--brand-ink);
+  white-space: nowrap;
+}
+.brand-logo.is-white .brand-name { color: var(--on-invert); }
+.brand-sub {
+  font-size: 11.5px;
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--ink-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── قفل الرأس ────────────────────────────────────────────────────────────── */
+.brand-lock {
+  position: relative;
+  isolation: isolate;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+  box-shadow: 0 1px 0 rgba(var(--ink-rgb), 0.02);
+}
+/* التوازن المطلوب: كتلة الهوية في طرف الشريط، وعنوان المنصة مع أزرارها في
+   الطرف المقابل — والفراغ بينهما يفصل السلطتين بدل أن يحشرهما في زاوية. */
+.brand-lock-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px clamp(16px, 2.2vw, 34px);
+  min-height: 76px;
+}
+.brand-lock-logo {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+}
+.brand-lock-rule {
+  flex: 0 0 auto;
+  width: 1px;
+  height: 34px;
+  background: var(--line);
+}
+.brand-lock-titles {
+  min-width: 0;
+  flex: 0 1 auto;
+  margin-inline-start: auto;   /* يدفع العنوان إلى الطرف المقابل للهوية */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  text-align: end;
+}
+.brand-lock-title {
+  font-family: var(--f-display);
+  font-size: clamp(14px, 1.15vw, 18px);
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.brand-lock-sub {
+  font-size: 12px;
+  color: var(--ink-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.brand-lock-actions {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* الرأس الداكن الهوياتي: يستضيف النسخة البيضاء فوق النمط الهندسي */
+.brand-lock.is-inverted {
+  background: linear-gradient(135deg, var(--brand-teal), var(--brand-deep));
+  border-bottom-color: rgba(var(--ink-rgb), 0.2);
+}
+.brand-lock.is-inverted .brand-lock-title,
+.brand-lock.is-inverted .brand-lock-sub { color: var(--on-invert); }
+.brand-lock.is-inverted .brand-lock-rule {
+  background: rgba(var(--surf-1-rgb), 0.32);
+}
+
+@media (max-width: 900px) {
+  .brand-lock-rule, .brand-sub { display: none; }
+  .brand-lock-inner { gap: 10px; padding-inline: 12px; }
+  .brand-name { font-size: 15px; }
+}

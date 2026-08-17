@@ -18,13 +18,13 @@
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: thin;
-  scrollbar-color: rgba(244, 241, 230, 0.18) transparent;
+  scrollbar-color: rgba(var(--ink-rgb), 0.18) transparent;
 }
 [data-section="control"] .dash-body::-webkit-scrollbar {
   width: calc(var(--su) * 8);
 }
 [data-section="control"] .dash-body::-webkit-scrollbar-thumb {
-  background: rgba(244, 241, 230, 0.16);
+  background: rgba(var(--ink-rgb), 0.16);
   border-radius: 999px;
 }
 [data-section="control"] .dash-body::-webkit-scrollbar-track {
@@ -50,7 +50,7 @@
     background-color var(--dur-micro) var(--ease);
 }
 [data-section="control"] .kpi.ctl-act:hover {
-  background: rgba(22, 41, 31, 0.72);
+  background: rgba(var(--surf-3-rgb), 0.72);
   border-color: var(--hair-d);
   transform: translateY(calc(var(--su) * -2));
 }
@@ -89,7 +89,7 @@
   padding: calc(var(--su) * 4) calc(var(--su) * 12);
   border: 1px solid var(--hair-d2);
   border-radius: 999px;
-  background: rgba(11, 21, 18, 0.55);
+  background: rgba(var(--surf-1-rgb), 0.55);
   color: var(--mut-d);
   font-family: var(--f-body);
   font-size: calc(var(--su) * 12);
@@ -104,12 +104,12 @@
 [data-section="control"] .ctl-tbtn:hover {
   color: var(--ivory);
   border-color: var(--hair-d);
-  background: rgba(22, 41, 31, 0.72);
+  background: rgba(var(--surf-3-rgb), 0.72);
 }
 [data-section="control"] .ctl-tbtn.active {
   color: var(--ivory);
-  border-color: rgba(244, 241, 230, 0.35);
-  background: rgba(244, 241, 230, 0.08);
+  border-color: rgba(var(--ink-rgb), 0.35);
+  background: rgba(var(--ink-rgb), 0.08);
 }
 [data-section="control"] .ctl-tbtn:focus-visible {
   outline: 2px solid var(--gold);
@@ -149,16 +149,16 @@
 [data-section="control"] .ctl-measure-btn.ins .ctl-layer-dot { background: var(--green); }
 [data-section="control"] .ctl-measure-btn.enf .ctl-layer-dot { background: var(--collar-blue); }
 [data-section="control"] .ctl-measure-btn.vio.active {
-  border-color: rgba(214, 106, 80, 0.5);
-  background: rgba(214, 106, 80, 0.12);
+  border-color: rgba(var(--coral-rgb), 0.5);
+  background: rgba(var(--coral-rgb), 0.12);
 }
 [data-section="control"] .ctl-measure-btn.ins.active {
-  border-color: rgba(49, 162, 109, 0.5);
-  background: rgba(49, 162, 109, 0.12);
+  border-color: rgba(var(--green-rgb), 0.5);
+  background: rgba(var(--green-rgb), 0.12);
 }
 [data-section="control"] .ctl-measure-btn.enf.active {
-  border-color: rgba(63, 127, 176, 0.5);
-  background: rgba(63, 127, 176, 0.12);
+  border-color: rgba(var(--blue-rgb), 0.5);
+  background: rgba(var(--blue-rgb), 0.12);
 }
 
 /* نقاط هوية طبقات الخريطة: مرجاني للمخالفات حصراً، أخضر للمراقبين (قدرة) */
@@ -173,12 +173,12 @@
 [data-section="control"] .ctl-layer-btn.vio .ctl-layer-dot { background: var(--coral); }
 [data-section="control"] .ctl-layer-btn.ins .ctl-layer-dot { background: var(--green); }
 [data-section="control"] .ctl-layer-btn.vio.active {
-  border-color: rgba(214, 106, 80, 0.5);
-  background: rgba(214, 106, 80, 0.12);
+  border-color: rgba(var(--coral-rgb), 0.5);
+  background: rgba(var(--coral-rgb), 0.12);
 }
 [data-section="control"] .ctl-layer-btn.ins.active {
-  border-color: rgba(49, 162, 109, 0.5);
-  background: rgba(49, 162, 109, 0.12);
+  border-color: rgba(var(--green-rgb), 0.5);
+  background: rgba(var(--green-rgb), 0.12);
 }
 
 /* مفتاح نقاط التركّز الرقابي — حلقة مرجانية مجوفة (رمز النقطة الحرارية) */
@@ -188,12 +188,12 @@
   height: calc(var(--su) * 9);
   border-radius: 50%;
   border: calc(var(--su) * 2) solid var(--coral);
-  background: rgba(214, 106, 80, 0.25);
+  background: rgba(var(--coral-rgb), 0.25);
   flex: none;
 }
 [data-section="control"] .ctl-hs-btn.active {
-  border-color: rgba(214, 106, 80, 0.5);
-  background: rgba(214, 106, 80, 0.12);
+  border-color: rgba(var(--coral-rgb), 0.5);
+  background: rgba(var(--coral-rgb), 0.12);
   color: var(--ivory);
 }
 
@@ -244,8 +244,8 @@
     border-color var(--dur-micro) var(--ease);
 }
 [data-section="control"] .ctl-top-row:hover {
-  background: rgba(214, 106, 80, 0.08);
-  border-color: rgba(214, 106, 80, 0.32);
+  background: rgba(var(--coral-rgb), 0.08);
+  border-color: rgba(var(--coral-rgb), 0.32);
 }
 [data-section="control"] .ctl-top-row:focus-visible {
   outline: 2px solid var(--gold);
@@ -287,7 +287,7 @@
   display: block;
   height: calc(var(--su) * 7);
   border-radius: 999px;
-  background: rgba(244, 241, 230, 0.08);
+  background: rgba(var(--ink-rgb), 0.08);
   overflow: hidden;
 }
 [data-section="control"] .ctl-top-fill {
@@ -312,7 +312,7 @@
      يخترق سطر الوسم؛ خلفية معتمة + رفع طبقي يضمنان حزاماً نظيفاً دائماً */
   position: relative;
   z-index: 1;
-  background: rgba(16, 32, 26, 0.92);
+  background: rgba(var(--surf-2-rgb), 0.92);
   margin-top: calc(var(--su) * 7);
   padding: calc(var(--su) * 5) calc(var(--su) * 16) calc(var(--su) * 8);
   border-top: 1px solid var(--hair-d2);
@@ -352,13 +352,13 @@
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: thin;
-  scrollbar-color: rgba(244, 241, 230, 0.18) transparent;
+  scrollbar-color: rgba(var(--ink-rgb), 0.18) transparent;
 }
 [data-section="control"] .ctl-rail-cell .rail::-webkit-scrollbar {
   width: calc(var(--su) * 6);
 }
 [data-section="control"] .ctl-rail-cell .rail::-webkit-scrollbar-thumb {
-  background: rgba(244, 241, 230, 0.16);
+  background: rgba(var(--ink-rgb), 0.16);
   border-radius: 999px;
 }
 /* مقاسات مشدودة (الجولة 3): بطاقات الرؤى الثلاث كاملة داخل صندوق العمود —
@@ -387,7 +387,7 @@
    (إصلاح مراجعة الجولة 1: كان صف الجنوب — الأثقل عبئاً — يُقص بالفيضان). */
 [data-section="control"] .ctl-mon {
   flex: none;
-  background: rgba(16, 32, 26, 0.58);
+  background: rgba(var(--surf-2-rgb), 0.58);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid var(--hair-d2);
@@ -432,8 +432,8 @@
     border-color var(--dur-micro) var(--ease);
 }
 [data-section="control"] .ctl-mon-row:hover {
-  background: rgba(49, 162, 109, 0.1);
-  border-color: rgba(49, 162, 109, 0.38);
+  background: rgba(var(--green-rgb), 0.1);
+  border-color: rgba(var(--green-rgb), 0.38);
 }
 [data-section="control"] .ctl-mon-row:focus-visible {
   outline: 2px solid var(--gold);
@@ -463,7 +463,7 @@
   display: block;
   height: calc(var(--su) * 8);
   border-radius: 999px;
-  background: rgba(244, 241, 230, 0.08);
+  background: rgba(var(--ink-rgb), 0.08);
   overflow: hidden;
 }
 [data-section="control"] .ctl-mon-fill {
@@ -499,7 +499,7 @@
   padding: calc(var(--su) * 11) calc(var(--su) * 15);
   border: 1px solid var(--hair-d2);
   border-radius: var(--r-sm);
-  background: rgba(16, 32, 26, 0.58);
+  background: rgba(var(--surf-2-rgb), 0.58);
   color: var(--ink2-d);
   font-family: var(--f-body);
   cursor: pointer;
@@ -510,7 +510,7 @@
     color var(--dur-micro) var(--ease);
 }
 [data-section="control"] .ctl-appx:hover {
-  background: rgba(22, 41, 31, 0.78);
+  background: rgba(var(--surf-3-rgb), 0.78);
   border-color: var(--hair-d);
   color: var(--ivory);
 }
@@ -605,18 +605,18 @@
 }
 [data-section="control"] .ctl-badge.pos {
   color: var(--green-hi);
-  border-color: rgba(49, 162, 109, 0.45);
-  background: rgba(49, 162, 109, 0.07);
+  border-color: rgba(var(--green-rgb), 0.45);
+  background: rgba(var(--green-rgb), 0.07);
 }
 [data-section="control"] .ctl-badge.neg {
   color: var(--coral);
-  border-color: rgba(214, 106, 80, 0.45);
-  background: rgba(214, 106, 80, 0.07);
+  border-color: rgba(var(--coral-rgb), 0.45);
+  background: rgba(var(--coral-rgb), 0.07);
 }
 [data-section="control"] .ctl-badge.gold {
   color: var(--gold);
-  border-color: rgba(214, 171, 76, 0.45);
-  background: rgba(214, 171, 76, 0.07);
+  border-color: rgba(var(--gold-rgb), 0.45);
+  background: rgba(var(--gold-rgb), 0.07);
 }
 
 /* عنوان فرعي داخل البطاقة */
@@ -654,7 +654,7 @@
   display: block;
   height: calc(var(--su) * 12);
   border-radius: 999px;
-  background: rgba(244, 241, 230, 0.07);
+  background: rgba(var(--ink-rgb), 0.07);
   overflow: hidden;
 }
 [data-section="control"] .ctl-cbar-fill {
@@ -714,7 +714,7 @@
   display: block;
   height: calc(var(--su) * 16);
   border-radius: 999px;
-  background: rgba(244, 241, 230, 0.07);
+  background: rgba(var(--ink-rgb), 0.07);
   overflow: hidden;
 }
 [data-section="control"] .ctl-comp-fill {
@@ -740,13 +740,13 @@
   border: 1px solid var(--hair-d2);
   border-radius: var(--r-sm);
   scrollbar-width: thin;
-  scrollbar-color: rgba(244, 241, 230, 0.18) transparent;
+  scrollbar-color: rgba(var(--ink-rgb), 0.18) transparent;
 }
 [data-section="control"] .ctl-table::-webkit-scrollbar {
   width: calc(var(--su) * 7);
 }
 [data-section="control"] .ctl-table::-webkit-scrollbar-thumb {
-  background: rgba(244, 241, 230, 0.16);
+  background: rgba(var(--ink-rgb), 0.16);
   border-radius: 999px;
 }
 [data-section="control"] .ctl-table .table-dense th:first-child,
@@ -796,7 +796,7 @@
   padding: calc(var(--su) * 9) calc(var(--su) * 16);
   border: 1px solid var(--hair-d);
   border-radius: 999px;
-  background: rgba(244, 241, 230, 0.05);
+  background: rgba(var(--ink-rgb), 0.05);
   color: var(--ivory);
   font-family: var(--f-body);
   font-size: calc(var(--su) * 13.5);
@@ -807,8 +807,8 @@
     border-color var(--dur-micro) var(--ease);
 }
 [data-section="control"] .ctl-btn:hover {
-  background: rgba(244, 241, 230, 0.1);
-  border-color: rgba(244, 241, 230, 0.35);
+  background: rgba(var(--ink-rgb), 0.1);
+  border-color: rgba(var(--ink-rgb), 0.35);
 }
 [data-section="control"] .ctl-btn:focus-visible {
   outline: 2px solid var(--gold);

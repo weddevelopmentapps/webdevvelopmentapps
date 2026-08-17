@@ -92,7 +92,7 @@ body.mode-admin :focus-visible { outline-color: var(--accent); }
   padding: 12px 34px;
   border-radius: 999px;
   background: var(--green);
-  color: #06130C;
+  color: var(--on-accent);
   font-weight: 700;
   font-size: 15px;
 }
@@ -111,7 +111,7 @@ body.mode-admin :focus-visible { outline-color: var(--accent); }
   /* إصلاح مراجعة الجولة 2: خلفية حبة معتمة — كان سطر الإصدار يطبع فوق
      نصوص أسفل الأقسام عند 1366 فيندمج السطران في نص غير مقروء؛ الحبة
      تضمن مقروئية الشارة في كل قسم ومقاس مهما كان خلفها. */
-  background: rgba(6, 19, 12, 0.82);
+  background: rgba(var(--base-rgb), 0.82);
   padding: calc(var(--su) * 3) calc(var(--su) * 10);
   border-radius: 999px;
 }

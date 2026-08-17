@@ -21,6 +21,10 @@ RH.admin.shell = (function () {
     { id: "panels", name: "لوحات الرؤى" },
     { id: "steps", name: "الخطوات القادمة" },
     { id: "publish", name: "التحقق والنشر" },
+    // حزمة التوسعة §11: تبويبان لا يشترطان مسودة —
+    // منشئ الموجز يعمل على الإصدار المنشور، والمقارن يعلن بصدق غياب المسودة.
+    { id: "report", name: "منشئ الموجز" },
+    { id: "diff", name: "مقارنة الإصدارات" },
     { id: "preview", name: "المعاينة" },
     { id: "history", name: "الإصدارات" },
     { id: "audit", name: "سجل التدقيق" },
@@ -109,7 +113,10 @@ RH.admin.shell = (function () {
       }
     }
 
-    const content = h("div", {});
+    /* `adm-content` خطّاف بنيوي للاختبارات فقط: لا قاعدة CSS تستهدفه في أي
+       ملف أنماط، فلا أثر بصري له — يمنح e2e مرساة مستقرة على جسم التبويب
+       وحده دون الترويسة وشريط التبويبات. */
+    const content = h("div", { class: "adm-content" });
     const shellEl = h("div", { class: "adm-shell" },
       h("header", { class: "adm-header" },
         h("div", {},
@@ -190,6 +197,9 @@ RH.admin.shell = (function () {
               RH.core.router.go({ kind: "admin", id: "history", params: {} });
             }
           });
+      // حزمة التوسعة §11: منشئ الموجز ومقارن الإصدارات
+      case "report": return RH.admin.reportBuilder.render(content, session);
+      case "diff": return RH.admin.diffViewer.render(content, await RH.data.store.getDraft());
       case "preview": return RH.admin.publish.preview(content);
       case "history":
         return RH.admin.publish.history(content, session, () => {

@@ -87,8 +87,9 @@ RH.data.store = (function () {
 
   function openDB() {
     return new Promise((resolve) => {
-      if (!window.indexedDB) return resolve(null);
-      const req = indexedDB.open(DB_NAME, DB_VER);
+      const _idb = RH.core.storage.idb();
+      if (!_idb) return resolve(null);
+      const req = _idb.open(DB_NAME, DB_VER);
       req.onupgradeneeded = () => {
         const d = req.result;
         if (!d.objectStoreNames.contains("releases")) {

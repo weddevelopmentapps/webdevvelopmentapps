@@ -9,7 +9,7 @@
   flex-direction: column;
   padding: calc(var(--su) * 64) calc(var(--su) * 84) calc(var(--su) * 56);
   background:
-    radial-gradient(120% 100% at 85% -10%, rgba(22, 41, 31, 0.65) 0%, transparent 55%),
+    radial-gradient(120% 100% at 85% -10%, rgba(var(--surf-3-rgb), 0.65) 0%, transparent 55%),
     var(--stage-0);
 }
 
@@ -145,7 +145,7 @@
   display: flex;
   flex-direction: column;
   gap: calc(var(--su) * 4);
-  background: rgba(16, 32, 26, 0.55);
+  background: rgba(var(--surf-2-rgb), 0.55);
   border: 1px solid var(--hair-d2);
   border-radius: calc(var(--su) * 10);
   padding: calc(var(--su) * 10) calc(var(--su) * 16);

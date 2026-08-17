@@ -11,3 +11,18 @@ require("./reconciliation.test.mjs");
 require("./format.test.mjs");
 require("./router.test.mjs");
 require("./validate.test.mjs");
+require("./geomap-utils.test.mjs");
+require("./charts-micro.test.mjs");
+require("./scenarios-model.test.mjs");
+require("./atlas-model.test.mjs");
+require("./report-model.test.mjs");
+require("./notes-data.test.mjs");
+require("./palette-index.test.mjs");
+require("./diff-model.test.mjs");
+require("./methodology-model.test.mjs");
+require("./compare-model.test.mjs");
+// V3: بوابتا القبول الجديدتان (حد نص الإبراز 320 حرفاً + عقد مبدّل السمة)
+require("./highlight-cap.test.mjs");
+require("./theme-mode.test.mjs");
+// V3: بوابة التباعد والعزل الاتجاهي في الوسوم المركّبة (رقم + كلمة عربية)
+require("./caption-spacing.test.mjs");

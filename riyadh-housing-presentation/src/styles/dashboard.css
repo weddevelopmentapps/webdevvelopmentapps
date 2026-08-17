@@ -23,9 +23,9 @@
   z-index: 0;
   overflow: hidden;
   background:
-    radial-gradient(120% 90% at 82% 8%, rgba(49, 162, 109, 0.10), transparent 55%),
-    radial-gradient(90% 70% at 10% 100%, rgba(16, 32, 26, 0.85), transparent 70%),
-    linear-gradient(160deg, #10201A 0%, #0B1512 55%, #081009 100%);
+    radial-gradient(120% 90% at 82% 8%, rgba(var(--green-rgb), 0.10), transparent 55%),
+    radial-gradient(90% 70% at 10% 100%, rgba(var(--surf-2-rgb), 0.85), transparent 70%),
+    linear-gradient(160deg, var(--stage-2) 0%, var(--stage-1) 55%, var(--stage-0) 100%);
 }
 .media-bg .media-img,
 .media-bg .media-video {
@@ -44,10 +44,10 @@
   inset: 0;
   background:
     linear-gradient(180deg,
-      rgba(8, 16, 9, calc(var(--media-dim, 0.82) * 0.92)) 0%,
-      rgba(11, 21, 18, var(--media-dim, 0.82)) 34%,
-      rgba(11, 21, 18, calc(var(--media-dim, 0.82) * 1.06)) 100%),
-    radial-gradient(140% 100% at 50% 118%, rgba(16, 32, 26, 0.55), transparent 60%);
+      rgba(var(--base-rgb), calc(var(--media-dim, 0.82) * 0.92)) 0%,
+      rgba(var(--surf-1-rgb), var(--media-dim, 0.82)) 34%,
+      rgba(var(--surf-1-rgb), calc(var(--media-dim, 0.82) * 1.06)) 100%),
+    radial-gradient(140% 100% at 50% 118%, rgba(var(--surf-2-rgb), 0.55), transparent 60%);
 }
 @media (prefers-reduced-motion: reduce) {
   .media-bg .media-img, .media-bg .media-video { transition: none; }
@@ -104,11 +104,11 @@
   font-size: calc(var(--su) * 13.5);
   font-weight: 700;
   color: var(--gold);
-  border: 1px solid rgba(214, 171, 76, 0.45);
+  border: 1px solid rgba(var(--gold-rgb), 0.45);
   border-radius: 999px;
   padding: calc(var(--su) * 5) calc(var(--su) * 14);
   white-space: nowrap;
-  background: rgba(214, 171, 76, 0.07);
+  background: rgba(var(--gold-rgb), 0.07);
 }
 .dash-meta {
   font-size: calc(var(--su) * 13.5);
@@ -124,7 +124,7 @@
   gap: calc(var(--su) * 14);
 }
 .kpi {
-  background: rgba(16, 32, 26, 0.58);
+  background: rgba(var(--surf-2-rgb), 0.58);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid var(--hair-d2);
@@ -195,7 +195,7 @@
    خلية تكدس بطاقتين تتقاسمان الارتفاع بالتساوي (توزيع لوحات القيادة الكثيف). */
 .dash-cell > .dash-card { flex: 1 1 0; min-height: 0; }
 .dash-card {
-  background: rgba(16, 32, 26, 0.58);
+  background: rgba(var(--surf-2-rgb), 0.58);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid var(--hair-d2);
@@ -206,9 +206,9 @@
   min-width: 0;
   overflow: hidden;
 }
-.dash-card.pos { border-top: 2px solid rgba(49, 162, 109, 0.6); }
-.dash-card.neg { border-top: 2px solid rgba(214, 106, 80, 0.6); }
-.dash-card.warn, .dash-card.gold { border-top: 2px solid rgba(214, 171, 76, 0.55); }
+.dash-card.pos { border-top: 2px solid rgba(var(--green-rgb), 0.6); }
+.dash-card.neg { border-top: 2px solid rgba(var(--coral-rgb), 0.6); }
+.dash-card.warn, .dash-card.gold { border-top: 2px solid rgba(var(--gold-rgb), 0.55); }
 .card-head {
   display: flex;
   align-items: baseline;
@@ -256,7 +256,7 @@
 
 /* ── بطاقة إحصاء مدمجة ── */
 .stat-card {
-  background: rgba(16, 32, 26, 0.58);
+  background: rgba(var(--surf-2-rgb), 0.58);
   border: 1px solid var(--hair-d2);
   border-radius: var(--r-sm);
   padding: calc(var(--su) * 12) calc(var(--su) * 16);
@@ -302,7 +302,7 @@
   font-size: calc(var(--su) * 12.5);
   font-weight: 700;
   color: var(--mut-d);
-  background: rgba(11, 21, 18, 0.92);
+  background: rgba(var(--surf-1-rgb), 0.92);
   padding: calc(var(--su) * 7) calc(var(--su) * 10);
   border-bottom: 1px solid var(--hair-d);
   white-space: nowrap;
@@ -333,7 +333,7 @@
   letter-spacing: 0.3px;
 }
 .rail-item {
-  background: rgba(16, 32, 26, 0.58);
+  background: rgba(var(--surf-2-rgb), 0.58);
   border: 1px solid var(--hair-d2);
   border-inline-start: 3px solid var(--faint-d);
   border-radius: var(--r-sm);
@@ -360,8 +360,8 @@
   display: flex;
   align-items: flex-start;
   gap: calc(var(--su) * 10);
-  background: rgba(214, 171, 76, 0.06);
-  border: 1px dashed rgba(214, 171, 76, 0.4);
+  background: rgba(var(--gold-rgb), 0.06);
+  border: 1px dashed rgba(var(--gold-rgb), 0.4);
   border-radius: var(--r-sm);
   padding: calc(var(--su) * 11) calc(var(--su) * 15);
 }
@@ -393,7 +393,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(5, 10, 8, 0.62);
+  background: rgba(var(--scrim-rgb), 0.62);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   animation: detail-in 200ms var(--ease);
@@ -407,7 +407,7 @@
   background: var(--stage-2);
   border: 1px solid var(--hair-d);
   border-radius: var(--r);
-  box-shadow: 0 30px 90px rgba(4, 10, 8, 0.6);
+  box-shadow: 0 30px 90px rgba(var(--shadow-rgb), 0.6);
   overflow: hidden;
 }
 .detail-head {
@@ -458,19 +458,19 @@
 .geomap-svg { width: 100%; height: 100%; display: block; }
 .geomap-leaflet { position: absolute; inset: 0; background: var(--stage-1); }
 .geomap-district {
-  stroke: rgba(244, 241, 230, 0.16);
+  stroke: rgba(var(--ink-rgb), 0.16);
   stroke-width: 0.7;
   transition: filter 140ms;
   cursor: pointer;
 }
 .geomap-district:hover, .geomap-district.kfocus {
   filter: brightness(1.45);
-  stroke: rgba(244, 241, 230, 0.75);
+  stroke: rgba(var(--ink-rgb), 0.75);
   stroke-width: 1.3;
 }
 .geomap-hotspot {
-  fill: rgba(214, 106, 80, 0.42);
-  stroke: #D66A50;
+  fill: rgba(var(--coral-rgb), 0.42);
+  stroke: var(--coral);
   stroke-width: 0.8;
   pointer-events: none;
 }
@@ -478,10 +478,10 @@
   position: absolute;
   z-index: 20;
   pointer-events: none;
-  background: #131D17;
-  color: #F1F5F2;
+  background: var(--tip-bg);
+  color: var(--tip-fg);
   border-radius: 13px;
-  box-shadow: 0 14px 40px rgba(4, 10, 8, 0.5);
+  box-shadow: 0 14px 40px rgba(var(--shadow-rgb), 0.5);
   padding: calc(var(--su) * 10) calc(var(--su) * 14);
   font-size: calc(var(--su) * 13);
   min-width: calc(var(--su) * 190);
@@ -495,12 +495,12 @@
   gap: calc(var(--su) * 16);
   margin: calc(var(--su) * 2) 0;
 }
-.geomap-tip-row span { color: #A9B6AE; }
+.geomap-tip-row span { color: var(--tip-mut); }
 .geomap-tip-row b { font-family: var(--f-display); font-variant-numeric: tabular-nums; }
 .geomap-tip-sep {
   margin-top: calc(var(--su) * 6);
   padding-top: calc(var(--su) * 5);
-  border-top: 1px solid rgba(244, 241, 230, 0.12);
+  border-top: 1px solid rgba(var(--ink-rgb), 0.12);
   color: var(--gold);
   font-size: calc(var(--su) * 11.5);
 }
@@ -517,7 +517,7 @@
   align-items: center;
   gap: calc(var(--su) * 4) calc(var(--su) * 10);
   max-width: calc(100% - var(--su) * 20);
-  background: rgba(11, 21, 18, 0.78);
+  background: rgba(var(--surf-1-rgb), 0.78);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border: 1px solid var(--hair-d2);
@@ -561,8 +561,8 @@
   width: calc(var(--su) * 10);
   height: calc(var(--su) * 10);
   border-radius: 50%;
-  background: rgba(214, 106, 80, 0.42);
-  border: 1px solid #D66A50;
+  background: rgba(var(--coral-rgb), 0.42);
+  border: 1px solid var(--coral);
 }
 .geomap-attrib {
   position: absolute;
@@ -572,7 +572,7 @@
   font-size: calc(var(--su) * 10);
   color: var(--faint-d);
   pointer-events: none;
-  background: rgba(11, 21, 18, 0.6);
+  background: rgba(var(--surf-1-rgb), 0.6);
   border-radius: 6px;
   padding: calc(var(--su) * 2) calc(var(--su) * 8);
   /* سطر واحد دائماً — إصلاح المراجعة: كان الإسناد يلتف فيتشابك */
@@ -584,12 +584,12 @@
 
 /* تسميات القطاعات على الخريطة — نص صامت بظل يقرأ فوق أي درجة تعبئة */
 .geomap-seclabel {
-  fill: rgba(244, 241, 230, 0.85);
+  fill: rgba(var(--ink-rgb), 0.85);
   font-family: var(--f-body);
   font-size: 26px; /* بوحدات viewBox (عرضه 1000) لا بكسلات الشاشة */
   font-weight: 700;
   paint-order: stroke;
-  stroke: rgba(11, 21, 18, 0.75);
+  stroke: rgba(var(--surf-1-rgb), 0.75);
   stroke-width: 5px;
   pointer-events: none;
 }
@@ -597,11 +597,11 @@
 .geomap-seclabel-tile span {
   display: inline-block;
   transform: translate(-50%, -50%);
-  color: rgba(244, 241, 230, 0.92);
+  color: rgba(var(--ink-rgb), 0.92);
   font-family: var(--f-body);
   font-size: calc(var(--su) * 13);
   font-weight: 700;
-  text-shadow: 0 1px 6px rgba(11, 21, 18, 0.9);
+  text-shadow: 0 1px 6px rgba(var(--shadow-rgb), 0.9);
   white-space: nowrap;
 }
 .geomap-missing {
@@ -617,15 +617,15 @@
 /* تحييد كروم Leaflet مع الثيم الداكن */
 .geomap .leaflet-container { background: var(--stage-1); font-family: var(--f-body); }
 .geomap .leaflet-control-zoom a {
-  background: rgba(16, 32, 26, 0.85);
+  background: rgba(var(--surf-2-rgb), 0.85);
   color: var(--ivory);
   border-color: var(--hair-d2);
 }
 .geomap .leaflet-control-zoom a:hover { background: var(--stage-3); }
 .geomap .leaflet-tooltip {
-  background: #131D17;
-  color: #F1F5F2;
+  background: var(--tip-bg);
+  color: var(--tip-fg);
   border: none;
-  box-shadow: 0 14px 40px rgba(4, 10, 8, 0.5);
+  box-shadow: 0 14px 40px rgba(var(--shadow-rgb), 0.5);
   direction: rtl;
 }

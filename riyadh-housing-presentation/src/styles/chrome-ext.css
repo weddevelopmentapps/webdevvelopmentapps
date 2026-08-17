@@ -1,0 +1,134 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   chrome-ext.css — امتداد كروم المقدِّم لحزمة التوسعة (بادئة hudx-)
+   يملكه معمار التوسعة — لا يعدّله وكيل ميزة، ولا يلمس presenter.css المعتمد.
+
+   يضيف زرّي دخول اثنين فقط إلى شريط HUD القائم، بنمط .hud-btn ذاته حرفياً
+   (وراثة كاملة: الزران يحملان الصنف hud-btn ثم صنف موضعهما hudx-*):
+     #hud-palette  «بحث وتنقّل ‎Ctrl+K»   → يبث palette:toggle
+     #hud-report   «الموجز التنفيذي»      → يوجّه إلى ‎#/report
+
+   ── الموضع (تصحيح التكامل) ────────────────────────────────────────────────
+   الحافة العلوية الوسطى، بين زرّي التقليب `.hud-next` و`.hud-prev` تماماً.
+   هذا هو **الفراغ الوحيد المضمون** في كل لوحة وملحق: presenter.css يثبّت
+   زرّي التقليب على ‎50%∓300su لأن ترويسة اللوحة تشغل الزاويتين فقط، فوسط
+   الشريط العلوي خالٍ بالتصميم في كل أقسام V2 وكل الملاحق.
+
+   لماذا لا أسفل اليسار (الموضع الأول): تلك الزاوية مأهولة أصلاً بثلاثة
+   عناصر معتمدة — شارة الإصدار `#release-badge` (bottom 14su، الطرف
+   الاتجاهي الأخير = اليسار الفيزيائي في RTL)، وسطر البوابات
+   `.sum-gates` في الملخص، وزر «العودة إلى الغلاف» `.cls-home` في الختام —
+   فكان الزران يطبعان فوقها ويحجبانها عن النقر. بوابة اللقطات ترصد ذلك
+   حرفياً («محتوى يُرسم تحت شارة الإصدار» و«صف بيانات مقصوص»).
+   ولا أسفل اليمين: عمود البطاقات هناك مأهول في كل قسم (بطاقة الخريطة/
+   الجدول/الرسم) وزر «العودة إلى المحاور» يشغل ركنه.
+
+   الثبات البكسلي محفوظ: الزران عنصران ثابتان `position: fixed` خارج
+   المسرح، ولا يغيّران تخطيط أي قسم.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.hudx-palette,
+.hudx-report {
+  /* نفس ارتفاع صف زرّي التقليب حرفياً — صفٌّ علوي واحد متسق */
+  top: calc(var(--su) * 26);
+  bottom: auto;
+  font-size: max(11px, calc(var(--su) * 13));
+  padding: calc(var(--su) * 7) calc(var(--su) * 15);
+  gap: calc(var(--su) * 7);
+  /* سقف عرض مقيس بوحدة المسرح: المسافة من المنتصف إلى الحافة الداخلية لزر
+     التقليب المجاور ‎≈‎ 186su عند 1920 و‎169su عند 1366 — 164su يترك هامشاً
+     بصرياً واضحاً عند كل مقاس، و`overflow: hidden` حارس أخير فلا يسيل نص
+     فوق زر التقليب مهما تغيّر الخط أو طول التسمية. */
+  max-width: calc(var(--su) * 164);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* الترتيب حول المنتصف باتجاه القراءة العربية:
+   «الموجز التنفيذي» يمين المنتصف (يبدأ أولاً في RTL)، و«بحث وتنقّل» يساره.
+   كلٌّ منهما ينمو من المنتصف نحو زر التقليب المجاور ولا يتخطاه أبداً. */
+.hudx-report {
+  right: calc(50% + var(--su) * 5);
+  left: auto;
+}
+.hudx-palette {
+  left: calc(50% + var(--su) * 5);
+  right: auto;
+}
+
+/* رقاقة الاختصار داخل الزر: محايدة، معزولة اتجاهياً، لا تنافس نص الزر */
+.hudx-kbd {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 calc(var(--su) * 5);
+  border: 1px solid var(--hair-d2);
+  border-radius: calc(var(--su) * 5);
+  color: var(--faint-d);
+  font-family: var(--f-body);
+  font-size: 0.86em;
+  font-weight: 700;
+  line-height: 1.6;
+  direction: ltr;
+  unicode-bidi: isolate;
+  transition: color var(--dur-micro), border-color var(--dur-micro);
+}
+.hudx-palette:hover .hudx-kbd,
+.hudx-palette:focus-visible .hudx-kbd {
+  color: var(--ink2-d);
+  border-color: var(--hair-d);
+}
+
+/* أيقونة الزر: خط رفيع بلون النص الوارث — لا لون بيانات في الكروم */
+.hudx-ico {
+  flex: 0 0 auto;
+  width: max(13px, calc(var(--su) * 15));
+  height: max(13px, calc(var(--su) * 15));
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* الغلاف والخمول: يتبعان قاعدة .hud-btn القائمة تلقائياً (وراثة الصنف).
+   داخل الملاحق يبقى الزران عاملين — البحث والموجز مفيدان من أي موضع،
+   بخلاف زرّي التقليب اللذين يخفيهما presenter.css داخل الملحق. */
+body.in-appendix .hudx-palette,
+body.in-appendix .hudx-report {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* وضع الموجز يستبدل الكروم كله بشريط أدوات المستند (rpt-toolbar) */
+body.mode-report .hudx-palette,
+body.mode-report .hudx-report { display: none; }
+
+/* التدرّج على العرض — الحافة العلوية الوسطى تضيق بضيق الشاشة، فيتخلى الزران
+   عن أجزائهما الأقل ضرورة بالترتيب ولا يقتربان من زرّي التقليب أبداً:
+     ≤1500px  تُطوى رقاقة الاختصار (الاختصار نفسه يظل عاملاً، وسمة title
+              وaria-label تحملان النص كاملاً لقارئ الشاشة والتلميح).
+     ≤1120px  يبقى الرمزان وحدهما (حبّتان دائريتان) — التسمية في التلميح. */
+@media (max-width: 1500px) {
+  .hudx-kbd { display: none; }
+}
+@media (max-width: 1120px) {
+  .hudx-palette span:not(.hudx-kbd),
+  .hudx-report span:not(.hudx-kbd) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .hudx-palette,
+  .hudx-report {
+    padding: calc(var(--su) * 7) calc(var(--su) * 9);
+    gap: 0;
+  }
+}
+
+@media print {
+  .hudx-palette, .hudx-report { display: none !important; }
+}

@@ -67,16 +67,38 @@ test("serialize: يسقط المعاملات الفارغة، و admin/home يخ
   assert.deepStrictEqual(R.serialize({ kind: "admin", id: "publish", params: {} }), "/admin/publish");
 });
 
-test("parse: هاش فارغ أو جذر → المشهد 00", () => {
+/* V3_SPEC §4: الجذر الافتراضي صار التبويب الأول لا غلاف المسرح. */
+test("parse: هاش فارغ أو جذر → التبويب الافتراضي demand", () => {
   win.location.hash = "";
-  assert.deepStrictEqual(norm(R.parse()), { kind: "scene", id: "00", params: {} });
+  assert.deepStrictEqual(norm(R.parse()), { kind: "tab", id: "demand", params: {} });
   win.location.hash = "#/";
-  assert.deepStrictEqual(norm(R.parse()), { kind: "scene", id: "00", params: {} });
+  assert.deepStrictEqual(norm(R.parse()), { kind: "tab", id: "demand", params: {} });
 });
 
-test("parse: مسار مجهول يسقط بأمان إلى المشهد 00", () => {
+test("parse: مسار مجهول يسقط بأمان إلى التبويب الافتراضي", () => {
   win.location.hash = "#/bogus/route";
-  assert.deepStrictEqual(norm(R.parse()), { kind: "scene", id: "00", params: {} });
+  assert.deepStrictEqual(norm(R.parse()), { kind: "tab", id: "demand", params: {} });
+});
+
+test("V3: مسار التبويب يُحلَّل ويُسلسَل بمعاملاته", () => {
+  win.location.hash = "#/tab/licensing";
+  assert.deepStrictEqual(norm(R.parse()),
+    { kind: "tab", id: "licensing", params: {} });
+  win.location.hash = "#/tab/control?focus=south";
+  assert.deepStrictEqual(norm(R.parse()),
+    { kind: "tab", id: "control", params: { focus: "south" } });
+  assert.deepStrictEqual(
+    R.serialize({ kind: "tab", id: "kpis", params: {} }), "/tab/kpis");
+  assert.deepStrictEqual(
+    R.serialize({ kind: "tab", id: "demand", params: { collar: "blue", x: "" } }),
+    "/tab/demand?collar=blue");
+});
+
+test("V3: حالة العودة من ملحق تحمل مسار تبويب كاملاً", () => {
+  const state = { kind: "tab", id: "initiatives", params: { pillar: "p2" } };
+  const enc = R.encodeReturn(state);
+  assert.ok(!/[+/=]/.test(enc), "base64url بلا محارف تكسر العنوان");
+  assert.deepStrictEqual(norm(R.decodeReturn(enc)), state);
 });
 
 test("parse: ملحق بمعرف مركّب وadmin بتبويب", () => {
@@ -124,4 +146,42 @@ test("serialize/parse للأقسام: /section/<id> ذهاباً وإياباً 
   assert.deepStrictEqual(norm(R.parse()), route);
   // الغلاف الرقمي يبقى على /scene/
   assert.deepStrictEqual(R.serialize({ kind: "scene", id: "00", params: {} }), "/scene/00");
+});
+
+/* ── مسار الموجز التنفيذي (عقد V2_CONTRACTS_EXPANSION §2) ── */
+
+test("‎#/report يُحلَّل نوعاً مستقلاً بمعرف ثابت — لا يُخلط بالمشاهد", () => {
+  win.location.hash = "#/report";
+  assert.deepStrictEqual(norm(R.parse()), { kind: "report", id: "main", params: {} });
+  // ولا يمرّ عبر خريطة المسارات القديمة (لا استبدال في التاريخ)
+  const before = historyCalls.length;
+  win.location.hash = "#/report";
+  R.parse();
+  assert.deepStrictEqual(historyCalls.length, before);
+});
+
+test("‎?pages= يصل كاملاً إلى معاملات مسار الموجز", () => {
+  win.location.hash = "#/report?pages=summary,demand,forecast";
+  const route = R.parse();
+  assert.deepStrictEqual(route.kind, "report");
+  assert.deepStrictEqual(route.params.pages, "summary,demand,forecast");
+  assert.deepStrictEqual(route.params.pages.split(",").length, 3);
+});
+
+test("serialize/parse للموجز: ‎/report بلا معرف، ذهاباً وإياباً", () => {
+  assert.deepStrictEqual(
+    R.serialize({ kind: "report", id: "main", params: {} }), "/report");
+  const withPages = { kind: "report", id: "main", params: { pages: "summary,kpis" } };
+  const s = R.serialize(withPages);
+  assert.deepStrictEqual(s, "/report?pages=summary%2Ckpis");
+  win.location.hash = "#" + s;
+  assert.deepStrictEqual(norm(R.parse()), withPages);
+});
+
+test("مسار غير معروف يبقى محالاً إلى التبويب الافتراضي — الموجز لا يبتلع غيره", () => {
+  win.location.hash = "#/reporting";
+  assert.deepStrictEqual(norm(R.parse()), { kind: "tab", id: "demand", params: {} });
+  win.location.hash = "#/report/extra";
+  // الجزء الزائد يُتجاهل: المسار مفرد بحكم العقد
+  assert.deepStrictEqual(norm(R.parse()), { kind: "report", id: "main", params: {} });
 });

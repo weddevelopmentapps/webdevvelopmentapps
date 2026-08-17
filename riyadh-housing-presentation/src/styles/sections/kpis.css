@@ -26,11 +26,11 @@
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: thin;
-  scrollbar-color: rgba(244, 241, 230, 0.18) transparent;
+  scrollbar-color: rgba(var(--ink-rgb), 0.18) transparent;
 }
 [data-section="kpis"] .dash-body::-webkit-scrollbar { width: 8px; }
 [data-section="kpis"] .dash-body::-webkit-scrollbar-thumb {
-  background: rgba(244, 241, 230, 0.16);
+  background: rgba(var(--ink-rgb), 0.16);
   border-radius: 8px;
 }
 [data-section="kpis"] .dash-body::-webkit-scrollbar-track { background: transparent; }
@@ -71,7 +71,7 @@
 [data-section="kpis"] .kpi7-strip .kpi[role="button"]:hover {
   transform: translateY(calc(var(--su) * -2));
   border-color: var(--hair-d);
-  background: rgba(22, 41, 31, 0.66);
+  background: rgba(var(--surf-3-rgb), 0.66);
 }
 [data-section="kpis"] .kpi7-strip .kpi[role="button"]:focus-visible {
   outline: 2px solid var(--gold);
@@ -106,7 +106,7 @@
   border: 1px solid var(--hair-d2);
   border-radius: 999px;
   padding: calc(var(--su) * 2);
-  background: rgba(11, 21, 18, 0.5);
+  background: rgba(var(--surf-1-rgb), 0.5);
 }
 [data-section="kpis"] .kpi7-tool {
   font-family: var(--f-body);
@@ -130,8 +130,8 @@
 }
 [data-section="kpis"] .kpi7-tool[aria-pressed="true"] {
   color: var(--ivory);
-  background: rgba(49, 162, 109, 0.16);
-  box-shadow: inset 0 0 0 1px rgba(49, 162, 109, 0.35);
+  background: rgba(var(--green-rgb), 0.16);
+  box-shadow: inset 0 0 0 1px rgba(var(--green-rgb), 0.35);
 }
 [data-section="kpis"] .kpi7-tool[disabled] {
   opacity: 0.35;
@@ -143,7 +143,7 @@
   color: var(--gold);
 }
 [data-section="kpis"] .kpi7-tool.ghost:hover {
-  border-color: rgba(214, 171, 76, 0.5);
+  border-color: rgba(var(--gold-rgb), 0.5);
   color: var(--gold-hi);
 }
 
@@ -172,12 +172,12 @@
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: thin;
-  scrollbar-color: rgba(244, 241, 230, 0.18) transparent;
+  scrollbar-color: rgba(var(--ink-rgb), 0.18) transparent;
   padding-inline-end: calc(var(--su) * 2);
 }
 [data-section="kpis"] .kpi7-cards::-webkit-scrollbar { width: 7px; }
 [data-section="kpis"] .kpi7-cards::-webkit-scrollbar-thumb {
-  background: rgba(244, 241, 230, 0.16);
+  background: rgba(var(--ink-rgb), 0.16);
   border-radius: 8px;
 }
 [data-section="kpis"] .kpi7-cards[hidden] { display: none; }
@@ -188,7 +188,7 @@
   gap: calc(var(--su) * 5);
   min-width: 0;
   min-height: 0;
-  background: rgba(16, 32, 26, 0.55);
+  background: rgba(var(--surf-2-rgb), 0.55);
   border: 1px solid var(--hair-d2);
   border-radius: var(--r-sm);
   padding: calc(var(--su) * 9) calc(var(--su) * 13) calc(var(--su) * 8);
@@ -200,7 +200,7 @@
 [data-section="kpis"] .kpi7-card:hover {
   transform: translateY(calc(var(--su) * -1.5));
   border-color: var(--hair-d);
-  background: rgba(22, 41, 31, 0.66);
+  background: rgba(var(--surf-3-rgb), 0.66);
 }
 [data-section="kpis"] .kpi7-card:focus-visible {
   outline: 2px solid var(--gold);
@@ -253,8 +253,8 @@
   white-space: nowrap;
 }
 [data-section="kpis"] .kpi7-card[data-fmt="pct"] .kpi7-fmt-chip {
-  color: #7FA9C9; /* درجة مضيئة من الأزرق التصنيفي للمقروئية على الداكن */
-  border-color: rgba(63, 127, 176, 0.45);
+  color: var(--blue-hi); /* درجة مضيئة من الأزرق التصنيفي للمقروئية على الداكن */
+  border-color: rgba(var(--blue-rgb), 0.45);
 }
 
 /* ════════════════════════════════════════════════════════════════════════════
@@ -274,7 +274,7 @@
   height: calc(var(--su) * 8);
   transform: translateY(-50%);
   border-radius: 999px;
-  background: rgba(244, 241, 230, 0.07);
+  background: rgba(var(--ink-rgb), 0.07);
   overflow: hidden;
 }
 /* منطقة التحسن المطلوب: خط الأساس ← المستهدف — نطاق ذهبي مرئي بحق
@@ -288,8 +288,8 @@
   top: 0;
   bottom: 0;
   background: linear-gradient(270deg,
-    rgba(214, 171, 76, 0.5), rgba(214, 171, 76, 0.2));
-  border-inline-start: 1px solid rgba(214, 171, 76, 0.55);
+    rgba(var(--gold-rgb), 0.5), rgba(var(--gold-rgb), 0.2));
+  border-inline-start: 1px solid rgba(var(--gold-rgb), 0.55);
   border-radius: 999px;
 }
 /* شاخص خط الأساس: دائرة ذهبية مجوفة على أرضية المسرح */
@@ -438,18 +438,18 @@
   min-height: 0;
   overflow: auto;
   scrollbar-width: thin;
-  scrollbar-color: rgba(244, 241, 230, 0.28) transparent;
+  scrollbar-color: rgba(var(--ink-rgb), 0.28) transparent;
   scrollbar-gutter: stable;
   -webkit-mask-image: linear-gradient(180deg,
-    #000 0%, #000 calc(100% - var(--su) * 20), transparent 100%);
+    var(--mask-solid) 0%, var(--mask-solid) calc(100% - var(--su) * 20), transparent 100%);
   mask-image: linear-gradient(180deg,
-    #000 0%, #000 calc(100% - var(--su) * 20), transparent 100%);
+    var(--mask-solid) 0%, var(--mask-solid) calc(100% - var(--su) * 20), transparent 100%);
 }
 [data-section="kpis"] .kpi7-matrix .table-scroll::-webkit-scrollbar {
   width: calc(var(--su) * 7);
 }
 [data-section="kpis"] .kpi7-matrix .table-scroll::-webkit-scrollbar-thumb {
-  background: rgba(244, 241, 230, 0.24);
+  background: rgba(var(--ink-rgb), 0.24);
   border-radius: 999px;
 }
 [data-section="kpis"] .kpi7-matrix .table-dense th button:focus-visible {
@@ -479,7 +479,7 @@
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: thin;
-  scrollbar-color: rgba(244, 241, 230, 0.28) transparent;
+  scrollbar-color: rgba(var(--ink-rgb), 0.28) transparent;
   padding-inline-end: calc(var(--su) * 2);
   /* إصلاح مراجعة الجولة 3: العمود مضغوط ليتسع كاملاً فوق شريط الشارة
      المحجوز مركزياً في .dash-body — لا تلاشي إخفاء ولا حشوة ترقيع بعد
@@ -488,7 +488,7 @@
 }
 [data-section="kpis"] .kpi7-truth-col::-webkit-scrollbar { width: 7px; }
 [data-section="kpis"] .kpi7-truth-col::-webkit-scrollbar-thumb {
-  background: rgba(244, 241, 230, 0.16);
+  background: rgba(var(--ink-rgb), 0.16);
   border-radius: 8px;
 }
 [data-section="kpis"] .kpi7-truth-col > * { flex: none; }
@@ -498,7 +498,7 @@
 [data-section="kpis"] .kpi7-truth .card-head {
   padding-top: calc(var(--su) * 10);
 }
-[data-section="kpis"] .kpi7-truth:hover { border-color: rgba(214, 171, 76, 0.4); }
+[data-section="kpis"] .kpi7-truth:hover { border-color: rgba(var(--gold-rgb), 0.4); }
 [data-section="kpis"] .kpi7-truth:focus-visible {
   outline: 2px solid var(--gold);
   outline-offset: 2px;
@@ -559,7 +559,7 @@
   flex-wrap: nowrap;
   gap: calc(var(--su) * 9);
   min-width: 0;
-  background: rgba(16, 32, 26, 0.58);
+  background: rgba(var(--surf-2-rgb), 0.58);
   border: 1px solid var(--hair-d2);
   border-radius: var(--r-sm);
   padding: calc(var(--su) * 4) calc(var(--su) * 12);
@@ -569,8 +569,8 @@
   font-size: calc(var(--su) * 11.5);
   font-weight: 700;
   color: var(--gold);
-  border: 1px solid rgba(214, 171, 76, 0.45);
-  background: rgba(214, 171, 76, 0.07);
+  border: 1px solid rgba(var(--gold-rgb), 0.45);
+  background: rgba(var(--gold-rgb), 0.07);
   border-radius: 999px;
   padding: calc(var(--su) * 2) calc(var(--su) * 10);
   white-space: nowrap;
@@ -612,7 +612,7 @@
 
 /* اقتباس المصدر — نص الإصدار كما هو */
 [data-section="kpis"] .kpi7-quote {
-  border-inline-start: 3px solid rgba(214, 171, 76, 0.5);
+  border-inline-start: 3px solid rgba(var(--gold-rgb), 0.5);
   padding-inline-start: calc(var(--su) * 12);
   display: flex;
   flex-direction: column;
@@ -710,7 +710,7 @@
 [data-section="kpis"] .kpi7-na-tag {
   font-size: calc(var(--su) * 11.5);
   color: var(--gold-hi);
-  border: 1px dashed rgba(214, 171, 76, 0.4);
+  border: 1px dashed rgba(var(--gold-rgb), 0.4);
   border-radius: 999px;
   padding: calc(var(--su) * 1.5) calc(var(--su) * 9);
   white-space: nowrap;
@@ -786,8 +786,8 @@
   font-size: calc(var(--su) * 12.5);
   line-height: 1.7;
   color: var(--gold-hi);
-  background: rgba(214, 171, 76, 0.06);
-  border: 1px dashed rgba(214, 171, 76, 0.4);
+  background: rgba(var(--gold-rgb), 0.06);
+  border: 1px dashed rgba(var(--gold-rgb), 0.4);
   border-radius: var(--r-sm);
   padding: calc(var(--su) * 9) calc(var(--su) * 13);
   margin: 0;
@@ -796,10 +796,10 @@
   font-size: calc(var(--su) * 12.5);
   line-height: 1.65;
   color: var(--gold-hi);
-  border: 1px dashed rgba(214, 171, 76, 0.35);
+  border: 1px dashed rgba(var(--gold-rgb), 0.35);
   border-radius: var(--r-sm);
   padding: calc(var(--su) * 9) calc(var(--su) * 13);
-  background: rgba(214, 171, 76, 0.05);
+  background: rgba(var(--gold-rgb), 0.05);
 }
 [data-section="kpis"] .kpi7-profile-src {
   font-size: calc(var(--su) * 11.5);
@@ -889,7 +889,7 @@
   display: block;
   height: calc(var(--su) * 9);
   border-radius: 999px;
-  background: rgba(244, 241, 230, 0.07);
+  background: rgba(var(--ink-rgb), 0.07);
   overflow: hidden;
 }
 [data-section="kpis"] .kpi7-cols-fill {
@@ -918,7 +918,7 @@
 }
 [data-section="kpis"] .kpi7-cols-tag.pending {
   color: var(--gold-hi);
-  border-color: rgba(214, 171, 76, 0.4);
+  border-color: rgba(var(--gold-rgb), 0.4);
   border-style: dashed;
 }
 [data-section="kpis"] .kpi7-cols-row.empty .kpi7-cols-label { color: var(--mut-d); }
@@ -946,15 +946,15 @@
 }
 [data-section="kpis"] .kpi7-gate-tag.pass {
   color: var(--green-hi);
-  border: 1px solid rgba(49, 162, 109, 0.4);
+  border: 1px solid rgba(var(--green-rgb), 0.4);
 }
 [data-section="kpis"] .kpi7-gate-tag.warn {
   color: var(--gold-hi);
-  border: 1px dashed rgba(214, 171, 76, 0.45);
+  border: 1px dashed rgba(var(--gold-rgb), 0.45);
 }
 [data-section="kpis"] .kpi7-gate-tag.fail {
   color: var(--coral);
-  border: 1px solid rgba(214, 106, 80, 0.45);
+  border: 1px solid rgba(var(--coral-rgb), 0.45);
 }
 
 /* ════════════════════════════════════════════════════════════════════════════
@@ -974,8 +974,8 @@
 [data-section="kpis"] .kpi7-step-hi {
   border-radius: var(--r-sm);
   box-shadow:
-    0 0 0 1.5px rgba(214, 171, 76, 0.55),
-    0 0 34px rgba(214, 171, 76, 0.14);
+    0 0 0 1.5px rgba(var(--gold-rgb), 0.55),
+    0 0 34px rgba(var(--gold-rgb), 0.14);
 }
 
 /* ترويسة مجموعة الصيغة داخل شبكة البطاقات — صف كامل العرض */

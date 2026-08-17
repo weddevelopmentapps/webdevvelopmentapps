@@ -1,0 +1,575 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   tabs/kpis.css — أنماط التبويب ٥ «مؤشرات الأداء» (بادئة ‎kpi5-‎ حصراً)
+   ────────────────────────────────────────────────────────────────────────────
+   يُقرأ مع ‎src/styles/tabs.css‎ الذي يوفّر الأصناف الجاهزة
+   (‎.tabgrid‎ ‎.tabcard‎) — هذا الملف **يزيّنها ولا يعيد اختراعها**، ويضيف
+   مكوّنات هذا التبويب وحدها:
+     ‎.kpi5-strip‎    شريط الموجز في سطر واحد (كل رقم فيه زر إبراز)
+     ‎.kpi5-board‎    **شبكة العدّادات الأربعة عشر** ٣/الصف على 1920 · ٢ على 1366
+     ‎.kpi5-g-card‎   بطاقة العدّاد نصف الدائري (SVG كودي) — البطاقة نفسها زر
+     ‎.kpi5-arc‎      شرائح القوس الأربع: مسار · نطاق تحسن · علامة أساس · علامة مستهدف
+     ‎.kpi5-g-val‎    مركز العدّاد: القيمة المسجَّلة أو **حالة الغياب الصريحة**
+     ‎.kpi5-chip‎     رقاقات ترشيح الشبكة وترتيبها (تكتب حالتها في العنوان)
+     ‎.kpi5-matrix‎   مصفوفة المؤشرات الأربعة عشر
+
+   **لا عدّاد مكبَّر ولا لوح تفاصيل مرسى**: الشاشة كلها للعدّادات الأربعة عشر،
+   والتفصيل خلف نافذة الإبراز (نقرة) ثم الملحق (نقرة ثانية).
+
+   القاعدة الحاكمة (V3_SPEC §1 · V3_CONTRACTS §1-د):
+     **صفر لون مكتوب هنا.** كل لون ‎var(--…)‎ من ‎tokens.css‎، وكل شفافية
+     ‎rgba(var(--x-rgb), a)‎ — فتتبع العدّادات السمتين تلقائياً بلا كتلة داكنة
+     خاصة وبلا سطر JS واحد.
+
+   الصدق البصري (V3_SPEC §4-ب):
+     • **لا إبرة بلا قيمة**: ‎.kpi5-needle‎ لا تُرسم أصلاً في الحالة المعلّقة —
+       الغياب يُعلن نصاً في ‎.kpi5-g-val.is-pending‎ برقاقة متقطعة الحد لا
+       يمكن أن تُقرأ قيمةً.
+     • العلامتان مختلفتا **الشكل** لا اللون وحده: دائرة مجوفة لخط الأساس
+       وعارضة صلبة للمستهدف، ولكل منهما نصّه في ‎.kpi5-marks‎.
+     • الذهبي محجوز هنا لخط الأساس والمستهدف ونطاق التحسن بينهما — ولا يلوّن
+       أي قيمة أخرى.
+
+   التمرير الأفقي ممنوع على الصفحة: ‎min-width: 0‎ موروث من ‎.tabgrid > *‎،
+   والمصفوفة وحدها تُمرَّر داخل حاويتها ‎.kpi5-matrix-scroll‎ فلا تفيض اللوح.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.kpi5 {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 1.3vw, 22px);
+  min-width: 0;
+}
+
+/* ══ ١) اللافتة (حاضنة النمط الهندسي للهوية) ═══════════════════════════════ */
+.kpi5-banner {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px 22px;
+  flex-wrap: wrap;
+  padding: clamp(12px, 1.2vw, 20px) clamp(14px, 1.4vw, 24px);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background:
+    linear-gradient(135deg,
+      rgba(var(--brand-rgb), 0.06),
+      rgba(var(--surf-1-rgb), 0) 62%),
+    var(--surface-2);
+  min-width: 0;
+}
+.kpi5-banner-main { position: relative; z-index: 1; min-width: 0; }
+.kpi5-title {
+  font-family: var(--f-display);
+  font-size: clamp(20px, 1.9vw, 30px);
+  font-weight: 300;
+  line-height: 1.25;
+  color: var(--ink);
+}
+.kpi5-lede {
+  margin-block-start: 5px;
+  max-inline-size: 78ch;
+  font-size: clamp(12px, 0.95vw, 14px);
+  line-height: 1.75;
+  color: var(--ink-2);
+}
+.kpi5-asof {
+  position: relative;
+  z-index: 1;
+  flex: 0 0 auto;
+  font-size: 11.5px;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
+/* ══ ٢) شريط الموجز — سطر واحد مضغوط فوق الشبكة ════════════════════════════
+   ‎14 مؤشراً · 11 نسبي · 3 عددي · 0 من 14 قيمة حالية مسجّلة‎ — كل رقم زر،
+   والفاصل ‎·‎ يرسمه ‎::before‎ فلا عنصر فارغ في الشجرة. الشريط بديل صفّ
+   البطاقات الأربع الضخم: يوفّر الطية كلها لعدّادات المؤشرات. */
+.kpi5-strip {
+  display: flex;
+  align-items: center;
+  gap: 4px 14px;
+  flex-wrap: wrap;
+  padding: 9px clamp(12px, 1.2vw, 18px);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--surface);
+  min-width: 0;
+}
+.kpi5-stat {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 3px 4px;
+  border-radius: var(--r-sm);
+  color: var(--ink-2);
+  white-space: nowrap;
+  transition: color var(--dur-micro) var(--ease),
+              background var(--dur-micro) var(--ease);
+}
+.kpi5-stat + .kpi5-stat::before {
+  content: "·";
+  margin-inline-end: 10px;
+  color: var(--ink-4);
+}
+.kpi5-stat:hover { color: var(--ink); background: var(--surface-2); }
+.kpi5-stat:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.kpi5-stat-num {
+  font-family: var(--f-display);
+  font-size: clamp(17px, 1.35vw, 23px);
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--ink);
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+.kpi5-stat-unit { font-size: 12px; }
+/* الرقم المعلّق (‎0 من 14‎) بلكنة ذهبية تحريرية — لا قيمة بيانات */
+.kpi5-stat.is-pending .kpi5-stat-num { color: var(--gold); }
+.kpi5-stat.is-pending .kpi5-stat-unit { color: var(--ink-2); }
+/* وسم الصدق الحرفي يُدفع إلى طرف السطر فيلازم الأرقام ولا يزاحمها */
+.kpi5-strip-note {
+  margin-inline-start: auto;
+  padding-inline-start: 12px;
+  font-size: 11.5px;
+  line-height: 1.7;
+  color: var(--ink-3);
+}
+
+/* ══ ٣) أدوات الشبكة: الترشيح والترتيب ═════════════════════════════════════ */
+.kpi5-tools {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 18px;
+  flex-wrap: wrap;
+  padding: 2px 8px 8px;
+  min-width: 0;
+}
+.kpi5-chips {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+.kpi5-chips-cap {
+  font-size: 11.5px;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+.kpi5-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink-2);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+  white-space: nowrap;
+  transition: border-color var(--dur-micro) var(--ease),
+              background var(--dur-micro) var(--ease),
+              color var(--dur-micro) var(--ease);
+}
+.kpi5-chip:hover { background: var(--surface-2); color: var(--ink); }
+.kpi5-chip:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+/* الحالة المختارة بثلاث إشارات: لون + خلفية + ‎aria-pressed‎ على الزر نفسه */
+.kpi5-chip.is-on {
+  border-color: var(--brand);
+  background: var(--accent-soft);
+  color: var(--brand);
+}
+.kpi5-chip-num {
+  font-family: var(--f-display);
+  font-weight: 700;
+  color: var(--ink);
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+.kpi5-chip.is-on .kpi5-chip-num { color: var(--brand); }
+
+/* ══ ٤) شبكة العدّادات — ثلاثة في الصف على 1920 · اثنان على 1366 ════════════
+   البطاقة نفسها زر: نقرة واحدة = إبراز المؤشر. لا زر «تكبير» ولا حالة
+   «معروض» — فلا عدّاد يحتكر الشاشة على حساب الثلاثة عشر الباقية. */
+.kpi5-board {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(10px, 1.1vw, 18px);
+  padding: 0 8px 6px;
+  min-width: 0;
+}
+.kpi5-board > * { min-width: 0; }
+/* عتبة 1366: عمودان — فيبقى العدّاد مقروءاً لا مسحوقاً */
+@media (max-width: 1500px) {
+  .kpi5-board { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 760px) {
+  .kpi5-board { grid-template-columns: minmax(0, 1fr); }
+}
+
+.kpi5-g-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 11px 12px 10px;
+  min-width: 0;
+  inline-size: 100%;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  text-align: start;
+  color: var(--ink-2);
+  transition: border-color var(--dur-micro) var(--ease),
+              box-shadow var(--dur-micro) var(--ease);
+}
+.kpi5-g-card:hover {
+  border-color: rgba(var(--brand-rgb), 0.45);
+  box-shadow: 0 6px 22px rgba(var(--shadow-rgb), 0.14);
+}
+.kpi5-g-card:focus-visible { outline: 2px solid var(--gold); outline-offset: -3px; }
+
+/* سطر المعرف والرقاقة فوق الاسم — ارتفاع ثابت فتتحاذى البطاقات في صفها */
+.kpi5-g-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+}
+.kpi5-g-id {
+  flex: 0 0 auto;
+  font-family: var(--f-display);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-3);
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+/* اسم المؤشر **مقصوص في سطرين** والاسم الكامل في ‎title‎ — لا بتر خفي */
+.kpi5-g-name {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-width: 0;
+  min-block-size: calc(2 * 1.5em);
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+/* رقاقة نوع المؤشر (نسبي/عددي) — النص هو حامل المعنى واللون تعزيز */
+.kpi5-type {
+  flex: 0 0 auto;
+  padding: 2px 9px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 700;
+  line-height: 1.7;
+  white-space: nowrap;
+}
+.kpi5-type.is-pct {
+  color: var(--collar-blue);
+  border-color: rgba(var(--blue-rgb), 0.42);
+  background: rgba(var(--blue-rgb), 0.10);
+}
+.kpi5-type.is-num {
+  color: var(--ink-2);
+  background: var(--surface-2);
+}
+
+/* وعد النقرة الأولى — يظهر باهتاً ويشتد عند التحويم/التركيز */
+.kpi5-g-more {
+  align-self: flex-start;
+  font-size: 10.5px;
+  color: var(--ink-4);
+  opacity: 0.85;
+  transition: color var(--dur-micro) var(--ease);
+}
+.kpi5-g-card:hover .kpi5-g-more,
+.kpi5-g-card:focus-visible .kpi5-g-more { color: var(--brand); opacity: 1; }
+
+/* ══ ٥) العدّاد نصف الدائري نفسه ═══════════════════════════════════════════ */
+/* العدّاد **مضغوط**: سقف عرضه ثابت ويتوسط بطاقته مهما اتسع العمود، فلا
+   ينتفخ قوس واحد إلى ملء الصف كما كان يفعل العدّاد المكبَّر. */
+.kpi5-g-wrap {
+  position: relative;
+  display: block;
+  inline-size: 100%;
+  max-inline-size: 300px;
+  margin-inline: auto;
+  margin-block-start: 2px;
+  min-width: 0;
+}
+.kpi5-g {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+  overflow: visible;
+}
+
+/* شرائح القوس الأربع — ‎butt‎ كي تتلاصق الشرائح بلا تراكب يزيح العلامات */
+.kpi5-arc {
+  fill: none;
+  stroke-linecap: butt;
+}
+/* المسار المحايد بلون الشعيرة المعايَرة — يبقى مقروءاً على السمتين معاً */
+.kpi5-arc.is-track { stroke: var(--line); }
+/* نطاق التحسن المطلوب بين العلامتين — صبغة ذهبية شفافة تتبع السمة */
+.kpi5-arc.is-band { stroke: rgba(var(--gold-rgb), 0.28); }
+.kpi5-arc.is-base { stroke: var(--gold); }
+.kpi5-arc.is-target { stroke: var(--gold-hi); }
+
+/* العلامتان مختلفتا الشكل: دائرة مجوفة لخط الأساس · عارضة صلبة للمستهدف */
+.kpi5-mark-base {
+  fill: var(--surface);
+  stroke: var(--gold);
+  stroke-width: 2.6;
+}
+.kpi5-mark-target {
+  stroke: var(--gold-hi);
+  stroke-width: 3.4;
+  stroke-linecap: round;
+}
+
+/* الإبرة وقلبها — لا يُرسمان إلا حين تُسجَّل قيمة حالية (V3_SPEC §4-ب) */
+.kpi5-needle {
+  stroke: var(--green);
+  stroke-width: 3.4;
+  stroke-linecap: round;
+}
+.kpi5-needle-hub { fill: var(--green); }
+
+/* مركز العدّاد */
+.kpi5-g-center {
+  position: absolute;
+  inset-inline: 12%;
+  inset-block-end: 12%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  pointer-events: none;
+  text-align: center;
+}
+.kpi5-g-cap {
+  font-size: 10.5px;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+.kpi5-g-val {
+  font-family: var(--f-display);
+  font-size: clamp(15px, 1.3vw, 21px);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--ink);
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+/* **حالة الغياب الصريحة**: رقاقة متقطعة الحد لا تُقرأ قيمةً بحال */
+.kpi5-g-val.is-pending {
+  padding: 2px 10px;
+  border: 1px dashed rgba(var(--gold-rgb), 0.62);
+  border-radius: 999px;
+  background: rgba(var(--gold-rgb), 0.08);
+  color: var(--gold);
+  font-size: clamp(11px, 0.9vw, 13px);
+  font-weight: 600;
+  direction: rtl;
+}
+
+/* طرفا المقياس تحت القوس: الصفر أولاً (يمين) وأعلى المقياس آخراً (يسار).
+   يشارك العدّاد سقف عرضه ذاته فيقع كل طرف تحت طرف القوس المقابل له —
+   وإلا انزاح «0» إلى حافة البطاقة فقُرئ على غير موضعه من المقياس. */
+.kpi5-scale {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  inline-size: 100%;
+  max-inline-size: 300px;
+  margin-inline: auto;
+  min-width: 0;
+  font-size: 10.5px;
+  color: var(--ink-3);
+}
+.kpi5-scale-end {
+  flex: 0 0 auto;
+  font-family: var(--f-display);
+  font-style: normal;
+  font-weight: 600;
+  color: var(--ink-2);
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+.kpi5-scale-cap {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* سطر العلامتين: شكل + نص + قيمة */
+.kpi5-marks {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px 14px;
+  flex-wrap: wrap;
+  padding-block-start: 6px;
+  border-block-start: 1px solid var(--line);
+  min-width: 0;
+}
+.kpi5-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  font-size: 11px;
+  white-space: nowrap;
+}
+.kpi5-mark-lab { color: var(--ink-3); }
+.kpi5-mark-val {
+  font-family: var(--f-display);
+  font-weight: 700;
+  color: var(--gold);
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+.kpi5-mark.is-target .kpi5-mark-val { color: var(--gold-hi); }
+/* الشكلان مرآة للعلامتين على القوس: حلقة مجوفة · عارضة صلبة */
+.kpi5-mark-glyph {
+  flex: 0 0 auto;
+  display: inline-block;
+}
+.kpi5-mark-glyph.is-base {
+  inline-size: 11px;
+  block-size: 11px;
+  border: 2.5px solid var(--gold);
+  border-radius: 50%;
+  background: var(--surface);
+}
+.kpi5-mark-glyph.is-target {
+  inline-size: 4px;
+  block-size: 13px;
+  border-radius: 2px;
+  background: var(--gold-hi);
+}
+
+/* ══ ٦) مصفوفة المؤشرات ════════════════════════════════════════════════════ */
+.kpi5-matrix-scroll {
+  overflow-x: auto;
+  padding-inline: 8px;
+  padding-block-end: 6px;
+  min-width: 0;
+}
+.kpi5-matrix {
+  inline-size: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.kpi5-matrix-cap {
+  caption-side: bottom;
+  padding-block-start: 9px;
+  font-size: 11px;
+  line-height: 1.8;
+  color: var(--ink-3);
+  text-align: start;
+}
+.kpi5-matrix th,
+.kpi5-matrix td {
+  padding: 8px 10px;
+  text-align: start;
+  vertical-align: middle;
+  border-block-end: 1px solid var(--line);
+}
+.kpi5-matrix thead th {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 1;
+  background: var(--surface-2);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+.kpi5-matrix tbody th {
+  font-family: var(--f-display);
+  font-weight: 700;
+  color: var(--ink-3);
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+.kpi5-matrix td.tnum {
+  font-family: var(--f-display);
+  font-weight: 600;
+  color: var(--ink);
+  direction: ltr;
+  unicode-bidi: isolate;
+  white-space: nowrap;
+}
+.kpi5-matrix td.is-gold { color: var(--gold); }
+.kpi5-row { transition: background var(--dur-micro) var(--ease); }
+.kpi5-row:hover { background: var(--surface-2); }
+.kpi5-row-name { min-inline-size: 24ch; }
+.kpi5-row-btn {
+  text-align: start;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.55;
+  color: var(--ink);
+  border-block-end: 1px dotted var(--line);
+}
+.kpi5-row-btn:hover { color: var(--brand); border-block-end-color: var(--brand); }
+.kpi5-row-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+/* وسم الغياب داخل المصفوفة — يُقرأ نصاً ولا يتحول صفراً */
+.kpi5-na {
+  display: inline-block;
+  padding: 2px 9px;
+  border: 1px dashed rgba(var(--gold-rgb), 0.55);
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--gold);
+  white-space: nowrap;
+}
+
+/* ══ ٧) سطر الصدق أسفل اللوح ═══════════════════════════════════════════════ */
+.kpi5-foot {
+  margin-block-start: 2px;
+  font-size: 11.5px;
+  line-height: 1.9;
+  color: var(--ink-3);
+}
+.kpi5-foot-src { color: var(--ink-2); }
+
+/* ══ ٨) احترام تقليل الحركة ═══════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  .kpi5-stat,
+  .kpi5-chip,
+  .kpi5-g-card,
+  .kpi5-g-more,
+  .kpi5-row { transition: none; }
+}
+
+/* ══ ٩) الطباعة: الكروم التفاعلي يُخفى والمحتوى يُسطَّح ═══════════════════ */
+@media print {
+  .kpi5-banner { background: none; }
+  .kpi5-g-card { box-shadow: none; break-inside: avoid; }
+  .kpi5-tools,
+  .kpi5-g-more { display: none; }
+  .kpi5-board { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .kpi5-matrix-scroll { overflow: visible; }
+  .kpi5-matrix tr { break-inside: avoid; }
+}

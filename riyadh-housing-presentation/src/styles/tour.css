@@ -1,0 +1,1011 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   tour.css — الجولة الموجهة ودرج ملاحظات المتحدث (عقد V2_CONTRACTS_EXPANSION §6)
+   بادئة الميزة: `tour-` حصراً — لا صنف واحد هنا خارجها، ولا لمس لـdashboard.css
+   ولا tokens.css ولا ملفات الأقسام. الأصناف المشتركة المعتمدة تُستعمل كما هي
+   (‏.btn-fullscreen لزر الغلاف) دون إعادة تعريف.
+   ────────────────────────────────────────────────────────────────────────────
+   طبقات z المقصودة (فوق المسرح، وتحت حاجز الأخطاء):
+     55  .tour-spot        — الحجاب ذو الثقب (يعتم اللوحة ويترك العنصر مضيئاً)
+     56  .tour-spot-cap    — تسمية ما يُنظر إليه
+     60  .tour-bar         — شريط الجولة (فوق الحجاب فلا يعتم)
+     61  .tour-notes       — درج الملاحظات (أعلى الجميع — لوح عمل المتحدث)
+   عناصر التحكم المعتمدة (‎.hud-btn عند 50 و‎.hud-progress) تبقى تحت الحجاب
+   وفوق المسرح، وموضع ألواحنا محسوب كي لا يغطي أياً منها:
+     • الشريط يبدأ من ارتفاع 70 وحدة فيعلو شارة الإصدار ومؤشر التقدم وزر
+       «العودة إلى المحاور» دون تراكب.
+     • الدرج يقف عند 108 وحدة من الأسفل: كومة زرّي «بحث وتنقّل» و«الموجز»
+       (أسفل يسار المسرح) تبلغ حافتها العليا 98 وحدة مقيسةً على 1920، فيبقى
+       الزران ظاهرَين وقابلَين للنقر بجوار الدرج لا تحته.
+
+   انضباط اللون في هذا الملف (يخضع للمنظومة الدلالية المقفلة):
+     • الذهبي `--gold` لحلقة التركيز الكاشفة ووسوم الصدق فقط — وهو استعماله
+       المرخص في كروم الواجهة (حلقة التركيز/وسوم الاعتماد) لا في قيمة بيانات.
+     • الأخضر `--green` لمؤشر «ضمن الزمن التقديري» ولخطوات مكتملة — إشارة حالة
+       إيجابية في الكروم لا قيمة قطاعية.
+     • **لا مرجاني إطلاقاً** في هذا الملف: المرجاني للعجز والمخالفات حصراً،
+       ولا يجوز أن يستهلكه مؤشر إيقاع بروفة. تجاوز الزمن يُقرأ نصاً ونغمةً
+       محايدة (`--mut-d`).
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* ══════════════════════════════════════════════════════════════════════════
+   0) رموز موضعية للميزة — تُشتق من tokens.css ولا تعرّف لوناً جديداً
+   ══════════════════════════════════════════════════════════════════════════ */
+.tour-bar,
+.tour-notes,
+.tour-spot,
+.tour-spot-cap {
+  /* عرض الدرج يُعرَّف على اللوحين معاً لا على الدرج وحده: الشريط يحسب عرضه
+     بطرحه عند فتح الدرج، والخصائص المخصصة لا تُورَّث بين شقيقين */
+  --tour-notes-w: clamp(320px, calc(var(--su) * 430), 46vw);
+  --tour-glass: rgba(var(--base-rgb), 0.86);
+  --tour-glass-2: rgba(var(--surf-2-rgb), 0.72);
+  --tour-hair: var(--hair-d);
+  --tour-hair-2: var(--hair-d2);
+  --tour-ink: var(--ivory);
+  --tour-ink-2: var(--ink2-d);
+  --tour-mut: var(--mut-d);
+  --tour-faint: var(--faint-d);
+  --tour-ring: var(--gold);
+  --tour-veil: rgba(var(--scrim-rgb), 0.62);
+  --tour-radius: var(--r);
+  --tour-radius-sm: var(--r-sm);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   1) نقطة الدخول على الغلاف — زر «جولة موجهة»
+   يرث `.btn-fullscreen` المعتمد كاملاً (نفس المقاس والحبر والسلوك)، ولا
+   يضيف هنا إلا فاصلاً بصرياً رفيعاً يميّزه عن زر ملء الشاشة فوقه.
+   ══════════════════════════════════════════════════════════════════════════ */
+.tour-launch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--su) * 8);
+  letter-spacing: 0.2px;
+}
+.tour-launch::before {
+  content: "";
+  width: calc(var(--su) * 7);
+  height: calc(var(--su) * 7);
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  opacity: 0.7;
+  flex: 0 0 auto;
+}
+.tour-launch:hover::before,
+.tour-launch:focus-visible::before {
+  background: var(--gold);
+  border-color: var(--gold);
+  opacity: 1;
+}
+.tour-launch[hidden] { display: none; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   2) الضوء الكاشف — حجاب بثقب واحد حول عنصر حقيقي
+   ثقب واحد بظل خارجي ضخم: لا أربعة مستطيلات تتفكك عند الأطراف، ولا قناع SVG
+   يعاد رسمه في كل قياس. الطبقة كلها لا تلتقط المؤشر فيبقى العنصر المُبرَز
+   قابلاً للنقر والاستكشاف أثناء الجولة.
+   ══════════════════════════════════════════════════════════════════════════ */
+.tour-spot {
+  position: fixed;
+  z-index: 55;
+  border-radius: calc(var(--su) * 14);
+  border: 2px solid var(--tour-ring);
+  box-shadow:
+    0 0 0 9999px var(--tour-veil),
+    0 0 calc(var(--su) * 26) rgba(var(--gold-rgb), 0.28) inset,
+    0 0 calc(var(--su) * 34) rgba(var(--gold-rgb), 0.18);
+  pointer-events: none;
+  transition:
+    top var(--dur-std) var(--ease),
+    left var(--dur-std) var(--ease),
+    width var(--dur-std) var(--ease),
+    height var(--dur-std) var(--ease);
+}
+.tour-spot[hidden] { display: none; }
+
+/* أركان الحلقة: أربع زوايا رفيعة تشدّ العين إلى حدود العنصر لا إلى الإطار */
+.tour-spot::before,
+.tour-spot::after {
+  content: "";
+  position: absolute;
+  width: calc(var(--su) * 18);
+  height: calc(var(--su) * 18);
+  border: 2px solid var(--tour-ring);
+  border-radius: calc(var(--su) * 5);
+}
+.tour-spot::before {
+  top: calc(var(--su) * -6);
+  inset-inline-start: calc(var(--su) * -6);
+  border-inline-end: none;
+  border-bottom: none;
+}
+.tour-spot::after {
+  bottom: calc(var(--su) * -6);
+  inset-inline-end: calc(var(--su) * -6);
+  border-inline-start: none;
+  border-top: none;
+}
+
+.tour-spot-cap {
+  position: fixed;
+  z-index: 56;
+  max-width: calc(var(--su) * 420);
+  padding: calc(var(--su) * 6) calc(var(--su) * 14);
+  border-radius: 999px;
+  border: 1px solid rgba(var(--gold-rgb), 0.45);
+  background: var(--tour-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: var(--gold-hi);
+  font-family: var(--f-body);
+  font-size: max(11px, calc(var(--su) * 13.5));
+  font-weight: 700;
+  line-height: 1.5;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+  transition: top var(--dur-std) var(--ease), right var(--dur-std) var(--ease);
+}
+.tour-spot-cap[hidden] { display: none; }
+
+/* العنصر المُبرَز نفسه: رفع خفيف يفصله عن جيرانه المعتمين دون تغيير مقاسه
+   (لا transform: scale — أي تكبير يزيح التخطيط ويكسر الثبات البكسلي) */
+body.tour-active .tour-lit {
+  position: relative;
+  z-index: 2;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   3) شريط الجولة
+   ══════════════════════════════════════════════════════════════════════════ */
+.tour-bar {
+  position: fixed;
+  z-index: 60;
+  bottom: calc(var(--su) * 70);
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(calc(var(--su) * 1180), calc(100vw - var(--su) * 96));
+  max-height: calc(var(--su) * 472);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 10);
+  padding: calc(var(--su) * 16) calc(var(--su) * 22) calc(var(--su) * 14);
+  border-radius: var(--tour-radius);
+  border: 1px solid var(--tour-hair);
+  background:
+    linear-gradient(180deg, var(--tour-glass-2) 0%, var(--tour-glass) 62%);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 calc(var(--su) * 18) calc(var(--su) * 60) rgba(var(--shadow-rgb), 0.5);
+  overflow: hidden;
+  animation: tour-bar-in var(--dur-std) var(--ease);
+}
+.tour-bar[hidden] { display: none; }
+
+/* توزيع المساحة داخل الشريط — تفصيل حاسم لا تجميلي:
+   الشريط عمود مرن ذو سقف ارتفاع و‎overflow:hidden. بالسلوك الافتراضي
+   (flex-shrink:1) تنكمش قائمة النقاط — وهي حاوية تمرير فحدّها الأدنى يصبح
+   صفراً — فتختفي نقاط الحديث كلياً بينما تبقى الزينة حولها. لذلك: كل الأبناء
+   ثابتة المقاس، والنقاط وحدها هي المنطقة المرنة بحد أدنى مضمون. */
+.tour-bar > * { flex: 0 0 auto; }
+.tour-bar > .tour-bar-points {
+  flex: 1 1 auto;
+  min-height: calc(var(--su) * 92);
+}
+
+@keyframes tour-bar-in {
+  from { opacity: 0; transform: translate(-50%, calc(var(--su) * 16)); }
+  to { opacity: 1; transform: translateX(-50%); }
+}
+
+/* الدرج مفتوح: الشريط ينزاح ليبقى كاملاً في المساحة الحرة */
+body.tour-notes-open .tour-bar {
+  left: auto;
+  transform: none;
+  inset-inline-start: calc(var(--su) * 40);
+  width: min(calc(var(--su) * 1020),
+    calc(100vw - var(--su) * 80 - var(--tour-notes-w, calc(var(--su) * 420))));
+}
+
+/* ── ترويسة الشريط ── */
+.tour-bar-head {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: baseline;
+  gap: calc(var(--su) * 14);
+  min-height: calc(var(--su) * 26);
+}
+.tour-bar-id {
+  display: inline-flex;
+  align-items: baseline;
+  gap: calc(var(--su) * 10);
+  white-space: nowrap;
+}
+.tour-step {
+  font-size: max(11px, calc(var(--su) * 13));
+  font-weight: 800;
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.2px;
+}
+.tour-bar-kicker {
+  font-size: max(10px, calc(var(--su) * 12.5));
+  font-weight: 700;
+  color: var(--tour-faint);
+}
+.tour-bar-title {
+  font-family: var(--f-display);
+  font-size: max(15px, calc(var(--su) * 20));
+  font-weight: 700;
+  color: var(--tour-ink);
+  line-height: 1.25;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tour-bar-meta {
+  display: inline-flex;
+  align-items: baseline;
+  gap: calc(var(--su) * 10);
+  white-space: nowrap;
+}
+
+/* مؤشر الإيقاع: نغمة محايدة/خضراء فقط — لا مرجاني ولا ذهبي (عقد اللون) */
+.tour-pace {
+  font-size: max(10px, calc(var(--su) * 12));
+  font-weight: 700;
+  color: var(--tour-mut);
+  padding: calc(var(--su) * 2) calc(var(--su) * 9);
+  border: 1px solid var(--tour-hair-2);
+  border-radius: 999px;
+}
+.tour-pace.t-on {
+  color: var(--green-hi);
+  border-color: rgba(var(--green-rgb), 0.32);
+  background: rgba(var(--green-rgb), 0.08);
+}
+.tour-pace.t-near {
+  color: var(--tour-ink-2);
+  border-color: var(--tour-hair);
+}
+.tour-pace.t-over {
+  color: var(--tour-mut);
+  border-color: var(--tour-hair);
+  background: var(--tour-hair-2);
+}
+.tour-pace.t-neu { color: var(--tour-faint); }
+
+.tour-clock {
+  font-size: max(10px, calc(var(--su) * 12.5));
+  font-weight: 700;
+  color: var(--tour-faint);
+  font-variant-numeric: tabular-nums;
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+/* ── سطر الافتتاح ── */
+.tour-bar-headline {
+  font-size: max(12px, calc(var(--su) * 15));
+  font-weight: 600;
+  line-height: 1.55;
+  color: var(--tour-ink);
+  margin: 0;
+}
+.tour-bar-headline[hidden] { display: none; }
+
+/* ── نقاط الحديث: عمودان على الشاشات الواسعة، عمود واحد عند الضيق ── */
+.tour-bar-points {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: calc(var(--su) * 4) calc(var(--su) * 22);
+  overflow-y: auto;
+  max-height: calc(var(--su) * 210);
+  scrollbar-width: thin;
+}
+.tour-bar-point {
+  position: relative;
+  padding-inline-start: calc(var(--su) * 15);
+  font-size: max(11px, calc(var(--su) * 13.5));
+  line-height: 1.62;
+  color: var(--tour-ink-2);
+}
+.tour-bar-point::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: 0;
+  top: calc(var(--su) * 9);
+  width: calc(var(--su) * 5);
+  height: calc(var(--su) * 5);
+  border-radius: 50%;
+  background: var(--tour-faint);
+}
+
+/* ── رقاقات الإبراز: اختيار العنصر المرئي داخل اللوحة (ليست خطوات) ── */
+.tour-focus {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--su) * 7);
+}
+.tour-chip {
+  font-family: var(--f-body);
+  font-size: max(10px, calc(var(--su) * 12));
+  font-weight: 700;
+  color: var(--tour-mut);
+  background: transparent;
+  border: 1px solid var(--tour-hair-2);
+  border-radius: 999px;
+  padding: calc(var(--su) * 4) calc(var(--su) * 12);
+  cursor: pointer;
+  transition: color var(--dur-micro), border-color var(--dur-micro),
+    background var(--dur-micro);
+}
+.tour-chip:hover,
+.tour-chip:focus-visible {
+  color: var(--tour-ink);
+  border-color: var(--tour-hair);
+}
+.tour-chip.on {
+  color: var(--gold-hi);
+  border-color: rgba(var(--gold-rgb), 0.5);
+  background: rgba(var(--gold-rgb), 0.09);
+}
+
+/* ── وسوم الصدق: تُقرأ مع الأرقام ولا تُطوى أبداً ── */
+.tour-bar-caveats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--su) * 8);
+  /* منطقة تمرير خاصة بها: الوسم لا يُقصّ بحذف نصه (الصدق قبل الإيجاز)،
+     وإنما تُمرَّر المنطقة إن زاد عددها على سطرين في شريط ضيق */
+  max-height: calc(var(--su) * 68);
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+.tour-bar-caveats:empty { display: none; }
+.tour-caveat {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: calc(var(--su) * 7);
+  max-width: 100%;
+  font-size: max(10px, calc(var(--su) * 11.8));
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--gold);
+  background: rgba(var(--gold-rgb), 0.06);
+  border: 1px dashed rgba(var(--gold-rgb), 0.4);
+  border-radius: var(--tour-radius-sm);
+  padding: calc(var(--su) * 5) calc(var(--su) * 11);
+}
+/* داخل الشريط: النص كامل لا مقصوص — الوسم الذي يُقصّ يفقد وظيفته */
+.tour-bar .tour-caveat {
+  max-width: calc(var(--su) * 540);
+}
+.tour-caveat-dot {
+  flex: 0 0 auto;
+  width: calc(var(--su) * 7);
+  height: calc(var(--su) * 7);
+  margin-top: calc(var(--su) * 5);
+  border-radius: 50%;
+  background: var(--gold);
+}
+
+/* ── جملة العبور والحالات الصادقة ── */
+.tour-bar-transition {
+  margin: 0;
+  font-size: max(10px, calc(var(--su) * 12.2));
+  font-weight: 600;
+  color: var(--tour-faint);
+  border-inline-start: 2px solid var(--tour-hair);
+  padding-inline-start: calc(var(--su) * 9);
+}
+.tour-bar-transition[hidden] { display: none; }
+
+.tour-bar-status {
+  margin: 0;
+  font-size: max(10px, calc(var(--su) * 12));
+  font-weight: 600;
+  color: var(--tour-mut);
+  background: var(--tour-hair-2);
+  border-radius: var(--tour-radius-sm);
+  padding: calc(var(--su) * 6) calc(var(--su) * 12);
+}
+.tour-bar-status[hidden] { display: none; }
+
+/* ── أزرار التحكم ── */
+.tour-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: calc(var(--su) * 8);
+  padding-top: calc(var(--su) * 4);
+  border-top: 1px solid var(--tour-hair-2);
+}
+.tour-actions-sep {
+  flex: 1 1 auto;
+  min-width: calc(var(--su) * 8);
+}
+.tour-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--su) * 7);
+  font-family: var(--f-body);
+  font-size: max(11px, calc(var(--su) * 13));
+  font-weight: 700;
+  color: var(--tour-ink-2);
+  background: var(--tour-hair-2);
+  border: 1px solid var(--tour-hair-2);
+  border-radius: 999px;
+  padding: calc(var(--su) * 7) calc(var(--su) * 16);
+  cursor: pointer;
+  transition: color var(--dur-micro), background var(--dur-micro),
+    border-color var(--dur-micro), opacity var(--dur-micro);
+}
+.tour-btn:hover:not(:disabled),
+.tour-btn:focus-visible:not(:disabled) {
+  color: var(--tour-ink);
+  border-color: var(--tour-hair);
+  background: rgba(var(--ink-rgb), 0.09);
+}
+.tour-btn:disabled {
+  opacity: 0.38;
+  cursor: default;
+}
+.tour-btn.primary {
+  color: var(--on-invert);
+  background: var(--invert-bg);
+  border-color: var(--invert-bg);
+}
+.tour-btn.primary:hover:not(:disabled),
+.tour-btn.primary:focus-visible:not(:disabled) {
+  background: var(--invert-bg-hi);
+  color: var(--on-invert);
+}
+.tour-btn.ghost {
+  background: transparent;
+  border-color: var(--tour-hair-2);
+  color: var(--tour-mut);
+  font-weight: 600;
+}
+.tour-btn.ghost:hover:not(:disabled),
+.tour-btn.ghost:focus-visible:not(:disabled) { color: var(--tour-ink); }
+.tour-btn.danger { color: var(--tour-mut); }
+.tour-btn.danger:hover:not(:disabled),
+.tour-btn.danger:focus-visible:not(:disabled) {
+  color: var(--tour-ink);
+  border-color: var(--tour-hair);
+}
+.tour-btn-g {
+  font-size: 1.05em;
+  line-height: 1;
+  opacity: 0.85;
+}
+
+/* ── مسار الخطوات ── */
+.tour-rail {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--su) * 6);
+  padding-top: calc(var(--su) * 2);
+}
+.tour-dot {
+  flex: 1 1 0;
+  height: calc(var(--su) * 4);
+  min-width: calc(var(--su) * 12);
+  border: 0;
+  border-radius: 999px;
+  background: var(--tour-hair);
+  cursor: pointer;
+  padding: 0;
+  transition: background var(--dur-std), transform var(--dur-micro);
+}
+.tour-dot:hover,
+.tour-dot:focus-visible { transform: scaleY(1.8); }
+.tour-dot.done { background: var(--faint-d); }
+.tour-dot.now { background: var(--gold); }
+.tour-dot.empty { opacity: 0.5; }
+
+/* إعلان قارئ الشاشة — مخفي بصرياً لا وظيفياً */
+.tour-live {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── الحالة المطوية: سطر واحد بالعنوان والتحكم فقط ── */
+.tour-bar.collapsed {
+  max-height: calc(var(--su) * 108);
+  padding-bottom: calc(var(--su) * 10);
+}
+.tour-bar.collapsed .tour-bar-headline,
+.tour-bar.collapsed .tour-bar-points,
+.tour-bar.collapsed .tour-focus,
+.tour-bar.collapsed .tour-bar-caveats,
+.tour-bar.collapsed .tour-bar-transition,
+.tour-bar.collapsed .tour-bar-status { display: none; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   4) درج ملاحظات المتحدث
+   لوح جانبي على الحافة الداخلية النهائية (يسار الشاشة في RTL). ليس حواراً:
+   لا role="dialog" ولا aria-modal في الترميز — العرض يستمر خلفه وجهاز التقديم
+   يبقى عاملاً، وهذا ما يوجبه عقد §6.2 حرفياً.
+   ══════════════════════════════════════════════════════════════════════════ */
+.tour-notes {
+  --tour-notes-scale: 1;
+  position: fixed;
+  z-index: 61;
+  inset-block-start: 0;
+  inset-block-end: calc(var(--su) * 108);
+  inset-inline-end: 0;
+  width: var(--tour-notes-w);
+  display: flex;
+  flex-direction: column;
+  border-inline-start: 1px solid var(--tour-hair);
+  background:
+    linear-gradient(200deg, var(--tour-glass-2) 0%, var(--tour-glass) 55%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: calc(var(--su) * -18) 0 calc(var(--su) * 60) rgba(var(--shadow-rgb), 0.45);
+  animation: tour-notes-in var(--dur-std) var(--ease);
+}
+.tour-notes[hidden] { display: none; }
+
+@keyframes tour-notes-in {
+  from { opacity: 0; transform: translateX(calc(var(--su) * -26)); }
+  to { opacity: 1; transform: none; }
+}
+
+/* ── ترويسة الدرج ── */
+.tour-notes-head {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: start;
+  gap: calc(var(--su) * 10);
+  padding: calc(var(--su) * 16) calc(var(--su) * 18) calc(var(--su) * 10);
+  border-bottom: 1px solid var(--tour-hair-2);
+}
+.tour-notes-titles { min-width: 0; }
+.tour-notes-kicker {
+  font-size: max(10px, calc(var(--su) * 12));
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 0.3px;
+  margin-bottom: calc(var(--su) * 3);
+}
+.tour-notes-title {
+  margin: 0;
+  font-family: var(--f-display);
+  font-size: max(15px, calc(var(--su) * 21));
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--tour-ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tour-notes-tools {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--su) * 5);
+}
+.tour-nbtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: calc(var(--su) * 30);
+  height: calc(var(--su) * 30);
+  padding: 0 calc(var(--su) * 7);
+  font-family: var(--f-body);
+  font-size: max(10px, calc(var(--su) * 12.5));
+  font-weight: 800;
+  color: var(--tour-mut);
+  background: transparent;
+  border: 1px solid var(--tour-hair-2);
+  border-radius: calc(var(--su) * 9);
+  cursor: pointer;
+  transition: color var(--dur-micro), border-color var(--dur-micro),
+    background var(--dur-micro);
+}
+.tour-nbtn:hover,
+.tour-nbtn:focus-visible {
+  color: var(--tour-ink);
+  border-color: var(--tour-hair);
+  background: var(--tour-hair-2);
+}
+.tour-nbtn.on {
+  color: var(--gold-hi);
+  border-color: rgba(var(--gold-rgb), 0.45);
+}
+.tour-nbtn.close:hover,
+.tour-nbtn.close:focus-visible { color: var(--ivory); }
+
+.tour-notes-cov {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: baseline;
+  gap: calc(var(--su) * 8);
+  font-size: max(9.5px, calc(var(--su) * 11.5));
+  font-weight: 600;
+  color: var(--tour-faint);
+  font-variant-numeric: tabular-nums;
+}
+.tour-notes-cov .sep { opacity: 0.6; }
+
+/* ── شريط رقاقات الأقسام ── */
+.tour-notes-sections {
+  display: flex;
+  gap: calc(var(--su) * 5);
+  overflow-x: auto;
+  padding: calc(var(--su) * 9) calc(var(--su) * 18);
+  border-bottom: 1px solid var(--tour-hair-2);
+  scrollbar-width: thin;
+}
+.tour-schip {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--su) * 6);
+  max-width: calc(var(--su) * 190);
+  font-family: var(--f-body);
+  font-size: max(10px, calc(var(--su) * 11.8));
+  font-weight: 700;
+  color: var(--tour-mut);
+  background: transparent;
+  border: 1px solid var(--tour-hair-2);
+  border-radius: 999px;
+  padding: calc(var(--su) * 4) calc(var(--su) * 10);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color var(--dur-micro), border-color var(--dur-micro),
+    background var(--dur-micro);
+}
+.tour-schip:hover,
+.tour-schip:focus-visible {
+  color: var(--tour-ink);
+  border-color: var(--tour-hair);
+}
+.tour-schip.now {
+  color: var(--gold-hi);
+  border-color: rgba(var(--gold-rgb), 0.5);
+  background: rgba(var(--gold-rgb), 0.09);
+}
+/* قسم بلا ملاحظات معتمدة: يظهر ولا يُخفى — الصدق قبل الأناقة */
+.tour-schip.empty { opacity: 0.55; }
+.tour-schip.empty::after {
+  content: "—";
+  color: var(--tour-faint);
+  font-weight: 700;
+}
+.tour-schip-n {
+  font-variant-numeric: tabular-nums;
+  color: var(--tour-faint);
+}
+.tour-schip.now .tour-schip-n { color: var(--gold); }
+.tour-schip-t {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── جسم الدرج ── */
+.tour-notes-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: calc(var(--su) * 14) calc(var(--su) * 18) calc(var(--su) * 22);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 13);
+  font-size: calc(max(12px, var(--su) * 14) * var(--tour-notes-scale));
+  scrollbar-width: thin;
+}
+.tour-notes-body:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: -2px;
+}
+.tour-notes.dense .tour-notes-body {
+  gap: calc(var(--su) * 8);
+  padding-top: calc(var(--su) * 10);
+}
+
+.tour-notes-ask {
+  font-size: 1.02em;
+  font-weight: 700;
+  line-height: 1.6;
+  color: var(--gold);
+  border-inline-start: 3px solid var(--gold);
+  padding-inline-start: calc(var(--su) * 11);
+}
+.tour-notes-headline {
+  margin: 0;
+  font-size: 1.06em;
+  font-weight: 700;
+  line-height: 1.65;
+  color: var(--tour-ink);
+}
+
+.tour-notes-sec {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 8);
+  padding-top: calc(var(--su) * 10);
+  border-top: 1px solid var(--tour-hair-2);
+}
+.tour-notes-sec-h {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: calc(var(--su) * 10);
+  font-size: 0.82em;
+  font-weight: 700;
+  color: var(--tour-mut);
+  letter-spacing: 0.2px;
+}
+.tour-notes-sec-n {
+  color: var(--tour-faint);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.tour-notes-points {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 9);
+  counter-reset: tour-point;
+}
+.tour-notes.dense .tour-notes-points { gap: calc(var(--su) * 6); }
+.tour-notes-point {
+  counter-increment: tour-point;
+  position: relative;
+  padding-inline-start: calc(var(--su) * 26);
+  line-height: 1.75;
+  color: var(--tour-ink-2);
+}
+.tour-notes-point::before {
+  content: counter(tour-point);
+  position: absolute;
+  inset-inline-start: 0;
+  top: calc(var(--su) * 2);
+  width: calc(var(--su) * 19);
+  height: calc(var(--su) * 19);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid var(--tour-hair);
+  color: var(--tour-faint);
+  font-size: 0.72em;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+/* نقطة طويلة: إشارة إيقاع للمتحدث (لا حكم على المحتوى) */
+.tour-notes-point.long::after {
+  content: "";
+  position: absolute;
+  inset-inline-start: calc(var(--su) * 9);
+  top: calc(var(--su) * 24);
+  bottom: calc(var(--su) * 2);
+  width: 1px;
+  background: var(--tour-hair);
+}
+
+.tour-notes-sec.caveats .tour-caveat {
+  white-space: normal;
+  max-width: none;
+}
+.tour-notes-sec.caveats {
+  gap: calc(var(--su) * 7);
+}
+
+/* ── الأسئلة المتوقعة ── */
+.tour-qa {
+  border: 1px solid var(--tour-hair-2);
+  border-radius: var(--tour-radius-sm);
+  background: rgba(var(--surf-2-rgb), 0.4);
+  padding: calc(var(--su) * 8) calc(var(--su) * 12);
+}
+.tour-qa > summary {
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--tour-ink);
+  line-height: 1.6;
+  list-style: none;
+  display: flex;
+  align-items: flex-start;
+  gap: calc(var(--su) * 8);
+}
+.tour-qa > summary::-webkit-details-marker { display: none; }
+.tour-qa > summary::before {
+  content: "؟";
+  flex: 0 0 auto;
+  width: calc(var(--su) * 18);
+  height: calc(var(--su) * 18);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  font-size: 0.78em;
+  font-weight: 800;
+  margin-top: calc(var(--su) * 2);
+}
+.tour-qa[open] > summary { margin-bottom: calc(var(--su) * 7); }
+.tour-qa > p {
+  margin: 0;
+  padding-inline-start: calc(var(--su) * 26);
+  line-height: 1.75;
+  color: var(--tour-ink-2);
+}
+
+.tour-notes-transition {
+  display: flex;
+  align-items: flex-start;
+  gap: calc(var(--su) * 9);
+  padding-top: calc(var(--su) * 10);
+  border-top: 1px solid var(--tour-hair-2);
+  line-height: 1.7;
+  color: var(--tour-ink-2);
+}
+.tour-notes-transition-k {
+  flex: 0 0 auto;
+  font-size: 0.78em;
+  font-weight: 800;
+  color: var(--tour-faint);
+  border: 1px solid var(--tour-hair-2);
+  border-radius: 999px;
+  padding: calc(var(--su) * 2) calc(var(--su) * 9);
+  margin-top: calc(var(--su) * 3);
+}
+
+.tour-notes-foot {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 6);
+  padding-top: calc(var(--su) * 10);
+  border-top: 1px solid var(--tour-hair-2);
+  font-size: 0.82em;
+  color: var(--tour-faint);
+}
+.tour-notes-refs {
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.tour-notes-cta { padding-top: calc(var(--su) * 6); }
+.tour-notes-cta .tour-btn { width: 100%; justify-content: center; }
+
+/* ── الحالة الصادقة داخل الدرج ── */
+.tour-empty {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 7);
+  padding: calc(var(--su) * 14) calc(var(--su) * 15);
+  border: 1px dashed rgba(var(--gold-rgb), 0.4);
+  border-radius: var(--tour-radius-sm);
+  background: rgba(var(--gold-rgb), 0.05);
+}
+.tour-empty b {
+  font-size: 0.98em;
+  font-weight: 800;
+  color: var(--gold);
+}
+.tour-empty p {
+  margin: 0;
+  line-height: 1.7;
+  color: var(--tour-ink-2);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   5) حلقة التركيز الموحدة داخل ألواح الميزة
+   ══════════════════════════════════════════════════════════════════════════ */
+.tour-bar :focus-visible,
+.tour-notes :focus-visible,
+.tour-launch:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+  border-radius: 999px;
+}
+.tour-notes-body:focus-visible { border-radius: 0; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   6) تكيّف المقاسات
+   1366×768: الشريط يفقد العمود الثاني للنقاط ويقلّص حشوته؛ الدرج ينكمش.
+   الشاشات الضيقة جداً (عرض تجريبي على حاسوب صغير): الدرج يملأ العرض والشريط
+   يعتمد سطراً واحداً — لا عنصر يخرج خارج الإطار ولا تمرير أفقي.
+   ══════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 1440px) {
+  .tour-bar {
+    max-height: calc(var(--su) * 500);
+    padding: calc(var(--su) * 13) calc(var(--su) * 18) calc(var(--su) * 12);
+  }
+  .tour-bar-points { max-height: calc(var(--su) * 260); }
+  .tour-notes { --tour-notes-w: clamp(300px, calc(var(--su) * 400), 48vw); }
+}
+
+@media (max-width: 1100px) {
+  .tour-bar-points { grid-template-columns: minmax(0, 1fr); }
+  .tour-bar .tour-caveat { max-width: 100%; }
+}
+
+@media (max-width: 860px) {
+  .tour-bar {
+    bottom: calc(var(--su) * 56);
+    width: calc(100vw - var(--su) * 40);
+  }
+  body.tour-notes-open .tour-bar {
+    inset-inline-start: calc(var(--su) * 20);
+    width: calc(100vw - var(--su) * 40);
+  }
+  .tour-notes {
+    --tour-notes-w: min(100vw, 460px);
+    inset-block-end: 0;
+  }
+  /* الدرج يغطي الشريط على الضيق: الشريط يُخفى ما دام الدرج مفتوحاً كي لا
+     يتراكب لوحان على مساحة واحدة (الدرج يحمل أزرار التنقل ذاتها) */
+  body.tour-notes-open .tour-bar { display: none; }
+  .tour-bar-meta { display: none; }
+}
+
+@media (max-height: 720px) {
+  .tour-bar { bottom: calc(var(--su) * 52); max-height: calc(var(--su) * 300); }
+  .tour-bar-points { max-height: calc(var(--su) * 120); }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   7) تقليل الحركة — احترام كامل: ظهور وإخفاء فوريان بلا انزلاق ولا انتقال
+   ══════════════════════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  .tour-bar,
+  .tour-notes {
+    animation: none;
+  }
+  .tour-spot,
+  .tour-spot-cap,
+  .tour-btn,
+  .tour-nbtn,
+  .tour-chip,
+  .tour-schip,
+  .tour-dot {
+    transition: none;
+  }
+  .tour-dot:hover,
+  .tour-dot:focus-visible { transform: none; }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   8) الطباعة — الجولة أداة قاعة لا مستند: لا أثر لها في أي مخرج مطبوع
+   ══════════════════════════════════════════════════════════════════════════ */
+@media print {
+  .tour-bar,
+  .tour-notes,
+  .tour-spot,
+  .tour-spot-cap,
+  .tour-launch { display: none !important; }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   9) حصر الظهور بوضع المقدِّم
+   الأوضاع المستندية (إدارة/موجز) تكتب body.className كاملاً فتسقط أعلامنا،
+   وهذه القاعدة حزام أمان ثانٍ: لا يظهر لوح جولة فوق سطح تحريري أو مستند.
+   ══════════════════════════════════════════════════════════════════════════ */
+body.mode-admin .tour-bar,
+body.mode-admin .tour-notes,
+body.mode-admin .tour-spot,
+body.mode-admin .tour-spot-cap,
+body.mode-report .tour-bar,
+body.mode-report .tour-notes,
+body.mode-report .tour-spot,
+body.mode-report .tour-spot-cap { display: none; }

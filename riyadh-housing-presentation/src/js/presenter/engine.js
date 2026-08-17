@@ -30,9 +30,20 @@ RH.presenter.engine = (function () {
 
   function registerScene(def) { scenes.set(def.id, def); }
   function registerAppendix(def) { appendices.set(def.id, def); }
+  /** هل الملحق مسجَّل في هذا البناء؟ — تحتاجه إحالة المسارات القديمة في tabs.js
+      كي لا تُحيل إلى ملحق غائب فتترك شاشة «المشهد غير موجود». */
+  const hasAppendix = (id) => appendices.has(String(id).split("/")[0]);
 
   // ── قياس المسرح: 16:9 دائماً مع letterbox متحكم ──
   function layout() {
+    // في وضع التبويبات (خارج وضع العرض) تملك قشرة التبويبات وحدة القياس ‎--su‎
+    // وتحسبها على العرض الكامل — فلا يفرض المسرح إطار 16:9 على لوحة تتمرر.
+    if (document.body.classList.contains("mode-tabs")) {
+      // قراءة مباشرة لا عبر ‎su()‎: هذه الدالة تُستدعى من ‎init()‎ قبل تهيئة
+      // الثابت ‎su‎ أدناه (منطقة الموت الزمنية) فيسقط الإقلاع.
+      return parseFloat(getComputedStyle(document.documentElement)
+        .getPropertyValue("--su")) || 1;
+    }
     const vw = window.innerWidth, vh = window.innerHeight;
     const w = Math.min(vw, vh * 16 / 9);
     const hgt = w * 9 / 16;
@@ -223,8 +234,11 @@ RH.presenter.engine = (function () {
 
   /** فتح ملحق مع حفظ حالة المستدعي الدقيقة */
   function openAppendix(id, extraParams) {
+    // مصدر الحقيقة هو المسار الحي لا حالة المحرك: الملحق قد يُفتح من تبويب
+    // V3 (‎#/tab/…‎) الذي لا يمرّ بالمحرك أصلاً، فتُحفظ حالته حرفياً للعودة.
+    const cur = RH.core.router.parse();
     const ret = RH.core.router.encodeReturn({
-      kind: current.kind, id: current.id, params: current.params,
+      kind: cur.kind, id: cur.id, params: cur.params,
     });
     RH.core.router.go({ kind: "appendix", id,
       params: Object.assign({}, extraParams || {}, { return: ret }) });
@@ -232,17 +246,22 @@ RH.presenter.engine = (function () {
 
   /** العودة من ملحق إلى حالة المستدعي المخزنة حرفياً */
   function returnFromAppendix() {
-    const ret = current && current.params.return
-      ? RH.core.router.decodeReturn(current.params.return) : null;
-    if (ret && ret.kind === "scene") {
-      RH.core.router.go({ kind: "scene", id: ret.id, params: ret.params || {} });
+    const cur = RH.core.router.parse();
+    const raw = (cur.params && cur.params.return)
+      || (current && current.params && current.params.return) || null;
+    const ret = raw ? RH.core.router.decodeReturn(raw) : null;
+    if (ret && ret.kind && ret.id) {
+      RH.core.router.go({ kind: ret.kind, id: ret.id, params: ret.params || {} });
+    } else if (RH.tabs) {
+      RH.core.router.go({ kind: "tab", id: RH.tabs.DEFAULT_ID, params: {} });
     } else {
       agenda();
     }
   }
 
   return {
-    LINEAR, setLinear, setMajors, registerScene, registerAppendix, init, show, layout,
+    LINEAR, setLinear, setMajors, registerScene, registerAppendix, hasAppendix,
+    init, show, layout,
     next, prev, home, end, agenda, goScene, openAppendix, returnFromAppendix,
     isLocked, current: () => current, updateParams, stepsOf, su,
   };

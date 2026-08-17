@@ -1,0 +1,1008 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   admin-ext.css — تبويبا الإدارة الجديدان: منشئ الموجز ومقارن الإصدارات
+   بادئة الميزة: adf-  ·  يُضم بعد admin.css (build.py §1) فيرث لغتها كاملة
+   ────────────────────────────────────────────────────────────────────────────
+   قواعد ملزمة راعاها هذا الملف:
+
+   • **لا لمس لـ admin.css ولا لأي ملف مشترك.** كل صنف هنا يبدأ بـ`adf-`،
+     والأصناف المشتركة (`.adm-card`، `.btn`، `.st`، `.hint`، `.sub`) تُستعمل
+     كما هي دون إعادة تعريف.
+
+   • **لا لون من منظومة الرسوم الدلالية.** الأخضر/الرملي/المرجاني هنا هي ألوان
+     حالة الإدارة القائمة (`--ok`/`--warn`/`--bad`) بمعانيها المنصوصة في عقد
+     المقارن: إضافة خضراء، تغيير رملي، حذف مرجاني. الذهبي غائب تماماً — فهو
+     محجوز للمستهدفات وخطوط الأساس في الرسوم، ولا مستهدف في هذين التبويبين.
+     عدّادات الكتل (أرقام/رسوم/جداول/رؤى) بأربع درجات رمادية محايدة عمداً:
+     هي كتل مطبوعة لا قيم بيانات، فلا تستحق لوناً دلالياً.
+
+   • **الأرقام معزولة اتجاهياً.** `.adf-num` و`.adf-mono` تحملان
+     `unicode-bidi: isolate` كي لا تنقلب المسارات اللاتينية والأرقام داخل
+     الفقرات العربية.
+
+   • **الحركة محترمة.** الانتقالات كلها عبر `--dur-micro` الذي يصفّره
+     `prefers-reduced-motion` في tokens.css، مع تصفير صريح إضافي أسفل الملف.
+
+   • **الطباعة.** هذان سطحان إداريان لا يُطبعان؛ القاعدة الأخيرة تُخفي شريط
+     الأدوات والأزرار عند الطباعة وتفتح المجموعات المطويّة كي يخرج الورق
+     كاملاً إن أصرّ أحد على طباعة الشاشة.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* ══════════════════════════════════════════════════════════════════════════
+   0) أساسيات مشتركة بين التبويبين
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.adf-card { position: relative; }
+
+/* عزل اتجاهي للأرقام والمسارات اللاتينية داخل النص العربي */
+.adf-num {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  unicode-bidi: isolate;
+  font-weight: 700;
+}
+.adf-mono {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  direction: ltr;
+  unicode-bidi: isolate;
+  letter-spacing: 0.01em;
+}
+
+.adf-note {
+  font-size: 12.8px;
+  line-height: 1.85;
+  color: var(--mut);
+  margin-top: 10px;
+  max-width: 78ch;
+}
+
+/* بطاقة تنبيه: شريط جانبي رفيع لا خلفية ملوّنة صارخة */
+.adm-card.adf-alert {
+  border-inline-start: 3px solid var(--warn);
+}
+.adm-card.adf-alert > h3 { color: var(--warn); }
+
+/* رقاقات صغيرة موحّدة */
+.adf-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 4px 9px;
+  border-radius: 999px;
+  border: 1px solid var(--hair);
+  color: var(--mut);
+  background: var(--paper);
+  white-space: nowrap;
+}
+.adf-chip.k-added { color: var(--ok); border-color: rgba(var(--ok-rgb), 0.32); }
+.adf-chip.k-changed { color: var(--warn); border-color: rgba(var(--warn-rgb), 0.32); }
+.adf-chip.k-removed { color: var(--bad); border-color: rgba(var(--bad-rgb), 0.32); }
+.adf-chip.k-honesty { color: var(--info); border-color: rgba(var(--info-rgb), 0.32); }
+.adf-chip.k-high { color: var(--bad); border-color: rgba(var(--bad-rgb), 0.32); }
+.adf-chip.k-required { color: var(--accent); border-color: rgba(var(--accent-rgb), 0.3); }
+.adf-chip.k-fig,
+.adf-chip.k-chart,
+.adf-chip.k-table,
+.adf-chip.k-insight,
+.adf-chip.k-sheet { color: var(--ink2); }
+
+/* صف إجراءات */
+.adf-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+/* حقول وصفية (dl) */
+.adf-field {
+  display: grid;
+  grid-template-columns: 128px 1fr;
+  gap: 10px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--hair2);
+  font-size: 13px;
+}
+.adf-field:last-child { border-bottom: 0; }
+.adf-field dt { color: var(--mut); font-size: 12px; }
+.adf-field dd { color: var(--ink); }
+
+/* شريط حالة حي (aria-live) */
+.adf-status {
+  font-size: 12.5px;
+  color: var(--mut);
+  padding: 10px 0 14px;
+  border-bottom: 1px solid var(--hair2);
+  margin-bottom: 14px;
+}
+.adf-status b { color: var(--ink2); }
+.adf-statusq { color: var(--faint); }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   1) مقارن الإصدارات — بطاقة الهوية
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.adf-identity {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+@media (max-width: 900px) {
+  .adf-identity { grid-template-columns: 1fr; }
+}
+
+.adf-side {
+  border: 1px solid var(--hair);
+  border-radius: var(--r-sm);
+  padding: 16px 18px;
+  background: var(--paper);
+}
+.adf-side-base { border-inline-start: 3px solid var(--accent); }
+.adf-side-draft { border-inline-start: 3px solid var(--info); }
+.adf-side-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-bottom: 10px;
+  margin-bottom: 6px;
+  border-bottom: 1px solid var(--hair);
+}
+.adf-side-kind {
+  font-family: var(--f-display);
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   2) مقارن الإصدارات — الملخص
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.adf-tallies {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 12px;
+}
+@media (max-width: 1100px) {
+  .adf-tallies { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 620px) {
+  .adf-tallies { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* عدّاد: رقم ضخم فوق تسمية — لا أيقونة ولا إطار ملوّن مصمت */
+.adf-tally {
+  border: 1px solid var(--hair);
+  border-radius: var(--r-sm);
+  padding: 14px 14px 12px;
+  background: var(--surface);
+}
+.adf-tally-n {
+  display: block;
+  font-family: var(--f-display);
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  unicode-bidi: isolate;
+  color: var(--ink);
+}
+.adf-tally-l {
+  display: block;
+  font-size: 11.8px;
+  color: var(--mut);
+  margin-top: 5px;
+  line-height: 1.5;
+}
+.adf-tally.is-added .adf-tally-n { color: var(--ok); }
+.adf-tally.is-changed .adf-tally-n { color: var(--warn); }
+.adf-tally.is-removed .adf-tally-n { color: var(--bad); }
+.adf-tally.is-high .adf-tally-n { color: var(--bad); }
+.adf-tally.is-honesty .adf-tally-n { color: var(--info); }
+.adf-tally.is-total { background: var(--accent-softer); border-color: rgba(var(--accent-rgb), 0.18); }
+
+/* شريط تركيبة الفروق */
+.adf-mix {
+  display: flex;
+  height: 8px;
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 16px;
+  background: var(--hair2);
+}
+.adf-mix-seg { display: block; height: 100%; }
+.adf-mix-seg.is-added { background: var(--ok); }
+.adf-mix-seg.is-changed { background: var(--warn); }
+.adf-mix-seg.is-removed { background: var(--bad); }
+
+/* رقاقات المجموعات — مرشِّح سريع */
+.adf-groupchips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+.adf-groupchip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink2);
+  border: 1px solid var(--hair);
+  border-radius: 999px;
+  padding: 6px 12px;
+  background: var(--surface);
+  transition: border-color var(--dur-micro), color var(--dur-micro);
+}
+.adf-groupchip:hover { border-color: var(--accent); color: var(--accent); }
+.adf-groupchip[aria-pressed="true"] {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-softer);
+}
+.adf-groupchip-n { color: var(--mut); font-size: 11.5px; }
+.adf-groupchip[aria-pressed="true"] .adf-groupchip-n { color: var(--accent); }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   3) مقارن الإصدارات — بطاقة وسوم الصدق
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.adm-card.adf-honesty-card { border-inline-start: 3px solid var(--info); }
+.adm-card.adf-honesty-card > h3 { color: var(--info); }
+
+.adf-honesty-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 6px;
+}
+.adf-honesty-item {
+  border: 1px solid var(--hair);
+  border-radius: var(--r-sm);
+  padding: 13px 15px;
+  background: var(--paper);
+}
+.adf-honesty-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-bottom: 8px;
+}
+.adf-honesty-label { font-size: 13.5px; font-weight: 700; color: var(--ink); }
+.adf-honesty-vals {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 13px;
+}
+.adf-honesty-vals .adf-val {
+  padding: 4px 10px;
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  border: 1px solid var(--hair);
+  max-width: 46ch;
+  overflow-wrap: anywhere;
+}
+.adf-honesty-vals .adf-val.is-from { color: var(--mut); }
+.adf-honesty-vals .adf-val.is-to { color: var(--ink); font-weight: 600; }
+
+.adf-arrow { color: var(--faint); font-size: 13px; }
+
+.adf-caveats {
+  margin-top: 9px;
+  padding-inline-start: 16px;
+  font-size: 12.3px;
+  line-height: 1.8;
+  color: var(--mut);
+}
+.adf-caveats li { list-style: "— "; padding-inline-start: 4px; }
+
+.adf-more { font-size: 12.3px; color: var(--faint); padding-top: 4px; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   4) مقارن الإصدارات — شريط الأدوات
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.adm-card.adf-tablecard { padding-bottom: 18px; }
+
+.adf-toolbar {
+  display: grid;
+  gap: 12px;
+  padding-bottom: 4px;
+}
+.adf-toolbar-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+}
+.adf-toolbar-row.is-second { align-items: center; }
+.adf-spacer { flex: 1 1 auto; }
+
+.adf-searchwrap { flex: 1 1 280px; min-width: 220px; }
+.adf-search {
+  width: 100%;
+  font-family: inherit;
+  font-size: 14px;
+  padding: 10px 13px;
+  border: 1px solid var(--hair);
+  border-radius: var(--r-sm);
+  background: var(--paper);
+  color: var(--ink);
+}
+.adf-search:focus { outline: 2px solid var(--accent); outline-offset: 0; }
+
+.adf-ctl { display: grid; gap: 5px; }
+.adf-ctl-l { font-size: 11.5px; font-weight: 600; color: var(--mut); }
+.adf-select {
+  font-family: inherit;
+  font-size: 13.5px;
+  padding: 9px 12px;
+  border: 1px solid var(--hair);
+  border-radius: var(--r-sm);
+  background: var(--paper);
+  color: var(--ink);
+  min-width: 150px;
+}
+.adf-select:focus { outline: 2px solid var(--accent); outline-offset: 0; }
+
+.adf-kinds { display: flex; flex-wrap: wrap; gap: 8px; }
+.adf-kind {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink2);
+  border: 1px solid var(--hair);
+  border-radius: 999px;
+  padding: 6px 13px;
+  background: var(--surface);
+  cursor: pointer;
+  transition: border-color var(--dur-micro);
+}
+.adf-kind:hover { border-color: var(--accent); }
+.adf-kind input { accent-color: var(--accent); }
+.adf-kind:focus-within { outline: 2px solid var(--accent); outline-offset: 1px; }
+.adf-kind.k-added { color: var(--ok); }
+.adf-kind.k-changed { color: var(--warn); }
+.adf-kind.k-removed { color: var(--bad); }
+.adf-kind.k-honesty { color: var(--info); }
+
+.btn.adf-mini { font-size: 12.5px; padding: 7px 15px; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   5) مقارن الإصدارات — المجموعات والصفوف
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.adf-results { display: grid; gap: 14px; }
+
+.adf-group {
+  border: 1px solid var(--hair);
+  border-radius: var(--r-sm);
+  overflow: hidden;
+  background: var(--surface);
+}
+.adf-ghead {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  width: 100%;
+  text-align: start;
+  padding: 12px 15px;
+  background: var(--paper);
+  border-bottom: 1px solid var(--hair);
+  transition: background var(--dur-micro);
+}
+.adf-ghead:hover { background: var(--accent-softer); }
+.adf-ghead:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.adf-group.is-collapsed .adf-ghead { border-bottom: 0; }
+.adf-gcaret { color: var(--faint); font-size: 11px; }
+.adf-gname { font-family: var(--f-display); font-size: 14px; font-weight: 700; color: var(--ink); }
+.adf-gcount { font-size: 12px; color: var(--mut); font-weight: 600; }
+
+.adf-gbody { display: grid; }
+
+/* صف فرق واحد */
+.adf-row {
+  border-bottom: 1px solid var(--hair2);
+  padding: 13px 15px 13px 15px;
+  border-inline-start: 3px solid transparent;
+  transition: background var(--dur-micro);
+}
+.adf-row:last-child { border-bottom: 0; }
+.adf-row:hover { background: var(--accent-softer); }
+.adf-row.is-added { border-inline-start-color: var(--ok); }
+.adf-row.is-changed { border-inline-start-color: var(--warn); }
+.adf-row.is-removed { border-inline-start-color: var(--bad); }
+.adf-row.sev-high { background: rgba(var(--bad-rgb), 0.035); }
+.adf-row.is-open { background: var(--paper); }
+
+.adf-rowhead {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.adf-rowtoggle {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  border: 1px solid var(--hair);
+  color: var(--mut);
+  font-size: 10px;
+  line-height: 1;
+  background: var(--surface);
+  flex: 0 0 auto;
+}
+.adf-rowtoggle:hover { border-color: var(--accent); color: var(--accent); }
+.adf-rowtoggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+.adf-rowlabel {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.adf-rowpath {
+  font-size: 11.5px;
+  color: var(--faint);
+  margin: 5px 0 9px;
+  padding-inline-start: 30px;
+  overflow-wrap: anywhere;
+}
+
+.adf-rowvals {
+  display: flex;
+  align-items: stretch;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-inline-start: 30px;
+}
+.adf-valblock {
+  flex: 1 1 240px;
+  min-width: 0;
+  border: 1px solid var(--hair);
+  border-radius: var(--r-sm);
+  padding: 8px 11px;
+  background: var(--surface);
+}
+.adf-valcap { font-size: 10.8px; color: var(--faint); margin-bottom: 3px; }
+.adf-valtext {
+  font-size: 13px;
+  color: var(--ink);
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+  max-height: 5.2em;
+  overflow: hidden;
+}
+.adf-valblock.is-from .adf-valtext { color: var(--mut); }
+.adf-valblock.is-missing { border-style: dashed; background: var(--paper); }
+.adf-valblock.is-missing .adf-valtext { color: var(--faint); font-style: italic; }
+.adf-rowvals .adf-arrow { align-self: center; }
+
+.adf-delta {
+  align-self: center;
+  font-size: 12px;
+  color: var(--ink2);
+  border: 1px solid var(--hair);
+  border-radius: 999px;
+  padding: 5px 11px;
+  background: var(--paper);
+  white-space: nowrap;
+}
+
+.adf-rowcaveat {
+  margin: 9px 0 0;
+  padding-inline-start: 30px;
+  font-size: 12px;
+  color: var(--info);
+  line-height: 1.7;
+}
+.adf-rowcaveat-more { color: var(--faint); }
+
+/* لوحة التفصيل */
+.adf-detailhost:empty { display: none; }
+.adf-detail {
+  margin: 12px 0 2px;
+  padding: 14px 15px;
+  border: 1px solid var(--hair);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+}
+.adf-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+@media (max-width: 820px) {
+  .adf-detail-grid { grid-template-columns: 1fr; }
+}
+.adf-detail-cap {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--mut);
+  margin-bottom: 6px;
+}
+.adf-pre {
+  font-family: var(--f-display);
+  font-size: 12px;
+  line-height: 1.7;
+  direction: ltr;
+  unicode-bidi: isolate;
+  text-align: start;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 320px;
+  overflow: auto;
+  background: var(--paper);
+  border: 1px solid var(--hair2);
+  border-radius: var(--r-sm);
+  padding: 10px 12px;
+  color: var(--ink2);
+}
+.adf-detail-meta { margin-top: 14px; }
+.adf-detail-caveats { margin-top: 12px; }
+
+/* حالات فارغة */
+.adf-empty {
+  text-align: center;
+  padding: 40px 24px;
+  border: 1px dashed var(--hair);
+  border-radius: var(--r-sm);
+  background: var(--paper);
+}
+.adf-empty h4 {
+  font-family: var(--f-display);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+.adf-empty p {
+  font-size: 12.8px;
+  color: var(--mut);
+  line-height: 1.85;
+  max-width: 62ch;
+  margin: 0 auto 14px;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   6) الترقيم
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.adf-pagerhost:empty { display: none; }
+.adf-pager {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-top: 16px;
+  margin-top: 14px;
+  border-top: 1px solid var(--hair2);
+}
+.adf-pagenums { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.adf-page {
+  min-width: 34px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink2);
+  border: 1px solid var(--hair);
+  border-radius: 8px;
+  padding: 6px 10px;
+  background: var(--surface);
+  transition: border-color var(--dur-micro), color var(--dur-micro);
+}
+.adf-page:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.adf-page:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.adf-page:disabled { color: var(--faint); cursor: not-allowed; }
+.adf-page[aria-current="page"] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+}
+.adf-page.is-step { font-weight: 700; }
+.adf-pagegap { color: var(--faint); padding: 0 2px; }
+.adf-pageinfo { font-size: 12px; color: var(--mut); margin-inline-start: auto; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   7) الحقول المستثناة
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.adm-card.adf-ignored { background: var(--paper); }
+.adf-ignore-list { display: grid; gap: 2px; }
+.adf-ignore-row {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 12px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--hair2);
+  font-size: 12.3px;
+}
+.adf-ignore-row:last-child { border-bottom: 0; }
+.adf-ignore-row dt { color: var(--ink2); }
+.adf-ignore-row dd { color: var(--mut); }
+@media (max-width: 720px) {
+  .adf-ignore-row { grid-template-columns: 1fr; gap: 2px; }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   8) منشئ الموجز — التوليفات
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.adf-presets {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+@media (max-width: 1100px) {
+  .adf-presets { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 700px) {
+  .adf-presets { grid-template-columns: 1fr; }
+}
+
+.adf-preset {
+  display: grid;
+  gap: 5px;
+  text-align: start;
+  padding: 14px 16px;
+  border: 1px solid var(--hair);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  transition: border-color var(--dur-micro), background var(--dur-micro);
+}
+.adf-preset:hover { border-color: var(--accent); }
+.adf-preset:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.adf-preset.is-on {
+  border-color: var(--accent);
+  background: var(--accent-softer);
+}
+.adf-preset-n {
+  font-family: var(--f-display);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.adf-preset.is-on .adf-preset-n { color: var(--accent); }
+.adf-preset-c { font-size: 11.5px; font-weight: 600; color: var(--mut); }
+.adf-preset-d { font-size: 12.2px; color: var(--mut); line-height: 1.75; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   9) منشئ الموجز — قائمة الصفحات
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.adf-pagelist { display: grid; gap: 2px; }
+
+.adf-pagerow {
+  display: grid;
+  grid-template-columns: 30px 1fr;
+  gap: 12px;
+  align-items: start;
+  padding: 13px 12px;
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  transition: background var(--dur-micro), border-color var(--dur-micro);
+}
+.adf-pagerow:hover { background: var(--accent-softer); }
+.adf-pagerow.is-off { opacity: 0.62; }
+.adf-pagerow.is-on { border-color: var(--hair); background: var(--surface); }
+.adf-pagerow.is-mandatory { background: var(--paper); border-color: var(--hair); opacity: 1; }
+.adf-pagerow:focus-within { border-color: var(--accent); }
+
+.adf-pagebox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 2px;
+  cursor: pointer;
+}
+.adf-pagebox input {
+  width: 17px;
+  height: 17px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+.adf-pagebox input:disabled { cursor: not-allowed; }
+
+.adf-pagemain { min-width: 0; }
+.adf-pagehead {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.adf-pagetitle {
+  font-family: var(--f-display);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.adf-pagekicker { font-size: 11.5px; color: var(--faint); }
+.adf-pageid { font-size: 11px; color: var(--faint); }
+.adf-pagehint {
+  font-size: 12.3px;
+  color: var(--mut);
+  line-height: 1.7;
+  margin-top: 4px;
+  max-width: 74ch;
+}
+.adf-pagestats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   10) منشئ الموجز — الإخراج
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.adf-linkrow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 11px 14px;
+  border: 1px solid var(--hair);
+  border-radius: var(--r-sm);
+  background: var(--paper);
+}
+.adf-linklabel { font-size: 12px; color: var(--mut); font-weight: 600; }
+.adf-link { font-size: 12.5px; color: var(--ink2); overflow-wrap: anywhere; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   11) منشئ الموجز — المعاينة
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.adf-cover {
+  border: 1px solid var(--hair);
+  border-inline-start: 3px solid var(--accent);
+  border-radius: var(--r-sm);
+  padding: 16px 18px;
+  background: var(--paper);
+  margin-bottom: 16px;
+}
+.adf-cover-head h4 {
+  font-family: var(--f-display);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-top: 3px;
+  line-height: 1.5;
+}
+.adf-cover-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px 18px;
+  margin-top: 14px;
+}
+@media (max-width: 1000px) {
+  .adf-cover-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+.adf-cover-grid dt { font-size: 11px; color: var(--mut); margin-bottom: 3px; }
+.adf-cover-grid dd { font-size: 13px; color: var(--ink); font-weight: 600; }
+
+.adf-preview-kicker {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.3px;
+}
+
+.adf-previews {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+@media (max-width: 1000px) {
+  .adf-previews { grid-template-columns: 1fr; }
+}
+
+.adf-preview {
+  border: 1px solid var(--hair);
+  border-radius: var(--r-sm);
+  padding: 15px 17px;
+  background: var(--surface);
+}
+.adf-preview-head {
+  display: grid;
+  gap: 2px;
+  padding-bottom: 11px;
+  border-bottom: 1px solid var(--hair2);
+}
+.adf-preview-head h4 {
+  font-family: var(--f-display);
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.adf-preview-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px 12px;
+  margin-top: 12px;
+}
+.adf-preview-stats dt { font-size: 10.8px; color: var(--mut); }
+.adf-preview-stats dd {
+  font-family: var(--f-display);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  unicode-bidi: isolate;
+  margin-top: 1px;
+}
+
+/* شريط تركيبة الصفحة — أربع درجات رمادية محايدة، لا لون دلالي */
+.adf-comp {
+  display: flex;
+  height: 6px;
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 13px;
+  background: var(--hair2);
+}
+.adf-comp-seg { display: block; height: 100%; }
+.adf-comp-seg.is-fig { background: var(--ink2); }
+.adf-comp-seg.is-chart { background: var(--mut); }
+.adf-comp-seg.is-table { background: var(--faint); }
+.adf-comp-seg.is-insight { background: rgba(var(--ink-rgb), 0.16); }
+
+.adf-preview-cap {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--mut);
+  margin-top: 12px;
+}
+.adf-preview-caveats { margin-top: 6px; }
+.adf-preview-caveats.is-none {
+  font-size: 12px;
+  color: var(--faint);
+  margin-top: 12px;
+}
+
+.adf-totals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--hair2);
+}
+.adf-total {
+  display: grid;
+  gap: 2px;
+  border: 1px solid var(--hair);
+  border-radius: var(--r-sm);
+  padding: 10px 14px;
+  background: var(--paper);
+  min-width: 104px;
+}
+.adf-total-n {
+  font-family: var(--f-display);
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  unicode-bidi: isolate;
+}
+.adf-total-l { font-size: 11.2px; color: var(--mut); }
+.adf-total.is-honesty .adf-total-n { color: var(--info); }
+.adf-total.is-sheets { background: var(--accent-softer); border-color: rgba(var(--accent-rgb), 0.18); }
+.adf-total.is-sheets .adf-total-n { color: var(--accent); }
+
+.adf-prov {
+  margin-top: 16px;
+  padding: 14px 16px;
+  border: 1px dashed var(--hair);
+  border-radius: var(--r-sm);
+  background: var(--paper);
+}
+.adf-prov-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+  margin-top: 8px;
+  font-size: 12.5px;
+  color: var(--mut);
+}
+.adf-prov-grid .adf-num { color: var(--ink); }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   12) منشئ الموجز — ما الذي يفقده الاختيار
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.adf-loss {
+  border: 1px solid var(--hair);
+  border-inline-start: 3px solid var(--warn);
+  border-radius: var(--r-sm);
+  padding: 15px 17px;
+  background: var(--paper);
+}
+.adf-loss-head { font-size: 13.5px; color: var(--ink2); }
+.adf-loss-head b { color: var(--warn); }
+.adf-loss-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 11px;
+}
+.adf-loss-page {
+  font-size: 12.3px;
+  color: var(--ink2);
+  border: 1px solid var(--hair);
+  border-radius: var(--r-sm);
+  padding: 7px 12px;
+  background: var(--surface);
+}
+.adf-loss-meta { color: var(--faint); }
+.adf-loss-tot { font-size: 12.5px; color: var(--mut); margin-top: 12px; line-height: 1.8; }
+.adf-loss-tot b { color: var(--ink2); }
+.adf-loss-caveats { margin-top: 12px; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   13) منشئ الموجز — الاختيارات السابقة
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.adf-recents { display: grid; gap: 6px; margin-top: 12px; }
+.adf-recent {
+  display: grid;
+  grid-template-columns: minmax(120px, auto) auto 1fr;
+  gap: 12px;
+  align-items: baseline;
+  text-align: start;
+  padding: 9px 12px;
+  border: 1px solid var(--hair);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  transition: border-color var(--dur-micro);
+}
+.adf-recent:hover { border-color: var(--accent); }
+.adf-recent:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.adf-recent-n { font-size: 13px; font-weight: 700; color: var(--ink); }
+.adf-recent-t { font-size: 11.5px; color: var(--faint); }
+.adf-recent-p { font-size: 11px; color: var(--mut); overflow-wrap: anywhere; }
+@media (max-width: 760px) {
+  .adf-recent { grid-template-columns: 1fr; gap: 3px; }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   14) الحركة والطباعة
+   ══════════════════════════════════════════════════════════════════════════ */
+
+@media (prefers-reduced-motion: reduce) {
+  .adf-groupchip,
+  .adf-ghead,
+  .adf-row,
+  .adf-kind,
+  .adf-page,
+  .adf-preset,
+  .adf-pagerow,
+  .adf-recent { transition: none; }
+}
+
+@media print {
+  .adf-toolbar,
+  .adf-pager,
+  .adf-actions,
+  .adf-groupchips,
+  .adf-rowtoggle,
+  .adf-gcaret { display: none !important; }
+  /* المجموعة المطويّة لا صفوف لها في الشجرة أصلاً (لا تُبنى إلا عند الفتح)،
+     فالطباعة تعكس ما على الشاشة حرفياً — والتقرير الكامل يُصدَّر بـCSV أو
+     بالنسخ النصي من بطاقة الإجراءات، لا بطباعة شاشة الإدارة. */
+  .adf-row,
+  .adf-preview,
+  .adf-group { break-inside: avoid; }
+  .adf-valtext { max-height: none; overflow: visible; }
+  .adf-pre { max-height: none; overflow: visible; }
+}

@@ -19,9 +19,17 @@ const JS_ORDER = [
   "src/js/core/dom.js",
   "src/js/core/format.js",
   "src/js/core/bus.js",
+  // V3: مبدّل السمة — لا يلمس DOM وقت التحميل (يقرأ documentElement كسولاً)
+  "src/js/core/theme-mode.js",
   "src/js/data/derive.js",
   "src/js/data/validate.js",
   "src/js/core/router.js",
+  // أسس حزمة التوسعة: منطق نقي (geoutils) ومكتبة SVG/DOM لا تلمس أي شيء
+  // خارج محاكاة DOM الدنيا أدناه — فتُختبران بالملف الحقيقي لا بنسخة.
+  "src/js/viz/geomap-utils.js",
+  "src/js/viz/charts-micro.js",
+  // V3: نافذة الإبراز — نموذجها (normalize/measure) نقي وقابل للاختبار كاملاً
+  "src/js/presenter/highlight.js",
 ];
 
 /* ── محاكاة DOM دنيا: تكفي h()/svg()/clear دون محرك عرض ── */
@@ -66,7 +74,13 @@ class FakeElement extends FakeNode {
   querySelectorAll() { return []; }
 }
 
+/* عنصر الجذر ‎<html>‎ الوهمي: يكفي لفحص كتابة/مسح ‎data-theme‎ */
+export const documentElementMock = new FakeElement("html");
+
 const documentMock = {
+  documentElement: documentElementMock,
+  addEventListener() {},
+  removeEventListener() {},
   createElement: (t) => new FakeElement(t),
   createElementNS: (ns, t) => new FakeElement(t, ns),
   createTextNode: (t) => new FakeText(t),
@@ -88,7 +102,35 @@ const historyMock = {
   pushState(_state, _title, url) { historyCalls.push(String(url)); },
 };
 
+/* تخزين محلي وهمي قابل للفحص (عقد RH.core.themeMode) */
+class FakeStorage {
+  constructor() { this.map = new Map(); }
+  getItem(k) { return this.map.has(k) ? this.map.get(k) : null; }
+  setItem(k, v) { this.map.set(k, String(v)); }
+  removeItem(k) { this.map.delete(k); }
+  clear() { this.map.clear(); }
+}
+
+export const localStorageMock = new FakeStorage();
+
+/* ‎matchMedia‎ وهمي: تُضبط ‎matches‎ من الاختبار لمحاكاة تفضيل النظام */
+export const mediaState = { dark: false, reduced: false };
+function matchMediaMock(query) {
+  const dark = /prefers-color-scheme:\s*dark/.test(query);
+  const reduced = /prefers-reduced-motion/.test(query);
+  return {
+    media: query,
+    get matches() {
+      return dark ? mediaState.dark : (reduced ? mediaState.reduced : false);
+    },
+    addEventListener() {}, removeEventListener() {},
+    addListener() {}, removeListener() {},
+  };
+}
+
 export const win = {
+  localStorage: localStorageMock,
+  matchMedia: matchMediaMock,
   location: {
     hash: "",
     href: "https://unit.test/index.html",
@@ -107,6 +149,7 @@ export const win = {
 const sandbox = {
   window: win,
   document: documentMock,
+  getComputedStyle: () => ({ getPropertyValue: () => "" }),
   history: historyMock,
   location: win.location,
   Node: FakeNode,
@@ -133,6 +176,44 @@ export const RH = vm.runInContext("RH;", context);
 /* ── الحقيقة المرجعية: نسخة جديدة معزولة عند كل استدعاء ── */
 const releaseText = readFileSync(path.join(ROOT, "data", "release.json"), "utf8");
 export function freshRelease() { return JSON.parse(releaseText); }
+
+const geoText = readFileSync(path.join(ROOT, "data", "riyadh-geo.json"), "utf8");
+export function freshGeo() { return JSON.parse(geoText); }
+
+/* ── أدوات فحص شجرة DOM الوهمية (اختبارات الرسوم المصغرة) ── */
+
+/** عنصر جذر وهمي يصلح مضيفاً لدوال RH.viz.micro */
+export function host() { return new FakeElement("div"); }
+
+/** كل النص الظاهر في شجرة عنصر — يجمع عقد النص المتفرقة بالترتيب */
+export function textOf(node) {
+  if (!node) return "";
+  if (node instanceof FakeText) return node.textContent;
+  let out = node.childNodes.length ? "" : String(node.textContent || "");
+  for (const c of node.childNodes) out += textOf(c);
+  return out;
+}
+
+/** صنف العنصر أياً كان مصدره: className لعناصر HTML وسمة class لعناصر SVG */
+export function classOf(node) {
+  return String(node.className || node.getAttribute?.("class") || "");
+}
+
+/** كل عناصر الشجرة (بما فيها الجذر) التي يحتوي صنفها الاسم المطلوب */
+export function findAll(node, cls) {
+  const out = [];
+  (function walk(n) {
+    if (!(n instanceof FakeText) && classOf(n).split(/\s+/).includes(cls)) out.push(n);
+    for (const c of n.childNodes || []) walk(c);
+  })(node);
+  return out;
+}
+
+/** أول مطابق أو null */
+export function find(node, cls) {
+  const all = findAll(node, cls);
+  return all.length ? all[0] : null;
+}
 
 /** يطبّع كائن بيانات وُلد داخل سياق vm إلى عالم الاختبار:
     البروتوتايب مختلف عبر العالمين فيفشل deepStrictEqual رغم تطابق البنية —

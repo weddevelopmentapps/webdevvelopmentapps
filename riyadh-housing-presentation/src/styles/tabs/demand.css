@@ -1,0 +1,225 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   tabs/demand.css — أنماط التبويب ١ «الطلب» (بادئة ‎dmt-‎ حصراً)
+   ────────────────────────────────────────────────────────────────────────────
+   يُقرأ مع ‎src/styles/tabs.css‎ الذي يوفّر الأصناف الجاهزة
+   (‎.tabfigs‎ ‎.tabfig‎ ‎.tabgrid‎ ‎.tabcard‎ ‎.tabchart‎) — هذا الملف **يزيّنها
+   ولا يعيد اختراعها**، ويضيف مكوّنين خاصين بالتبويب فقط:
+     ‎.dmt-fig‎    بطاقة رقم كبير قابلة للنقر (زر حقيقي)
+     ‎.dmt-chip‎   رقاقة تفاعلية = المسار المفاتيحي إلى نافذة الإبراز
+
+   القاعدة الحاكمة (V3_SPEC §1 · V3_CONTRACTS §1-د):
+     **صفر لون مكتوب هنا.** كل لون ‎var(--…)‎ من ‎tokens.css‎، وكل شفافية
+     ‎rgba(var(--x-rgb), a)‎ — فتتبع السمتان تلقائياً بلا كتلة داكنة خاصة.
+   التمرير الأفقي ممنوع: ‎min-width: 0‎ موروث من ‎.tabgrid > *‎، ولا عرض ثابت
+   في أي قاعدة هنا.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.dmt {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 1.3vw, 22px);
+  min-width: 0;
+}
+
+/* ── ١) شريط الأرقام الكبرى ─────────────────────────────────────────────────
+   البطل يأخذ عرضاً مضاعفاً على الشاشات الواسعة، والثلاثة الباقية تتساوى. */
+.dmt-figs {
+  grid-template-columns:
+    minmax(0, 1.7fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
+}
+@media (max-width: 1180px) {
+  .dmt-figs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dmt-fig-hero { grid-column: 1 / -1; }
+}
+@media (max-width: 620px) {
+  .dmt-figs { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* بطاقة الرقم زرٌّ حقيقي: تُقرأ كبطاقة وتُفعَّل بالنقر وبلوحة المفاتيح */
+.dmt-fig {
+  position: relative;
+  display: block;
+  text-align: start;
+  overflow: hidden;
+  transition: border-color var(--dur-micro) var(--ease),
+              box-shadow var(--dur-micro) var(--ease),
+              transform var(--dur-micro) var(--ease);
+}
+.dmt-fig::after {
+  /* شعيرة سفلية بلون الهوية تنمو عند التحويم — إشارة «قابل للنقر» بلا أيقونة */
+  content: "";
+  position: absolute;
+  inset-block-end: 0;
+  inset-inline-start: 0;
+  inline-size: 0;
+  block-size: 2px;
+  background: linear-gradient(90deg, var(--brand-teal), var(--brand-deep));
+  transition: inline-size var(--dur-std) var(--ease);
+}
+.dmt-fig:hover,
+.dmt-fig:focus-visible {
+  border-color: var(--brand);
+  box-shadow: 0 6px 22px rgba(var(--ink-rgb), 0.07);
+  transform: translateY(-1px);
+}
+.dmt-fig:hover::after,
+.dmt-fig:focus-visible::after { inline-size: 100%; }
+.dmt-fig:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+.dmt-fig .tabfig-label { white-space: normal; }
+.dmt-fig .tabfig-foot { line-height: 1.65; }
+
+/* الرقم الدقيق (الياقات) أضيق من الصيغة التنفيذية فيُصغَّر مقاسه كي لا يفيض */
+.dmt-fig.is-exact .tabfig-value { font-size: clamp(21px, 1.75vw, 31px); }
+.dmt-fig.is-pct .tabfig-value { font-size: clamp(24px, 2.1vw, 36px); }
+
+/* النغمة الدلالية على الرقم وحده — لا على السطح (لا كتل ملونة كبيرة) */
+.dmt-fig.is-tone-blue .tabfig-value { color: var(--collar-blue); }
+.dmt-fig.is-tone-demand .tabfig-value { color: var(--demand); }
+.dmt-fig.is-tone-green .tabfig-value { color: var(--green); }
+
+/* بطاقة البطل: نمط متوازيات الأضلاع (يحقنه ‎RH.brand.pattern‎) خلف النص */
+.dmt-fig-hero {
+  background:
+    linear-gradient(135deg,
+      rgba(var(--brand-rgb), 0.05),
+      rgba(var(--surf-1-rgb), 0) 62%),
+    var(--surface);
+  border-color: rgba(var(--brand-rgb), 0.28);
+}
+/* النصّ فوق النمط — ‎> span‎ لا ‎> *‎: طبقة ‎.brand-pattern‎ المحقونة مطلقة
+   الموضع بحكم ‎brand.css‎، ومحدِّد ‎> *‎ بالوزن نفسه كان يُلغي إطلاقها فيتضخم
+   ارتفاع البطاقة بارتفاع الـSVG (خلل رُصد في فحص المتصفح وأُصلح هنا). */
+.dmt-fig-hero > span { position: relative; z-index: 1; }
+.dmt-fig-hero .tabfig-label { color: var(--ink-2); }
+.dmt-fig-hero .tabfig-value { color: var(--brand-ink); }
+.dmt-fig-hero .tabfig-value .word { color: var(--brand); }
+
+/* ── ٢) بطاقات الرسوم ───────────────────────────────────────────────────── */
+.dmt-card .tabcard-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.dmt-card .tabcard-note { max-inline-size: 24ch; }
+
+/* الشريط المكدس شريط واحد عريض: لا يحتاج ارتفاع الرسم البطل كاملاً ليقرأ،
+   لكنه يبقى ‎.tabchart‎ (الحد الأدنى الملزم) كي لا ينكمش على الشاشات القصيرة. */
+.dmt-collar-chart { min-block-size: min(40vh, 340px); block-size: min(40vh, 340px); }
+
+/* ── ٣) الرقاقات: المسار المفاتيحي إلى نافذة الإبراز ────────────────────── */
+.dmt-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-inline: 8px;
+  min-inline-size: 0;
+}
+.dmt-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-inline-size: 100%;
+  padding: 6px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--ink-2);
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.5;
+  transition: border-color var(--dur-micro) var(--ease),
+              background var(--dur-micro) var(--ease),
+              color var(--dur-micro) var(--ease);
+}
+.dmt-chip:hover,
+.dmt-chip:focus-visible {
+  background: var(--surface-3);
+  border-color: var(--brand);
+  color: var(--ink);
+}
+.dmt-chip:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.dmt-chip.is-on {
+  border-color: var(--brand);
+  background: var(--accent-soft);
+  color: var(--ink);
+}
+
+.dmt-chip-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* قيمة الرقاقة عبارة **مركّبة** (رقم + وحدة عربية + نسبة) لا رقم مجرد، فلا
+   يجوز فرض ‎direction: ltr‎ عليها: الفرض كان يقلب ترتيب مقاطعها بصرياً
+   («82.0٪ · سرير 1,164,400») فتبدو الأرقام ملتصقة بالكلمات. العزل وحده هو
+   المطلوب — يفصلها عن جارتها ويُبقي أساسها عربياً، والرقم بداخلها معزول
+   من ‎fmt.caption‎ فيقرأ يسارياً كما يجب. */
+.dmt-chip-value {
+  font-family: var(--f-display);
+  font-weight: 700;
+  color: var(--ink);
+  white-space: nowrap;
+  unicode-bidi: isolate;
+}
+
+/* عيّنة اللون: تربط الرقاقة بعلامتها في الرسم دون الاعتماد على اللون وحده
+   (النص كامل داخل الرقاقة، والعينة تعزيز بصري لا حامل معنى). */
+.dmt-chip-swatch {
+  flex: 0 0 auto;
+  inline-size: 9px;
+  block-size: 9px;
+  border-radius: 3px;
+  background: var(--ink-4);
+}
+.dmt-chip.is-tone-blue .dmt-chip-swatch { background: var(--collar-blue); }
+.dmt-chip.is-tone-demand .dmt-chip-swatch { background: var(--demand); }
+.dmt-chip.is-tone-neutral .dmt-chip-swatch { background: var(--ink-4); }
+
+/* رقاقات مفاتيح الياقات: أبرز قليلاً لأنها تحمل القيم الدقيقة */
+.dmt-legend { gap: 10px; padding-block-start: 2px; }
+.dmt-legend .dmt-chip {
+  padding: 8px 14px;
+  font-size: 13px;
+  background: var(--surface);
+}
+.dmt-legend .dmt-chip:hover,
+.dmt-legend .dmt-chip:focus-visible { background: var(--surface-2); }
+
+/* رقاقات هادئة (الأنشطة): تسمية فقط، حضور بصري أخف */
+.dmt-chips.is-quiet .dmt-chip {
+  padding: 5px 10px;
+  font-size: 11.5px;
+  background: transparent;
+  color: var(--ink-3);
+}
+.dmt-chips.is-quiet .dmt-chip:hover,
+.dmt-chips.is-quiet .dmt-chip:focus-visible {
+  background: var(--surface-2);
+  color: var(--ink);
+}
+
+/* ── ٤) سطر الصدق أسفل اللوح ────────────────────────────────────────────── */
+.dmt-foot {
+  margin-block-start: 2px;
+  font-size: 11.5px;
+  line-height: 1.9;
+  color: var(--ink-3);
+}
+.dmt-foot .ltr { color: var(--ink-2); }
+
+/* ── ٥) احترام تقليل الحركة ─────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .dmt-fig,
+  .dmt-fig::after,
+  .dmt-chip { transition: none; }
+  .dmt-fig:hover,
+  .dmt-fig:focus-visible { transform: none; }
+}
+
+/* ── ٦) الطباعة: البطاقات تُسطَّح والرقاقات تُخفى (كروم تفاعلي لا محتوى) ── */
+@media print {
+  .dmt-fig { box-shadow: none; transform: none; }
+  .dmt-fig::after { display: none; }
+  .dmt-chips { display: none; }
+}

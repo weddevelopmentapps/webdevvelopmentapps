@@ -1,0 +1,1002 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   methodology.css — ملحق المنهجية والإسناد (ملحق `methodology`)
+   بادئة الميزة: `mth-`  ·  عقد V2_CONTRACTS_EXPANSION §8.1 و§0
+
+   قواعد ملزمة مطبَّقة هنا حرفياً:
+   • **لا لمس لملف مشترك**: كل صنف هنا يبدأ بـ`mth-`، ولا يُعاد تعريف أي صنف
+     من dashboard.css أو tokens.css أو appendix.css أو micro.css — تُستهلك
+     أصنافها المشتركة (`.dash-card`، `.card-head`، `.card-body`، `.table-dense`،
+     `.pending-card`، `.mcr-*`) كما هي، وما هنا يقتصر على تحجيم مضيفات هذا
+     الملحق داخل نطاق `.mth-*`.
+   • **لا لون حرفي**: كل صبغة رمز من tokens.css. منظومة المعنى مقفلة —
+     الذهبي لوسوم الاعتماد وخط الأساس حصراً، المرجاني للحاجب والخلل حصراً،
+     الأخضر للاجتياز، الأزرق فئة ثانوية (المشتق مقابل الخام)، والمحايد
+     للمعلومة. لا لون يحمل معنى غير معناه.
+   • **كل مقاس بوحدة `--su`**: الصفحات الأربع تتسع في إطار المسرح 16:9 عند
+     1920×1080 وعند 1366×768 دون تمرير المسرح؛ الفيضان يُحل بتمرير **داخل
+     المكوّن** (جداول وأعمدة) لا بتمرير الصفحة.
+   • **حركة**: انتقالات دقيقة فقط (`--dur-micro` المصفَّرة في tokens.css عند
+     طلب التقليل)، مع تصفير صريح إضافي أسفل الملف لما لا يمر بها.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* ── جذر الصفحة داخل هيكل الملاحق ─────────────────────────────────────── */
+.mth-page {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 12);
+  overflow: hidden;                 /* الفيضان يُحل داخل المكوّنات لا هنا */
+}
+
+/* نغمات RH.viz.micro داخل هذا الملحق — تثبيت النغمة الدلالية في نطاق
+   `.mth-*` وحده (المكتبة ملك معمار التوسعة ولا يعدّلها وكيل ميزة، ومنظومة
+   المعنى غير قابلة للتنازل). لا صنف من micro.css يُعاد تعريفه عالمياً. */
+.mth-page .mcr-bars.t-blue,
+.mth-page .mcr-bar-fill.t-blue,
+.mth-page .mcr-ratio.t-blue,
+.mth-page .mcr-spark.t-blue {
+  --mcr-tone: var(--collar-blue);
+  --mcr-tone-hi: var(--collar-blue);
+}
+.mth-page .mcr-bars.t-pos,
+.mth-page .mcr-bar-fill.t-pos,
+.mth-page .mcr-ratio.t-pos,
+.mth-page .mcr-spark.t-pos {
+  --mcr-tone: var(--green);
+  --mcr-tone-hi: var(--green-hi);
+}
+.mth-page .mcr-bars.t-neg,
+.mth-page .mcr-bar-fill.t-neg,
+.mth-page .mcr-ratio.t-neg,
+.mth-page .mcr-spark.t-neg {
+  --mcr-tone: var(--coral);
+  --mcr-tone-hi: var(--coral);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   1) شريط الإحصاءات العلوي — أرقام الهوية والنتيجة
+   ════════════════════════════════════════════════════════════════════════ */
+.mth-strip {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: calc(var(--su) * 12);
+  flex: none;
+}
+.mth-stat {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 3);
+  background: rgba(var(--surf-2-rgb), 0.55);
+  border: 1px solid var(--hair-d2);
+  border-radius: var(--r-sm);
+  padding: calc(var(--su) * 10) calc(var(--su) * 14);
+  min-width: 0;
+}
+.mth-stat.pos { border-top: 2px solid rgba(var(--green-rgb), 0.55); }
+.mth-stat.neg { border-top: 2px solid rgba(var(--coral-rgb), 0.55); }
+.mth-stat.warn { border-top: 2px solid rgba(var(--gold-rgb), 0.5); }
+.mth-stat-k {
+  font-size: calc(var(--su) * 12);
+  font-weight: 600;
+  color: var(--mut-d);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mth-stat-v {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-size: calc(var(--su) * 21);
+  font-weight: 700;
+  color: var(--ivory);
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mth-stat.pos .mth-stat-v { color: var(--green-hi); }
+.mth-stat.neg .mth-stat-v { color: var(--coral); }
+.mth-stat.warn .mth-stat-v { color: var(--gold-hi); }
+.mth-stat-f {
+  font-size: calc(var(--su) * 11.5);
+  color: var(--faint-d);
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   2) شبكات الصفحات
+   ════════════════════════════════════════════════════════════════════════ */
+.mth-grid {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  gap: calc(var(--su) * 14);
+  align-items: stretch;
+}
+.mth-grid-2 { grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); }
+.mth-grid-gates { grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); }
+.mth-grid-dec { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); }
+
+.mth-col {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 12);
+  min-height: 0;
+  min-width: 0;
+  overflow: auto;                  /* التمرير داخل العمود لا في الصفحة */
+  padding-inline-end: calc(var(--su) * 4);
+}
+.mth-col-inner {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 12);
+  min-height: 0;
+}
+.mth-card { flex: none; }
+.mth-card .card-body { gap: calc(var(--su) * 8); }
+
+/* ════════════════════════════════════════════════════════════════════════
+   3) قوائم مفتاح/قيمة (هوية الإصدار، تفصيل المقياس، قرائن القرار)
+   ════════════════════════════════════════════════════════════════════════ */
+.mth-kvs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: calc(var(--su) * 8) calc(var(--su) * 14);
+  margin: 0;
+}
+.mth-kvs.tight { grid-template-columns: minmax(0, 1fr); gap: calc(var(--su) * 6); }
+.mth-kv {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 2);
+  min-width: 0;
+}
+.mth-kv.wide { grid-column: 1 / -1; }
+.mth-kv-k {
+  font-size: calc(var(--su) * 11.5);
+  font-weight: 600;
+  color: var(--mut-d);
+}
+.mth-kv-v {
+  margin: 0;
+  font-size: calc(var(--su) * 14);
+  color: var(--ivory);
+  line-height: 1.6;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: calc(var(--su) * 8);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.mth-kv-note {
+  font-size: calc(var(--su) * 11.5);
+  color: var(--faint-d);
+}
+
+/* نص لاتيني معزول: هاش/مرساة/صيغة/معرف */
+.mth-mono {
+  font-family: var(--f-display);
+  direction: ltr;
+  unicode-bidi: isolate;
+  text-align: left;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink2-d);
+  overflow-wrap: anywhere;
+}
+.mth-mono.small { font-size: calc(var(--su) * 11.5); color: var(--faint-d); }
+
+/* ════════════════════════════════════════════════════════════════════════
+   4) الوسوم والملاحظات
+   ════════════════════════════════════════════════════════════════════════ */
+.mth-badge {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  font-size: calc(var(--su) * 11);
+  font-weight: 700;
+  line-height: 1;
+  padding: calc(var(--su) * 4) calc(var(--su) * 9);
+  border-radius: 999px;
+  border: 1px solid var(--hair-d);
+  color: var(--mut-d);
+  background: rgba(var(--ink-rgb), 0.04);
+  white-space: nowrap;
+}
+.mth-badge.gold {
+  color: var(--gold-hi);
+  border-color: rgba(var(--gold-rgb), 0.45);
+  background: rgba(var(--gold-rgb), 0.08);
+}
+.mth-badge.pos {
+  color: var(--green-hi);
+  border-color: rgba(var(--green-rgb), 0.42);
+  background: rgba(var(--green-rgb), 0.08);
+}
+.mth-badge.neg {
+  color: var(--coral);
+  border-color: rgba(var(--coral-rgb), 0.45);
+  background: rgba(var(--coral-rgb), 0.08);
+}
+.mth-badge.blue {
+  color: var(--collar-blue);
+  border-color: rgba(var(--blue-rgb), 0.45);
+  background: rgba(var(--blue-rgb), 0.08);
+}
+.mth-badge.neu { color: var(--ink2-d); }
+
+.mth-note {
+  flex: none;
+  font-size: calc(var(--su) * 12);
+  color: var(--faint-d);
+  line-height: 1.7;
+  margin: 0;
+}
+.mth-note.wide { max-width: none; }
+.mth-note.warnline {
+  color: var(--gold-hi);
+  border-inline-start: 2px solid rgba(var(--gold-rgb), 0.45);
+  padding-inline-start: calc(var(--su) * 10);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   5) الجداول الكثيفة داخل الملحق
+   ════════════════════════════════════════════════════════════════════════ */
+.mth-tscroll {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+.mth-table td { vertical-align: top; }
+.mth-table td.k { white-space: normal; }
+.mth-table td.num {
+  font-family: var(--f-display);
+  font-weight: 700;
+  color: var(--ivory);
+}
+.mth-table .mth-dim { color: var(--faint-d); font-size: calc(var(--su) * 12); }
+
+.mth-tr { transition: background var(--dur-micro); }
+.mth-tr[role="button"] { cursor: pointer; }
+.mth-tr[role="button"]:hover { background: rgba(var(--ink-rgb), 0.035); }
+.mth-tr[role="button"]:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: -2px;
+}
+.mth-tr.now { background: rgba(var(--gold-rgb), 0.09); }
+.mth-tr.now td { color: var(--ivory); }
+.mth-tr.bad td:first-child { box-shadow: inset 2px 0 0 var(--coral); }
+.mth-tr.warn td:first-child { box-shadow: inset 2px 0 0 var(--gold); }
+
+.mth-tnote {
+  flex: none;
+  font-size: calc(var(--su) * 11.5);
+  color: var(--faint-d);
+  padding-top: calc(var(--su) * 6);
+  margin: 0;
+}
+
+.mth-cell-label {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 2);
+  min-width: 0;
+}
+.mth-cell-id {
+  font-family: var(--f-display);
+  direction: ltr;
+  unicode-bidi: isolate;
+  text-align: left;
+  font-size: calc(var(--su) * 10.5);
+  color: var(--faint-d);
+}
+.mth-perv {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--su) * 8);
+  white-space: normal;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   6) شريط الأدوات: بحث، ترشيح، ترتيب
+   ════════════════════════════════════════════════════════════════════════ */
+.mth-tools {
+  flex: none;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: calc(var(--su) * 10);
+}
+.mth-search {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--su) * 6);
+  background: rgba(var(--base-rgb), 0.6);
+  border: 1px solid var(--hair-d);
+  border-radius: 999px;
+  padding: calc(var(--su) * 4) calc(var(--su) * 8) calc(var(--su) * 4) calc(var(--su) * 4);
+  min-width: calc(var(--su) * 420);
+  flex: 1 1 calc(var(--su) * 420);
+  max-width: calc(var(--su) * 620);
+}
+.mth-search:focus-within { border-color: var(--gold); }
+.mth-search-input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: 0;
+  outline: none;
+  color: var(--ivory);
+  font-family: var(--f-body);
+  font-size: calc(var(--su) * 14.5);
+  padding: calc(var(--su) * 6) calc(var(--su) * 10);
+}
+.mth-search-input::placeholder { color: var(--faint-d); }
+.mth-search-input::-webkit-search-cancel-button { display: none; }
+.mth-search-clear {
+  flex: none;
+  font-size: calc(var(--su) * 12);
+  font-weight: 600;
+  color: var(--mut-d);
+  border: 1px solid var(--hair-d2);
+  border-radius: 999px;
+  padding: calc(var(--su) * 4) calc(var(--su) * 12);
+  transition: color var(--dur-micro), border-color var(--dur-micro);
+}
+.mth-search-clear:hover:not(:disabled),
+.mth-search-clear:focus-visible { color: var(--ivory); border-color: var(--gold); }
+.mth-search-clear:disabled { opacity: 0.3; cursor: default; }
+
+.mth-count {
+  font-size: calc(var(--su) * 12.5);
+  font-weight: 600;
+  color: var(--mut-d);
+  white-space: nowrap;
+}
+
+.mth-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--su) * 6);
+  flex-wrap: wrap;
+}
+.mth-toggle-label {
+  font-size: calc(var(--su) * 11.5);
+  color: var(--faint-d);
+  font-weight: 600;
+}
+.mth-toggle-btn {
+  font-size: calc(var(--su) * 12.5);
+  font-weight: 600;
+  color: var(--mut-d);
+  background: rgba(var(--surf-2-rgb), 0.55);
+  border: 1px solid var(--hair-d2);
+  border-radius: 999px;
+  padding: calc(var(--su) * 5) calc(var(--su) * 13);
+  transition: color var(--dur-micro), border-color var(--dur-micro),
+    background var(--dur-micro);
+}
+.mth-toggle-btn:hover, .mth-toggle-btn:focus-visible {
+  color: var(--ivory);
+  border-color: var(--hair-d);
+}
+.mth-toggle-btn.now {
+  color: var(--stage-0);
+  background: var(--gold);
+  border-color: var(--gold);
+}
+.mth-dirbtn {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--su) * 6);
+  font-size: calc(var(--su) * 12.5);
+  font-weight: 600;
+  color: var(--mut-d);
+  border: 1px solid var(--hair-d2);
+  border-radius: 999px;
+  padding: calc(var(--su) * 5) calc(var(--su) * 13);
+}
+.mth-dirbtn:hover, .mth-dirbtn:focus-visible { color: var(--ivory); border-color: var(--gold); }
+
+/* ════════════════════════════════════════════════════════════════════════
+   7) الصفحة 2: الجدول + لوحة التفصيل + شريط الترقيم
+   ════════════════════════════════════════════════════════════════════════ */
+.mth-body {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: calc(var(--su) * 14);
+}
+.mth-table-host {
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  background: rgba(var(--surf-2-rgb), 0.5);
+  border: 1px solid var(--hair-d2);
+  border-radius: var(--r-sm);
+  padding: calc(var(--su) * 6) calc(var(--su) * 8);
+  overflow: hidden;
+}
+.mth-detail {
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+}
+.mth-detail-card { flex: 1; }
+.mth-detail-head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: calc(var(--su) * 10);
+}
+.mth-detail-value {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-size: calc(var(--su) * 27);
+  font-weight: 700;
+  color: var(--ivory);
+  line-height: 1.1;
+}
+
+.mth-hint {
+  margin: 0;
+  padding-inline-start: calc(var(--su) * 16);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 6);
+  font-size: calc(var(--su) * 12.5);
+  color: var(--mut-d);
+  line-height: 1.65;
+}
+.mth-hint li::marker { color: var(--gold); }
+
+.mth-sub {
+  border-top: 1px solid var(--hair-d2);
+  padding-top: calc(var(--su) * 8);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 6);
+}
+.mth-sub-title {
+  font-size: calc(var(--su) * 12);
+  font-weight: 700;
+  color: var(--gold-hi);
+  letter-spacing: 0.2px;
+}
+.mth-sub-empty {
+  margin: 0;
+  font-size: calc(var(--su) * 12.5);
+  color: var(--faint-d);
+  line-height: 1.6;
+}
+.mth-sub-foot {
+  margin: 0;
+  font-size: calc(var(--su) * 11.5);
+  color: var(--faint-d);
+}
+
+.mth-chain, .mth-deps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 5);
+}
+.mth-chain-item {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--su) * 8);
+  min-width: 0;
+}
+.mth-chain-item.d2 { padding-inline-start: calc(var(--su) * 14); }
+.mth-chain-item.d3 { padding-inline-start: calc(var(--su) * 28); }
+.mth-chain-item.d4 { padding-inline-start: calc(var(--su) * 42); }
+.mth-chain-depth {
+  flex: none;
+  font-size: calc(var(--su) * 10.5);
+  font-weight: 700;
+  color: var(--faint-d);
+  border: 1px solid var(--hair-d2);
+  border-radius: 999px;
+  padding: calc(var(--su) * 2) calc(var(--su) * 6);
+}
+.mth-chain-link {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: calc(var(--su) * 10);
+  background: rgba(var(--base-rgb), 0.45);
+  border: 1px solid var(--hair-d2);
+  border-radius: var(--r-sm);
+  padding: calc(var(--su) * 6) calc(var(--su) * 10);
+  text-align: start;
+  transition: border-color var(--dur-micro), background var(--dur-micro);
+}
+.mth-chain-link:hover, .mth-chain-link:focus-visible {
+  border-color: var(--gold);
+  background: rgba(var(--gold-rgb), 0.07);
+}
+.mth-chain-name {
+  font-size: calc(var(--su) * 12.5);
+  color: var(--ink2-d);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mth-chain-val {
+  flex: none;
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-size: calc(var(--su) * 12.5);
+  color: var(--ivory);
+}
+.mth-chain-via {
+  flex: none;
+  font-size: calc(var(--su) * 10.5);
+  color: var(--faint-d);
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+.mth-chain-missing {
+  font-size: calc(var(--su) * 12);
+  color: var(--coral);
+}
+
+.mth-pager {
+  flex: none;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: calc(var(--su) * 8);
+}
+.mth-pgbtn, .mth-pgnum {
+  font-size: calc(var(--su) * 12.5);
+  font-weight: 600;
+  color: var(--mut-d);
+  border: 1px solid var(--hair-d2);
+  border-radius: 999px;
+  padding: calc(var(--su) * 5) calc(var(--su) * 13);
+  transition: color var(--dur-micro), border-color var(--dur-micro);
+}
+.mth-pgbtn:hover:not(:disabled), .mth-pgbtn:focus-visible,
+.mth-pgnum:hover, .mth-pgnum:focus-visible { color: var(--ivory); border-color: var(--gold); }
+.mth-pgbtn:disabled { opacity: 0.3; cursor: default; }
+.mth-pgnums { display: inline-flex; gap: calc(var(--su) * 5); }
+.mth-pgnum.now {
+  color: var(--stage-0);
+  background: var(--gold);
+  border-color: var(--gold);
+}
+.mth-pginfo {
+  font-size: calc(var(--su) * 12);
+  color: var(--faint-d);
+  margin-inline-start: auto;
+}
+.mth-perpage .mth-toggle-btn { padding: calc(var(--su) * 4) calc(var(--su) * 10); }
+
+/* ════════════════════════════════════════════════════════════════════════
+   8) الصفحة 1: المصادر والإخلاءات
+   ════════════════════════════════════════════════════════════════════════ */
+.mth-disc {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 8);
+}
+.mth-disc-item {
+  background: rgba(var(--gold-rgb), 0.05);
+  border: 1px dashed rgba(var(--gold-rgb), 0.35);
+  border-radius: var(--r-sm);
+  padding: calc(var(--su) * 9) calc(var(--su) * 13);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 4);
+}
+.mth-disc-head {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--su) * 8);
+}
+.mth-disc-label {
+  font-size: calc(var(--su) * 13);
+  font-weight: 700;
+  color: var(--gold-hi);
+}
+.mth-disc-text {
+  margin: 0;
+  font-size: calc(var(--su) * 13.5);
+  color: var(--ivory);
+  line-height: 1.6;
+}
+.mth-disc-rule {
+  margin: 0;
+  font-size: calc(var(--su) * 11.5);
+  color: var(--faint-d);
+  line-height: 1.55;
+}
+
+.mth-pagenav {
+  flex: none;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: calc(var(--su) * 10);
+}
+.mth-linkbtn {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--su) * 8);
+  font-size: calc(var(--su) * 13.5);
+  font-weight: 700;
+  color: var(--ivory);
+  background: rgba(var(--surf-2-rgb), 0.6);
+  border: 1px solid var(--hair-d);
+  border-radius: 999px;
+  padding: calc(var(--su) * 7) calc(var(--su) * 18);
+  transition: background var(--dur-micro), border-color var(--dur-micro);
+}
+.mth-linkbtn:hover, .mth-linkbtn:focus-visible {
+  background: var(--stage-3);
+  border-color: var(--gold);
+}
+.mth-linkbtn.ghost {
+  color: var(--mut-d);
+  background: transparent;
+  border-style: dashed;
+}
+.mth-linkbtn.ghost:hover, .mth-linkbtn.ghost:focus-visible { color: var(--ivory); }
+.mth-arrow { color: var(--gold); font-weight: 700; }
+
+/* ════════════════════════════════════════════════════════════════════════
+   9) الصفحة 3: الإنذارات والفلسفة والوسوم والبوابات
+   ════════════════════════════════════════════════════════════════════════ */
+.mth-warns, .mth-flags, .mth-openlist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 8);
+}
+.mth-warn {
+  background: rgba(var(--gold-rgb), 0.05);
+  border: 1px solid rgba(var(--gold-rgb), 0.3);
+  border-radius: var(--r-sm);
+  padding: calc(var(--su) * 8) calc(var(--su) * 12);
+}
+.mth-warn-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: calc(var(--su) * 8);
+}
+.mth-warn-dot {
+  width: calc(var(--su) * 8);
+  height: calc(var(--su) * 8);
+  border-radius: 50%;
+  background: var(--gold);
+  flex: none;
+}
+.mth-warn-label {
+  font-size: calc(var(--su) * 13.5);
+  font-weight: 700;
+  color: var(--gold-hi);
+}
+.mth-warn-detail {
+  margin: calc(var(--su) * 4) 0 0;
+  font-size: calc(var(--su) * 12.5);
+  color: var(--mut-d);
+  line-height: 1.6;
+}
+
+.mth-phil {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: calc(var(--su) * 10);
+}
+.mth-phil-item {
+  border: 1px solid var(--hair-d2);
+  border-radius: var(--r-sm);
+  padding: calc(var(--su) * 9) calc(var(--su) * 13);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 5);
+}
+.mth-phil-item.neg { border-inline-start: 3px solid var(--coral); }
+.mth-phil-item.gold { border-inline-start: 3px solid var(--gold); }
+.mth-phil-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: calc(var(--su) * 8);
+}
+.mth-phil-title {
+  font-size: calc(var(--su) * 13.5);
+  font-weight: 700;
+  color: var(--ivory);
+}
+.mth-phil-count {
+  margin-inline-start: auto;
+  font-family: var(--f-display);
+  font-size: calc(var(--su) * 12.5);
+  color: var(--mut-d);
+}
+.mth-phil-text {
+  margin: 0;
+  font-size: calc(var(--su) * 12.5);
+  color: var(--ink2-d);
+  line-height: 1.7;
+}
+
+.mth-flag {
+  border: 1px solid var(--hair-d2);
+  border-radius: var(--r-sm);
+  padding: calc(var(--su) * 8) calc(var(--su) * 12);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 4);
+}
+.mth-flag.gold { border-inline-start: 3px solid var(--gold); }
+.mth-flag.neg { border-inline-start: 3px solid var(--coral); }
+.mth-flag.neu { border-inline-start: 3px solid var(--hair-d); }
+.mth-flag-head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: calc(var(--su) * 8);
+}
+.mth-flag-label {
+  font-size: calc(var(--su) * 13);
+  font-weight: 700;
+  color: var(--ivory);
+}
+.mth-flag-value {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-size: calc(var(--su) * 14);
+  color: var(--gold-hi);
+}
+.mth-flag-ref {
+  font-size: calc(var(--su) * 11);
+  color: var(--faint-d);
+  margin-inline-start: auto;
+}
+.mth-flag-note {
+  margin: 0;
+  font-size: calc(var(--su) * 12);
+  color: var(--ink2-d);
+  line-height: 1.65;
+}
+.mth-flag-rule {
+  margin: 0;
+  font-size: calc(var(--su) * 11.5);
+  color: var(--faint-d);
+  line-height: 1.55;
+}
+
+.mth-gfilters {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: calc(var(--su) * 10);
+  flex: none;
+}
+.mth-groups {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--su) * 5);
+  flex: none;
+  padding-bottom: calc(var(--su) * 4);
+  border-bottom: 1px solid var(--hair-d2);
+}
+.mth-gtab {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--su) * 6);
+  font-size: calc(var(--su) * 11.5);
+  font-weight: 600;
+  color: var(--mut-d);
+  border: 1px solid var(--hair-d2);
+  border-radius: 999px;
+  padding: calc(var(--su) * 4) calc(var(--su) * 10);
+  transition: color var(--dur-micro), border-color var(--dur-micro);
+}
+.mth-gtab:hover, .mth-gtab:focus-visible { color: var(--ivory); border-color: var(--hair-d); }
+.mth-gtab.now { color: var(--stage-0); background: var(--gold); border-color: var(--gold); }
+.mth-gtab-n {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  opacity: 0.75;
+}
+.mth-gtab-fail {
+  font-family: var(--f-display);
+  color: var(--gold-hi);
+  border-inline-start: 1px solid var(--hair-d2);
+  padding-inline-start: calc(var(--su) * 6);
+}
+.mth-gtab.now .mth-gtab-fail { color: var(--stage-0); }
+.mth-gtab.has-fail { border-color: rgba(var(--gold-rgb), 0.4); }
+
+.mth-glist-host {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding-top: calc(var(--su) * 6);
+}
+.mth-gtable td { white-space: normal; }
+.mth-gcell {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 2);
+}
+.mth-gdetail {
+  font-size: calc(var(--su) * 11.5);
+  color: var(--faint-d);
+  line-height: 1.55;
+}
+.mth-card-gates { flex: 1; min-height: 0; }
+.mth-card-gates .card-body { min-height: 0; }
+
+/* ════════════════════════════════════════════════════════════════════════
+   10) الصفحة 4: قرارات المطابقة
+   ════════════════════════════════════════════════════════════════════════ */
+.mth-card-dec { flex: 1; min-height: 0; }
+.mth-card-dec .card-body { min-height: 0; }
+.mth-declist {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.mth-dectable td { white-space: normal; }
+.mth-dec-topic { line-height: 1.55; }
+.mth-dec-ev {
+  font-family: var(--f-display);
+  font-weight: 700;
+  color: var(--green-hi);
+}
+.mth-dec-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: calc(var(--su) * 8);
+}
+.mth-dec-area { font-size: calc(var(--su) * 12); color: var(--faint-d); }
+.mth-dec-body {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 4);
+}
+.mth-dec-k {
+  font-size: calc(var(--su) * 11.5);
+  font-weight: 700;
+  color: var(--gold-hi);
+}
+.mth-dec-text {
+  margin: 0;
+  font-size: calc(var(--su) * 14);
+  color: var(--ivory);
+  line-height: 1.8;
+}
+.mth-dec-actions {
+  display: flex;
+  gap: calc(var(--su) * 8);
+  padding-top: calc(var(--su) * 4);
+}
+.mth-openitem { display: flex; }
+.mth-openbtn {
+  flex: 1;
+  display: flex;
+  align-items: baseline;
+  gap: calc(var(--su) * 10);
+  background: rgba(var(--base-rgb), 0.45);
+  border: 1px solid var(--hair-d2);
+  border-radius: var(--r-sm);
+  padding: calc(var(--su) * 7) calc(var(--su) * 11);
+  text-align: start;
+  transition: border-color var(--dur-micro), background var(--dur-micro);
+}
+.mth-openbtn:hover, .mth-openbtn:focus-visible {
+  border-color: var(--gold);
+  background: rgba(var(--gold-rgb), 0.07);
+}
+.mth-open-topic {
+  flex: 1;
+  min-width: 0;
+  font-size: calc(var(--su) * 12.5);
+  color: var(--ink2-d);
+  line-height: 1.5;
+}
+.mth-open-state {
+  flex: none;
+  font-size: calc(var(--su) * 11);
+  color: var(--gold-hi);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   11) نقطتا الدخول في قسم الخاتمة (عقد التوسعة §8)
+   ────────────────────────────────────────────────────────────────────────
+   الزران يسكنان فراغ منتصف ترويسة القسم لا شبكتَه: شبكة الخاتمة المعتمدة
+   ممتلئة تماماً، وأي عنصر يُضاف داخلها يدفع صفاً معتمداً خارج الإطار.
+   الترويسة توزيعها `space-between`، فالزران يملآن فراغاً قائماً بلا إزاحة
+   بكسل واحد. الأسلوب صدى لأصناف dashboard.css القائمة دون إعادة تعريفها.
+   ════════════════════════════════════════════════════════════════════════ */
+.mth-entry-wrap {
+  align-self: flex-end;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--su) * 8);
+  margin-bottom: calc(var(--su) * 4);
+}
+.mth-entry {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--su) * 9);
+  padding: calc(var(--su) * 8) calc(var(--su) * 18);
+  border: 1px solid var(--hair-d2);
+  border-radius: 999px;
+  background: rgba(var(--surf-2-rgb), 0.6);
+  color: var(--ink2-d);
+  font-family: var(--f-body);
+  font-size: calc(var(--su) * 14);
+  font-weight: 600;
+  white-space: nowrap;
+  transition: color var(--dur-micro), border-color var(--dur-micro),
+    background var(--dur-micro);
+}
+.mth-entry:hover, .mth-entry:focus-visible {
+  color: var(--ivory);
+  border-color: var(--gold);
+  background: var(--stage-3);
+}
+.mth-entry-arrow { color: var(--gold); font-weight: 700; }
+
+/* ════════════════════════════════════════════════════════════════════════
+   12) كسر العرض الضيق (1366×768) — تكثيف بلا فقد محتوى
+   ════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 1440px) {
+  .mth-strip { gap: calc(var(--su) * 9); }
+  .mth-stat { padding: calc(var(--su) * 8) calc(var(--su) * 11); }
+  .mth-stat-v { font-size: calc(var(--su) * 19); }
+  .mth-kvs { grid-template-columns: minmax(0, 1fr); }
+  .mth-search { min-width: calc(var(--su) * 320); flex-basis: calc(var(--su) * 320); }
+  .mth-detail-value { font-size: calc(var(--su) * 23); }
+  .mth-body { grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); }
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   13) طباعة: الملحق ليس مستند الموجز — لكن إن طُبعت الشاشة فلتُقرأ
+   ════════════════════════════════════════════════════════════════════════ */
+@media print {
+  .mth-tools, .mth-pager, .mth-pagenav, .mth-groups, .mth-gfilters,
+  .mth-decfilter, .mth-dec-actions { display: none !important; }
+  .mth-col, .mth-tscroll, .mth-detail { overflow: visible !important; }
+  .mth-page { overflow: visible !important; }
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   14) احترام تقليل الحركة — تصفير صريح لما لا يمر برموز المدد
+   ════════════════════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  .mth-tr, .mth-toggle-btn, .mth-chain-link, .mth-openbtn, .mth-linkbtn,
+  .mth-entry, .mth-gtab, .mth-search-clear, .mth-pgbtn, .mth-pgnum {
+    transition: none !important;
+  }
+}
