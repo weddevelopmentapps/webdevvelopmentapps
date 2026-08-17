@@ -125,3 +125,41 @@ test("serialize/parse للأقسام: /section/<id> ذهاباً وإياباً 
   // الغلاف الرقمي يبقى على /scene/
   assert.deepStrictEqual(R.serialize({ kind: "scene", id: "00", params: {} }), "/scene/00");
 });
+
+/* ── مسار الموجز التنفيذي (عقد V2_CONTRACTS_EXPANSION §2) ── */
+
+test("‎#/report يُحلَّل نوعاً مستقلاً بمعرف ثابت — لا يُخلط بالمشاهد", () => {
+  win.location.hash = "#/report";
+  assert.deepStrictEqual(norm(R.parse()), { kind: "report", id: "main", params: {} });
+  // ولا يمرّ عبر خريطة المسارات القديمة (لا استبدال في التاريخ)
+  const before = historyCalls.length;
+  win.location.hash = "#/report";
+  R.parse();
+  assert.deepStrictEqual(historyCalls.length, before);
+});
+
+test("‎?pages= يصل كاملاً إلى معاملات مسار الموجز", () => {
+  win.location.hash = "#/report?pages=summary,demand,forecast";
+  const route = R.parse();
+  assert.deepStrictEqual(route.kind, "report");
+  assert.deepStrictEqual(route.params.pages, "summary,demand,forecast");
+  assert.deepStrictEqual(route.params.pages.split(",").length, 3);
+});
+
+test("serialize/parse للموجز: ‎/report بلا معرف، ذهاباً وإياباً", () => {
+  assert.deepStrictEqual(
+    R.serialize({ kind: "report", id: "main", params: {} }), "/report");
+  const withPages = { kind: "report", id: "main", params: { pages: "summary,kpis" } };
+  const s = R.serialize(withPages);
+  assert.deepStrictEqual(s, "/report?pages=summary%2Ckpis");
+  win.location.hash = "#" + s;
+  assert.deepStrictEqual(norm(R.parse()), withPages);
+});
+
+test("مسار غير معروف يبقى محالاً إلى الغلاف — الموجز لا يبتلع غيره", () => {
+  win.location.hash = "#/reporting";
+  assert.deepStrictEqual(norm(R.parse()), { kind: "scene", id: "00", params: {} });
+  win.location.hash = "#/report/extra";
+  // الجزء الزائد يُتجاهل: المسار مفرد بحكم العقد
+  assert.deepStrictEqual(norm(R.parse()), { kind: "report", id: "main", params: {} });
+});

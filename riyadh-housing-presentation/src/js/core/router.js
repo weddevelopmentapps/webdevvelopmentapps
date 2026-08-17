@@ -2,6 +2,7 @@
    المسارات:  #/section/<id>[?step=n&…]   — أقسام لوحات V2 (داخلياً kind:"scene")
               #/scene/00                   — الغلاف (المعرفات الرقمية القديمة تُحوَّل)
               #/appendix/<id>[?page=n&return=<حالة مرمّزة>]
+              #/report[?pages=a,b,c]        — الموجز التنفيذي (يتجاوز المسرح)
               #/admin[/<tab>]
    تحويلات المسارات القديمة تتم بالاستبدال (لا إدخال في التاريخ → لا حلقات). */
 "use strict";
@@ -70,6 +71,12 @@ RH.core.router = (function () {
     if (segments[0] === "appendix" && segments[1] != null) {
       return { kind: "appendix", id: segments.slice(1).join("/"), params };
     }
+    // الموجز التنفيذي (عقد التوسعة §2): مسار بلا معرف — المعرف الثابت "main"
+    // يبقى في الكائن كي تظل مقارنات المحرك/التطبيق موحدة الشكل (kind+id).
+    // ‎?pages=a,b,c يحصر صفحات الأقسام؛ غيابه = المستند كاملاً.
+    if (segments[0] === "report") {
+      return { kind: "report", id: "main", params };
+    }
     if (segments[0] === "admin") {
       return { kind: "admin", id: segments[1] || "home", params };
     }
@@ -81,6 +88,8 @@ RH.core.router = (function () {
     // معرفات المشاهد الرقمية (الغلاف 00) تبقى /scene/، وأقسام V2 الاسمية /section/
     if (route.kind === "scene" && !/^\d+$/.test(route.id)) h = "/section/" + route.id;
     if (route.kind === "admin" && route.id === "home") h = "/admin";
+    // الموجز مسار مفرد لا معرف له في العنوان — ‎#/report وحده (مع معاملاته)
+    if (route.kind === "report") h = "/report";
     const q = Object.entries(route.params || {})
       .filter(([, v]) => v != null && v !== "")
       .map(([k, v]) => encodeURIComponent(k) + "=" + encodeURIComponent(v))

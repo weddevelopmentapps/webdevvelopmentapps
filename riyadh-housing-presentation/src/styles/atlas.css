@@ -1,0 +1,1007 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   atlas.css — أطلس الأحياء (ملحق `atlas`)
+   بادئة الميزة: `atl-`  ·  عقد V2_CONTRACTS_EXPANSION §5 و§0
+
+   قواعد ملزمة مطبَّقة هنا حرفياً:
+   • **لا لمس لملف مشترك**: كل صنف في هذا الملف يبدأ بـ`atl-`، ولا يُعاد تعريف
+     أي صنف من dashboard.css أو tokens.css أو appendix.css أو micro.css —
+     تُستهلك أصنافها المشتركة (`.table-dense`، `.pending-card`، `.mcr-*`)
+     كما هي، وما تحتها من قواعد هنا يقتصر على **تحجيمها** داخل نطاق `.atl-*`.
+   • **لا لون حرفي**: كل صبغة رمز من tokens.css. منظومة المعنى مقفلة:
+     أخضر = طاقة/تغطية/حالة بيانات متوفرة، رملي = طلب، مرجاني = عجز ومخالفات
+     ونقاط تركّز حصراً، ذهبي = خط المقارنة/المستهدف حصراً، محايد = عدم اليقين
+     وحالات «لا بيانات». إبراز الحي المختار على الخريطة **حبر واجهة عاجي**
+     (مؤشر تركيز) لا لون قيمة — فلا يستهلك أي لون دلالي.
+   • **كل مقاس بوحدة `--su`**: الصفحة تتسع في إطار المسرح 16:9 عند 1920×1080
+     وعند 1366×768 دون تمرير المسرح؛ الفيضان يُحل بتمرير **داخل المكوّن**
+     (القائمة وجسم اللسان) لا بتمرير الصفحة.
+   • **حركة**: انتقالات دقيقة فقط (`--dur-micro`) وتُصفَّر صراحةً عند
+     `prefers-reduced-motion: reduce`.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* ── جذر الصفحة داخل هيكل الملاحق ─────────────────────────────────────── */
+.atl-page {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 10);
+  overflow: hidden;                 /* الفيضان يُحل داخل المكوّنات لا هنا */
+}
+
+/* ملخص ناطق: يقرأه القارئ الصوتي ولا يشغل مساحة بصرية */
+.atl-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.atl-grid {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: calc(var(--su) * 430) minmax(0, 1fr);
+  gap: calc(var(--su) * 22);
+  align-items: stretch;
+}
+
+/* ────────────────────────────────────────────────────────────────────────
+   نغمات RH.viz.micro داخل هذا الملحق
+   ملاحظة تنفيذية (نفس ما رفعه وكيل السيناريوهات إلى معمار التوسعة): في
+   micro.css تأتي كتلة القيم الافتراضية `.mcr-spark, .mcr-bars, …` **بعد**
+   قواعد النغمة `:where(…).t-*` وبالوزن ذاته (0-1-0)، فتفوز القاعدة اللاحقة
+   ويعود `--mcr-tone` أخضر مهما كانت النغمة الممرَّرة. تصحيح المكتبة ذاتها من
+   صلاحية مالكها (لا يعدّله وكيل ميزة)، ومنظومة المعنى غير قابلة للتنازل —
+   فيُثبَّت هنا **داخل نطاق `.atl-*` وحده** ما يجعل النغمة الدلالية تصل فعلاً.
+   لا صنف من micro.css يُعاد تعريفه عالمياً.
+   ──────────────────────────────────────────────────────────────────────── */
+.atl-page .mcr-spark.t-neg,
+.atl-page .mcr-bars.t-neg,
+.atl-page .mcr-ratio.t-neg,
+.atl-page .mcr-bar-fill.t-neg,
+.atl-page .mcr-sm.t-neg {
+  --mcr-tone: var(--coral);
+  --mcr-tone-hi: var(--coral);
+}
+.atl-page .mcr-spark.t-neu,
+.atl-page .mcr-bars.t-neu,
+.atl-page .mcr-ratio.t-neu,
+.atl-page .mcr-bar-fill.t-neu,
+.atl-page .mcr-sm.t-neu {
+  --mcr-tone: var(--mut-d);
+  --mcr-tone-hi: var(--ink2-d);
+}
+.atl-page .mcr-spark.t-pos,
+.atl-page .mcr-bars.t-pos,
+.atl-page .mcr-ratio.t-pos,
+.atl-page .mcr-bar-fill.t-pos,
+.atl-page .mcr-sm.t-pos {
+  --mcr-tone: var(--green);
+  --mcr-tone-hi: var(--green-hi);
+}
+.atl-page .mcr-spark.t-demand,
+.atl-page .mcr-bars.t-demand,
+.atl-page .mcr-ratio.t-demand,
+.atl-page .mcr-bar-fill.t-demand,
+.atl-page .mcr-sm.t-demand {
+  --mcr-tone: var(--demand);
+  --mcr-tone-hi: var(--demand);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   1) العمود الأيمن: البحث والمرشّحات والقائمة والترقيم
+   ════════════════════════════════════════════════════════════════════════ */
+.atl-side {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 9);
+  background: rgba(16, 32, 26, 0.5);
+  border: 1px solid var(--hair-d2);
+  border-radius: var(--r-sm);
+  padding: calc(var(--su) * 12) calc(var(--su) * 12) calc(var(--su) * 10);
+}
+
+/* ── حقل البحث ─────────────────────────────────────────────────────────── */
+.atl-search {
+  flex: none;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: calc(var(--su) * 8);
+  background: var(--stage-1);
+  border: 1px solid var(--hair-d);
+  border-radius: 999px;
+  padding: calc(var(--su) * 5) calc(var(--su) * 12);
+  transition: border-color var(--dur-micro), background var(--dur-micro);
+}
+.atl-search:focus-within {
+  border-color: var(--gold);
+  background: var(--stage-2);
+}
+.atl-search-icon {
+  flex: none;
+  font-size: calc(var(--su) * 19);
+  line-height: 1;
+  color: var(--mut-d);
+}
+.atl-search-input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: 0;
+  outline: none;
+  color: var(--ivory);
+  font-family: var(--f-body);
+  font-size: calc(var(--su) * 16);
+  padding: calc(var(--su) * 5) 0;
+}
+.atl-search-input::placeholder { color: var(--faint-d); }
+.atl-search-input::-webkit-search-cancel-button { display: none; }
+.atl-search-clear {
+  flex: none;
+  width: calc(var(--su) * 24);
+  height: calc(var(--su) * 24);
+  border-radius: 50%;
+  color: var(--mut-d);
+  font-size: calc(var(--su) * 13);
+  line-height: 1;
+  border: 1px solid transparent;
+  transition: color var(--dur-micro), border-color var(--dur-micro);
+}
+.atl-search-clear:hover,
+.atl-search-clear:focus-visible {
+  color: var(--ivory);
+  border-color: var(--hair-d);
+}
+
+/* ── مرشّحات القطاعات + مفتاح العينة ───────────────────────────────────── */
+.atl-filters {
+  flex: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--su) * 5);
+}
+.atl-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--su) * 6);
+  font-family: var(--f-body);
+  font-size: calc(var(--su) * 13);
+  font-weight: 600;
+  color: var(--mut-d);
+  background: var(--stage-1);
+  border: 1px solid var(--hair-d2);
+  border-radius: 999px;
+  padding: calc(var(--su) * 4) calc(var(--su) * 10);
+  transition: color var(--dur-micro), border-color var(--dur-micro),
+    background var(--dur-micro);
+}
+.atl-filter:hover { color: var(--ivory); border-color: var(--hair-d); }
+.atl-filter:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+.atl-filter.active {
+  color: var(--ivory);
+  background: var(--stage-3);
+  border-color: var(--hair-d);
+}
+.atl-filter.empty { opacity: 0.45; }
+.atl-filter-n {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-size: calc(var(--su) * 12);
+  color: var(--faint-d);
+}
+.atl-filter.active .atl-filter-n { color: var(--ink2-d); }
+/* مفتاح العينة: حالة «بيانات متوفرة» — الأخضر استخدامه الدلالي المسموح */
+.atl-filter-sample.active {
+  border-color: var(--green);
+  color: var(--green-hi);
+}
+.atl-filter-sample.active .atl-filter-n { color: var(--green-hi); }
+
+/* ── صف الترتيب ────────────────────────────────────────────────────────── */
+.atl-sortrow {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: calc(var(--su) * 8);
+  flex-wrap: wrap;
+}
+.atl-sortrow-l {
+  font-size: calc(var(--su) * 12.5);
+  color: var(--faint-d);
+}
+.atl-sort {
+  flex: 1;
+  min-width: calc(var(--su) * 150);
+  font-family: var(--f-body);
+  font-size: calc(var(--su) * 13);
+  color: var(--ivory);
+  background: var(--stage-1);
+  border: 1px solid var(--hair-d2);
+  border-radius: var(--r-sm);
+  padding: calc(var(--su) * 5) calc(var(--su) * 9);
+}
+.atl-sort:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
+.atl-sort option { background: var(--stage-2); color: var(--ivory); }
+.atl-sort-note {
+  flex-basis: 100%;
+  font-size: calc(var(--su) * 11.5);
+  color: var(--faint-d);
+  line-height: 1.5;
+}
+
+/* ── عدّاد النتائج ─────────────────────────────────────────────────────── */
+.atl-count {
+  flex: none;
+  font-size: calc(var(--su) * 12.5);
+  color: var(--mut-d);
+  line-height: 1.6;
+  min-height: calc(var(--su) * 20);
+  border-inline-start: 2px solid var(--hair-d);
+  padding-inline-start: calc(var(--su) * 9);
+}
+
+/* ── القائمة ───────────────────────────────────────────────────────────── */
+.atl-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 3);
+  padding: calc(var(--su) * 2);
+  border-radius: var(--r-sm);
+}
+.atl-list:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.atl-list::-webkit-scrollbar { width: 7px; }
+.atl-list::-webkit-scrollbar-thumb {
+  background: var(--hair-d);
+  border-radius: 999px;
+}
+.atl-list::-webkit-scrollbar-track { background: transparent; }
+
+.atl-opt {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(var(--su) * 8);
+  cursor: pointer;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: calc(var(--su) * 9);
+  padding: calc(var(--su) * 7) calc(var(--su) * 10);
+  transition: background var(--dur-micro), border-color var(--dur-micro);
+}
+.atl-opt:hover { background: rgba(22, 41, 31, 0.6); }
+.atl-opt.is-active {
+  background: rgba(22, 41, 31, 0.8);
+  border-color: var(--hair-d);
+}
+.atl-opt.is-sel {
+  background: var(--stage-3);
+  border-color: var(--gold);
+}
+.atl-opt-main {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 2);
+  min-width: 0;
+}
+.atl-opt-name {
+  font-size: calc(var(--su) * 15);
+  font-weight: 600;
+  color: var(--ink2-d);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.atl-opt.is-sel .atl-opt-name,
+.atl-opt.is-active .atl-opt-name { color: var(--ivory); }
+.atl-opt-en {
+  font-size: calc(var(--su) * 11);
+  color: var(--faint-d);
+  direction: ltr;
+  unicode-bidi: isolate;
+  text-align: start;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.atl-opt-side {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: calc(var(--su) * 6);
+}
+.atl-opt-sec {
+  font-size: calc(var(--su) * 11.5);
+  color: var(--faint-d);
+}
+.atl-opt-badge {
+  font-size: calc(var(--su) * 10.5);
+  font-weight: 700;
+  color: var(--green-hi);
+  background: rgba(49, 162, 109, 0.12);
+  border: 1px solid rgba(49, 162, 109, 0.34);
+  border-radius: 999px;
+  padding: calc(var(--su) * 2) calc(var(--su) * 7);
+  white-space: nowrap;
+}
+
+/* ── الترقيم ───────────────────────────────────────────────────────────── */
+.atl-pager {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(var(--su) * 8);
+  padding-top: calc(var(--su) * 6);
+  border-top: 1px solid var(--hair-d2);
+}
+.atl-page-btn {
+  font-family: var(--f-body);
+  font-size: calc(var(--su) * 12.5);
+  font-weight: 600;
+  color: var(--mut-d);
+  border: 1px solid var(--hair-d2);
+  border-radius: 999px;
+  padding: calc(var(--su) * 4) calc(var(--su) * 13);
+  transition: color var(--dur-micro), border-color var(--dur-micro);
+}
+.atl-page-btn:hover:not(:disabled),
+.atl-page-btn:focus-visible { color: var(--ivory); border-color: var(--hair-d); }
+.atl-page-btn:disabled { opacity: 0.32; cursor: default; }
+.atl-page-lbl {
+  flex: 1;
+  text-align: center;
+  font-size: calc(var(--su) * 11.5);
+  color: var(--faint-d);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   2) العمود الأيسر: لوحة الحي (أو اللوحة التمهيدية)
+   ════════════════════════════════════════════════════════════════════════ */
+.atl-main {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 10);
+  background: rgba(16, 32, 26, 0.42);
+  border: 1px solid var(--hair-d2);
+  border-radius: var(--r-sm);
+  padding: calc(var(--su) * 14) calc(var(--su) * 16) calc(var(--su) * 12);
+  overflow: hidden;
+}
+.atl-main:focus { outline: none; }
+
+/* ── ترويسة اللوحة ─────────────────────────────────────────────────────── */
+.atl-head {
+  flex: none;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: calc(var(--su) * 14);
+}
+.atl-head-main { min-width: 0; }
+.atl-name {
+  font-family: var(--f-display);
+  font-size: calc(var(--su) * 27);
+  font-weight: 700;
+  color: var(--ivory);
+  line-height: 1.25;
+}
+.atl-head-sub {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: calc(var(--su) * 7);
+  margin-top: calc(var(--su) * 6);
+}
+.atl-name-en {
+  font-size: calc(var(--su) * 12.5);
+  color: var(--faint-d);
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+.atl-head-side { flex: none; display: flex; gap: calc(var(--su) * 8); }
+
+/* ── الرقاقات الدلالية ─────────────────────────────────────────────────── */
+.atl-chip {
+  display: inline-flex;
+  align-items: center;
+  font-size: calc(var(--su) * 12);
+  font-weight: 600;
+  color: var(--mut-d);
+  background: rgba(244, 241, 230, 0.05);
+  border: 1px solid var(--hair-d2);
+  border-radius: 999px;
+  padding: calc(var(--su) * 3) calc(var(--su) * 10);
+  white-space: nowrap;
+}
+.atl-chip.t-pos {
+  color: var(--green-hi);
+  border-color: rgba(49, 162, 109, 0.36);
+  background: rgba(49, 162, 109, 0.1);
+}
+.atl-chip.t-neg {
+  color: var(--coral);
+  border-color: rgba(214, 106, 80, 0.36);
+  background: rgba(214, 106, 80, 0.1);
+}
+.atl-chip.t-demand {
+  color: var(--demand);
+  border-color: rgba(156, 122, 46, 0.4);
+  background: rgba(156, 122, 46, 0.1);
+}
+.atl-chip.t-neu { color: var(--ink2-d); }
+.atl-chiprow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: calc(var(--su) * 8);
+  margin: calc(var(--su) * 6) 0 calc(var(--su) * 2);
+}
+
+/* ── أزرار الأطلس ──────────────────────────────────────────────────────── */
+.atl-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--su) * 8);
+  font-family: var(--f-body);
+  font-size: calc(var(--su) * 13.5);
+  font-weight: 700;
+  color: var(--ivory);
+  background: var(--stage-2);
+  border: 1px solid var(--hair-d);
+  border-radius: 999px;
+  padding: calc(var(--su) * 6) calc(var(--su) * 16);
+  transition: background var(--dur-micro), border-color var(--dur-micro);
+}
+.atl-btn:hover:not(:disabled),
+.atl-btn:focus-visible { background: var(--stage-3); border-color: var(--gold); }
+.atl-btn:disabled { opacity: 0.4; cursor: default; }
+.atl-btn.ghost {
+  background: transparent;
+  color: var(--mut-d);
+  font-weight: 600;
+}
+.atl-btn.ghost:hover, .atl-btn.ghost:focus-visible { color: var(--ivory); }
+.atl-btn.peer {
+  font-size: calc(var(--su) * 12.5);
+  font-weight: 600;
+  padding: calc(var(--su) * 4) calc(var(--su) * 12);
+}
+.atl-btn-arrow { font-size: calc(var(--su) * 13); color: var(--gold); }
+
+/* ── بطاقة الخريطة المصغرة ─────────────────────────────────────────────── */
+.atl-mapcard {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 6);
+  background: var(--stage-1);
+  border: 1px solid var(--hair-d2);
+  border-radius: var(--r-sm);
+  padding: calc(var(--su) * 9) calc(var(--su) * 11) calc(var(--su) * 8);
+}
+.atl-mapcard-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(var(--su) * 10);
+}
+.atl-mapcard-title {
+  font-size: calc(var(--su) * 13);
+  font-weight: 600;
+  color: var(--mut-d);
+}
+.atl-mapmodes { display: flex; gap: calc(var(--su) * 4); }
+.atl-mapmode {
+  font-family: var(--f-body);
+  font-size: calc(var(--su) * 12);
+  font-weight: 600;
+  color: var(--faint-d);
+  background: transparent;
+  border: 1px solid var(--hair-d2);
+  border-radius: 999px;
+  padding: calc(var(--su) * 3) calc(var(--su) * 11);
+  transition: color var(--dur-micro), border-color var(--dur-micro);
+}
+.atl-mapmode:hover { color: var(--ink2-d); }
+.atl-mapmode:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.atl-mapmode.active {
+  color: var(--ivory);
+  border-color: var(--hair-d);
+  background: var(--stage-3);
+}
+/* جسم البطاقة: الرسم في عمود بمقاسه الطبيعي (الرياض شبه مربعة الحدود)،
+   و«نظرة سريعة» تملأ العرض المتبقي بدل فراغ حول رسم مربع في صندوق عريض */
+.atl-mapcard-body {
+  display: grid;
+  grid-template-columns: calc(var(--su) * 290) minmax(0, 1fr);
+  gap: calc(var(--su) * 14);
+  align-items: stretch;
+}
+.atl-maphost {
+  height: calc(var(--su) * 286);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+}
+.atl-maphost.ov { height: calc(var(--su) * 330); }
+.atl-mapside {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* ── نظرة سريعة: كل صف يعلن مستوى قيمته (حيّي/قطاعي/جغرافي) ── */
+.atl-glance {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: calc(var(--su) * 6);
+}
+.atl-glance-row {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 2);
+  background: rgba(11, 21, 18, 0.6);
+  border: 1px solid var(--hair-d2);
+  border-inline-start: 2px solid var(--hair-d);
+  border-radius: calc(var(--su) * 9);
+  padding: calc(var(--su) * 7) calc(var(--su) * 11);
+  min-width: 0;
+}
+.atl-glance-k {
+  font-size: calc(var(--su) * 11);
+  color: var(--mut-d);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.atl-glance-v {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-size: calc(var(--su) * 16);
+  font-weight: 700;
+  color: var(--ivory);
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.atl-glance-l {
+  font-size: calc(var(--su) * 10.5);
+  color: var(--faint-d);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.atl-glance-row.t-pos { border-inline-start-color: var(--green); }
+.atl-glance-row.t-pos .atl-glance-v { color: var(--green-hi); }
+.atl-glance-row.t-neg { border-inline-start-color: var(--coral); }
+.atl-glance-row.t-neg .atl-glance-v { color: var(--coral); }
+.atl-map,
+.atl-map-frame {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+}
+.atl-map-svg { width: 100%; height: 100%; display: block; }
+.atl-map-missing {
+  font-size: calc(var(--su) * 13);
+  color: var(--mut-d);
+  text-align: center;
+  padding: calc(var(--su) * 20);
+}
+
+/* حدود الأحياء: حبر واجهة محايد — الإبراز مؤشر تركيز لا لون قيمة */
+.atl-map-d {
+  fill: rgba(244, 241, 230, 0.09);
+  stroke: rgba(244, 241, 230, 0.34);
+  stroke-width: 0.9;
+  cursor: pointer;
+  transition: fill var(--dur-micro), stroke var(--dur-micro);
+}
+.atl-map-d:hover { fill: rgba(244, 241, 230, 0.24); }
+.atl-map-d.in-sec {
+  fill: rgba(244, 241, 230, 0.19);
+  stroke: rgba(244, 241, 230, 0.52);
+}
+.atl-map-d.has-sample { stroke-dasharray: 3 2; }
+.atl-map-d.is-sel {
+  fill: rgba(244, 241, 230, 0.82);
+  stroke: var(--ivory);
+  stroke-width: 2.2;
+  stroke-dasharray: none;
+}
+/* نقاط التركّز الرقابي — المرجاني استخدامه الدلالي المسموح */
+.atl-map-hs {
+  fill: rgba(214, 106, 80, 0.5);
+  stroke: var(--coral);
+  stroke-width: 0.7;
+  pointer-events: none;
+}
+.atl-map-ring {
+  fill: none;
+  stroke: rgba(244, 241, 230, 0.46);
+  stroke-width: 1.3;
+  stroke-dasharray: 6 4;
+  pointer-events: none;
+}
+.atl-map-pin {
+  fill: var(--ivory);
+  stroke: var(--stage-0);
+  stroke-width: 0.8;
+  pointer-events: none;
+}
+.atl-map-scale-line {
+  stroke: rgba(244, 241, 230, 0.4);
+  stroke-width: 1.2;
+  pointer-events: none;
+}
+.atl-map-scale-text {
+  fill: rgba(244, 241, 230, 0.55);
+  font-family: var(--f-display);
+  font-size: 11px;
+  pointer-events: none;
+}
+
+/* ── شريط الألسنة ──────────────────────────────────────────────────────── */
+.atl-tabs {
+  flex: none;
+  display: flex;
+  gap: calc(var(--su) * 4);
+  border-bottom: 1px solid var(--hair-d2);
+  padding-bottom: calc(var(--su) * 5);
+}
+.atl-tab {
+  font-family: var(--f-body);
+  font-size: calc(var(--su) * 13.5);
+  font-weight: 600;
+  color: var(--mut-d);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: calc(var(--su) * 5) calc(var(--su) * 14);
+  transition: color var(--dur-micro), background var(--dur-micro),
+    border-color var(--dur-micro);
+}
+.atl-tab:hover { color: var(--ivory); }
+.atl-tab:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.atl-tab.active {
+  color: var(--ivory);
+  background: var(--stage-3);
+  border-color: var(--hair-d);
+}
+.atl-tabpanel {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 8);
+  padding-inline-end: calc(var(--su) * 6);
+}
+/* عناصر جسم اللسان لا تنضغط: الجداول حاويات تمرير أفقي، ولو بقي انكماشها
+   الافتراضي داخل عمود مرن يفيض لانهارت إلى ارتفاع شبه صفري وغاب محتواها. */
+.atl-tabpanel > * { flex: 0 0 auto; }
+.atl-tabpanel:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.atl-tabpanel::-webkit-scrollbar { width: 7px; }
+.atl-tabpanel::-webkit-scrollbar-thumb {
+  background: var(--hair-d);
+  border-radius: 999px;
+}
+.atl-tabpanel::-webkit-scrollbar-track { background: transparent; }
+
+/* ════════════════════════════════════════════════════════════════════════
+   3) لبنات المحتوى داخل الألسنة واللوحة التمهيدية
+   ════════════════════════════════════════════════════════════════════════ */
+.atl-subhead {
+  display: flex;
+  align-items: baseline;
+  gap: calc(var(--su) * 10);
+  margin-top: calc(var(--su) * 4);
+  padding-bottom: calc(var(--su) * 4);
+  border-bottom: 1px solid var(--hair-d2);
+}
+.atl-subhead-t {
+  font-size: calc(var(--su) * 14.5);
+  font-weight: 700;
+  color: var(--ivory);
+}
+.atl-subhead-s {
+  font-size: calc(var(--su) * 12);
+  color: var(--faint-d);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.atl-para {
+  font-size: calc(var(--su) * 13.5);
+  line-height: 1.85;
+  color: var(--ink2-d);
+  max-width: calc(var(--su) * 860);
+}
+
+.atl-note {
+  display: flex;
+  align-items: flex-start;
+  gap: calc(var(--su) * 7);
+  font-size: calc(var(--su) * 11.5);
+  line-height: 1.7;
+  color: var(--mut-d);
+}
+.atl-note.faint { color: var(--faint-d); }
+.atl-note-dot {
+  flex: none;
+  width: calc(var(--su) * 4);
+  height: calc(var(--su) * 4);
+  margin-top: calc(var(--su) * 7);
+  border-radius: 50%;
+  background: var(--gold);
+  opacity: 0.7;
+}
+
+.atl-empty {
+  font-size: calc(var(--su) * 13);
+  color: var(--mut-d);
+  background: rgba(244, 241, 230, 0.03);
+  border: 1px dashed var(--hair-d2);
+  border-radius: var(--r-sm);
+  padding: calc(var(--su) * 12) calc(var(--su) * 14);
+  line-height: 1.7;
+}
+.atl-empty-list {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: calc(var(--su) * 10);
+  margin: calc(var(--su) * 8);
+}
+
+/* بطاقة الحالة الصادقة — تستهلك .pending-card المشتركة كما هي */
+.atl-honest { margin: calc(var(--su) * 2) 0; }
+.atl-honest .pending-card { width: 100%; }
+
+/* ── شبكة الأرقام ──────────────────────────────────────────────────────── */
+.atl-figs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(calc(var(--su) * 168), 1fr));
+  gap: calc(var(--su) * 7);
+}
+.atl-fig {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 3);
+  background: rgba(11, 21, 18, 0.62);
+  border: 1px solid var(--hair-d2);
+  border-inline-start: 2px solid var(--hair-d);
+  border-radius: calc(var(--su) * 9);
+  padding: calc(var(--su) * 8) calc(var(--su) * 11);
+  min-width: 0;
+}
+.atl-fig-k {
+  font-size: calc(var(--su) * 11.5);
+  color: var(--mut-d);
+  line-height: 1.45;
+}
+.atl-fig-v {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-size: calc(var(--su) * 18);
+  font-weight: 700;
+  color: var(--ivory);
+  line-height: 1.2;
+}
+.atl-fig-o {
+  font-size: calc(var(--su) * 10.5);
+  color: var(--faint-d);
+  direction: ltr;
+  unicode-bidi: isolate;
+  text-align: start;
+}
+.atl-fig.t-pos { border-inline-start-color: var(--green); }
+.atl-fig.t-pos .atl-fig-v { color: var(--green-hi); }
+.atl-fig.t-neg { border-inline-start-color: var(--coral); }
+.atl-fig.t-neg .atl-fig-v { color: var(--coral); }
+.atl-fig.t-demand { border-inline-start-color: var(--demand); }
+.atl-fig.t-neu { border-inline-start-color: var(--hair-d); }
+.atl-figs-sample .atl-fig-v { font-size: calc(var(--su) * 20); }
+.atl-figs-ov {
+  grid-template-columns: repeat(auto-fill, minmax(calc(var(--su) * 196), 1fr));
+}
+
+/* ── شريط النسبة والأشرطة المصغرة ──────────────────────────────────────── */
+.atl-cov { margin: calc(var(--su) * 4) 0 calc(var(--su) * 2); }
+.atl-cov .mcr-ratio { width: 100%; }
+.atl-bars { margin: calc(var(--su) * 2) 0; }
+.atl-bars .mcr-bars { width: 100%; }
+.atl-bars .mcr-bar-label {
+  font-size: calc(var(--su) * 12);
+  max-width: calc(var(--su) * 190);
+}
+
+/* ── الجداول (تستهلك .table-dense المشتركة) ────────────────────────────── */
+.atl-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--hair-d2);
+  border-radius: var(--r-sm);
+}
+.atl-table-wrap::-webkit-scrollbar { height: 7px; }
+.atl-table-wrap::-webkit-scrollbar-thumb {
+  background: var(--hair-d);
+  border-radius: 999px;
+}
+.atl-table { width: 100%; font-size: calc(var(--su) * 12.5); }
+.atl-table th { white-space: nowrap; }
+.atl-table td { font-variant-numeric: tabular-nums; }
+.atl-prov td, .atl-prov th { vertical-align: top; line-height: 1.65; }
+.atl-prov-rel td { direction: rtl; }
+
+/* ── قائمة أحياء العينة في القطاع (الحالة الصادقة) ─────────────────────── */
+.atl-peers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--su) * 6);
+}
+
+/* ── لسان الجوار ───────────────────────────────────────────────────────── */
+.atl-near {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 4);
+}
+.atl-near-row {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--su) * 10);
+  width: 100%;
+  text-align: start;
+  font-family: var(--f-body);
+  background: rgba(11, 21, 18, 0.55);
+  border: 1px solid var(--hair-d2);
+  border-radius: calc(var(--su) * 9);
+  padding: calc(var(--su) * 7) calc(var(--su) * 12);
+  transition: background var(--dur-micro), border-color var(--dur-micro);
+}
+.atl-near-row:hover,
+.atl-near-row:focus-visible {
+  background: var(--stage-3);
+  border-color: var(--hair-d);
+}
+.atl-near-row.same { border-inline-start: 2px solid var(--hair-d); }
+.atl-near-name {
+  flex: 1;
+  min-width: 0;
+  font-size: calc(var(--su) * 14);
+  font-weight: 600;
+  color: var(--ink2-d);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.atl-near-sec { font-size: calc(var(--su) * 11.5); color: var(--faint-d); }
+.atl-near-badge {
+  font-size: calc(var(--su) * 10.5);
+  font-weight: 700;
+  color: var(--green-hi);
+  border: 1px solid rgba(49, 162, 109, 0.34);
+  border-radius: 999px;
+  padding: calc(var(--su) * 2) calc(var(--su) * 7);
+  white-space: nowrap;
+}
+.atl-near-km {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-size: calc(var(--su) * 13.5);
+  color: var(--ivory);
+  min-width: calc(var(--su) * 62);
+  text-align: end;
+}
+
+/* ── بطاقة «للحي صف موثق» في لسان الملف ────────────────────────────────── */
+.atl-sample-lead {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: calc(var(--su) * 7);
+  background: rgba(49, 162, 109, 0.06);
+  border: 1px solid rgba(49, 162, 109, 0.24);
+  border-radius: var(--r-sm);
+  padding: calc(var(--su) * 10) calc(var(--su) * 13);
+}
+.atl-sample-lead-t {
+  font-size: calc(var(--su) * 13.5);
+  line-height: 1.8;
+  color: var(--ink2-d);
+}
+
+/* ── جدول اللوحة التمهيدية ─────────────────────────────────────────────── */
+.atl-ov-table .atl-table { font-size: calc(var(--su) * 12.5); }
+
+/* ════════════════════════════════════════════════════════════════════════
+   4) نقطة الدخول المرخصة داخل قسم الخريطة (`.atl-entry` في s05-map.js)
+   الصنف يعيش هنا لا في map.css: ملفات الأقسام مقفلة بأمر مجلس المراجعة،
+   وبادئة الميزة تحمل نمطها معها. الشكل مطابق لأزرار العمود الجانبي القائمة.
+   ════════════════════════════════════════════════════════════════════════ */
+.atl-entry {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(var(--su) * 10);
+  width: 100%;
+  font-family: var(--f-body);
+  font-size: calc(var(--su) * 13.5);
+  font-weight: 700;
+  color: var(--ivory);
+  background: rgba(22, 41, 31, 0.55);
+  border: 1px solid var(--hair-d);
+  border-radius: 999px;
+  padding: calc(var(--su) * 8) calc(var(--su) * 16);
+  margin-top: calc(var(--su) * 8);
+  transition: background var(--dur-micro), border-color var(--dur-micro);
+}
+.atl-entry:hover,
+.atl-entry:focus-visible {
+  background: var(--stage-3);
+  border-color: var(--gold);
+}
+.atl-entry-arrow { color: var(--gold); font-size: calc(var(--su) * 14); }
+
+/* ════════════════════════════════════════════════════════════════════════
+   5) المقاس الضيق (فئة 1366×768): تضييق العمود وتصغير الخريطة كي تبقى
+   الصفحة داخل الإطار بلا تمرير للمسرح — التمرير يبقى داخل المكوّنات.
+   ════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 1440px) {
+  .atl-grid { grid-template-columns: calc(var(--su) * 400) minmax(0, 1fr); }
+  .atl-mapcard-body {
+    grid-template-columns: calc(var(--su) * 250) minmax(0, 1fr);
+  }
+  .atl-maphost { height: calc(var(--su) * 248); }
+  .atl-maphost.ov { height: calc(var(--su) * 286); }
+  .atl-glance { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .atl-figs {
+    grid-template-columns: repeat(auto-fill, minmax(calc(var(--su) * 156), 1fr));
+  }
+  .atl-tab { padding: calc(var(--su) * 5) calc(var(--su) * 11); }
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   6) تقليل الحركة: تصفير صريح لكل انتقال في هذا الملف
+   ════════════════════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  .atl-search,
+  .atl-search-clear,
+  .atl-filter,
+  .atl-opt,
+  .atl-page-btn,
+  .atl-btn,
+  .atl-tab,
+  .atl-mapmode,
+  .atl-near-row,
+  .atl-map-d,
+  .atl-entry {
+    transition: none;
+  }
+}

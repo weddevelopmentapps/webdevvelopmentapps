@@ -1417,7 +1417,33 @@
     rt.sub(syncMeters);
     syncMeters();
 
-    /* ── 6.4) سطرا الإسناد الإلزاميان أسفل العمود ── */
+    /* ── 6.4) نقطة الدخول المرخصة إلى أطلس الأحياء (عقد التوسعة §5) ──
+       زر واحد بنمط أزرار العمود القائم (صنفه `atl-` في atlas.css — ملفات
+       الأقسام مقفلة)، يفتح الملحق مع حفظ حالة القسم كاملة (عقد §7). إن كان
+       رصيف الحي مفتوحاً يسافر الحي المعروض مع الفتح (`d=<key>`) فيبدأ
+       الأطلس من الحي نفسه — تكامل تركيز الخريطة. الزر يظهر فقط إذا كان
+       الملحق مضمّناً في هذا البناء (بناء جزئي لا يخلّف زراً معطلاً). */
+    if (RH.explore && RH.explore.districts) {
+      rail.appendChild(h("button", {
+        class: "atl-entry",
+        type: "button",
+        "data-interactive": "",
+        "aria-label": "فتح أطلس الأحياء: بحث في "
+          + fmt.countNoun(countDistricts(ctx.geo), LOCAL_NOUNS.district)
+          + " ولوحة لكل حي",
+        onclick: () => {
+          const info = dockOpen && lastInfo ? lastInfo : null;
+          const key = info
+            ? RH.explore.districts.keyOf(info.sector, info.name) : "";
+          ctx.openAppendix("atlas", key ? { d: key } : null);
+        },
+      },
+        h("span", {}, "أطلس الأحياء"),
+        h("span", { class: "atl-entry-arrow", "aria-hidden": "true" }, "←"),
+      ));
+    }
+
+    /* ── 6.5) سطرا الإسناد الإلزاميان أسفل العمود ── */
     rail.appendChild(h("div", { class: "map-src" },
       h("p", { class: "map-src-line" }, String(rel.neighbourhoods.label) + "."),
       h("p", { class: "map-src-line" }, ATTRIB_TEXT + "."),

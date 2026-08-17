@@ -11,3 +11,8 @@ require("./reconciliation.test.mjs");
 require("./format.test.mjs");
 require("./router.test.mjs");
 require("./validate.test.mjs");
+require("./geomap-utils.test.mjs");
+require("./charts-micro.test.mjs");
+require("./scenarios-model.test.mjs");
+require("./atlas-model.test.mjs");
+require("./report-model.test.mjs");

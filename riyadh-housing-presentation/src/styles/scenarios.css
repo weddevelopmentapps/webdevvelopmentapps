@@ -1,0 +1,1058 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   scenarios.css — مستكشف السيناريوهات (ملحق `scenarios`)
+   بادئة الميزة: `axs-`  ·  عقد V2_CONTRACTS_EXPANSION §4 و§0
+
+   قواعد ملزمة مطبَّقة هنا حرفياً:
+   • **لا لمس لملف مشترك**: كل صنف في هذا الملف يبدأ بـ`axs-`، ولا يُعاد تعريف
+     أي صنف من dashboard.css أو tokens.css أو appendix.css أو micro.css —
+     تُستهلك أصنافها المشتركة (`.dash-card`، `.card-body`، `.table-dense`،
+     `.pending-card`، `.mcr-*`) كما هي، وما تحته من قواعد هنا يقتصر على
+     **تحجيم** المضيفات الخاصة بالملحق داخل نطاق `.axs-*`.
+   • **لا لون حرفي**: كل صبغة رمز من tokens.css؛ درجات بطاقات السيناريوهات
+     الثلاث شفافيات من صبغة العجز الواحدة (`--coral`) لا صبغات جديدة —
+     فتبقى منظومة المعنى مقفلة (مرجاني=عجز حصراً، أخضر=تغطية/طاقة، ذهبي=
+     وسوم الاعتماد وخط الأساس والمؤشر الاسترشادي حصراً، محايد=عدم اليقين).
+   • **كل مقاس بوحدة `--su`**: الصفحات تتسع في إطار المسرح 16:9 عند 1920×1080
+     وعند 1366×768 دون تمرير المسرح؛ الفيضان — إن وقع — يُحل بتمرير **داخل
+     المكوّن** (جداول وأعمدة جانبية) لا بتمرير الصفحة.
+   • **حركة**: انتقالات دقيقة فقط (`--dur-micro`)، وتُصفَّر كلها عند
+     `prefers-reduced-motion: reduce` (رموز المدد نفسها مصفَّرة في tokens.css،
+     ويُضاف هنا تصفير صريح لما لا يمر بها).
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* ── جذر الصفحة داخل هيكل الملاحق ─────────────────────────────────────── */
+.axs-page {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 12);
+  overflow: hidden;               /* الفيضان يُحل داخل المكوّنات لا هنا */
+}
+
+/* ── نغمات RH.viz.micro داخل هذا الملحق ───────────────────────────────────
+   ملاحظة تنفيذية (مرفوعة إلى معمار التوسعة): في micro.css تأتي كتلة القيم
+   الافتراضية `.mcr-spark, .mcr-bars, …` **بعد** قواعد النغمة `:where(…).t-*`
+   وبالوزن ذاته (0-1-0)، فتفوز القاعدة اللاحقة ويعود `--mcr-tone` أخضر مهما
+   كانت النغمة الممرَّرة. تصحيح المكتبة ذاتها من صلاحية مالكها (لا يعدّله
+   وكيل ميزة)، ومنظومة المعنى غير قابلة للتنازل — فيُثبَّت هنا **داخل نطاق
+   `.axs-*` وحده** ما يجعل النغمة الدلالية تصل فعلاً: مرجاني للعجز حصراً،
+   محايد لعدم اليقين، أخضر للتغطية. لا صنف من micro.css يُعاد تعريفه عالمياً.
+   ───────────────────────────────────────────────────────────────────────── */
+.axs-page .mcr-spark.t-neg,
+.axs-page .mcr-bars.t-neg,
+.axs-page .mcr-ratio.t-neg,
+.axs-page .mcr-bar-fill.t-neg,
+.axs-page .mcr-sm.t-neg {
+  --mcr-tone: var(--coral);
+  --mcr-tone-hi: var(--coral);
+}
+.axs-page .mcr-spark.t-neu,
+.axs-page .mcr-bars.t-neu,
+.axs-page .mcr-ratio.t-neu,
+.axs-page .mcr-bar-fill.t-neu,
+.axs-page .mcr-sm.t-neu {
+  --mcr-tone: var(--mut-d);
+  --mcr-tone-hi: var(--ink2-d);
+}
+.axs-page .mcr-spark.t-pos,
+.axs-page .mcr-bars.t-pos,
+.axs-page .mcr-ratio.t-pos,
+.axs-page .mcr-bar-fill.t-pos,
+.axs-page .mcr-sm.t-pos {
+  --mcr-tone: var(--green);
+  --mcr-tone-hi: var(--green-hi);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   0) نقطة الدخول المرخصة في قسم «سيناريوهات العجز» (عقد التوسعة §4)
+   ────────────────────────────────────────────────────────────────────────
+   الزر يسكن فراغ منتصف ترويسة القسم لا شبكتَه: شبكة القسم المعتمدة ممتلئة
+   تماماً (كل خلية تساوي محتواها بالبكسل)، فأي عنصر يُضاف داخلها يدفع صفاً
+   معتمداً خارج الإطار. الترويسة توزيعها `space-between` وارتفاعها الأدنى
+   مضبوط في dashboard.css، فالزر يملأ فراغاً قائماً بلا إزاحة بكسل واحد.
+   الأسلوب صدى لأصناف dashboard.css القائمة (حبة زجاجية بحد شعري وحلقة
+   تركيز ذهبية) دون إعادة تعريف أيٍّ منها.
+   ════════════════════════════════════════════════════════════════════════ */
+.axs-entry {
+  align-self: flex-end;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--su) * 9);
+  margin-bottom: calc(var(--su) * 4);
+  padding: calc(var(--su) * 8) calc(var(--su) * 18);
+  border: 1px solid var(--hair-d2);
+  border-radius: 999px;
+  background: rgba(16, 32, 26, 0.6);
+  color: var(--ink2-d);
+  font-family: var(--f-body);
+  font-size: calc(var(--su) * 14);
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color var(--dur-micro) var(--ease),
+    border-color var(--dur-micro) var(--ease),
+    color var(--dur-micro) var(--ease);
+}
+.axs-entry:hover {
+  background: var(--stage-3);
+  border-color: var(--hair-d);
+  color: var(--ivory);
+}
+.axs-entry:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.axs-entry-arrow {
+  color: var(--faint-d);
+  transition: transform var(--dur-micro) var(--ease);
+}
+.axs-entry:hover .axs-entry-arrow {
+  transform: translateX(calc(var(--su) * -3));
+  color: var(--ivory);
+}
+@media (prefers-reduced-motion: reduce) {
+  .axs-entry, .axs-entry-arrow { transition: none; }
+  .axs-entry:hover .axs-entry-arrow { transform: none; }
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   1) الشريط العلوي: التحفظ الملازم + مرساة القراءة المعتمدة في صف واحد
+   الذهبي هنا وسم اعتماد لا قيمة بيانات (عقد اللون).
+   ════════════════════════════════════════════════════════════════════════ */
+.axs-top {
+  flex: none;
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
+  gap: calc(var(--su) * 12);
+  align-items: stretch;
+}
+.axs-caveat {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 5);
+  background: rgba(214, 171, 76, 0.06);
+  border: 1px dashed rgba(214, 171, 76, 0.4);
+  border-radius: var(--r-sm);
+  padding: calc(var(--su) * 8) calc(var(--su) * 14) calc(var(--su) * 9);
+}
+.axs-caveat-head {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--su) * 10);
+  flex-wrap: wrap;
+}
+.axs-caveat-head .axs-caveat-btn { margin-inline-start: auto; }
+.axs-caveat-dot {
+  width: calc(var(--su) * 9);
+  height: calc(var(--su) * 9);
+  border-radius: 50%;
+  background: var(--gold);
+  flex: none;
+}
+.axs-caveat-badge {
+  font-size: calc(var(--su) * 13);
+  font-weight: 700;
+  color: var(--gold-hi);
+  border: 1px solid rgba(214, 171, 76, 0.45);
+  border-radius: 999px;
+  padding: calc(var(--su) * 3) calc(var(--su) * 12);
+  background: rgba(214, 171, 76, 0.07);
+  white-space: nowrap;
+}
+.axs-caveat-title {
+  font-size: calc(var(--su) * 13.5);
+  font-weight: 700;
+  color: var(--ink2-d);
+}
+.axs-caveat-text {
+  font-size: calc(var(--su) * 12.5);
+  line-height: 1.55;
+  color: var(--mut-d);
+  margin: 0;
+}
+.axs-caveat-btn {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--su) * 8);
+  padding: calc(var(--su) * 4) calc(var(--su) * 12);
+  border: 1px solid rgba(214, 171, 76, 0.4);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--gold-hi);
+  font-family: var(--f-body);
+  font-size: calc(var(--su) * 12);
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background-color var(--dur-micro) var(--ease),
+    border-color var(--dur-micro) var(--ease);
+}
+.axs-caveat-btn:hover {
+  background: rgba(214, 171, 76, 0.12);
+  border-color: rgba(214, 171, 76, 0.65);
+}
+.axs-arrow {
+  color: var(--faint-d);
+  transition: transform var(--dur-micro) var(--ease);
+}
+.axs-caveat-btn:hover .axs-arrow {
+  transform: translateX(calc(var(--su) * -3));
+  color: var(--gold-hi);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   2) صف المرساة المعتمدة — أرقام منشورة لا محسوبة في الواجهة
+   ════════════════════════════════════════════════════════════════════════ */
+.axs-anchor {
+  flex: none;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-rows: minmax(0, 1fr);
+  gap: calc(var(--su) * 6);
+}
+.axs-anchor-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0;
+  background: rgba(16, 32, 26, 0.55);
+  border: 1px solid var(--hair-d2);
+  border-radius: var(--r-sm);
+  padding: calc(var(--su) * 3) calc(var(--su) * 10) calc(var(--su) * 4);
+  min-width: 0;
+  line-height: 1.35;
+}
+.axs-anchor-k {
+  font-size: calc(var(--su) * 10.5);
+  font-weight: 600;
+  color: var(--mut-d);
+}
+.axs-anchor-v {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-size: calc(var(--su) * 15.5);
+  font-weight: 700;
+  color: var(--ivory);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.axs-anchor-item.neg .axs-anchor-v { color: var(--coral); }
+.axs-anchor-item.pos .axs-anchor-v { color: var(--green-hi); }
+.axs-anchor-note {
+  font-size: calc(var(--su) * 9.5);
+  color: var(--faint-d);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   3) كتلة المنزلق — منزلق الأشهر ورقاقاتها وأساس المقارنة
+   ════════════════════════════════════════════════════════════════════════ */
+.axs-slider-block {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 7);
+  background: rgba(16, 32, 26, 0.5);
+  border: 1px solid var(--hair-d2);
+  border-radius: var(--r-sm);
+  padding: calc(var(--su) * 8) calc(var(--su) * 14) calc(var(--su) * 10);
+}
+.axs-slider-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(var(--su) * 14);
+  flex-wrap: wrap;
+}
+.axs-slider-headmain {
+  display: flex;
+  align-items: baseline;
+  gap: calc(var(--su) * 10);
+  flex-wrap: wrap;
+  min-width: 0;
+}
+.axs-slider-title {
+  font-size: calc(var(--su) * 12.5);
+  font-weight: 700;
+  color: var(--mut-d);
+}
+.axs-slider-value {
+  font-family: var(--f-display);
+  font-size: calc(var(--su) * 19);
+  font-weight: 700;
+  color: var(--ivory);
+}
+.axs-slider-meta {
+  font-size: calc(var(--su) * 12);
+  color: var(--faint-d);
+}
+.axs-slider-row {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--su) * 12);
+}
+.axs-slider-track { flex: 1; min-width: 0; }
+
+/* المنزلق نفسه: مسار محايد وإبهام عاجي بحلقة تركيز ذهبية (كروم الواجهة) */
+.axs-slider {
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  height: calc(var(--su) * 22);
+  cursor: pointer;
+  margin: 0;
+}
+.axs-slider::-webkit-slider-runnable-track {
+  height: calc(var(--su) * 6);
+  border-radius: 999px;
+  background: rgba(244, 241, 230, 0.12);
+}
+.axs-slider::-moz-range-track {
+  height: calc(var(--su) * 6);
+  border-radius: 999px;
+  background: rgba(244, 241, 230, 0.12);
+}
+.axs-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: calc(var(--su) * 18);
+  height: calc(var(--su) * 18);
+  margin-top: calc(var(--su) * -6);
+  border-radius: 50%;
+  background: var(--ivory);
+  border: calc(var(--su) * 3) solid var(--stage-1);
+  box-shadow: 0 0 0 1px var(--hair-d);
+  transition: background-color var(--dur-micro) var(--ease);
+}
+.axs-slider::-moz-range-thumb {
+  width: calc(var(--su) * 18);
+  height: calc(var(--su) * 18);
+  border-radius: 50%;
+  background: var(--ivory);
+  border: calc(var(--su) * 3) solid var(--stage-1);
+  box-shadow: 0 0 0 1px var(--hair-d);
+}
+.axs-slider:hover::-webkit-slider-thumb { background: var(--gold-hi); }
+.axs-slider:hover::-moz-range-thumb { background: var(--gold-hi); }
+.axs-slider:focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; }
+
+.axs-nav-btn {
+  flex: none;
+  font-family: var(--f-body);
+  font-size: calc(var(--su) * 12.5);
+  font-weight: 700;
+  color: var(--ink2-d);
+  background: rgba(16, 32, 26, 0.6);
+  border: 1px solid var(--hair-d2);
+  border-radius: 999px;
+  padding: calc(var(--su) * 6) calc(var(--su) * 14);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background-color var(--dur-micro) var(--ease),
+    border-color var(--dur-micro) var(--ease),
+    color var(--dur-micro) var(--ease);
+}
+.axs-nav-btn:hover:not(:disabled) {
+  background: var(--stage-3);
+  border-color: var(--hair-d);
+  color: var(--ivory);
+}
+.axs-nav-btn:disabled { opacity: 0.35; cursor: default; }
+.axs-nav-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+/* رقاقات الأشهر: مسار قفز مباشر موازٍ للمنزلق */
+.axs-chips {
+  display: flex;
+  gap: calc(var(--su) * 6);
+  flex-wrap: wrap;
+}
+.axs-chip {
+  font-family: var(--f-body);
+  font-size: calc(var(--su) * 11.5);
+  font-weight: 600;
+  color: var(--mut-d);
+  background: transparent;
+  border: 1px solid var(--hair-d2);
+  border-radius: 999px;
+  padding: calc(var(--su) * 3) calc(var(--su) * 10);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background-color var(--dur-micro) var(--ease),
+    border-color var(--dur-micro) var(--ease),
+    color var(--dur-micro) var(--ease);
+}
+.axs-chip:hover { color: var(--ivory); border-color: var(--hair-d); }
+.axs-chip.now {
+  color: var(--stage-0);
+  background: var(--ivory);
+  border-color: var(--ivory);
+}
+.axs-chip:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+/* مجموعة التبديل (أساس المقارنة / المقياس المعروض) */
+.axs-toggle {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--su) * 7);
+  flex-wrap: wrap;
+}
+.axs-toggle-label {
+  font-size: calc(var(--su) * 12);
+  font-weight: 700;
+  color: var(--mut-d);
+  margin-inline-end: calc(var(--su) * 4);
+}
+.axs-toggle-btn {
+  font-family: var(--f-body);
+  font-size: calc(var(--su) * 12);
+  font-weight: 600;
+  color: var(--mut-d);
+  background: rgba(16, 32, 26, 0.6);
+  border: 1px solid var(--hair-d2);
+  border-radius: 999px;
+  padding: calc(var(--su) * 4) calc(var(--su) * 13);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background-color var(--dur-micro) var(--ease),
+    border-color var(--dur-micro) var(--ease),
+    color var(--dur-micro) var(--ease);
+}
+.axs-toggle-btn:hover { color: var(--ivory); border-color: var(--hair-d); }
+.axs-toggle-btn.now {
+  color: var(--ivory);
+  background: var(--stage-3);
+  border-color: rgba(214, 171, 76, 0.45);
+}
+.axs-toggle-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.axs-basis { margin-top: calc(var(--su) * 2); }
+
+/* ════════════════════════════════════════════════════════════════════════
+   4) جسم صفحة المقارنة: بطاقات السيناريوهات ثم الصف السفلي الثلاثي
+   ════════════════════════════════════════════════════════════════════════ */
+.axs-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 12);
+}
+.axs-cards {
+  flex: none;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: calc(var(--su) * 12);
+}
+.axs-cards-note {
+  flex: none;
+  font-size: calc(var(--su) * 11);
+  line-height: 1.5;
+  color: var(--faint-d);
+  margin: calc(var(--su) * -4) 0 0;
+  border-inline-start: 2px solid var(--gold);
+  padding-inline-start: calc(var(--su) * 8);
+}
+.axs-lower {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns:
+    minmax(0, 2.05fr) minmax(0, 0.8fr) minmax(0, 0.85fr);
+  gap: calc(var(--su) * 12);
+}
+.axs-lower2 {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  gap: calc(var(--su) * 12);
+}
+.axs-table-host {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.axs-table-host > .dash-card { flex: 1 1 0; min-height: 0; }
+/* كثافة جداول هذا الملحق: تحجيم موضعي داخل نطاق `axs-` فقط (لا إعادة تعريف
+   عامة لـ`.table-dense`) — صفوف الملحق قليلة وواجب إظهارها كاملة داخل إطار
+   الصفحة بلا تمرير، فالكثافة هنا أعلى من كثافة لوحات الأقسام. */
+.axs-table-host .table-dense { font-size: calc(var(--su) * 13); }
+.axs-table-host .table-dense th {
+  font-size: calc(var(--su) * 11.5);
+  padding: calc(var(--su) * 5) calc(var(--su) * 8);
+}
+.axs-table-host .table-dense td {
+  padding: calc(var(--su) * 4.5) calc(var(--su) * 8);
+}
+.axs-table-host .card-head {
+  padding: calc(var(--su) * 9) calc(var(--su) * 14) calc(var(--su) * 3);
+}
+.axs-table-host .card-title { font-size: calc(var(--su) * 14.5); }
+.axs-table-host .card-body { padding: calc(var(--su) * 5) calc(var(--su) * 12) 0; }
+.axs-table-host .card-note {
+  font-size: calc(var(--su) * 10.5);
+  line-height: 1.5;
+  padding: calc(var(--su) * 5) calc(var(--su) * 12) calc(var(--su) * 8);
+}
+.axs-aside,
+.axs-col {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 10);
+  overflow: hidden;
+}
+/* البطاقات تتقاسم ارتفاع العمود بحدودها الظاهرة، ومن فاض محتواه تمرّر
+   **داخل جسمه** لا عند حافة الإطار — فلا تُقصّ بطاقة بصرياً ولا يُحذف صف
+   بيانات (عقد «التمرير داخل المكوّن لا المسرح»). */
+.axs-aside > .dash-card,
+.axs-col > .dash-card { flex: 1 1 auto; min-height: 0; }
+.axs-aside .card-body,
+.axs-col .card-body { overflow-y: auto; overflow-x: hidden; }
+/* تحجيم موضعي لبطاقات الأعمدة داخل نطاق `axs-` فقط — إطار الملحق أضيق من
+   لوحة القسم، والبطاقة المشتركة تبقى كما هي خارج هذا النطاق. */
+.axs-aside .card-head,
+.axs-col .card-head {
+  padding: calc(var(--su) * 9) calc(var(--su) * 13) calc(var(--su) * 3);
+}
+.axs-aside .card-title,
+.axs-col .card-title { font-size: calc(var(--su) * 14); max-width: 100%; }
+.axs-aside .card-sub,
+.axs-col .card-sub { font-size: calc(var(--su) * 10.5); }
+.axs-aside .card-body,
+.axs-col .card-body {
+  padding: calc(var(--su) * 5) calc(var(--su) * 13) calc(var(--su) * 10);
+}
+
+/* ── بطاقة سيناريو ── */
+.axs-card {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 5);
+  background: rgba(16, 32, 26, 0.58);
+  border: 1px solid var(--hair-d2);
+  border-radius: var(--r-sm);
+  padding: calc(var(--su) * 8) calc(var(--su) * 13) calc(var(--su) * 9);
+  min-width: 0;
+}
+/* درجات ترتيبية من صبغة العجز الواحدة — لا صبغة جديدة */
+.axs-card.conservative { border-top: 2px solid rgba(214, 106, 80, 0.85); }
+.axs-card.base { border-top: 2px solid rgba(214, 106, 80, 0.55); }
+.axs-card.optimistic { border-top: 2px solid rgba(214, 106, 80, 0.3); }
+
+.axs-card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: calc(var(--su) * 8);
+}
+.axs-card-name {
+  font-size: calc(var(--su) * 16);
+  font-weight: 700;
+  color: var(--ivory);
+}
+.axs-card-rank {
+  font-size: calc(var(--su) * 11);
+  color: var(--faint-d);
+  white-space: nowrap;
+}
+.axs-card-hero {
+  display: flex;
+  align-items: baseline;
+  gap: calc(var(--su) * 7);
+}
+.axs-card-num {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-size: calc(var(--su) * 24);
+  font-weight: 700;
+  color: var(--coral);
+  direction: ltr;
+  unicode-bidi: isolate;
+  line-height: 1.05;
+}
+.axs-card-unit {
+  font-size: calc(var(--su) * 13);
+  color: var(--mut-d);
+}
+.axs-card-sub {
+  font-size: calc(var(--su) * 11);
+  color: var(--faint-d);
+  line-height: 1.4;
+  /* سطر واحد داخل إطار الملحق — النص الكامل في تلميح العنصر */
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.axs-card-ratio { margin-top: calc(var(--su) * 1); }
+.axs-card-rows {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 3);
+}
+.axs-card-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: calc(var(--su) * 10);
+  font-size: calc(var(--su) * 11.5);
+  padding: calc(var(--su) * 1) 0;
+  border-bottom: 1px solid var(--hair-d2);
+}
+.axs-card-row:last-child { border-bottom: 0; }
+.axs-card-k { color: var(--mut-d); min-width: 0; }
+.axs-card-v {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  color: var(--ivory);
+  white-space: nowrap;
+}
+.axs-card-row.pos .axs-card-v { color: var(--green-hi); }
+.axs-card-row.neg .axs-card-v { color: var(--coral); }
+.axs-card-extra {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(var(--su) * 8);
+  font-size: calc(var(--su) * 12);
+  padding-top: calc(var(--su) * 5);
+  border-top: 1px dashed var(--hair-d2);
+}
+
+/* ── خلايا الجداول الخاصة بالملحق ── */
+.axs-cell-chip { display: inline-flex; }
+.axs-t-name { font-weight: 700; color: var(--ivory); white-space: nowrap; }
+.axs-t-num {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  color: var(--ivory);
+  direction: ltr;
+  unicode-bidi: isolate;
+  white-space: nowrap;
+}
+.axs-t-num.neg { color: var(--coral); }
+.axs-t-num.pos { color: var(--green-hi); }
+.axs-t-dash { font-size: calc(var(--su) * 11.5); color: var(--faint-d); }
+.axs-t-formula {
+  font-size: calc(var(--su) * 11.5);
+  color: var(--mut-d);
+  white-space: nowrap;
+}
+.axs-jump {
+  font-family: var(--f-body);
+  font-size: calc(var(--su) * 13);
+  font-weight: 700;
+  color: var(--ink2-d);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: calc(var(--su) * 8);
+  padding: calc(var(--su) * 2) calc(var(--su) * 8);
+  cursor: pointer;
+  white-space: nowrap;
+  text-align: start;
+  transition:
+    background-color var(--dur-micro) var(--ease),
+    border-color var(--dur-micro) var(--ease),
+    color var(--dur-micro) var(--ease);
+}
+.axs-jump:hover {
+  color: var(--ivory);
+  background: rgba(244, 241, 230, 0.05);
+  border-color: var(--hair-d2);
+}
+.axs-jump:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.axs-kind {
+  font-size: calc(var(--su) * 11.5);
+  font-weight: 700;
+  border-radius: 999px;
+  padding: calc(var(--su) * 2) calc(var(--su) * 9);
+  border: 1px solid var(--hair-d2);
+  color: var(--mut-d);
+  white-space: nowrap;
+}
+.axs-kind.raw { color: var(--ink2-d); }
+.axs-kind.derived { color: var(--green-hi); border-color: rgba(49, 162, 109, 0.35); }
+.axs-kind.supplied { color: var(--gold-hi); border-color: rgba(214, 171, 76, 0.4); }
+.axs-origin {
+  font-size: calc(var(--su) * 11.5);
+  color: var(--mut-d);
+  line-height: 1.5;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   5) الانتشار والوتيرة
+   ════════════════════════════════════════════════════════════════════════ */
+.axs-spread-hero {
+  display: flex;
+  align-items: baseline;
+  gap: calc(var(--su) * 7);
+  margin-bottom: calc(var(--su) * 6);
+}
+.axs-spread-num {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-size: calc(var(--su) * 26);
+  font-weight: 700;
+  color: var(--ivory);           /* محايد: عدم يقين لا خلل */
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+.axs-spread-unit { font-size: calc(var(--su) * 12.5); color: var(--mut-d); }
+.axs-spread-bars { margin-bottom: calc(var(--su) * 6); }
+.axs-spread-strip { margin-bottom: calc(var(--su) * 4); }
+.axs-spread-foot {
+  font-size: calc(var(--su) * 11.5);
+  color: var(--faint-d);
+  line-height: 1.6;
+}
+.axs-spread-card .card-body,
+.axs-pace-card .card-body { gap: calc(var(--su) * 2); }
+
+/* ════════════════════════════════════════════════════════════════════════
+   6) الصيغ المعروضة والمثال المحلول وتذكير المفاتيح
+   ════════════════════════════════════════════════════════════════════════ */
+.axs-formulas {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 5);
+}
+.axs-formula {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 1);
+  padding-bottom: calc(var(--su) * 4);
+  border-bottom: 1px solid var(--hair-d2);
+}
+.axs-formula:last-child { border-bottom: 0; padding-bottom: 0; }
+.axs-formula-k {
+  font-size: calc(var(--su) * 11.5);
+  font-weight: 700;
+  color: var(--ink2-d);
+}
+.axs-formula-x {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-size: calc(var(--su) * 11.5);
+  align-self: flex-start;
+  max-width: 100%;
+  color: var(--gold-hi);
+  background: rgba(214, 171, 76, 0.06);
+  border-radius: calc(var(--su) * 6);
+  padding: calc(var(--su) * 3) calc(var(--su) * 8);
+  overflow-x: auto;
+  white-space: nowrap;
+}
+.axs-formula-n {
+  font-size: calc(var(--su) * 10);
+  color: var(--faint-d);
+  line-height: 1.45;
+}
+.axs-worked {
+  margin-top: calc(var(--su) * 8);
+  padding: calc(var(--su) * 8) calc(var(--su) * 11);
+  background: rgba(49, 162, 109, 0.06);
+  border: 1px solid rgba(49, 162, 109, 0.22);
+  border-radius: calc(var(--su) * 9);
+}
+.axs-worked-k {
+  display: block;
+  font-size: calc(var(--su) * 11.5);
+  font-weight: 700;
+  color: var(--green-hi);
+  margin-bottom: calc(var(--su) * 3);
+}
+.axs-worked-t {
+  font-size: calc(var(--su) * 11.5);
+  line-height: 1.65;
+  color: var(--ink2-d);
+  margin: 0;
+}
+.axs-keys {
+  margin-top: calc(var(--su) * 8);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 2);
+}
+.axs-keys-k {
+  font-size: calc(var(--su) * 11);
+  font-weight: 700;
+  color: var(--mut-d);
+}
+.axs-keys-v {
+  font-size: calc(var(--su) * 11);
+  color: var(--faint-d);
+  line-height: 1.55;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   7) صفحة الحساسية
+   ════════════════════════════════════════════════════════════════════════ */
+.axs-tools {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(var(--su) * 16);
+  flex-wrap: wrap;
+}
+.axs-tools-note {
+  font-size: calc(var(--su) * 11.5);
+  color: var(--faint-d);
+}
+.axs-sm-card { flex: none; }
+.axs-sm-host { display: block; }
+.axs-cell-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: calc(var(--su) * 8);
+  margin-bottom: calc(var(--su) * 4);
+}
+.axs-cell-name {
+  font-size: calc(var(--su) * 13.5);
+  font-weight: 700;
+  color: var(--ivory);
+}
+.axs-cell-rank {
+  font-size: calc(var(--su) * 10.5);
+  color: var(--faint-d);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* ارتفاع مقيَّد للمسار: المكتبة تعطي `height:auto` على viewBox نسبته ثابتة،
+   فيتضخّم الرسم مع عرض الخلية ويبتلع إطار الصفحة — نثبت الارتفاع هنا
+   (‏preserveAspectRatio="none" في المكتبة يمطّ الرسم بلا تشويه دلالي). */
+.axs-cell-spark { margin: calc(var(--su) * 2) 0 calc(var(--su) * 4); }
+.axs-cell-spark .mcr-spark { height: calc(var(--su) * 76); }
+.axs-cell-ends {
+  display: flex;
+  align-items: baseline;
+  gap: calc(var(--su) * 6);
+  font-size: calc(var(--su) * 11.5);
+  color: var(--mut-d);
+}
+.axs-cell-ends b {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  color: var(--ivory);
+}
+.axs-cell-to { color: var(--faint-d); }
+.axs-cell-chiprow { margin-top: calc(var(--su) * 5); }
+
+/* ════════════════════════════════════════════════════════════════════════
+   8) لوحة الصدق
+   ════════════════════════════════════════════════════════════════════════ */
+.axs-honest-grid {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: calc(var(--su) * 10);
+}
+/* جدول الإسناد أسفل لوحة الصدق: ارتفاعه محتواه محصوراً بسقف من الإطار.
+   `.axs-table-host > .dash-card` قاعدتها `flex: 1 1 0` (تصلح لخلية شبكة
+   ممدودة)، وهي هنا عنصر مرن أساسه المحتوى — فلولا هذا التخصيص لصار
+   الارتفاع الافتراضي صفراً واختفى الجدول. */
+.axs-prov {
+  flex: 0 1 auto;
+  min-height: 0;
+  max-height: 40%;
+}
+.axs-prov > .dash-card { flex: 0 1 auto; min-height: 0; }
+.axs-krows {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 3);
+}
+.axs-krow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: calc(var(--su) * 10);
+  flex-wrap: wrap;
+  font-size: calc(var(--su) * 12);
+  padding: calc(var(--su) * 3) 0;
+  border-bottom: 1px solid var(--hair-d2);
+}
+.axs-krow:last-child { border-bottom: 0; }
+.axs-k { color: var(--mut-d); min-width: 0; }
+.axs-v {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  color: var(--ivory);
+}
+.axs-krow.gold .axs-v { color: var(--gold-hi); }
+.axs-v.pos { color: var(--green-hi); }
+.axs-krow-sub {
+  flex-basis: 100%;
+  font-size: calc(var(--su) * 10.5);
+  color: var(--faint-d);
+  line-height: 1.5;
+}
+.axs-para {
+  font-size: calc(var(--su) * 12);
+  line-height: 1.7;
+  color: var(--ink2-d);
+  margin: 0 0 calc(var(--su) * 8);
+}
+.axs-req {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 5);
+}
+.axs-req-item {
+  display: flex;
+  align-items: flex-start;
+  gap: calc(var(--su) * 8);
+  font-size: calc(var(--su) * 12.5);
+  color: var(--ink2-d);
+  line-height: 1.55;
+}
+.axs-req-dot {
+  width: calc(var(--su) * 7);
+  height: calc(var(--su) * 7);
+  border-radius: 50%;
+  background: var(--gold);
+  margin-top: calc(var(--su) * 6);
+  flex: none;
+}
+.axs-checks {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 3);
+}
+.axs-check {
+  display: grid;
+  grid-template-columns:
+    calc(var(--su) * 9) minmax(0, 1fr) calc(var(--su) * 62);
+  align-items: baseline;
+  gap: calc(var(--su) * 7);
+  font-size: calc(var(--su) * 11.5);
+  padding: calc(var(--su) * 3) 0;
+  border-bottom: 1px solid var(--hair-d2);
+}
+.axs-check:last-child { border-bottom: 0; }
+.axs-check-dot {
+  width: calc(var(--su) * 7);
+  height: calc(var(--su) * 7);
+  border-radius: 50%;
+  flex: none;
+  align-self: center;
+}
+.axs-check.ok .axs-check-dot { background: var(--green); }
+.axs-check.bad .axs-check-dot { background: var(--coral); }
+.axs-check-label { color: var(--ink2-d); line-height: 1.45; }
+.axs-check-detail {
+  grid-column: 2;
+  font-size: calc(var(--su) * 10.5);
+  color: var(--faint-d);
+  line-height: 1.4;
+}
+.axs-check-state {
+  grid-row: 1;
+  grid-column: 3;
+  font-weight: 700;
+  text-align: end;
+  white-space: nowrap;
+}
+.axs-check.ok .axs-check-state { color: var(--green-hi); }
+.axs-check.bad .axs-check-state { color: var(--coral); }
+.axs-rules-card { min-height: 0; }
+.axs-rules {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 6);
+}
+.axs-rule {
+  display: flex;
+  align-items: flex-start;
+  gap: calc(var(--su) * 8);
+  font-size: calc(var(--su) * 11.5);
+  color: var(--ink2-d);
+  line-height: 1.6;
+}
+.axs-rule-dot {
+  width: calc(var(--su) * 5);
+  height: calc(var(--su) * 5);
+  border-radius: 50%;
+  background: var(--mut-d);
+  margin-top: calc(var(--su) * 7);
+  flex: none;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   9) الهوامش المشتركة
+   ════════════════════════════════════════════════════════════════════════ */
+.axs-note {
+  font-size: calc(var(--su) * 11.5);
+  line-height: 1.6;
+  color: var(--mut-d);
+  margin: calc(var(--su) * 6) 0 0;
+}
+.axs-note.src { color: var(--faint-d); }
+.axs-page > .axs-note { flex: none; }
+
+/* ════════════════════════════════════════════════════════════════════════
+   10) الكثافة عند العرض الضيق (فئة 1366) — أرقام أصغر لا محتوى محذوف:
+   لا يُخفى في هذا الملحق صف بيانات ولا وسم صدق في أي مقاس.
+   ════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 1440px) {
+  .axs-anchor { gap: calc(var(--su) * 10); }
+  .axs-anchor-v { font-size: calc(var(--su) * 19); }
+  .axs-card-num { font-size: calc(var(--su) * 26); }
+  .axs-slider-value { font-size: calc(var(--su) * 19); }
+  .axs-chip { font-size: calc(var(--su) * 11); padding: calc(var(--su) * 3) calc(var(--su) * 8); }
+  .axs-lower {
+    grid-template-columns: minmax(0, 1.95fr) minmax(0, 0.85fr) minmax(0, 0.9fr);
+  }
+  .axs-card-num { font-size: calc(var(--su) * 22); }
+  .axs-card-sub { font-size: calc(var(--su) * 10); }
+  .axs-card-row { font-size: calc(var(--su) * 11); }
+  .axs-caveat-text { font-size: calc(var(--su) * 11.5); }
+  .axs-slider-block { gap: calc(var(--su) * 6); }
+  .axs-formula-n { display: none; }   /* الشرح يبقى في تلميح الصيغة نفسها */
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   11) تقليل الحركة — تصفير صريح لكل انتقال في هذا الملف
+   ════════════════════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  .axs-caveat-btn,
+  .axs-arrow,
+  .axs-nav-btn,
+  .axs-chip,
+  .axs-toggle-btn,
+  .axs-jump,
+  .axs-slider::-webkit-slider-thumb {
+    transition: none;
+  }
+  .axs-caveat-btn:hover .axs-arrow { transform: none; }
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   12) الطباعة — الملحق ليس مستنداً مطبوعاً: تُخفى أدوات التحكم وحدها
+   ويبقى كل ما يحمل معنى (القيم ووسوم الصدق) ظاهراً.
+   ════════════════════════════════════════════════════════════════════════ */
+@media print {
+  .axs-slider-row,
+  .axs-chips,
+  .axs-toggle,
+  .axs-caveat-btn { display: none; }
+  .axs-aside,
+  .axs-col { overflow: visible; }
+  .axs-page { overflow: visible; }
+}

@@ -22,6 +22,10 @@ const JS_ORDER = [
   "src/js/data/derive.js",
   "src/js/data/validate.js",
   "src/js/core/router.js",
+  // أسس حزمة التوسعة: منطق نقي (geoutils) ومكتبة SVG/DOM لا تلمس أي شيء
+  // خارج محاكاة DOM الدنيا أدناه — فتُختبران بالملف الحقيقي لا بنسخة.
+  "src/js/viz/geomap-utils.js",
+  "src/js/viz/charts-micro.js",
 ];
 
 /* ── محاكاة DOM دنيا: تكفي h()/svg()/clear دون محرك عرض ── */
@@ -133,6 +137,44 @@ export const RH = vm.runInContext("RH;", context);
 /* ── الحقيقة المرجعية: نسخة جديدة معزولة عند كل استدعاء ── */
 const releaseText = readFileSync(path.join(ROOT, "data", "release.json"), "utf8");
 export function freshRelease() { return JSON.parse(releaseText); }
+
+const geoText = readFileSync(path.join(ROOT, "data", "riyadh-geo.json"), "utf8");
+export function freshGeo() { return JSON.parse(geoText); }
+
+/* ── أدوات فحص شجرة DOM الوهمية (اختبارات الرسوم المصغرة) ── */
+
+/** عنصر جذر وهمي يصلح مضيفاً لدوال RH.viz.micro */
+export function host() { return new FakeElement("div"); }
+
+/** كل النص الظاهر في شجرة عنصر — يجمع عقد النص المتفرقة بالترتيب */
+export function textOf(node) {
+  if (!node) return "";
+  if (node instanceof FakeText) return node.textContent;
+  let out = node.childNodes.length ? "" : String(node.textContent || "");
+  for (const c of node.childNodes) out += textOf(c);
+  return out;
+}
+
+/** صنف العنصر أياً كان مصدره: className لعناصر HTML وسمة class لعناصر SVG */
+export function classOf(node) {
+  return String(node.className || node.getAttribute?.("class") || "");
+}
+
+/** كل عناصر الشجرة (بما فيها الجذر) التي يحتوي صنفها الاسم المطلوب */
+export function findAll(node, cls) {
+  const out = [];
+  (function walk(n) {
+    if (!(n instanceof FakeText) && classOf(n).split(/\s+/).includes(cls)) out.push(n);
+    for (const c of n.childNodes || []) walk(c);
+  })(node);
+  return out;
+}
+
+/** أول مطابق أو null */
+export function find(node, cls) {
+  const all = findAll(node, cls);
+  return all.length ? all[0] : null;
+}
 
 /** يطبّع كائن بيانات وُلد داخل سياق vm إلى عالم الاختبار:
     البروتوتايب مختلف عبر العالمين فيفشل deepStrictEqual رغم تطابق البنية —

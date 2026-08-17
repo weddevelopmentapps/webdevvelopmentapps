@@ -1,0 +1,348 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   micro.css — أنماط مكتبة الرسوم المصغرة RH.viz.micro (عقد التوسعة §9)
+   بادئة الميزة: mcr-  ·  يملكه معمار التوسعة (لا يعدّله وكيل ميزة)
+
+   المكتبة تُستهلك في ثلاثة أسطح مختلفة الأرضية، وهذا الملف هو ما يجعلها
+   تُقرأ في الثلاثة دون أن يعرف الجافاسكربت شيئاً عن السياق:
+     • مسرح المقدِّم الداكن (لوحات الأقسام والملاحق)  → حبر عاجي
+     • الإدارة الورقية الفاتحة (منشئ الموجز/المقارن) → حبر داكن
+     • الموجز التنفيذي وطباعته (body.mode-report)     → حبر داكن + خطوط أعرض
+   لا لون مكتوب حرفياً هنا: كل صبغة رمز من tokens.css عبر رمز موضعي واحد
+   (--mcr-tone) تضبطه أصناف النغمة المقفلة. الدلالة عقد على المستدعي:
+   t-neg للعجز/المخالفات حصراً، t-gold للمستهدف/خط الأساس حصراً.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* ── النغمات: رمز موضعي واحد ترثه كل أجزاء الرسم ──
+   :where() يبقي الوزن صفراً فلا تتقدم النغمة على أي تخصيص لاحق،
+   والقصر على جذور mcr يمنع تسرّب أسماء t-* العامة إلى بقية النظام. */
+:where(.mcr-spark, .mcr-bars, .mcr-ratio, .mcr-bar-fill, .mcr-sm).t-pos {
+  --mcr-tone: var(--green);
+  --mcr-tone-hi: var(--green-hi);
+}
+:where(.mcr-spark, .mcr-bars, .mcr-ratio, .mcr-bar-fill, .mcr-sm).t-demand {
+  --mcr-tone: var(--demand);
+  --mcr-tone-hi: var(--demand);   /* لا درجة مضيئة للطلب في tokens — العلامة بلونه ذاته */
+}
+:where(.mcr-spark, .mcr-bars, .mcr-ratio, .mcr-bar-fill, .mcr-sm).t-neg {
+  --mcr-tone: var(--coral);
+  --mcr-tone-hi: var(--coral);
+}
+:where(.mcr-spark, .mcr-bars, .mcr-ratio, .mcr-bar-fill, .mcr-sm).t-gold {
+  --mcr-tone: var(--gold);
+  --mcr-tone-hi: var(--gold-hi);
+}
+:where(.mcr-spark, .mcr-bars, .mcr-ratio, .mcr-bar-fill, .mcr-sm).t-blue {
+  --mcr-tone: var(--collar-blue);
+  --mcr-tone-hi: var(--collar-blue);
+}
+:where(.mcr-spark, .mcr-bars, .mcr-ratio, .mcr-bar-fill, .mcr-sm).t-neu {
+  --mcr-tone: var(--mut-d);
+  --mcr-tone-hi: var(--ink2-d);
+}
+
+/* حبر السياق: المسرح داكن افتراضاً، والإدارة/الموجز يقلبانه دون لمس JS */
+.mcr-spark, .mcr-bars, .mcr-ratio, .mcr-sm, .mcr-delta, .mcr-empty {
+  --mcr-ink: var(--ivory);
+  --mcr-ink2: var(--ink2-d);
+  --mcr-mut: var(--mut-d);
+  --mcr-hair: var(--hair-d);
+  --mcr-hair2: var(--hair-d2);
+  --mcr-tone: var(--green);
+  --mcr-tone-hi: var(--green-hi);
+}
+body.mode-admin .mcr-spark, body.mode-admin .mcr-bars,
+body.mode-admin .mcr-ratio, body.mode-admin .mcr-sm,
+body.mode-admin .mcr-delta, body.mode-admin .mcr-empty,
+body.mode-report .mcr-spark, body.mode-report .mcr-bars,
+body.mode-report .mcr-ratio, body.mode-report .mcr-sm,
+body.mode-report .mcr-delta, body.mode-report .mcr-empty {
+  --mcr-ink: var(--ink);
+  --mcr-ink2: var(--ink2);
+  --mcr-mut: var(--mut);
+  --mcr-hair: var(--hair);
+  --mcr-hair2: var(--hair2);
+}
+
+/* ── حالة «لا بيانات» الصادقة: شرطة محايدة لا خط صفري مختلق ── */
+.mcr-empty {
+  display: inline-block;
+  min-width: 2ch;
+  text-align: center;
+  color: var(--mcr-mut);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+/* ════════════════ sparkline ════════════════ */
+.mcr-spark {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;               /* علامة القيمة الأخيرة تتجاوز الإطار قليلاً */
+}
+.mcr-spark-line {
+  stroke: var(--mcr-tone);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke; /* preserveAspectRatio=none لا يشوّه السماكة */
+}
+.mcr-spark-area {
+  fill: var(--mcr-tone);
+  opacity: 0.13;
+  stroke: none;
+}
+.mcr-spark-dot {
+  fill: var(--mcr-tone-hi);
+  stroke: none;
+}
+/* خط المستهدف الذهبي — مستهدف/خط أساس حصراً (عقد الدلالة) */
+.mcr-spark-target {
+  stroke: var(--gold);
+  stroke-width: 1;
+  stroke-dasharray: 4 3;
+  opacity: 0.75;
+  vector-effect: non-scaling-stroke;
+}
+.mcr-spark-target-label {
+  fill: var(--gold);
+  font-family: var(--f-body);
+  font-size: 9px;
+  font-weight: 600;
+}
+.mcr-spark-last {
+  fill: var(--mcr-ink);
+  font-family: var(--f-body);
+  font-size: 10px;
+  font-weight: 700;
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+/* ════════════════ microBars ════════════════ */
+.mcr-bars {
+  display: grid;
+  gap: calc(var(--su) * 5);
+  width: 100%;
+}
+.mcr-bar {
+  display: grid;
+  grid-template-columns: minmax(0, 8.5em) 1fr auto;
+  align-items: center;
+  gap: calc(var(--su) * 8);
+  min-height: 1.35em;
+}
+.mcr-bar-label {
+  color: var(--mcr-mut);
+  font-size: max(10px, calc(var(--su) * 12.5));
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mcr-bar-track {
+  position: relative;
+  display: block;
+  height: max(6px, calc(var(--su) * 8));
+  border-radius: 999px;
+  background: var(--mcr-hair2);
+  overflow: hidden;
+}
+.mcr-bar-fill {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;          /* RTL: الشريط ينمو من اليمين تلقائياً */
+  display: block;
+  border-radius: 999px;
+  background: var(--mcr-tone);
+  min-width: 2px;                  /* قيمة صغيرة موجبة تبقى مرئية لا تختفي */
+}
+.mcr-bar-val {
+  color: var(--mcr-ink);
+  font-size: max(10px, calc(var(--su) * 12.5));
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  direction: ltr;
+  unicode-bidi: isolate;
+  text-align: left;
+  min-width: 4ch;
+}
+
+/* ════════════════ deltaChip ════════════════ */
+.mcr-delta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.32em;
+  padding: 0.14em 0.62em;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-size: max(10px, calc(var(--su) * 12.5));
+  font-weight: 700;
+  line-height: 1.55;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+.mcr-delta b {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+.mcr-delta-arrow { font-size: 0.82em; line-height: 1; }
+.mcr-delta-label {
+  font-weight: 600;
+  opacity: 0.82;
+  font-size: 0.92em;
+}
+.mcr-delta.pos {
+  color: var(--green-hi);
+  background: rgba(49, 162, 109, 0.11);
+  border-color: rgba(49, 162, 109, 0.28);
+}
+.mcr-delta.neg {
+  color: var(--coral);
+  background: rgba(214, 106, 80, 0.11);
+  border-color: rgba(214, 106, 80, 0.3);
+}
+.mcr-delta.neu {
+  color: var(--mcr-mut);
+  background: var(--mcr-hair2);
+  border-color: var(--mcr-hair2);
+}
+/* على الورق الفاتح تُشدَّد الدرجات كي تبقى فوق عتبة التباين */
+body.mode-admin .mcr-delta.pos, body.mode-report .mcr-delta.pos {
+  color: var(--ok);
+  background: rgba(14, 131, 69, 0.09);
+  border-color: rgba(14, 131, 69, 0.26);
+}
+body.mode-admin .mcr-delta.neg, body.mode-report .mcr-delta.neg {
+  color: var(--bad);
+  background: rgba(179, 64, 47, 0.09);
+  border-color: rgba(179, 64, 47, 0.26);
+}
+
+/* ════════════════ ratioBar — البديل القانوني للـgauge المحرّم ════════════════ */
+.mcr-ratio {
+  display: grid;
+  gap: calc(var(--su) * 5);
+  width: 100%;
+}
+.mcr-ratio-track {
+  position: relative;
+  height: max(8px, calc(var(--su) * 11));
+  border-radius: 999px;
+  background: var(--mcr-hair2);
+  border: 1px solid var(--mcr-hair2);
+  overflow: visible;               /* شاخص المستهدف يعلو الحافة */
+}
+.mcr-ratio-fill {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  border-radius: 999px;
+  background: var(--mcr-tone);
+}
+/* شاخص المستهدف الذهبي — عمود رفيع يعبر الشريط بكامل ارتفاعه وزيادة */
+.mcr-ratio-target {
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  width: 2px;
+  border-radius: 1px;
+  background: var(--gold);
+  transform: translateX(50%);      /* RTL: المحاذاة على مركز النسبة لا حافتها */
+}
+.mcr-ratio-meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: calc(var(--su) * 10);
+}
+.mcr-ratio-val {
+  color: var(--mcr-ink);
+  font-size: max(12px, calc(var(--su) * 15));
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.mcr-ratio-target-label {
+  color: var(--gold);
+  font-size: max(10px, calc(var(--su) * 12));
+  font-weight: 600;
+}
+/* سطر الوسم الملازم — منهجية 81.6٪ وأمثالها تُمرَّر هنا إلزامياً */
+.mcr-ratio-note {
+  color: var(--mcr-mut);
+  font-size: max(9.5px, calc(var(--su) * 11.5));
+  font-weight: 600;
+  line-height: 1.5;
+  border-inline-start: 2px solid var(--gold);
+  padding-inline-start: calc(var(--su) * 7);
+}
+
+/* ════════════════ smallMultiples ════════════════ */
+.mcr-sm-title {
+  color: var(--mcr-mut);
+  font-size: max(10px, calc(var(--su) * 12.5));
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  margin-block-end: calc(var(--su) * 6);
+}
+.mcr-sm {
+  display: grid;
+  gap: calc(var(--su) * 10);
+  width: 100%;
+}
+.mcr-sm-cell {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--su) * 4);
+  min-width: 0;                    /* يمنع تمدد الخلية بمحتوى غير قابل للالتفاف */
+  padding: calc(var(--su) * 8) calc(var(--su) * 9);
+  border: 1px solid var(--mcr-hair2);
+  border-radius: var(--r-sm);
+  background: var(--mcr-hair2);
+}
+body.mode-admin .mcr-sm-cell, body.mode-report .mcr-sm-cell {
+  background: transparent;
+  border-color: var(--mcr-hair);
+}
+.mcr-sm-cell .mcr-sm-label {
+  color: var(--mcr-mut);
+  font-size: max(10px, calc(var(--su) * 12));
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mcr-sm-cell .mcr-sm-value {
+  color: var(--mcr-ink);
+  font-size: max(13px, calc(var(--su) * 17));
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+.mcr-sm-cell .mcr-sm-sub {
+  color: var(--mcr-mut);
+  font-size: max(9.5px, calc(var(--su) * 11.5));
+  font-weight: 600;
+}
+
+/* ── طباعة: المكتبة SVG/DOM فتخرج حادة؛ يبقى ضبط الحبر وقطع الصفحات ── */
+@media print {
+  .mcr-spark-line { stroke-width: 1.4; }
+  .mcr-spark-area { opacity: 0.18; }
+  .mcr-bar, .mcr-sm-cell, .mcr-ratio { break-inside: avoid; }
+  .mcr-delta {
+    border-color: currentColor;
+    background: transparent;
+  }
+  .mcr-bar-track, .mcr-ratio-track {
+    border-color: rgba(17, 24, 21, 0.25);
+  }
+  /* طابعات كثيرة تُسقط الخلفيات — الحد يضمن قراءة الشريط ولو بلا تعبئة */
+  .mcr-bar-fill, .mcr-ratio-fill {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+}
+
+/* المكتبة سكونية أصلاً (لا حركة ولا انتقالات) فلا شيء يُعطَّل هنا —
+   القاعدة موجودة توثيقاً للمدقق: prefers-reduced-motion لا يغيّر شيئاً. */

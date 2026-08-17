@@ -1,0 +1,85 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   chrome-ext.css — امتداد كروم المقدِّم لحزمة التوسعة (بادئة hudx-)
+   يملكه معمار التوسعة — لا يعدّله وكيل ميزة، ولا يلمس presenter.css المعتمد.
+
+   يضيف زرّي دخول اثنين فقط إلى شريط HUD القائم، بنمط .hud-btn ذاته حرفياً
+   (وراثة كاملة: الزران يحملان الصنف hud-btn ثم صنف موضعهما hudx-*):
+     #hud-palette  «بحث وتنقّل ‎Ctrl+K»   → يبث palette:toggle
+     #hud-report   «الموجز التنفيذي»      → يوجّه إلى ‎#/report
+   الموضع: أسفل يسار المسرح، فوق مؤشر التقدم المركزي وبعيداً عن «العودة إلى
+   المحاور» (أسفل اليمين) وعن زرّي التقليب (منتصف الأعلى) — لا تراكب مع أي
+   عنصر معتمد، والثبات البكسلي للأقسام محفوظ لأن الزرين خارج المسرح كلياً.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.hudx-palette,
+.hudx-report {
+  top: auto;
+  bottom: calc(var(--su) * 24);
+  right: auto;
+  left: calc(var(--su) * 30);
+  font-size: max(11px, calc(var(--su) * 13));
+  padding: calc(var(--su) * 7) calc(var(--su) * 15);
+  gap: calc(var(--su) * 7);
+}
+
+/* الموجز يجلس فوق اللوحة (كومة رأسية على حافة واحدة بفاصل ثابت) */
+.hudx-report {
+  bottom: calc(var(--su) * 24 + var(--su) * 34);
+}
+
+/* رقاقة الاختصار داخل الزر: محايدة، معزولة اتجاهياً، لا تنافس نص الزر */
+.hudx-kbd {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 calc(var(--su) * 5);
+  border: 1px solid var(--hair-d2);
+  border-radius: calc(var(--su) * 5);
+  color: var(--faint-d);
+  font-family: var(--f-body);
+  font-size: 0.86em;
+  font-weight: 700;
+  line-height: 1.6;
+  direction: ltr;
+  unicode-bidi: isolate;
+  transition: color var(--dur-micro), border-color var(--dur-micro);
+}
+.hudx-palette:hover .hudx-kbd,
+.hudx-palette:focus-visible .hudx-kbd {
+  color: var(--ink2-d);
+  border-color: var(--hair-d);
+}
+
+/* أيقونة الزر: خط رفيع بلون النص الوارث — لا لون بيانات في الكروم */
+.hudx-ico {
+  flex: 0 0 auto;
+  width: max(13px, calc(var(--su) * 15));
+  height: max(13px, calc(var(--su) * 15));
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* الغلاف والخمول: يتبعان قاعدة .hud-btn القائمة تلقائياً (وراثة الصنف).
+   داخل الملاحق يبقى الزران عاملين — البحث والموجز مفيدان من أي موضع،
+   بخلاف زرّي التقليب اللذين يخفيهما presenter.css داخل الملحق. */
+body.in-appendix .hudx-palette,
+body.in-appendix .hudx-report {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* وضع الموجز يستبدل الكروم كله بشريط أدوات المستند (rpt-toolbar) */
+body.mode-report .hudx-palette,
+body.mode-report .hudx-report { display: none; }
+
+/* شاشات ضيقة جداً (عرض تجريبي على حاسوب محمول صغير): يبقى الأيقونة والنص
+   وتُطوى رقاقة الاختصار — الاختصار نفسه يظل عاملاً. */
+@media (max-width: 900px) {
+  .hudx-kbd { display: none; }
+}
+
+@media print {
+  .hudx-palette, .hudx-report { display: none !important; }
+}
