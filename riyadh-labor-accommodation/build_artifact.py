@@ -17,11 +17,15 @@ html = f"""<title>{TITLE}</title>
 <style>
 html{{direction:rtl}}
 {fonts}
+{b['leafletCss']}
 {b['css']}
 </style>
 {b['markup']}
 <script>
 {echarts}
+</script>
+<script>
+{b['leafletJs']}
 </script>
 <script>
 window.DATA = {b['data']};

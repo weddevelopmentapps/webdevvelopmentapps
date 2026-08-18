@@ -29,6 +29,8 @@ def data_uri(rel):
 def bundle():
     return {
         "css": read("src/styles.css"),
+        "leafletCss": read("vendor/leaflet.css"),
+        "leafletJs": read("vendor/leaflet.js"),
         "markup": read("src/markup.html"),
         "app": read("src/app.js"),
         "data": json.dumps(json.load(open(os.path.join(HERE, "data.json"), encoding="utf-8")),
@@ -50,11 +52,15 @@ if __name__ == "__main__":
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
 <style>
+{b['leafletCss']}
 {b['css']}
 </style>
 </head>
 <body>
 {b['markup']}
+<script>
+{b['leafletJs']}
+</script>
 <script>
 window.DATA = {b['data']};
 const IMAGES = {b['images']};

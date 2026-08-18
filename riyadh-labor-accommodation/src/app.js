@@ -199,66 +199,87 @@ function showTip(html,x,y){
 }
 function hideTip(){ tip.style.display='none'; }
 
-/* تدرّج أخضر يعكس قيمة المقياس — يجعل الخريطة تحمل معلومة بدل لون موحّد */
-function shadeFill(t){
-  const a=[232,243,238], b=[14,90,67], k=Math.max(0,Math.min(1,t));
-  return `rgb(${a.map((v,i)=>Math.round(v+(b[i]-v)*k)).join(',')})`;
-}
-function drawMap(wrapId,{mode,sectorTip,onSector,dots,dotTip,onDot,hotspots,metric,metricLabel}){
-  const wrap = el(wrapId);
-  const vals = metric? D.sectors.map(metric) : null;
-  const mx = vals? Math.max(...vals) : 0, mn = vals? Math.min(...vals) : 0;
-  const norm = v => (mx===mn)? .5 : .16+.84*((v-mn)/(mx-mn));
-  const polys = D.sectors.map((sec,idx)=>{
-    const g=D.geo[sec], sel=S.sectors.has(sec), dim=S.sectors.size&&!sel;
-    const fill = vals? ` style="fill:${shadeFill(norm(vals[idx]))}"` : '';
-    return `<polygon class="sector-poly${sel?' sel':dim?' dim':''}" data-sec="${sec}"
-      points="${g.poly.map(p=>p.join(',')).join(' ')}"${fill}></polygon>`;
-  }).join('');
-  const valLabels = vals? D.sectors.map((sec,idx)=>{
-    const g=D.geo[sec];
-    return `<text class="sector-val${norm(vals[idx])>.55?' on-dark':''}" x="${g.label[0]}" y="${g.label[1]+4.4}">${fmtAx(vals[idx])}</text>`;
-  }).join('') : '';
-  const labels = D.sectors.map(sec=>{
-    const g=D.geo[sec], sel=S.sectors.has(sec);
-    return `<text class="sector-label${sel?' sel':''}" x="${g.label[0]}" y="${g.label[1]}">${sec.replace(/^(ال)?قطاع /,'')}</text>`;
-  }).join('');
-  let dotSvg='';
-  if(hotspots){
-    dotSvg = D.hotspots.map((h,i)=>({h,i})).filter(x=>secOK(x.h.sector)).map(({h,i})=>{
-      const col = h.density>60? C.red : h.density>35? C.amber : C.green2;
-      return `<circle class="hot-dot" data-h="${i}" cx="${h.x}" cy="${h.y}" r="${(1+h.density/24).toFixed(1)}" fill="${col}" opacity="${(0.35+h.density/160).toFixed(2)}"></circle>`;
-    }).join('');
-  } else if(dots){
-    dotSvg = dots.map(f=>{
-      const r=(0.7+Math.sqrt(f.beds)/58).toFixed(2);
-      return `<circle class="fac-dot" data-f="${f.id}" cx="${f.x}" cy="${f.y}" r="${r}" fill="${OCC_COLOR(f.occ_rate)}" fill-opacity=".82"></circle>`;
-    }).join('');
-  }
-  wrap.innerHTML = `<svg viewBox="0 0 100 100" role="img" aria-label="خريطة قطاعات الرياض">
-    <defs><filter id="soft-${wrapId}"><feDropShadow dx="0" dy=".6" stdDeviation=".7" flood-color="#0E5A43" flood-opacity=".18"/></filter></defs>
-    <g filter="url(#soft-${wrapId})">${polys}</g><g>${dotSvg}</g><g>${labels}${valLabels}</g></svg>`;
-  wrap.querySelectorAll('.sector-poly').forEach(p=>{
-    const sec=p.dataset.sec;
-    p.addEventListener('mousemove',e=>showTip(sectorTip(sec),e.clientX,e.clientY));
-    p.addEventListener('mouseleave',hideTip);
-    p.addEventListener('click',()=>{hideTip(); onSector(sec);});
-  });
-  wrap.querySelectorAll('.fac-dot').forEach(c=>{
-    const f=D.facilities.find(x=>x.id===c.dataset.f);
-    c.addEventListener('mousemove',e=>showTip(dotTip(f),e.clientX,e.clientY));
-    c.addEventListener('mouseleave',hideTip);
-    c.addEventListener('click',e=>{e.stopPropagation(); hideTip(); onDot(f);});
-  });
-  wrap.querySelectorAll('.hot-dot').forEach(c=>{
-    const h=D.hotspots[+c.dataset.h];
-    c.addEventListener('mousemove',e=>showTip(
-      `<b>نقطة ساخنة — ${h.sector}</b>${ttRow('كثافة المخالفات',h.density+' / 100')}${ttRow('التصنيف',h.density>60?'مرتفعة':h.density>35?'متوسطة':'منخفضة')}`,e.clientX,e.clientY));
-    c.addEventListener('mouseleave',hideTip);
-  });
+/* ============================================================
+   خريطة الرياض الفعلية — OpenStreetMap عبر Leaflet
+   القطاعات تُمثَّل بدوائر متناسبة عند نقاط ارتكاز تقريبية، لأن المصدر
+   لا يتضمن حدوداً جغرافية للقطاعات البلدية. لا تُرسم حدود مُختلَقة.
+   ============================================================ */
+const RIYADH_VIEW = {center:[24.700, 46.720], zoom:10};
+/* نقاط ارتكاز تقريبية مشتقة من مواقع أحياء كل قطاع في ورقة 13 */
+const SECTOR_AT = {
+  'قطاع الشمال': [24.810, 46.630],
+  'قطاع الشرق' : [24.722, 46.850],
+  'قطاع الوسط' : [24.628, 46.708],
+  'قطاع الغرب' : [24.606, 46.600],
+  'قطاع الجنوب': [24.572, 46.741],
+};
+const OSM_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+const OSM_ATTR = '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors';
+const LMAP = {};
+
+/* نصف قطر متناسب مع جذر القيمة حتى تعكس المساحة الحجم لا الطول */
+function radiusFor(v, mx){
+  if(!mx || v<=0) return 9;
+  return 11 + 27*Math.sqrt(v/mx);
 }
 
-/* ---------- facility drawer ---------- */
+function drawMap(wrapId, {metric, metricLabel, sectorTip, onSector, fmtV}){
+  const wrap = el(wrapId);
+  if(!wrap || typeof L === 'undefined') return;
+  let M = LMAP[wrapId];
+
+  if(!M || !wrap.contains(M.getContainer())){
+    wrap.innerHTML = '';
+    M = L.map(wrap, {
+      center:RIYADH_VIEW.center, zoom:RIYADH_VIEW.zoom,
+      scrollWheelZoom:false,           /* الصفحة تُمرَّر، والخريطة تُكبَّر بالأزرار */
+      zoomControl:true, attributionControl:true,
+      zoomSnap:.5, minZoom:8, maxZoom:16,
+    });
+    L.tileLayer(OSM_URL, {maxZoom:16, attribution:OSM_ATTR, crossOrigin:true}).addTo(M)
+      .on('tileerror', function(){
+        /* بناء دون اتصال: تبقى الدوائر والقيم ظاهرة فوق خلفية فارغة */
+        if(!wrap.dataset.offline){ wrap.dataset.offline='1'; wrap.classList.add('map-offline'); }
+      });
+    M.attributionControl.setPrefix('');
+    /* التأطير على نقاط الارتكاز بدل تكبير ثابت — يظل صحيحاً على أي مقاس */
+    M.fitBounds(L.latLngBounds(Object.values(SECTOR_AT)), {padding:[46,46], maxZoom:11});
+    LMAP[wrapId] = M;
+    M._marks = L.layerGroup().addTo(M);
+  }
+  M._marks.clearLayers();
+
+  const vals = D.sectors.map(metric);
+  const mx = Math.max(...vals);
+  D.sectors.forEach((sec, idx)=>{
+    const at = SECTOR_AT[sec]; if(!at) return;
+    const v = vals[idx];
+    const selected = S.sectors.has(sec);
+    const dimmed = S.sectors.size && !selected;
+    const c = L.circleMarker(at, {
+      radius: radiusFor(v, mx),
+      color: selected? '#0B4A37' : '#0E5A43',
+      weight: selected? 3 : 1.6,
+      opacity: dimmed? .45 : 1,
+      fillColor: selected? '#0E5A43' : '#177A5B',
+      fillOpacity: dimmed? .18 : .55,
+      className: 'sec-mark',
+    }).addTo(M._marks);
+
+    c.bindTooltip(sectorTip(sec), {direction:'top', offset:[0,-6], className:'map-tip-l', sticky:false});
+    c.on('click', ()=>onSector(sec));
+
+    L.marker(at, {interactive:false, keyboard:false, icon:L.divIcon({
+      className:'sec-lab',
+      html:`<span class="sl-n">${sec.replace(/^(ال)?قطاع /,'')}</span><span class="sl-v">${fmtV? fmtV(v) : fmtAx(v)}</span>`,
+      iconSize:[0,0],
+    })}).addTo(M._marks);
+  });
+
+  /* الحاويات المخفية تُقاس صفراً — تُعاد المعايرة عند الظهور */
+  requestAnimationFrame(()=>{ try{ M.invalidateSize(false); }catch(e){} });
+}
+
 function facilityDrawer(f){
   openDrawer(f.name, `${f.sector} — حي ${f.district}`, `
     ${fld('رقم المنشأة',f.id)}
@@ -442,14 +463,13 @@ function renderT1(){
   reClick(sup,p=>toggleSector(supRows[p.dataIndex].s));
 
   /* map + side panel */
-  /* الخريطة تعرض القطاعات فقط — لا يتضمن المصدر إحداثيات منشآت */
+  /* خريطة فعلية للرياض؛ القطاعات كدوائر متناسبة — لا إحداثيات منشآت في المصدر */
   drawMap('map1',{
-    mode:'supply',
     sectorTip:s=>{const x=sectorFacts(s);
       return `<b>${s}</b>${ttRow('الأسرّة المرخصة',fmt(x.beds))}${ttRow('الرخص التشغيلية',fmt(x.opLic))}${ttRow('رخص البناء',fmt(x.buildLic))}${ttRow('العمالة (الطلب)',fmt(x.demand))}${ttRow('نسبة التغطية',fmt1(x.cov)+'٪')}`;},
     onSector:toggleSector,
-    dots:[],
     metric:s=>(D.capSector.find(r=>r.name===s)||{beds:0}).beds,
+    metricLabel:'الأسرّة المرخصة',
   });
   renderMap1Side(sec,sf);
 
@@ -708,18 +728,19 @@ function renderT3(){
     return {v:r.visits||0,w:r.violations||0,i:r.inspectors||0};};
   el('map2-title').textContent='خريطة الرقابة — القطاعات البلدية';
   el('map2-sub').textContent='الزيارات والمخالفات لكل قطاع — انقر قطاعاً للتفاصيل';
-  /* لا إحداثيات في المصدر، فلا نقاط منشآت ولا خريطة كثافة */
+  /* لا إحداثيات منشآت في المصدر، فلا نقاط ولا خريطة كثافة */
   drawMap('map2',{
-    mode:'monitor',
     sectorTip:s=>{const a=secAgg(s);
       return `<b>${s}</b>${ttRow('الزيارات الرقابية',fmt(a.v))}${ttRow('المخالفات',fmt(a.w))}${ttRow('المراقبون',fmt(a.i))}${ttRow('معدل المخالفة',fmt1(a.v?a.w/a.v*100:0)+'٪')}`;},
     onSector:toggleSector,
-    dots:[],
     metric:s=>(D.inspSector.find(r=>r.name===s)||{violations:0}).violations,
+    metricLabel:'المخالفات',
+    fmtV:v=>fmt(v),
   });
   el('map2-legend').innerHTML=
-    `<span class="li"><span class="sw" style="background:${C.teal}"></span>كثافة اللون تعكس عدد المخالفات في القطاع</span>
-     <span class="li" style="margin-inline-start:auto">مخطط توضيحي لترتيب القطاعات — ليس خريطة حدود فعلية</span>`;
+    `<span class="li"><span class="sw" style="background:${C.teal}"></span>مساحة الدائرة ∝ عدد المخالفات في القطاع</span>
+     <span class="li">خريطة الأساس: OpenStreetMap</span>
+     <span class="li" style="margin-inline-start:auto">مواقع تقريبية — لا تتوفر حدود القطاعات البلدية في المصدر</span>`;
   const sSel=S.sectors.size===1?[...S.sectors][0]:null;
   const aSel=sSel? secAgg(sSel) : {v:secVisits,w:secViol,i:nInsp};
   el('map2-side').innerHTML=`
