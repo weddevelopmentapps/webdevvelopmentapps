@@ -36,6 +36,7 @@
 <!-- ======================= shell ======================= -->
 <div id="shell">
   <header id="topbar">
+    <div class="brand-pattern-layer" aria-hidden="true"></div>
     <div class="tb-title">
       <h1 id="page-title">لوحة معلومات السكن الجماعي للأفراد بمدينة الرياض</h1>
       <div class="sub"><b>أمانة منطقة الرياض</b> — وكالة التنمية الحضرية</div>
@@ -78,37 +79,33 @@
     <!-- ======================= TAB 1 — العرض والطلب ======================= -->
     <section class="tab active" id="tab-t1">
       <div class="hero" id="hero">
-        <div class="hero-img" id="hero-img" aria-hidden="true"></div>
-        <div class="hero-cols">
-          <div class="hero-side">
-            <div class="h-cap"><span class="sq" style="background:#C89B4B"></span>الطلب — إجمالي العمالة في الرياض</div>
-            <div class="hero-num" id="hero-demand">0</div>
-            <div class="h-note" id="hero-demand-note">عامل وافد ضمن نطاق أمانة منطقة الرياض</div>
+        <div class="hero-pattern" aria-hidden="true"></div>
+        <div class="hero-stats">
+          <div class="hs hs-supply">
+            <div class="hs-top"><span class="hs-v num" id="hero-supply">0</span><span class="hs-u">سرير</span></div>
+            <div class="hs-l">العرض الحالي (الطاقة المرخصة)</div>
           </div>
-          <div class="hero-mid">
-            <div class="gap-badge">
-              <div class="gb-cap">فجوة الإيواء</div>
-              <div class="gb-val"><span id="hero-gap">0</span> سرير</div>
-            </div>
-            <div class="cov">نسبة التغطية: <span id="hero-cov">0</span>%</div>
+          <div class="hs hs-gap">
+            <div class="hs-top"><span class="hs-v num" id="hero-gap">0</span><span class="hs-u">سرير</span></div>
+            <div class="hs-l">فجوة الإيواء غير المغطاة</div>
           </div>
-          <div class="hero-side">
-            <div class="h-cap"><span class="sq" style="background:#0E5A43"></span>العرض — الأسرّة المرخصة</div>
-            <div class="hero-num" id="hero-supply">0</div>
-            <div class="h-note" id="hero-supply-note">سرير مرخص في 140 منشأة سكن جماعي</div>
+          <div class="hs hs-demand">
+            <div class="hs-top"><span class="hs-v num" id="hero-demand">0</span><span class="hs-u">فرد</span></div>
+            <div class="hs-l">إجمالي الطلب</div>
           </div>
         </div>
-        <div class="hero-bridge">
-          <div class="bridge-track">
-            <div class="bridge-gapzone" id="bridge-gap"></div>
-            <div class="bridge-fill" id="bridge-fill"></div>
-            <div class="bridge-marker" id="bridge-marker"></div>
-          </div>
-          <div class="bridge-legend">
-            <span class="lg"><span class="sw" style="background:#0E5A43"></span>أسرّة مرخصة (مغطّى)</span>
-            <span class="lg" id="bridge-cap">—</span>
-            <span class="lg"><span class="sw" style="background:repeating-linear-gradient(-45deg,#E8B25C 0 3px,#F3D9AC 3px 6px)"></span>فجوة غير مغطّاة</span>
-          </div>
+
+        <div class="gapbar" id="gapbar">
+          <div class="gb-fill" id="bridge-fill"></div>
+          <div class="gb-lab" id="gb-lab">—</div>
+        </div>
+        <div class="gapbar-caps">
+          <span id="gb-sup">—</span><span id="gb-dem">—</span>
+        </div>
+
+        <div class="hero-chips">
+          <div class="hchip"><span>الطلب يعادل</span><b id="hero-mult">—</b><span>أضعاف العرض الحالي</span></div>
+          <div class="hchip"><span>نسبة تغطية الطلب</span><b id="hero-cov">—</b></div>
         </div>
       </div>
 
@@ -200,6 +197,14 @@
           </div>
         </div>
       </div>
+      <div class="section-h"><span class="bar"></span><h2>النمو الشهري — من خط الأساس إلى الوضع الحالي</h2>
+        <span class="hint">مخطط شلالي: كل عمود هو إضافة الشهر فوق رصيد ما قبله</span></div>
+      <div class="grid" style="gap:14px;margin-bottom:16px">
+        <div class="card"><h3>رخص البناء</h3><div class="c-sub">رخصة</div><div class="chart wf" id="c-wf-constr"></div></div>
+        <div class="card"><h3>الرخص التشغيلية</h3><div class="c-sub">رخصة</div><div class="chart wf" id="c-wf-ops"></div></div>
+        <div class="card"><h3>الطاقة الاستيعابية</h3><div class="c-sub">سرير</div><div class="chart wf" id="c-wf-beds"></div></div>
+      </div>
+
       <div class="section-h"><span class="bar"></span><h2>سجل الإصدار الشهري</h2>
         <span class="grow"></span><input id="lic-search" class="tsearch" placeholder="ابحث بالشهر أو القطاع…"></div>
       <div class="card flat"><div class="tblwrap" id="tbl-lic"></div></div>

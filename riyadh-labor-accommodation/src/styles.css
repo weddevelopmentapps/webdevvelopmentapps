@@ -725,3 +725,91 @@ table.tbl{width:100%;border-collapse:collapse;font-size:12px;min-width:720px}
 @media(max-width:1200px){.mapwrap{height:380px}}
 @media(max-width:768px){.mapwrap{height:320px}}
 @media print{.leaflet-control-zoom{display:none}}
+
+
+/* ============================================================
+   تعديلات: بطل العرض والطلب · الشلال · الخريطة المسطّحة · نمط الأمانة
+   ============================================================ */
+
+/* ---------- النمط الهندسي لهوية أمانة منطقة الرياض ---------- */
+#topbar>*:not(.brand-pattern-layer){position:relative;z-index:1}
+.brand-pattern-layer{
+  position:absolute;inset:0;pointer-events:none;user-select:none;z-index:0;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='108' height='108'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%23178C7A'/><stop offset='1' stop-color='%230A5E3E'/></linearGradient></defs><g transform='rotate(-8 54 54)'><g transform='skewX(-18)'><rect x='-6' y='-44' width='45' height='196' fill='url(%23g)'/><rect x='30' y='-44' width='32' height='196' fill='url(%23g)' opacity='.62'/><rect x='66' y='-44' width='22' height='196' fill='url(%23g)' opacity='.34'/></g></g></svg>");
+  background-size:108px 108px;opacity:.07;
+}
+/* شريط الهوية أعلى المحتوى */
+#topbar::after{
+  content:"";position:absolute;inset-inline:0;bottom:-4px;height:4px;
+  background:linear-gradient(90deg,#0A5E3E,#178C7A 45%,#0E5A43);
+  opacity:.9;
+}
+#topbar{position:sticky}
+
+/* ---------- بطل العرض والطلب ---------- */
+.hero{position:relative;overflow:hidden;background:var(--card);
+  border:1px solid var(--line);border-radius:var(--r);padding:22px 26px 20px;
+  box-shadow:var(--shadow);margin-bottom:4px}
+.hero>*:not(.hero-pattern){position:relative;z-index:1}
+.hero-pattern{
+  position:absolute;inset:0;pointer-events:none;z-index:0;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='108' height='108'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%23178C7A'/><stop offset='1' stop-color='%230A5E3E'/></linearGradient></defs><g transform='rotate(-8 54 54)'><g transform='skewX(-18)'><rect x='-6' y='-44' width='45' height='196' fill='url(%23g)'/><rect x='30' y='-44' width='32' height='196' fill='url(%23g)' opacity='.62'/><rect x='66' y='-44' width='22' height='196' fill='url(%23g)' opacity='.34'/></g></g></svg>");background-size:108px 108px;opacity:.055;
+}
+.hero-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-bottom:20px}
+.hero-stats .hs{padding:0 26px;position:relative;text-align:center}
+.hero-stats .hs+.hs::after{content:"";position:absolute;inset-block:6px;
+  inset-inline-end:0;width:1px;background:var(--line)}
+.hs-top{display:flex;align-items:baseline;justify-content:center;gap:8px}
+.hs-v{font-family:var(--ff-d);font-weight:700;font-size:clamp(30px,3.2vw,44px);
+  letter-spacing:-1.4px;line-height:1.05}
+.hs-u{font-size:13px;font-weight:700;color:var(--muted)}
+.hs-l{font-size:13px;color:var(--ink);opacity:.72;font-weight:600;margin-top:6px}
+.hs-supply .hs-v{color:#1E5B44}
+.hs-gap .hs-v{color:#B3402F}
+.hs-demand .hs-v{color:var(--ink)}
+
+/* شريط الفجوة */
+.gapbar{
+  position:relative;height:64px;border-radius:8px;overflow:hidden;
+  background:repeating-linear-gradient(-45deg,#B3402F 0 9px,#C2543F 9px 18px);
+}
+.gapbar .gb-fill{
+  position:absolute;inset-block:0;inset-inline-start:0;width:0;
+  background:#1E5B44;transition:width 1s cubic-bezier(.25,.8,.3,1);
+}
+.gapbar .gb-lab{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  color:#fff;font-family:var(--ff-d);font-weight:700;font-size:17px;letter-spacing:-.2px;
+  text-shadow:0 1px 3px rgba(0,0,0,.28);
+}
+.gapbar-caps{display:flex;justify-content:space-between;margin-top:7px;
+  font-size:12px;color:var(--muted);font-weight:600}
+
+/* شرائح السياق */
+.hero-chips{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}
+.hchip{
+  background:#EFF2EF;border-radius:12px;padding:14px 20px;
+  display:flex;align-items:baseline;justify-content:center;gap:9px;
+  font-size:14px;color:var(--ink);font-weight:600;
+}
+.hchip b{font-family:var(--ff-d);font-weight:700;font-size:22px;color:#8A6D24;letter-spacing:-.5px}
+.hero-chips .hchip:last-child b{color:#1E5B44}
+
+/* ---------- الشلال ---------- */
+.chart.wf{height:190px}
+
+/* ---------- الخريطة المسطّحة (بلا بلاطات) ---------- */
+.mapwrap{background:#FBFCFB}
+.leaflet-container{background:#FBFCFB}
+.mapwrap.map-offline::after{display:none}   /* لا بلاطات تُحمَّل أصلاً */
+.sec-poly-l{transition:fill-opacity .2s}
+
+@media(max-width:1100px){
+  .hero-stats{grid-template-columns:1fr;gap:14px}
+  .hero-stats .hs{text-align:start;padding:0}
+  .hero-stats .hs+.hs::after{display:none}
+  .hero-stats .hs+.hs{border-top:1px solid var(--line);padding-top:12px}
+  .hs-top{justify-content:flex-start}
+  .hero-chips{grid-template-columns:1fr}
+  .chart.wf{height:210px}
+}
