@@ -204,79 +204,84 @@ function hideTip(){ tip.style.display='none'; }
    القطاعات تُمثَّل بدوائر متناسبة عند نقاط ارتكاز تقريبية، لأن المصدر
    لا يتضمن حدوداً جغرافية للقطاعات البلدية. لا تُرسم حدود مُختلَقة.
    ============================================================ */
-const RIYADH_VIEW = {center:[24.700, 46.720], zoom:10};
-/* نقاط ارتكاز تقريبية مشتقة من مواقع أحياء كل قطاع في ورقة 13 */
-const SECTOR_AT = {
-  'قطاع الشمال': [24.810, 46.630],
-  'قطاع الشرق' : [24.722, 46.850],
-  'قطاع الوسط' : [24.628, 46.708],
-  'قطاع الغرب' : [24.606, 46.600],
-  'قطاع الجنوب': [24.572, 46.741],
-};
 const OSM_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 const OSM_ATTR = '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors';
 const LMAP = {};
 
-/* نصف قطر متناسب مع جذر القيمة حتى تعكس المساحة الحجم لا الطول */
-function radiusFor(v, mx){
-  if(!mx || v<=0) return 9;
-  return 11 + 27*Math.sqrt(v/mx);
+/* تدرّج أخضر يعكس قيمة المقياس داخل حدود القطاع */
+function shadeFill(t){
+  const a=[232,243,238], b=[14,90,67], k=Math.max(0,Math.min(1,t));
+  return `rgb(${a.map((v,i)=>Math.round(v+(b[i]-v)*k)).join(',')})`;
 }
 
+/* ============================================================
+   خريطة الرياض الفعلية — أساس OpenStreetMap عبر Leaflet،
+   وحدود القطاعات الخمسة مرقمنة من خريطة القطاعات الرسمية للأمانة.
+   ============================================================ */
 function drawMap(wrapId, {metric, metricLabel, sectorTip, onSector, fmtV}){
   const wrap = el(wrapId);
-  if(!wrap || typeof L === 'undefined') return;
+  if(!wrap || typeof L === 'undefined' || typeof SECTORS_GEO === 'undefined') return;
   let M = LMAP[wrapId];
 
   if(!M || !wrap.contains(M.getContainer())){
     wrap.innerHTML = '';
     M = L.map(wrap, {
-      center:RIYADH_VIEW.center, zoom:RIYADH_VIEW.zoom,
-      scrollWheelZoom:false,           /* الصفحة تُمرَّر، والخريطة تُكبَّر بالأزرار */
-      zoomControl:true, attributionControl:true,
-      zoomSnap:.5, minZoom:8, maxZoom:16,
+      center:[24.68,46.72], zoom:10,
+      scrollWheelZoom:false,          /* الصفحة تُمرَّر؛ التكبير بالأزرار */
+      zoomControl:true, attributionControl:true, zoomSnap:.5, minZoom:8, maxZoom:16,
     });
-    L.tileLayer(OSM_URL, {maxZoom:16, attribution:OSM_ATTR, crossOrigin:true}).addTo(M)
+    L.tileLayer(OSM_URL, {maxZoom:16, attribution:OSM_ATTR}).addTo(M)
       .on('tileerror', function(){
-        /* بناء دون اتصال: تبقى الدوائر والقيم ظاهرة فوق خلفية فارغة */
         if(!wrap.dataset.offline){ wrap.dataset.offline='1'; wrap.classList.add('map-offline'); }
       });
     M.attributionControl.setPrefix('');
-    /* التأطير على نقاط الارتكاز بدل تكبير ثابت — يظل صحيحاً على أي مقاس */
-    M.fitBounds(L.latLngBounds(Object.values(SECTOR_AT)), {padding:[46,46], maxZoom:11});
     LMAP[wrapId] = M;
     M._marks = L.layerGroup().addTo(M);
+    M._fitted = false;
   }
   M._marks.clearLayers();
 
-  const vals = D.sectors.map(metric);
-  const mx = Math.max(...vals);
-  D.sectors.forEach((sec, idx)=>{
-    const at = SECTOR_AT[sec]; if(!at) return;
-    const v = vals[idx];
-    const selected = S.sectors.has(sec);
-    const dimmed = S.sectors.size && !selected;
-    const c = L.circleMarker(at, {
-      radius: radiusFor(v, mx),
-      color: selected? '#0B4A37' : '#0E5A43',
-      weight: selected? 3 : 1.6,
-      opacity: dimmed? .45 : 1,
-      fillColor: selected? '#0E5A43' : '#177A5B',
-      fillOpacity: dimmed? .18 : .55,
-      className: 'sec-mark',
-    }).addTo(M._marks);
+  const vals = {};
+  D.sectors.forEach(sec => { vals[sec] = metric(sec); });
+  const mx = Math.max(...Object.values(vals)), mn = Math.min(...Object.values(vals));
+  const norm = v => mx===mn ? .55 : .14 + .86*((v-mn)/(mx-mn));
 
-    c.bindTooltip(sectorTip(sec), {direction:'top', offset:[0,-6], className:'map-tip-l', sticky:false});
-    c.on('click', ()=>onSector(sec));
+  const layer = L.geoJSON(SECTORS_GEO, {
+    style: f => {
+      const sec = f.properties.name, v = vals[sec];
+      const selected = S.sectors.has(sec), dimmed = S.sectors.size && !selected;
+      return {
+        color: selected? '#0A3D22' : '#FFFFFF',
+        weight: selected? 3 : 1.6,
+        opacity: dimmed? .5 : 1,
+        fillColor: v==null? '#D9E2DD' : shadeFill(norm(v)),
+        fillOpacity: dimmed? .28 : .78,
+        className: 'sec-poly-l',
+      };
+    },
+    onEachFeature: (f, lyr) => {
+      const sec = f.properties.name;
+      lyr.bindTooltip(sectorTip(sec), {sticky:true, direction:'top', className:'map-tip-l'});
+      lyr.on('click', ()=>onSector(sec));
+      lyr.on('mouseover', e=>e.target.setStyle({fillOpacity:.9, weight:2.6}));
+      lyr.on('mouseout',  e=>layer.resetStyle(e.target));
+    },
+  }).addTo(M._marks);
 
-    L.marker(at, {interactive:false, keyboard:false, icon:L.divIcon({
-      className:'sec-lab',
-      html:`<span class="sl-n">${sec.replace(/^(ال)?قطاع /,'')}</span><span class="sl-v">${fmtV? fmtV(v) : fmtAx(v)}</span>`,
+  /* تسمية القطاع وقيمته عند نقطة داخل حدوده */
+  SECTORS_GEO.features.forEach(f => {
+    const sec = f.properties.name, v = vals[sec];
+    if(v==null) return;
+    const dark = norm(v) > .52;
+    L.marker(f.properties.labelAt, {interactive:false, keyboard:false, icon:L.divIcon({
+      className:'sec-lab'+(dark?' on-dark':''),
+      html:`<span class="sl-n">${sec.replace(/^(ال)?قطاع /,'')}</span>`+
+           `<span class="sl-v">${fmtV? fmtV(v) : fmtAx(v)}</span>`,
       iconSize:[0,0],
     })}).addTo(M._marks);
   });
 
-  /* الحاويات المخفية تُقاس صفراً — تُعاد المعايرة عند الظهور */
+  if(!M._fitted){ M.fitBounds(layer.getBounds(), {padding:[16,16]}); M._fitted = true; }
   requestAnimationFrame(()=>{ try{ M.invalidateSize(false); }catch(e){} });
 }
 
@@ -727,7 +732,7 @@ function renderT3(){
   const secAgg=name=>{const r=D.inspSector.find(x=>x.name===name)||{};
     return {v:r.visits||0,w:r.violations||0,i:r.inspectors||0};};
   el('map2-title').textContent='خريطة الرقابة — القطاعات البلدية';
-  el('map2-sub').textContent='الزيارات والمخالفات لكل قطاع — انقر قطاعاً للتفاصيل';
+  el('map2-sub').textContent='الزيارات والمخالفات لكل قطاع بلدي — انقر قطاعاً للتفاصيل';
   /* لا إحداثيات منشآت في المصدر، فلا نقاط ولا خريطة كثافة */
   drawMap('map2',{
     sectorTip:s=>{const a=secAgg(s);
@@ -738,9 +743,9 @@ function renderT3(){
     fmtV:v=>fmt(v),
   });
   el('map2-legend').innerHTML=
-    `<span class="li"><span class="sw" style="background:${C.teal}"></span>مساحة الدائرة ∝ عدد المخالفات في القطاع</span>
+    `<span class="li"><span class="sw" style="background:linear-gradient(to left,#E8F3EE,#0E5A43)"></span>مخالفات أقل ← مخالفات أكثر</span>
      <span class="li">خريطة الأساس: OpenStreetMap</span>
-     <span class="li" style="margin-inline-start:auto">مواقع تقريبية — لا تتوفر حدود القطاعات البلدية في المصدر</span>`;
+     <span class="li" style="margin-inline-start:auto">الحدود مرقمنة من خريطة القطاعات الرسمية للأمانة — تقريبية للعرض</span>`;
   const sSel=S.sectors.size===1?[...S.sectors][0]:null;
   const aSel=sSel? secAgg(sSel) : {v:secVisits,w:secViol,i:nInsp};
   el('map2-side').innerHTML=`

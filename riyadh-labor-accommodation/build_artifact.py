@@ -30,6 +30,7 @@ html{{direction:rtl}}
 <script>
 window.DATA = {b['data']};
 const IMAGES = {b['images']};
+const SECTORS_GEO = {b['sectorsGeo']};
 </script>
 <script>
 {b['app']}

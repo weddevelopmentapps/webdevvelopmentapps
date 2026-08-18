@@ -36,6 +36,7 @@ def bundle():
         "data": json.dumps(json.load(open(os.path.join(HERE, "data.json"), encoding="utf-8")),
                            ensure_ascii=False, separators=(",", ":")),
         "images": json.dumps({k: data_uri(v) for k, v in IMAGES.items()}, ensure_ascii=False),
+        "sectorsGeo": read("assets/riyadh-sectors.geojson"),
     }
 
 
@@ -64,6 +65,7 @@ if __name__ == "__main__":
 <script>
 window.DATA = {b['data']};
 const IMAGES = {b['images']};
+const SECTORS_GEO = {b['sectorsGeo']};
 </script>
 <script>
 {b['app']}

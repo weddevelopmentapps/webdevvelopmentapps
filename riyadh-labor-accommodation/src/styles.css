@@ -692,8 +692,7 @@ table.tbl{width:100%;border-collapse:collapse;font-size:12px;min-width:720px}
 .leaflet-bar{box-shadow:0 1px 3px rgba(14,90,67,.18)!important;border:none!important}
 
 /* دائرة القطاع */
-.sec-mark{cursor:pointer;transition:fill-opacity .2s,stroke-width .2s}
-.sec-mark:hover{fill-opacity:.72!important}
+.sec-poly-l{cursor:pointer;transition:fill-opacity .2s}
 
 /* تسمية القطاع فوق الدائرة */
 .sec-lab{
@@ -704,8 +703,11 @@ table.tbl{width:100%;border-collapse:collapse;font-size:12px;min-width:720px}
   white-space:nowrap;text-align:center;line-height:1.25;
   paint-order:stroke;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 5px #fff;
 }
-.sec-lab .sl-n{font-family:var(--ff-b);font-weight:700;font-size:12px;color:#173A2B;margin-bottom:1px}
-.sec-lab .sl-v{font-family:var(--ff-d);font-weight:700;font-size:12.5px;color:var(--green)}
+.sec-lab .sl-n{font-family:var(--ff-b);font-weight:700;font-size:12.5px;color:#173A2B;margin-bottom:1px}
+.sec-lab .sl-v{font-family:var(--ff-d);font-weight:700;font-size:13px;color:var(--green)}
+/* على التعبئة الغامقة يُقلب النص إلى أبيض بهالة داكنة */
+.sec-lab.on-dark .sl-n,.sec-lab.on-dark .sl-v{
+  color:#fff;text-shadow:0 0 3px rgba(8,40,26,.9),0 0 6px rgba(8,40,26,.75)}
 
 /* تلميح الخريطة بنفس هوية تلميحات الرسوم */
 .leaflet-tooltip.map-tip-l{
