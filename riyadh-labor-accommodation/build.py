@@ -1,21 +1,22 @@
 # -*- coding: utf-8 -*-
 """يجمّع index.html المستقل من src/ + data.json + assets/.
 
-الصور مضمّنة كـ data URI، فلا يصدر عن الملف أي طلب لصور خارجية.
-لاستبدال أي صورة برسم فوتوغرافي فعلي: ضع الملف في assets/ بالاسم نفسه
-(بامتداد .jpg أو .png) وحدّث المسار في IMAGES أدناه — لا يلزم تغيير أي كود آخر.
+الصور مضمّنة كـ data URI فلا يصدر عن الملف أي طلب لصور خارجية.
+لاستبدال أي صورة برسم فوتوغرافي فعلي: ضع الملف في assets/ وحدّث المسار في
+IMAGES أدناه — لا يلزم تغيير أي كود آخر.
 """
 import base64, json, mimetypes, os
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 read = lambda p: open(os.path.join(HERE, p), encoding="utf-8").read()
 
-# مفتاح الصورة في الواجهة  ->  الملف في assets/
 IMAGES = {
     "cover": "assets/cover.svg",
     "lic":   "assets/sec-licensing.svg",
     "ctl":   "assets/sec-monitoring.svg",
 }
+
+TITLE = "لوحة معلومات السكن الجماعي للأفراد بمدينة الرياض — أمانة منطقة الرياض"
 
 
 def data_uri(rel):
@@ -26,18 +27,15 @@ def data_uri(rel):
 
 
 def bundle():
-    imgs = {k: data_uri(v) for k, v in IMAGES.items()}
     return {
         "css": read("src/styles.css"),
         "markup": read("src/markup.html"),
         "app": read("src/app.js"),
         "data": json.dumps(json.load(open(os.path.join(HERE, "data.json"), encoding="utf-8")),
                            ensure_ascii=False, separators=(",", ":")),
-        "images": json.dumps(imgs, ensure_ascii=False),
+        "images": json.dumps({k: data_uri(v) for k, v in IMAGES.items()}, ensure_ascii=False),
     }
 
-
-TITLE = "لوحة معلومات السكن الجماعي للأفراد بمدينة الرياض — أمانة منطقة الرياض"
 
 if __name__ == "__main__":
     b = bundle()

@@ -1,1735 +1,1289 @@
 /* ============================================================
-   لوحة معلومات السكن الجماعي للأفراد بمدينة الرياض
-   عرض تنفيذي تفاعلي قائم على المشاهد — أمانة منطقة الرياض
+   لوحة معلومات سكن العمالة — أمانة منطقة الرياض
+   Vanilla JS + Apache ECharts 5 — all state in memory (no storage)
    ============================================================ */
 'use strict';
 const D = window.DATA;
-const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-/* ---------------------------------------------------------- الألوان
-   انضباط اللون: الأخضر = بيانات وإجراء · الذهبي = المستهدف حصراً
-   الأحمر = حالة إشكالية حصراً · الأزرق = قيمة محتسبة/مُسقَطة       */
+/* ---------- palette (validated) ---------- */
 const C = {
-  ink:'#111815', ink2:'#39453F', mut:'#6B7870', faint:'#95A19A',
-  accent:'#0E6B39', accent2:'#12854A', accent3:'#3FA06B', soft:'#EDF4EF',
-  deep:'#0A3D22', gold:'#B8963E', goldSoft:'#F3E7C9',
-  ok:'#0E8345', warn:'#B77A12', bad:'#B3402F', info:'#33628F', slate:'#7C8A82',
-  gapFill:'#E4DCCC', line:'rgba(17,24,21,.10)', split:'rgba(17,24,21,.055)'
+  green:'#0E5A43', green2:'#177A5B', teal:'#1B8563', gold:'#A8842F', goldUi:'#C4A24D',
+  clay:'#B0603C', red:'#C0392B', amber:'#D68910', ink:'#1E2B26', muted:'#6B7A74',
+  line:'#E4EAE7', tint:'#E8F3EE',
+  ramp5:['#8FBFA8','#67AC8E','#419573','#24805D','#0E5A43'],
 };
-
-/* ---------------------------------------------------------- تنسيق */
-const fmt   = n => (n == null || isNaN(n)) ? '—' : Math.round(n).toLocaleString('en-US');
-const fmt1  = n => (n == null || isNaN(n)) ? '—' : (Math.round(n*10)/10).toLocaleString('en-US',{minimumFractionDigits:1,maximumFractionDigits:1});
-const pc    = (v,d=1) => v == null ? '—' : (v*100).toFixed(d).replace(/\.0$/,'') + '٪';
-const pcRaw = (v,d=1) => v == null ? '—' : (v*100).toFixed(d).replace(/\.0$/,'');
-const axK   = v => Math.abs(v) >= 1e6 ? (v/1e6).toLocaleString('en-US',{maximumFractionDigits:1})+' مليون'
-                 : Math.abs(v) >= 1000 ? (v/1000).toLocaleString('en-US',{maximumFractionDigits:0})+' ألف'
-                 : fmt(v);
-/* أقرب سقف «مريح» للمحور — يمنع تكدّس تسمية القيمة القصوى فوق ما قبلها */
-function niceMax(v){
-  if(!v || !isFinite(v)) return 1;
-  const p = Math.pow(10, Math.floor(Math.log10(Math.abs(v))));
-  for(const m of [1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10]){
-    if(m*p >= v) return m*p;
-  }
-  return 10*p;
+function rampN(n){ // interpolate the validated 5-step green ramp to n steps
+  if(n<=5) return C.ramp5.slice(5-n);
+  const hex=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
+  const a=C.ramp5.map(hex), out=[];
+  for(let i=0;i<n;i++){const t=i/(n-1)*(a.length-1),j=Math.floor(t),f=t-j,b=a[Math.min(j+1,a.length-1)];
+    out.push('#'+a[j].map((v,k)=>Math.round(v+(b[k]-v)*f).toString(16).padStart(2,'0')).join(''));}
+  return out;
 }
-const el  = id => document.getElementById(id);
-const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const ltr = s => `<span class="ltr">${s}</span>`;
+const OCC_COLOR = r => r>95 ? C.red : (r>85 ? C.amber : C.green2);
 
-/* اتفاق العدد مع المعدود بالعربية */
-function cnt(n, one, two, few, many){
-  if(n === 1) return one;
-  if(n === 2) return two;
-  if(n >= 3 && n <= 10) return `${fmt(n)} ${few}`;
-  return `${fmt(n)} ${many}`;
-}
+/* ---------- formatting (Latin digits, thousands separators) ---------- */
+const fmt  = n => Math.round(n).toLocaleString('en-US');
+const fmt1 = n => (Math.round(n*10)/10).toLocaleString('en-US',{minimumFractionDigits:1,maximumFractionDigits:1});
+const fmtAx = v => Math.abs(v)>=1e6 ? (v/1e6).toLocaleString('en-US',{maximumFractionDigits:1})+' مليون'
+              : Math.abs(v)>=1e3 ? (v/1e3).toLocaleString('en-US',{maximumFractionDigits:1})+' ألف' : fmt(v);
+const fmtSAR = v => Math.abs(v)>=1e6 ? (v/1e6).toLocaleString('en-US',{maximumFractionDigits:1})+' مليون ريال'
+              : fmt(v)+' ريال';
+const el = id => document.getElementById(id);
+const els = s => [...document.querySelectorAll(s)];
 
-/* أسماء الأشهر تُعرض كما وردت في المصدر — أي إعادة تشكيل للرقم تُفسد ترتيب
-   الاتجاهين داخل تسمية محور مُدارة، فتظهر السنة مبعثرة. */
-const AR_MONTH_SHORT = m => (m || '').replace(/^ما قبل /, 'قبل ');
-function fmtDate(s){
-  if(!s) return '—';
-  const M = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
-  const [y,m,d] = s.split('-');
-  return `${+d} ${M[+m-1]} ${y}`;
-}
-
-/* ---------------------------------------------------------- الحالة */
-const S = {
-  tab: 't1',
-  scene: 0,          // فهرس المشهد ضمن كل المشاهد
-  sector: '',        // معرف القطاع المحدد أو فراغ
-  goal: '',          // تصفية المبادرات حسب الهدف
-  areaSector: '',
-};
-const SEC = () => S.sector ? D.sectors.find(s => s.id === S.sector) : null;
-const SECNAME = () => { const s = SEC(); return s ? s.name : 'كل القطاعات'; };
-
-/* نطاق الأرقام حسب التصفية القطاعية */
-function scope(){
-  const s = SEC();
-  if(!s) return {
-    demand:D.totals.demand, supply:D.totals.supply, gap:D.totals.gap, coverage:D.totals.coverage,
-    buildLic:D.totals.buildingLic, opLic:D.totals.operationalLic,
-    inspectors:D.totals.inspectors, visits:D.totals.visits, violations:D.totals.violations,
-    label:'إجمالي مدينة الرياض', national:true
-  };
-  return {
-    demand:s.demand, supply:s.capacity, gap:s.gap, coverage:s.coverage,
-    buildLic:s.buildLic, opLic:s.opLic,
-    inspectors:s.inspectors, visits:s.visits, violations:s.violations,
-    label:s.name, national:false
-  };
-}
-
-/* ---------------------------------------------------------- الرسوم */
-const CH = {};
-function chart(id){
-  const node = el(id);
-  if(!node) return null;
-  if(CH[id]){ try{ CH[id].dispose(); }catch(e){} }
-  const c = echarts.init(node, null, {renderer:'canvas'});
-  CH[id] = c;
-  return c;
-}
-function resizeAll(){ Object.values(CH).forEach(c => { try{ c.resize(); }catch(e){} }); }
-let rzT; addEventListener('resize', () => { clearTimeout(rzT); rzT = setTimeout(resizeAll, 120); });
-
-const TT = {
-  backgroundColor:'#0F1A14', borderWidth:0,
-  textStyle:{color:'#F1F5F2', fontFamily:'Cairo', fontSize:11.5},
-  extraCssText:'direction:rtl;text-align:right;border-radius:12px;padding:10px 14px;box-shadow:0 14px 40px rgba(10,20,15,.34);'
-};
-const ttHead = t => `<div style="font-family:'IBM Plex Sans Arabic';font-weight:700;font-size:12.5px;margin-bottom:6px;padding-bottom:5px;border-bottom:1px solid rgba(255,255,255,.14)">${t}</div>`;
-const ttRow  = (k,v,sw) => `<div style="display:flex;justify-content:space-between;gap:18px;margin:2.5px 0">
-  <span style="color:#A9B6AE">${sw?`<span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:${sw};margin-inline-end:6px"></span>`:''}${k}</span>
-  <b style="font-family:'IBM Plex Sans Arabic';color:#fff;font-weight:600">${v}</b></div>`;
-
-function base(o){
-  return Object.assign({
-    animation: !RM, animationDuration: 320,
-    textStyle:{fontFamily:'Cairo'},
-    grid:{top:16, right:18, bottom:22, left:18, containLabel:true}
-  }, o);
-}
-/* محور فئوي رأسي — الزمن يقرأ من اليمين إلى اليسار */
-const catX = (data, extra) => Object.assign({
-  type:'category', data, inverse:true,
-  axisLine:{lineStyle:{color:C.line}}, axisTick:{show:false},
-  axisLabel:{color:C.mut, fontSize:10, fontFamily:'Cairo', interval:0}
-}, extra || {});
-/* محور قيمي رأسي — القيم على اليمين */
-const valY = (fmtF, extra) => Object.assign({
-  type:'value', position:'right', splitLine:{lineStyle:{color:C.split}},
-  axisLabel:{color:C.faint, fontSize:10, fontFamily:'IBM Plex Sans Arabic', formatter:fmtF || axK}
-}, extra || {});
-/* أشرطة أفقية — تنمو من اليمين إلى اليسار */
-/* الأشرطة الأفقية تحمل تسمية القيمة عند طرفها، فلا حاجة لتسمية الحد الأقصى —
-   إظهارها يُنتج تكراراً بصرياً عند سقف غير مستدير (10 و10.4 مثلاً). */
-const barX = (fmtF, extra) => Object.assign({
-  type:'value', inverse:true, splitLine:{lineStyle:{color:C.split}},
-  axisLabel:{color:C.faint, fontSize:10, fontFamily:'IBM Plex Sans Arabic',
-    showMaxLabel:false, formatter:fmtF || axK}
-}, extra || {});
-const barY = (data, w) => ({
-  type:'category', data, position:'right', inverse:true,
-  axisLine:{lineStyle:{color:'transparent'}}, axisTick:{show:false},
-  axisLabel:{color:C.ink2, fontSize:10.5, fontFamily:'Cairo', interval:0,
-    width:w||null, overflow:w?'truncate':'none'}
-});
-const LBL = (fmtF, extra) => Object.assign({
-  show:true, position:'left', color:C.ink2, fontFamily:'IBM Plex Sans Arabic',
-  fontSize:10.5, fontWeight:600, formatter:fmtF
-}, extra || {});
-
-/* ---------------------------------------------------------- عناصر واجهة */
-const TAG = {
-  real:  '<span class="tag t-real">بيانات فعلية</span>',
-  calc:  '<span class="tag t-calc">قيمة محتسبة</span>',
-  sample:'<span class="tag t-sample">بيانات عينة</span>',
-  none:  '<span class="tag t-none">لا تتوفر بيانات فعلية</span>'
-};
-function noData(key){
-  const g = D.gaps.find(x => x.key === key) || {title:'لا تتوفر بيانات فعلية', need:''};
-  return `<div class="nodata">
-    <svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 15l3.5-3.5 3 3L20 8"/><path d="M4 4l16 16" stroke-dasharray="2 2.5"/></svg>
-    <div class="nd-t">${esc(g.title)}</div>
-    <div class="nd-d">لا يوجد لهذا الرسم مصدر بيانات فعلي في مصنّف البيانات الرئيسي — لم تُعرض أي قيم تقديرية.</div>
-    <div class="nd-n"><b>المطلوب لتفعيله:</b> ${esc(g.need)}</div>
-  </div>`;
-}
-function railCell(label, value, unit, foot, cls){
-  return `<div class="cell">
-    <div class="c-l">${label}</div>
-    <div class="c-v ${cls||''}">${value}${unit?`<small>${unit}</small>`:''}</div>
-    ${foot ? `<div class="c-f">${foot}</div>` : ''}
-  </div>`;
-}
-const rail = (cells) => `<div class="rail" style="grid-template-columns:repeat(${cells.length},minmax(0,1fr))">${cells.join('')}</div>`;
-
-function panel(title, sub, bodyHTML, opts){
-  const o = opts || {};
-  return `<div class="panel ${o.cls||''}" ${o.style?`style="${o.style}"`:''}>
-    ${title ? `<div class="p-head"><h3>${title}</h3>${sub?`<div class="p-sub">${sub}</div>`:''}${o.tag?`<div class="p-tag">${o.tag}</div>`:''}</div>` : ''}
-    <div class="p-body ${o.bodyCls||''}">${bodyHTML}</div>
-  </div>`;
-}
-const chartBody = id => `<div class="chart" id="${id}"></div>`;
-
-function imghead(kicker, title, desc, img){
-  return `<div class="imghead" style="min-height:0">
-    <div class="ih-img" style="background-image:url('${IMAGES[img]}')"></div>
-    <div class="ih-veil"></div>
-    <div class="ih-c"><div class="ih-k">${kicker}</div><div class="ih-t">${title}</div>
-      <div class="ih-d">${desc}</div></div>
-  </div>`;
-}
-
-/* عدّاد تصاعدي للأرقام البطولية */
-function countUp(node, to, {dec=0, dur=520, suffix=''} = {}){
-  if(!node) return;
-  if(RM){ node.textContent = (dec ? fmt1(to) : fmt(to)) + suffix; return; }
+/* ---------- count-up ---------- */
+/* سجل العدّادات — يُستخدم لتثبيت القيم النهائية قبل الطباعة حتى لا تُلتقط قيمة وسط الحركة */
+const COUNTERS=new Map();
+addEventListener('beforeprint',()=>COUNTERS.forEach((v,node)=>{
+  node.textContent=(v.decimals? fmt1(v.to) : fmt(v.to))+v.suffix;
+}));
+function countUp(node, to, {decimals=0, dur=620, suffix=''}={}) {
+  if(node) COUNTERS.set(node,{to,decimals,suffix});
+  const f = v => (decimals? v.toLocaleString('en-US',{minimumFractionDigits:decimals,maximumFractionDigits:decimals}) : fmt(v)) + suffix;
+  if (REDUCED || dur<=0) { node.textContent = f(to); return; }
   const t0 = performance.now();
   (function step(t){
-    const p = Math.min(1, (t - t0)/dur);
-    const e = 1 - Math.pow(1 - p, 3);
-    node.textContent = (dec ? fmt1(to*e) : fmt(to*e)) + suffix;
-    if(p < 1) requestAnimationFrame(step);
-  })(performance.now());
+    const p = Math.min(1,(t-t0)/dur), e = 1-Math.pow(1-p,3);
+    node.textContent = f(to*e);
+    if (p<1) requestAnimationFrame(step); else node.textContent = f(to);
+  })(t0);
 }
 
-/* ---------------------------------------------------------- الدرج */
-function openDrawer(title, sub, html){
-  el('dr-t').innerHTML = title;
-  el('dr-s').innerHTML = sub || '';
-  el('dr-b').innerHTML = html;
-  el('drawer').classList.add('on');
+/* ---------- ECharts base ---------- */
+const CH = {};
+function chart(id){
+  const dom = el(id); if(!dom) return null;
+  if(CH[id] && CH[id].getDom()!==dom){ try{CH[id].dispose();}catch(e){} delete CH[id]; }
+  let c = echarts.getInstanceByDom(dom);
+  if(!c) c = echarts.init(dom);
+  CH[id]=c; return c;
+}
+const TT = {
+  backgroundColor:'#fff', borderColor:C.line, borderWidth:1, padding:[9,13],
+  textStyle:{fontFamily:'Cairo',fontSize:12,color:C.ink}, confine:true,
+  extraCssText:'direction:rtl;text-align:right;box-shadow:0 8px 24px rgba(14,90,67,.14);border-radius:10px;',
+};
+function base(opt){
+  return Object.assign({
+    animation:!REDUCED, animationDuration:700, animationEasing:'cubicOut',
+    textStyle:{fontFamily:'Cairo',color:C.ink},
+    tooltip:Object.assign({},TT),
+  },opt);
+}
+const AXV = {type:'value',axisLabel:{formatter:fmtAx,color:C.muted,fontSize:10.5,fontFamily:'Cairo'},
+  splitLine:{lineStyle:{color:'#EFF3F0'}},axisLine:{show:false},axisTick:{show:false}};
+const AXC = {type:'category',axisLabel:{color:C.muted,fontSize:10.5,fontFamily:'Cairo'},
+  axisLine:{lineStyle:{color:C.line}},axisTick:{show:false}};
+const AXVY = Object.assign({},AXV,{position:'right'}); // RTL: value axis on the right for vertical charts
+const AR_MONTH_NAMES=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+function fmtDate(iso){ if(!iso||iso==='—')return iso;
+  const [y,m,d]=iso.split('-').map(Number);
+  return `${d} ${AR_MONTH_NAMES[m-1]} ${y}`; }
+const ltr = s => `<span dir="ltr">${s}</span>`;
+const nounCount=(n,sing,plur)=> (n>=3&&n<=10)? `${fmt(n)} ${plur}` : `${fmt(n)} ${sing}`;
+function ttRow(k,v,sw){return `<div class="row"><span>${sw?`<span style="display:inline-block;width:9px;height:9px;border-radius:3px;background:${sw};margin-inline-start:2px;margin-inline-end:6px"></span>`:''}${k}</span><span>${v}</span></div>`;}
+function reClick(c,fn){ c.off('click'); if(fn) c.on('click',fn); }
+
+/* ---------- global state (memory only) ---------- */
+const S = {
+  tab:'t1', range:12,
+  sectors:new Set(), types:new Set(),   // empty = الكل
+  collar:null, pillar:null, scenario:'أساسي',
+  hotspot:false, kpiWeak:false, t6shown:false,
+  facSearch:'', licSearch:'', iniSearch:'', inspSortK:'visits',
+};
+const M24 = [...new Set(D.licenses.map(r=>r.month))].sort();
+const MLBL = {}; D.licenses.forEach(r=>MLBL[r.month]=r.month_ar);
+const winMonths = () => M24.slice(-S.range);
+const inWin = m => winMonths().includes(m);
+/* السلاسل الشهرية في المصدر على مستوى المدينة (sector/type = null)،
+   فتمر دون تأثر بالتصفية بدل أن تُفرَّغ منها. */
+const secOK = s => s==null || !S.sectors.size || S.sectors.has(s);
+const typOK = t => t==null || !S.types.size || S.types.has(t);
+/* هل التصفية الحالية غير قابلة للتطبيق على سلسلة مدينة-المستوى؟ */
+const cityOnlyNote = () => (S.sectors.size||S.types.size)
+  ? '<span class="scope-note">هذه السلسلة على مستوى المدينة في المصدر — لا تتأثر بتصفية القطاع أو نوع السكن</span>' : '';
+const TYPES = ['مجمع سكني','مبنى سكني','كبائن متنقلة'];
+const TYPE_COLORS = {'مجمع سكني':C.teal,'مبنى سكني':C.gold,'كبائن متنقلة':C.clay};
+const STATUS_CHIP = {'منجزة':'st-green','جاري العمل':'st-teal','متأخرة':'st-amber','لم تبدأ بعد':'st-grey'};
+const STATUS_COLOR = {'منجزة':C.green2,'جاري العمل':C.teal,'متأخرة':C.amber,'لم تبدأ بعد':'#9AA8A2'};
+const RISK_CHIP = {'منخفض':'st-green','متوسط':'st-amber','مرتفع':'st-red'};
+
+function anyFilter(){ return S.sectors.size||S.types.size||S.collar||S.range!==12; }
+function syncFilterUI(){
+  el('g-sector').value = S.sectors.size===1 ? [...S.sectors][0] : '';
+  el('g-type').value   = S.types.size===1 ? [...S.types][0] : '';
+  el('g-range').value  = String(S.range);
+  el('g-reset').classList.toggle('show', !!anyFilter());
+  ['fb2','fb3'].forEach(fb=>{
+    const bar = el(fb);
+    bar.querySelectorAll('[data-role="range"] .pill').forEach(p=>p.classList.toggle('on',+p.dataset.v===S.range));
+    bar.querySelectorAll('[data-role="sectors"] .pill').forEach(p=>p.classList.toggle('on',S.sectors.has(p.dataset.v)));
+    bar.querySelectorAll('[data-role="types"] .pill').forEach(p=>p.classList.toggle('on',S.types.has(p.dataset.v)));
+    bar.querySelector('[data-role="reset"]').classList.toggle('show', !!(S.sectors.size||S.types.size||S.range!==12));
+  });
+  el('t1-reset').classList.toggle('show', !!(S.collar||S.sectors.size));
+}
+function refresh(){ syncFilterUI(); renderTab(S.tab); }
+function toggleSector(sec){
+  if(S.sectors.size===1 && S.sectors.has(sec)) S.sectors.clear();
+  else { S.sectors.clear(); S.sectors.add(sec); }
+  refresh();
+}
+function resetAll(){ S.sectors.clear(); S.types.clear(); S.collar=null; S.range=12; refresh(); }
+
+/* ---------- drawer ---------- */
+function openDrawer(title, sub, html, after){
+  el('dr-title').textContent = title; el('dr-sub').textContent = sub||'';
+  el('dr-body').innerHTML = html;
+  el('drawer').classList.add('open'); el('overlay').classList.add('open');
   el('drawer').setAttribute('aria-hidden','false');
-  el('veil').classList.add('on');
+  if(after) after(el('dr-body'));
 }
 function closeDrawer(){
-  el('drawer').classList.remove('on');
+  el('drawer').classList.remove('open'); el('overlay').classList.remove('open');
   el('drawer').setAttribute('aria-hidden','true');
-  el('veil').classList.remove('on');
 }
-const fld = (l,v) => `<div class="fld"><span class="l">${l}</span><span class="v">${v}</span></div>`;
-const drSec = t => `<div class="dr-sec">${t}</div>`;
-
-/* ---------------------------------------------------------- تلميح الخريطة */
-const mtip = () => el('maptip');
-function showTip(html, x, y){
-  const t = mtip();
-  t.innerHTML = html; t.style.display = 'block';
-  const r = t.getBoundingClientRect();
-  t.style.left = Math.max(8, Math.min(innerWidth - r.width - 8, x - r.width/2)) + 'px';
-  t.style.top  = Math.max(8, y - r.height - 14) + 'px';
-}
-const hideTip = () => { mtip().style.display = 'none'; };
+el('dr-close').onclick = closeDrawer; el('overlay').onclick = closeDrawer;
+addEventListener('keydown',e=>{ if(e.key==='Escape') closeDrawer(); });
+const fld = (l,v)=>`<div class="fld"><span class="l">${l}</span><span class="v">${v}</span></div>`;
+const fldNA = l=>`<div class="fld"><span class="l">${l}</span><span class="v na-txt">لا تتوفر بيانات فعلية</span></div>`;
 
 /* ============================================================
-   الخريطة التخطيطية للقطاعات البلدية
-   مخطط توضيحي لترتيب القطاعات — ليس خريطة GIS بحدود فعلية
+   توفر البيانات — الرسوم التي لا مصدر فعلي لها تُعرض بحالة صريحة
    ============================================================ */
-const GEO = {
-  sector_north : {poly:[[14,6],[86,6],[88,30],[62,34],[38,33],[12,29]],  at:[50,19]},
-  sector_east  : {poly:[[62,34],[88,30],[93,62],[70,70],[62,52]],        at:[76,50]},
-  sector_center: {poly:[[38,33],[62,34],[62,52],[70,70],[46,66],[36,52]],at:[51,49]},
-  sector_west  : {poly:[[12,29],[38,33],[36,52],[46,66],[22,72],[7,50]], at:[24,50]},
-  sector_south : {poly:[[22,72],[46,66],[70,70],[74,92],[40,96],[20,90]],at:[46,82]}
-};
-/* تدرّج أخضر من فاتح إلى غامق حسب قيمة المقياس */
-function ramp(t){
-  const a = [237,244,239], b = [14,107,57];
-  const k = Math.max(0, Math.min(1, t));
+const AV = D.avail;
+const gapOf = k => (D.gaps.find(g=>g.key===k)) || {title:'لا تتوفر بيانات فعلية',need:''};
+/* يستبدل محتوى الحاوية ببطاقة «لا تتوفر بيانات فعلية» ويتخلص من أي رسم سابق فيها */
+function noData(id,key){
+  const node=el(id); if(!node) return;
+  if(CH[id]){ try{CH[id].dispose();}catch(e){} delete CH[id]; }
+  const g=gapOf(key);
+  node.innerHTML=`<div class="nodata">
+    <svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 15l3.5-3.5 3 3L20 8"/><path d="M4 4l16 16" stroke-dasharray="2 2.5"/></svg>
+    <div class="nd-t">${g.title}</div>
+    <div class="nd-d">لا يوجد لهذا الرسم مصدر بيانات فعلي في مصنّف البيانات الرئيسي — لم تُعرض أي قيم تقديرية.</div>
+    <div class="nd-n"><b>المطلوب لتفعيله:</b> ${g.need}</div>
+  </div>`;
+}
+const NA_CHIP = '<span class="na-chip">لا تتوفر بيانات فعلية</span>';
+const naCard = (label,ico)=>kpiCard(label,'<span class="na-val">—</span>',NA_CHIP,'na',ico);
+
+/* ---------- sortable/searchable table ---------- */
+function makeTable(containerId, cols, rows, {onRow, sortKey, desc=true, max}={}) {
+  const cont = el(containerId); let sk = sortKey||cols.find(c=>c.sort)?.k, sd = desc;
+  function draw(){
+    let rs=[...rows];
+    if(sk) rs.sort((a,b)=>{const x=a[sk],y=b[sk];return (typeof x==='number'? x-y : String(x).localeCompare(String(y),'ar'))*(sd?-1:1);});
+    if(max) rs=rs.slice(0,max);
+    cont.innerHTML = `<table class="tbl"><thead><tr>${cols.map(c=>
+      `<th data-k="${c.k}">${c.l}${sk===c.k?`<span class="arr">${sd?'▼':'▲'}</span>`:''}</th>`).join('')}</tr></thead><tbody>${
+      rs.map((r,i)=>`<tr data-i="${rows.indexOf(r)}">${cols.map(c=>`<td>${c.f? c.f(r[c.k],r) : r[c.k]}</td>`).join('')}</tr>`).join('')
+    }</tbody></table>`;
+    cont.querySelectorAll('th').forEach(th=>th.onclick=()=>{const k=th.dataset.k; if(sk===k) sd=!sd; else {sk=k;sd=true;} draw();});
+    if(onRow) cont.querySelectorAll('tbody tr').forEach(tr=>tr.onclick=()=>onRow(rows[+tr.dataset.i]));
+  }
+  draw();
+  return {redraw:(newRows)=>{ if(newRows) rows=newRows; draw(); }};
+}
+
+/* ---------- Riyadh SVG map component ---------- */
+const tip = el('map-tip');
+function showTip(html,x,y){
+  tip.innerHTML=html; tip.style.display='block';
+  const w=tip.offsetWidth,h=tip.offsetHeight;
+  tip.style.left=Math.min(innerWidth-w-14,Math.max(8,x-w/2))+'px';
+  tip.style.top=(y-h-16<8? y+18 : y-h-16)+'px';
+}
+function hideTip(){ tip.style.display='none'; }
+
+/* تدرّج أخضر يعكس قيمة المقياس — يجعل الخريطة تحمل معلومة بدل لون موحّد */
+function shadeFill(t){
+  const a=[232,243,238], b=[14,90,67], k=Math.max(0,Math.min(1,t));
   return `rgb(${a.map((v,i)=>Math.round(v+(b[i]-v)*k)).join(',')})`;
 }
-function drawMap(wrapId, {metric, label, fmtV}){
+function drawMap(wrapId,{mode,sectorTip,onSector,dots,dotTip,onDot,hotspots,metric,metricLabel}){
   const wrap = el(wrapId);
-  if(!wrap) return;
-  const vals = D.sectors.map(metric);
-  const mx = Math.max(...vals), mn = Math.min(...vals);
-  const norm = v => mx === mn ? .55 : .16 + .84*((v - mn)/(mx - mn));
-
-  wrap.innerHTML = `<svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
-    ${D.sectors.map(s => {
-      const v = metric(s), f = ramp(norm(v));
-      const on = S.sector === s.id;
-      return `<polygon class="sec-poly${on?' sel':''}" data-sec="${s.id}"
-        points="${GEO[s.id].poly.map(p=>p.join(',')).join(' ')}" style="fill:${f}"></polygon>`;
-    }).join('')}
-    ${D.sectors.map(s => {
-      const v = metric(s), dark = norm(v) > .55;
-      const [x,y] = GEO[s.id].at;
-      return `<text class="sec-lbl" x="${x}" y="${y-1.2}" style="fill:${dark?'#fff':'#111815'};stroke:${dark?'rgba(10,40,25,.5)':'rgba(255,255,255,.8)'}">${esc(s.short)}</text>
-              <text class="sec-val" x="${x}" y="${y+3.4}" style="fill:${dark?'#fff':'#0E6B39'};stroke:${dark?'rgba(10,40,25,.5)':'rgba(255,255,255,.85)'}">${fmtV(v)}</text>`;
-    }).join('')}
-  </svg>`;
-
-  wrap.querySelectorAll('.sec-poly').forEach(p => {
-    const s = D.sectors.find(x => x.id === p.dataset.sec);
-    p.addEventListener('mousemove', e => showTip(
-      ttHead(esc(s.name)) +
-      ttRow('الطلب', fmt(s.demand)) +
-      ttRow('الطاقة المرخصة', fmt(s.capacity)) +
-      ttRow('نسبة التغطية', pc(s.coverage,2)) +
-      ttRow('الرخص التشغيلية', fmt(s.opLic)) +
-      ttRow('المخالفات', fmt(s.violations)),
-      e.clientX, e.clientY));
-    p.addEventListener('mouseleave', hideTip);
-    p.addEventListener('click', () => { hideTip(); setSector(S.sector === s.id ? '' : s.id); });
-  });
-}
-
-/* ============================================================
-   سجل المشاهد
-   ============================================================ */
-const TABS = [
-  {id:'t1', name:'العرض والطلب'},
-  {id:'t2', name:'التراخيص'},
-  {id:'t3', name:'الرقابة والامتثال'},
-  {id:'t4', name:'المبادرات'},
-  {id:'t5', name:'مؤشرات الأداء'},
-  {id:'t6', name:'التوقعات'},
-  {id:'t7', name:'حوكمة البيانات'}
-];
-
-const SCENES = [
-  /* ---------------- 1 — العرض والطلب ---------------- */
-  {id:'s1_gap', tab:'t1', kick:'العرض والطلب', title:'فجوة الإيواء',
-   sub:'المسافة بين إجمالي الطلب والطاقة الاستيعابية المرخصة', build:sc_gap},
-  {id:'s1_demand', tab:'t1', kick:'العرض والطلب', title:'تركيبة الطلب',
-   sub:'توزيع العمالة حسب نوع الياقة والمجموعة المهنية', build:sc_demand},
-  {id:'s1_supply', tab:'t1', kick:'العرض والطلب', title:'المعروض المرخص وتوزيعه',
-   sub:'الطاقة الاستيعابية حسب القطاع البلدي ونوع السكن', build:sc_supply},
-
-  /* ---------------- 2 — التراخيص ---------------- */
-  {id:'s2_overview', tab:'t2', kick:'التراخيص', title:'الأداء مقابل خط الأساس',
-   sub:'رخص البناء والرخص التشغيلية والطاقة الاستيعابية — أغسطس 2025 إلى أغسطس 2026', build:sc_licOverview},
-  {id:'s2_flow', tab:'t2', kick:'التراخيص', title:'المسار الشهري للإصدار',
-   sub:'الإضافات الشهرية والرصيد التراكمي للطاقة الاستيعابية والرخص', build:sc_licFlow},
-  {id:'s2_dist', tab:'t2', kick:'التراخيص', title:'التوزيع القطاعي وأنواع المساكن',
-   sub:'الرخص والطاقة الاستيعابية حسب القطاع البلدي ونوع السكن', build:sc_licDist},
-
-  /* ---------------- 3 — الرقابة والامتثال ---------------- */
-  {id:'s3_overview', tab:'t3', kick:'الرقابة والامتثال', title:'منظومة الرقابة',
-   sub:'المراقبون والجولات والمخالفات ونسبة الامتثال — آخر 12 شهراً', build:sc_ctlOverview},
-  {id:'s3_trend', tab:'t3', kick:'الرقابة والامتثال', title:'الاتجاه الشهري',
-   sub:'الزيارات الرقابية والمخالفات ومعدل المخالفة لكل زيارة', build:sc_ctlTrend},
-  {id:'s3_violations', tab:'t3', kick:'الرقابة والامتثال', title:'أنواع المخالفات',
-   sub:'تركيبة المخالفات حسب النوع وتوزيعها على القطاعات', build:sc_ctlViol},
-  {id:'s3_areas', tab:'t3', kick:'الرقابة والامتثال', title:'سجل الأحياء',
-   sub:'الرخص والطاقة والمخالفات على مستوى الحي', build:sc_ctlAreas},
-
-  /* ---------------- 4 — المبادرات ---------------- */
-  {id:'s4_status', tab:'t4', kick:'المبادرات', title:'حالة المبادرات',
-   sub:'18 مبادرة موزعة على أربعة أهداف — الحالة محتسبة بتاريخ اليوم المرجعي', build:sc_iniStatus},
-  {id:'s4_timeline', tab:'t4', kick:'المبادرات', title:'الجدول الزمني',
-   sub:'فترات التنفيذ المخططة لكل مبادرة مقابل تاريخ اليوم', build:sc_iniTimeline},
-  {id:'s4_register', tab:'t4', kick:'المبادرات', title:'سجل المبادرات',
-   sub:'القائمة الكاملة — انقر أي مبادرة لعرض تفاصيلها', build:sc_iniRegister},
-
-  /* ---------------- 5 — مؤشرات الأداء ---------------- */
-  {id:'s5_goals', tab:'t5', kick:'مؤشرات الأداء', title:'قطع المسافة نحو المستهدف',
-   sub:'موقع كل مؤشر بين خط الأساس والمستهدف المعتمد', build:sc_kpiGoals},
-  {id:'s5_register', tab:'t5', kick:'مؤشرات الأداء', title:'بطاقات المؤشرات',
-   sub:'المؤشرات الأربعة عشر — انقر أي مؤشر لعرض تفاصيله', build:sc_kpiCards},
-
-  /* ---------------- 6 — التوقعات ---------------- */
-  {id:'s6_projection', tab:'t6', kick:'التوقعات', title:'الإسقاط المحتسب للطاقة الاستيعابية',
-   sub:'امتداد خطي لمتوسط الإضافة الشهرية الفعلية — ليس نموذجاً تنبؤياً معتمداً', build:sc_projection},
-
-  /* ---------------- 7 — حوكمة البيانات ---------------- */
-  {id:'s7_sources', tab:'t7', kick:'حوكمة البيانات', title:'سجل المصادر والملكية',
-   sub:'الجهة المنتجة لكل مجموعة بيانات وحالة اعتمادها', build:sc_sources},
-  {id:'s7_gaps', tab:'t7', kick:'حوكمة البيانات', title:'فجوات البيانات',
-   sub:'الرسوم المعطّلة لعدم توفر مصدر فعلي — وما يلزم لتفعيل كل منها', build:sc_gaps}
-];
-const sceneIdx = id => SCENES.findIndex(s => s.id === id);
-const tabScenes = t => SCENES.filter(s => s.tab === t);
-
-/* ============================================================
-   بناء المشاهد
-   ============================================================ */
-
-/* ---------------- 1.1 فجوة الإيواء ---------------- */
-function sc_gap(host){
-  const q = scope();
-  const mult = q.supply ? q.demand / q.supply : null;
-  host.innerHTML = `
-    ${rail([
-      railCell('إجمالي الطلب', `<span id="k-dem">0</span>`, 'فرد', `${esc(q.label)} — ${esc(D.meta.asOf)}`),
-      railCell('الطاقة الاستيعابية المرخصة', `<span id="k-sup">0</span>`, 'سرير',
-        `${fmt(q.opLic)} رخصة تشغيلية سارية`),
-      railCell('فجوة الإيواء', `<span id="k-gap">0</span>`, 'سرير',
-        `<b class="delta dn">${pc(1-q.coverage,1)}</b> من الطلب غير مغطّى`),
-      railCell('مضاعف الطلب مقابل العرض', `<span id="k-mul">0</span>`, 'مرة',
-        `لكل سرير مرخص ${ltr(fmt1(mult))} فرد ضمن الطلب`)
-    ])}
-    <div class="sc-body g-23" style="grid-template-rows:minmax(0,1fr)">
-      ${panel('الطاقة المرخصة مقابل الطلب حسب القطاع البلدي',
-        'الجزء الأخضر هو المغطّى فعلياً — والباقي هو الفجوة',
-        chartBody('c-gapsec'), {tag:TAG.real})}
-      <div class="stack">
-        ${panel('نسبة تغطية الطلب', 'الطاقة المرخصة ÷ الطلب — لكل قطاع', chartBody('c-cov'), {tag:TAG.real})}
-        ${panel('', '', `
-          <div class="bridge">
-            <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:11px">
-              <div class="hero-num lg" id="k-cov">0</div>
-              <div style="font-size:11.5px;color:var(--mut);font-weight:600;line-height:1.5">
-                نسبة التغطية الحالية<br>${esc(q.label)}
-              </div>
-            </div>
-            <div class="bg-track">
-              <div class="bg-fill" id="bg-fill" style="width:0%"></div>
-              <div class="bg-mark" id="bg-mark" style="inset-inline-start:0%"></div>
-            </div>
-            <div class="bg-leg">
-              <span class="lg"><span class="sw" style="background:linear-gradient(to left,#0E6B39,#12854A)"></span>
-                مغطّى — ${ltr(fmt(q.supply))} سرير</span>
-              <span class="lg"><span class="sw" style="background:repeating-linear-gradient(-45deg,#F3EEE1 0 4px,#FAF6EC 4px 8px);border:1px solid var(--hair)"></span>
-                فجوة — ${ltr(fmt(q.gap))} سرير</span>
-            </div>
-            <div class="note" style="margin-top:12px">
-              كل سرير مرخص واحد يقابله ${ltr(fmt1(mult))} فرد ضمن الطلب المسجل. سدّ الفجوة بالكامل
-              يستلزم ${ltr(fmt(q.gap))} سرير إضافي — أي نحو ${ltr(fmt1(q.gap/q.supply))} ضعف الطاقة المرخصة القائمة.
-            </div>
-          </div>`, {cls:'tint fit'})}
-      </div>
-    </div>`;
-
-  countUp(el('k-dem'), q.demand);
-  countUp(el('k-sup'), q.supply);
-  countUp(el('k-gap'), q.gap);
-  countUp(el('k-mul'), mult, {dec:1});
-  const covNode = el('k-cov');
-  if(RM){ covNode.textContent = pcRaw(q.coverage,2)+'٪'; }
-  else {
-    const t0 = performance.now();
-    (function st(t){ const p = Math.min(1,(t-t0)/900), e = 1-Math.pow(1-p,3);
-      covNode.textContent = (q.coverage*100*e).toFixed(2)+'٪'; if(p<1) requestAnimationFrame(st); })(performance.now());
+  const vals = metric? D.sectors.map(metric) : null;
+  const mx = vals? Math.max(...vals) : 0, mn = vals? Math.min(...vals) : 0;
+  const norm = v => (mx===mn)? .5 : .16+.84*((v-mn)/(mx-mn));
+  const polys = D.sectors.map((sec,idx)=>{
+    const g=D.geo[sec], sel=S.sectors.has(sec), dim=S.sectors.size&&!sel;
+    const fill = vals? ` style="fill:${shadeFill(norm(vals[idx]))}"` : '';
+    return `<polygon class="sector-poly${sel?' sel':dim?' dim':''}" data-sec="${sec}"
+      points="${g.poly.map(p=>p.join(',')).join(' ')}"${fill}></polygon>`;
+  }).join('');
+  const valLabels = vals? D.sectors.map((sec,idx)=>{
+    const g=D.geo[sec];
+    return `<text class="sector-val${norm(vals[idx])>.55?' on-dark':''}" x="${g.label[0]}" y="${g.label[1]+4.4}">${fmtAx(vals[idx])}</text>`;
+  }).join('') : '';
+  const labels = D.sectors.map(sec=>{
+    const g=D.geo[sec], sel=S.sectors.has(sec);
+    return `<text class="sector-label${sel?' sel':''}" x="${g.label[0]}" y="${g.label[1]}">${sec.replace(/^(ال)?قطاع /,'')}</text>`;
+  }).join('');
+  let dotSvg='';
+  if(hotspots){
+    dotSvg = D.hotspots.map((h,i)=>({h,i})).filter(x=>secOK(x.h.sector)).map(({h,i})=>{
+      const col = h.density>60? C.red : h.density>35? C.amber : C.green2;
+      return `<circle class="hot-dot" data-h="${i}" cx="${h.x}" cy="${h.y}" r="${(1+h.density/24).toFixed(1)}" fill="${col}" opacity="${(0.35+h.density/160).toFixed(2)}"></circle>`;
+    }).join('');
+  } else if(dots){
+    dotSvg = dots.map(f=>{
+      const r=(0.7+Math.sqrt(f.beds)/58).toFixed(2);
+      return `<circle class="fac-dot" data-f="${f.id}" cx="${f.x}" cy="${f.y}" r="${r}" fill="${OCC_COLOR(f.occ_rate)}" fill-opacity=".82"></circle>`;
+    }).join('');
   }
-  requestAnimationFrame(() => {
-    el('bg-fill').style.width = Math.max(0.4, q.coverage*100) + '%';
-    el('bg-mark').style.insetInlineStart = Math.max(0.4, q.coverage*100) + '%';
+  wrap.innerHTML = `<svg viewBox="0 0 100 100" role="img" aria-label="خريطة قطاعات الرياض">
+    <defs><filter id="soft-${wrapId}"><feDropShadow dx="0" dy=".6" stdDeviation=".7" flood-color="#0E5A43" flood-opacity=".18"/></filter></defs>
+    <g filter="url(#soft-${wrapId})">${polys}</g><g>${dotSvg}</g><g>${labels}${valLabels}</g></svg>`;
+  wrap.querySelectorAll('.sector-poly').forEach(p=>{
+    const sec=p.dataset.sec;
+    p.addEventListener('mousemove',e=>showTip(sectorTip(sec),e.clientX,e.clientY));
+    p.addEventListener('mouseleave',hideTip);
+    p.addEventListener('click',()=>{hideTip(); onSector(sec);});
   });
+  wrap.querySelectorAll('.fac-dot').forEach(c=>{
+    const f=D.facilities.find(x=>x.id===c.dataset.f);
+    c.addEventListener('mousemove',e=>showTip(dotTip(f),e.clientX,e.clientY));
+    c.addEventListener('mouseleave',hideTip);
+    c.addEventListener('click',e=>{e.stopPropagation(); hideTip(); onDot(f);});
+  });
+  wrap.querySelectorAll('.hot-dot').forEach(c=>{
+    const h=D.hotspots[+c.dataset.h];
+    c.addEventListener('mousemove',e=>showTip(
+      `<b>نقطة ساخنة — ${h.sector}</b>${ttRow('كثافة المخالفات',h.density+' / 100')}${ttRow('التصنيف',h.density>60?'مرتفعة':h.density>35?'متوسطة':'منخفضة')}`,e.clientX,e.clientY));
+    c.addEventListener('mouseleave',hideTip);
+  });
+}
 
-  /* شريط مكدّس: المغطّى + الفجوة = الطلب */
-  const secs = D.sectors;
-  const c1 = chart('c-gapsec');
-  c1 && c1.setOption(base({
-    tooltip:Object.assign({}, TT, {trigger:'axis', axisPointer:{type:'shadow'}, formatter:ps => {
-      const s = secs.find(x => x.name === ps[0].name);
-      return ttHead(esc(s.name)) + ttRow('الطلب', fmt(s.demand)) +
-        ttRow('الطاقة المرخصة', fmt(s.capacity), C.accent) +
-        ttRow('الفجوة', fmt(s.gap), C.gapFill) +
-        ttRow('نسبة التغطية', pc(s.coverage,2));
-    }}),
-    legend:{data:['الطاقة المرخصة','الفجوة'], bottom:0, textStyle:{color:C.mut, fontSize:11, fontFamily:'Cairo'},
-      itemWidth:11, itemHeight:11, itemGap:16},
-    grid:{top:12, right:96, bottom:34, left:56, containLabel:true},
-    xAxis:barX(axK), yAxis:barY(secs.map(s => s.name), 74),
+/* ---------- facility drawer ---------- */
+function facilityDrawer(f){
+  openDrawer(f.name, `${f.sector} — حي ${f.district}`, `
+    ${fld('رقم المنشأة',f.id)}
+    ${fld('نوع السكن',f.type)}
+    ${fld('الأسرّة المرخصة',fmt(f.beds))}
+    ${fld('الأسرّة المشغولة',fmt(f.occupied))}
+    ${fld('معدل الإشغال',`<span class="st ${f.occ_rate>95?'st-red':f.occ_rate>85?'st-amber':'st-green'}">${fmt1(f.occ_rate)}٪</span>`)}
+    ${fld('درجة الامتثال',f.compliance+' / 100')}
+    ${fld('مستوى الخطورة',`<span class="st ${RISK_CHIP[f.risk]}">${f.risk}</span>`)}
+    ${fld('حالة الترخيص',`<span class="st ${f.lic_status==='ساري'?'st-green':'st-amber'}">${f.lic_status}</span>`)}
+    ${fld('تاريخ الترخيص',fmtDate(f.lic_date))}
+    ${fld('آخر زيارة رقابية',fmtDate(f.last_visit))}
+    <div class="dr-chart" id="dr-fac-chart"></div>`,
+    ()=>{ const c=chart('dr-fac-chart'); c.setOption(base({
+      title:{text:'الإشغال مقابل الطاقة',textStyle:{fontSize:12,fontFamily:'IBM Plex Sans Arabic',color:C.muted},right:0},
+      grid:{containLabel:true,left:6,right:6,top:34,bottom:0},
+      xAxis:Object.assign({},AXV,{max:f.beds,inverse:true}),
+      yAxis:Object.assign({},AXC,{data:['الأسرّة'],position:'right'}),
+      series:[{type:'bar',data:[f.occupied],barWidth:22,itemStyle:{color:OCC_COLOR(f.occ_rate),borderRadius:[6,0,0,6]},
+        showBackground:true,backgroundStyle:{color:'#EDF1EE',borderRadius:6},
+        label:{show:true,position:'insideRight',formatter:()=>fmt(f.occupied)+' / '+fmt(f.beds),color:'#fff',fontWeight:'bold'}}],
+      tooltip:Object.assign({},TT,{formatter:()=>`<b>${f.name}</b>${ttRow('الأسرّة المشغولة',fmt(f.occupied))}${ttRow('الأسرّة الشاغرة',fmt(f.beds-f.occupied))}${ttRow('معدل الإشغال',fmt1(f.occ_rate)+'٪')}`}),
+    })); c.resize(); });
+}
+
+/* ============================================================
+   TAB 1 — العرض والطلب
+   ============================================================ */
+let facTable=null;
+/* الطاقة المرخصة والطلب لكل قطاع — من ورقتَي 04 و08 مباشرة */
+function sectorFacts(sec){
+  const rs = D.capSector.filter(r=>!sec||r.name===sec);
+  const beds = rs.reduce((a,r)=>a+r.beds,0);
+  const demand = sec ? (D.demand.sector.find(r=>r.name===sec)||{total:0}).total : D.meta.totals.demand;
+  return {rs,beds,demand,gap:demand-beds,cov:beds?beds/demand*100:0,
+    opLic:rs.reduce((a,r)=>a+r.opLic,0), buildLic:rs.reduce((a,r)=>a+r.buildLic,0)};
+}
+/* المصدر لا يفصّل الياقات على القطاعات أو المجموعات المهنية، فلا تُشتق قيم
+   تناسبية: تُعرض أرقام المدينة كما هي مع تنبيه على النطاق. */
+function demandVal(row){ return row.total; }
+
+function scopeFacts(){
+  const rs = D.capSector.filter(r=>secOK(r.name));
+  const beds = rs.reduce((a,r)=>a+r.beds,0);
+  const demand = S.sectors.size
+    ? D.demand.sector.filter(r=>S.sectors.has(r.name)).reduce((a,r)=>a+r.total,0)
+    : D.meta.totals.demand;
+  return {rs,beds,demand,gap:demand-beds,cov:beds?beds/demand*100:0,
+    opLic:rs.reduce((a,r)=>a+r.opLic,0), buildLic:rs.reduce((a,r)=>a+r.buildLic,0)};
+}
+function scopeLabel(){
+  const n=S.sectors.size;
+  if(!n) return null;
+  if(n===1) return [...S.sectors][0];
+  return n===2? 'قطاعين محددين' : `${n} قطاعات محددة`;
+}
+function renderT1(){
+  const sec = scopeLabel();
+  const sf = scopeFacts();
+  /* hero */
+  countUp(el('hero-demand'), sf.demand);
+  countUp(el('hero-supply'), sf.beds);
+  countUp(el('hero-gap'), sf.gap);
+  countUp(el('hero-cov'), sf.cov, {decimals:1});
+  el('hero-demand-note').textContent = sec? `عامل وافد ضمن ${sec}` : 'عامل وافد ضمن نطاق أمانة منطقة الرياض';
+  el('hero-supply-note').textContent =
+    `سرير مرخص ضمن ${fmt(sf.opLic)} رخصة تشغيلية سارية`;
+  el('bridge-cap').textContent = `التغطية ${fmt1(sf.cov)}٪ من إجمالي الطلب`;
+  const covW = Math.max(2,Math.min(100,sf.cov));
+  requestAnimationFrame(()=>{ el('bridge-fill').style.width=covW+'%';
+    el('bridge-marker').style.insetInlineStart=`calc(${covW}% - 2px)`;
+    el('bridge-gap').style.width=(100-covW)+'%'; });
+  if(!REDUCED){ ['hero-demand','hero-supply'].forEach(id=>{ el(id).classList.remove('glow'); void el(id).offsetWidth; el(id).classList.add('glow'); }); }
+
+  const k = 1;
+  el('t1-demand-hint').innerHTML =
+    'إجمالي العمالة حسب أبعاد التصنيف المتاحة في المصدر' +
+    (sec? ` <span class="scope-note">تركيبة الطلب (الياقات والمجموعات المهنية) متاحة على مستوى المدينة فقط — لا تتأثر بتصفية ${sec}</span>` : '');
+
+  /* donut — collar */
+  const collar = chart('c-collar');
+  collar.setOption(base({
+    tooltip:Object.assign({},TT,{trigger:'item',formatter:p=>`<b>${p.name}</b>${ttRow('عدد العمالة',fmt(p.value),p.color)}${ttRow('النسبة',p.percent+'٪')}`}),
+    legend:{bottom:0,icon:'circle',itemWidth:9,textStyle:{fontFamily:'Cairo',fontSize:11}},
+    series:[{type:'pie',radius:['52%','76%'],center:['50%','44%'],
+      itemStyle:{borderColor:'#fff',borderWidth:2,borderRadius:6},
+      label:{show:true,formatter:p=>`${Math.round(p.percent)}٪`,fontFamily:'IBM Plex Sans Arabic',fontWeight:'bold',fontSize:13,color:C.ink},
+      emphasis:{scaleSize:6},
+      data:[
+        {name:'ياقات زرقاء',value:D.meta.totals.blue,itemStyle:{color:C.teal}},
+        {name:'ياقات بيضاء',value:D.meta.totals.white,itemStyle:{color:C.gold}},
+      ]}],
+  }));
+  /* لا يوفر المصدر تصنيف الياقة داخل المجموعات المهنية، فلا يمكن للشريحة تصفية بقية الرسوم */
+  reClick(collar,null);
+
+  /* SSCO horizontal bars */
+  let occRows = D.demand.occupation
+    .map(r=>({name:r.name,v:r.count})).sort((a,b)=>a.v-b.v);
+  const ssco = chart('c-ssco');
+  ssco.setOption(base({
+    grid:{containLabel:true,left:48,right:14,top:6,bottom:2},
+    tooltip:Object.assign({},TT,{formatter:p=>`<b>${p.name}</b>${ttRow('عدد العمالة',fmt(p.value),C.teal)}${ttRow('من إجمالي الطلب',(p.value/D.meta.totals.demand*100).toFixed(1)+'٪')}`}),
+    xAxis:Object.assign({},AXV,{inverse:true}),
+    yAxis:Object.assign({},AXC,{data:occRows.map(r=>r.name),position:'right',axisLabel:Object.assign({},AXC.axisLabel,{width:170,overflow:'truncate'})}),
+    series:[{type:'bar',data:occRows.map(r=>r.v),barMaxWidth:18,
+      itemStyle:{color:C.teal,borderRadius:[6,0,0,6]},
+      label:{show:true,position:'left',formatter:p=>fmtAx(p.value),fontSize:10.5,color:C.muted,fontFamily:'Cairo'}}],
+  }));
+  reClick(ssco,null);
+
+  /* القطاع الاقتصادي · حجم المنشأة · الفئات العمرية · الجنسيات
+     أبعاد غير موجودة في مصنّف البيانات الرئيسي — تُعرض بحالة صريحة */
+  noData('c-econ','econ');
+  noData('c-sme','sme');
+  noData('c-age','age');
+  noData('c-nat','nat');
+
+  /* demand by municipal sector */
+  const dsecRows=D.demand.sector;
+  const dsec=chart('c-dsec');
+  dsec.setOption(base({
+    grid:{containLabel:true,left:8,right:8,top:14,bottom:2},
+    tooltip:Object.assign({},TT,{formatter:p=>`<b>${p.name}</b>${ttRow('عدد العمالة',fmt(p.value),p.color)}${ttRow('','انقر للتصفية على هذا القطاع')}`}),
+    xAxis:Object.assign({},AXC,{data:dsecRows.map(r=>r.name.replace(/^(ال)?قطاع /,'')),inverse:true}),
+    yAxis:AXVY,
+    series:[{type:'bar',data:dsecRows.map(r=>({value:demandVal(r),
+      itemStyle:{color:S.sectors.has(r.name)?C.green:C.teal,borderRadius:[6,6,0,0],opacity:S.sectors.size&&!S.sectors.has(r.name)?0.35:1}})),
+      barMaxWidth:24,label:{show:true,position:'top',formatter:p=>fmtAx(p.value),fontSize:10,color:C.muted,fontFamily:'Cairo'}}],
+  }));
+  reClick(dsec,p=>toggleSector(dsecRows[p.dataIndex].name));
+
+  /* بطاقات المعروض — المصدر لا يتضمن إشغالاً فعلياً ولا سجل منشآت */
+  const occCard=document.querySelector('[data-count="occupancy"]');
+  occCard.textContent='—'; occCard.classList.add('na-val');
+  el('chip-occ-note').innerHTML=NA_CHIP; el('chip-occ-note').className='k-delta na';
+  countUp(document.querySelector('[data-count="facilities"]'),sf.opLic);
+  el('chip-fac-note').textContent=`${fmt(sf.buildLic)} رخصة بناء · ${fmt(sf.beds)} سرير مرخص`;
+  el('chip-fac-note').className='k-delta up';
+  const topCap=[...D.capSector].sort((a,b)=>b.beds-a.beds)[0];
+  el('chip-topsec').textContent=topCap.name;
+  el('chip-topsec-note').textContent=`${fmt(topCap.beds)} سرير · تغطية ${fmt1(topCap.cov)}٪`;
+  el('chip-topsec-note').className='k-delta flat';
+
+  /* stacked bar by type */
+  /* الطاقة حسب نوع السكن — ورقة 09 (على مستوى المدينة؛ المصدر لا يوزعها قطاعياً) */
+  const typeAgg = TYPES.map(t=>{
+    const r=D.licType.find(x=>x.name===t);
+    return (r && typOK(t)) ? r.beds : 0;
+  });
+  const typeTotal = typeAgg.reduce((a,b)=>a+b,0)||1;
+  const ct = chart('c-type');
+  ct.setOption(base({
+    grid:{containLabel:true,left:8,right:8,top:8,bottom:26},
+    legend:{bottom:0,icon:'circle',itemWidth:9,textStyle:{fontFamily:'Cairo',fontSize:11}},
+    tooltip:Object.assign({},TT,{formatter:p=>`<b>${p.seriesName}</b>${ttRow('الأسرّة',fmt(p.value),p.color)}${ttRow('النسبة',(p.value/typeTotal*100).toFixed(1)+'٪')}`}),
+    xAxis:Object.assign({},AXV,{inverse:true,max:typeTotal}),
+    yAxis:Object.assign({},AXC,{data:['الأسرّة'],position:'right',axisLabel:{show:false},axisLine:{show:false}}),
+    series:TYPES.map((t,i)=>({name:t,type:'bar',stack:'a',data:[typeAgg[i]],barWidth:34,
+      itemStyle:{color:TYPE_COLORS[t],borderColor:'#fff',borderWidth:2,borderRadius:4},
+      label:{show:typeAgg[i]/typeTotal>0.08,formatter:()=>`${fmtAx(typeAgg[i])} · ${(typeAgg[i]/typeTotal*100).toFixed(0)}٪`,
+        color:'#fff',fontFamily:'Cairo',fontWeight:'bold',fontSize:11}})),
+  }));
+
+  /* supply vs demand per sector */
+  const sup=chart('c-supsec');
+  const supRows=D.capSector.map(r=>({s:r.name,beds:r.beds,dem:r.demand}));
+  sup.setOption(base({
+    grid:{containLabel:true,left:8,right:8,top:30,bottom:2},
+    legend:{top:0,icon:'circle',itemWidth:9,textStyle:{fontFamily:'Cairo',fontSize:11}},
+    tooltip:Object.assign({},TT,{trigger:'axis',axisPointer:{type:'shadow'},formatter:ps=>{
+      const r=supRows[ps[0].dataIndex];
+      return `<b>${r.s}</b>${ttRow('العمالة (الطلب)',fmt(r.dem),C.gold)}${ttRow('الأسرّة المرخصة',fmt(r.beds),C.teal)}${ttRow('نسبة التغطية',(r.beds/r.dem*100).toFixed(1)+'٪')}`;}}),
+    xAxis:Object.assign({},AXC,{data:supRows.map(r=>r.s.replace(/^(ال)?قطاع /,'')),inverse:true}),
+    yAxis:AXVY,
     series:[
-      /* الشريحة الخضراء أضيق من أن تحمل تسمية داخلية — نسبة التغطية معروضة كاملةً في اللوح المجاور */
-      {name:'الطاقة المرخصة', type:'bar', stack:'g', color:C.accent,
-       data:secs.map(s => s.capacity)},
-      {name:'الفجوة', type:'bar', stack:'g', color:C.gapFill,
-       data:secs.map(s => s.gap), itemStyle:{borderRadius:[6,0,0,6]},
-       label:LBL(p => fmt(secs[p.dataIndex].demand))}
-    ]
-  }));
-  c1 && c1.on('click', p => setSector(secs.find(s => s.name === p.name).id));
-
-  const c2 = chart('c-cov');
-  const covSorted = [...secs].sort((a,b) => b.coverage - a.coverage);
-  c2 && c2.setOption(base({
-    tooltip:Object.assign({}, TT, {trigger:'item', formatter:p => {
-      const s = covSorted[p.dataIndex];
-      return ttHead(esc(s.name)) + ttRow('نسبة التغطية', pc(s.coverage,2), C.accent) +
-        ttRow('الطاقة المرخصة', fmt(s.capacity)) + ttRow('الطلب', fmt(s.demand));
-    }}),
-    grid:{top:8, right:74, bottom:26, left:52, containLabel:true},
-    xAxis:barX(v => pcRaw(v,0)+'٪', {max:Math.max(...secs.map(s=>s.coverage))*1.25}),
-    yAxis:barY(covSorted.map(s => s.short), 46),
-    series:[{
-      type:'bar', color:C.accent, barWidth:'54%',
-      data:covSorted.map(s => s.coverage), itemStyle:{borderRadius:[6,0,0,6]},
-      label:LBL(p => pc(p.value,2)),
-      markLine:{silent:true, symbol:'none', lineStyle:{color:C.gold, type:'dashed', width:1.6},
-        data:[{xAxis:D.totals.coverage, label:{formatter:'متوسط المدينة', color:C.gold, fontSize:9.5,
-          fontFamily:'Cairo', position:'insideEndTop', rotate:0}}]}
-    }]
-  }));
-  c2 && c2.on('click', p => setSector(covSorted[p.dataIndex].id));
-}
-
-/* ---------------- 1.2 تركيبة الطلب ---------------- */
-function sc_demand(host){
-  const T = D.totals;
-  const s = SEC();
-  const scopeNote = s
-    ? `<div class="note warn" style="margin-top:10px">تركيبة الطلب (الياقات والمجموعات المهنية) متاحة في المصدر على مستوى المدينة فقط — الأرقام أدناه لكامل الرياض وليست للقطاع «${esc(s.name)}».</div>`
-    : '';
-  host.innerHTML = `
-    ${rail([
-      railCell('إجمالي الطلب', fmt(T.demand), 'فرد', 'مجموع الياقات ومجموع المجموعات المهنية'),
-      railCell('الياقات الزرقاء', fmt(T.blue), 'فرد', `<b class="delta flat">${pc(T.blue/T.demand,1)}</b> من الطلب`),
-      railCell('الياقات البيضاء', fmt(T.white), 'فرد', `<b class="delta flat">${pc(T.white/T.demand,1)}</b> من الطلب`),
-      railCell('أكبر مجموعة مهنية', fmt(D.activities[0].demand), 'فرد', esc(D.activities[0].name))
-    ])}
-    <div class="sc-body g-23" style="grid-template-rows:minmax(0,1fr)">
-      ${panel('المجموعات المهنية', 'التصنيف المهني لإجمالي العمالة', chartBody('c-act'), {tag:TAG.real})}
-      <div class="stack">
-        ${panel('نوع الياقة', 'الياقات الزرقاء مقابل البيضاء', chartBody('c-collar'), {tag:TAG.real})}
-        ${panel('أبعاد تصنيف إضافية', 'الجنسية · الفئة العمرية · حجم المنشأة', noData('demandProfile'), {tag:TAG.none})}
-      </div>
-    </div>
-    ${scopeNote}`;
-
-  const acts = [...D.activities].sort((a,b) => b.demand - a.demand);
-  const c1 = chart('c-act');
-  c1 && c1.setOption(base({
-    tooltip:Object.assign({}, TT, {trigger:'item', formatter:p => {
-      const a = acts[p.dataIndex];
-      return ttHead(esc(a.name)) + ttRow('عدد العمالة', fmt(a.demand), C.accent) +
-        ttRow('من إجمالي الطلب', pc(a.demand/T.demand,1));
-    }}),
-    grid:{top:10, right:196, bottom:20, left:88, containLabel:true},
-    xAxis:barX(axK, {max:acts[0].demand*1.22}),
-    yAxis:barY(acts.map(a => a.name), 186),
-    series:[{
-      type:'bar', color:C.accent, barWidth:'56%',
-      data:acts.map(a => a.demand), itemStyle:{borderRadius:[6,0,0,6]},
-      label:LBL(p => `${fmt(p.value)}  ·  ${pc(p.value/T.demand,1)}`)
-    }]
-  }));
-
-  const c2 = chart('c-collar');
-  const cd = [{name:'ياقات زرقاء', value:T.blue}, {name:'ياقات بيضاء', value:T.white}];
-  c2 && c2.setOption(base({
-    tooltip:Object.assign({}, TT, {trigger:'item', formatter:p =>
-      ttHead(esc(p.name)) + ttRow('عدد العمالة', fmt(p.value), p.color) + ttRow('النسبة', pc(p.value/T.demand,1))}),
-    grid:{top:6, right:80, bottom:16, left:40, containLabel:true},
-    xAxis:barX(axK, {max:T.blue*1.3}),
-    yAxis:barY(cd.map(x => x.name), 68),
-    series:[{
-      type:'bar', barWidth:'46%',
-      data:cd.map((x,i) => ({value:x.value, itemStyle:{color:i ? C.accent3 : C.accent, borderRadius:[6,0,0,6]}})),
-      label:LBL(p => `${fmt(p.value)} · ${pc(p.value/T.demand,1)}`)
-    }]
-  }));
-}
-
-/* ---------------- 1.3 المعروض المرخص ---------------- */
-function sc_supply(host){
-  const q = scope();
-  const avg = q.opLic ? q.supply/q.opLic : null;
-  host.innerHTML = `
-    ${rail([
-      railCell('الطاقة الاستيعابية', fmt(q.supply), 'سرير', esc(q.label)),
-      railCell('الرخص التشغيلية', fmt(q.opLic), 'رخصة', 'رخص سارية في نطاق العرض'),
-      railCell('رخص البناء', fmt(q.buildLic), 'رخصة', 'مصدرها الإدارة العامة للتراخيص'),
-      railCell('متوسط الأسرّة لكل رخصة تشغيلية', fmt(avg), 'سرير', 'الطاقة ÷ عدد الرخص التشغيلية')
-    ])}
-    <div class="sc-body g-32" style="grid-template-rows:minmax(0,1fr)">
-      <div class="stack">
-        ${panel('الطاقة الاستيعابية حسب نوع السكن', 'عدد الرخص ومتوسط الأسرّة لكل رخصة',
-          chartBody('c-htype'), {tag:TAG.real})}
-        ${panel('معدل الإشغال وسجل المنشآت', 'الأسرّة المشغولة فعلياً ومواقع المنشآت',
-          noData('occupancy'), {tag:TAG.none})}
-      </div>
-      ${panel('القطاعات البلدية — الطاقة الاستيعابية المرخصة',
-        'كثافة اللون تعكس حجم الطاقة. انقر قطاعاً لتصفية اللوحة بالكامل.', `
-        <div class="mapwrap" id="map-supply"></div>
-        <div class="map-leg">
-          <span class="lg"><span class="sw" style="background:linear-gradient(to left,#EDF4EF,#0E6B39)"></span>طاقة أقل ← طاقة أعلى</span>
-          <span class="lg" style="margin-inline-start:auto">مخطط توضيحي لترتيب القطاعات — ليس خريطة حدود فعلية</span>
-        </div>`, {tag:TAG.real, bodyCls:'', cls:''})}
-    </div>`;
-
-  drawMap('map-supply', {metric:s => s.capacity, label:'الطاقة', fmtV:v => axK(v)});
-
-  const H = D.housingTypes;
-  const c = chart('c-htype');
-  c && c.setOption(base({
-    tooltip:Object.assign({}, TT, {trigger:'item', formatter:p => {
-      const h = H[p.dataIndex];
-      return ttHead(esc(h.name)) + ttRow('الطاقة الاستيعابية', fmt(h.capacity), C.accent) +
-        ttRow('عدد الرخص', fmt(h.licenses)) + ttRow('متوسط الأسرّة لكل رخصة', fmt1(h.avgBeds)) +
-        ttRow('من إجمالي الطاقة', pc(h.capacity/D.totals.supply,1));
-    }}),
-    grid:{top:8, right:150, bottom:18, left:56, containLabel:true},
-    xAxis:barX(axK, {max:Math.max(...H.map(h=>h.capacity))*1.34}),
-    yAxis:barY(H.map(h => h.name), 84),
-    series:[{
-      type:'bar', color:C.accent, barWidth:'50%',
-      data:H.map(h => h.capacity), itemStyle:{borderRadius:[6,0,0,6]},
-      label:LBL(p => `${fmt(p.value)} سرير · ${fmt(H[p.dataIndex].licenses)} رخصة`)
-    }]
-  }));
-}
-
-/* ---------------- 2.1 التراخيص — مقابل خط الأساس ---------------- */
-function sc_licOverview(host){
-  const L = D.licDelta;
-  const card = (k, key, unit) => {
-    const d = L[key];
-    /* الجهة المنتجة غير المحددة لا تُوسم بلون البيانات المعتمدة */
-    const owned = d.owner && !d.owner.includes('غير محدد');
-    return `<div class="panel">
-      <div class="p-head"><h3>${esc(d.label)}</h3>
-        <div class="p-tag"><span class="tag ${owned ? 't-real' : 't-sample'}">${esc(d.owner||'—')}</span></div></div>
-      <div class="p-body">
-        <div style="display:flex;align-items:baseline;gap:12px">
-          <div class="hero-num lg num">${fmt(d.current)}</div>
-          <div style="font-size:11px;color:var(--mut);font-weight:600">${esc(unit)}<br>
-            <span class="delta up">+${fmt(d.change)} (${pc(d.pct,0)})</span></div>
-        </div>
-        <div style="font-size:11px;color:var(--faint);margin-top:6px">
-          خط الأساس ${ltr(fmt(d.baseline))} في ${fmtDate(d.baselineDate)}
-        </div>
-        <div class="chart" id="lo-c-${key}" style="flex:1;min-height:96px;margin-top:6px"></div>
-      </div>
-    </div>`;
-  };
-  host.innerHTML = `
-    <div class="sc-body" style="grid-template-rows:minmax(120px,.85fr) minmax(0,1.9fr)">
-      ${imghead('التراخيص', 'من خط الأساس إلى الوضع الحالي',
-        `خلال اثني عشر شهراً ارتفعت الطاقة الاستيعابية المرخصة من ${ltr(fmt(L.capacity.baseline))} إلى ${ltr(fmt(L.capacity.current))} سرير — بزيادة قدرها ${pc(L.capacity.pct,0)}.`,
-        'lic')}
-      <div class="sc-body g-3" style="grid-template-rows:minmax(0,1fr)">
-        ${card('', 'building', 'رخصة')}
-        ${card('', 'operational', 'رخصة')}
-        ${card('', 'capacity', 'سرير')}
-      </div>
-    </div>`;
-
-  ['building','operational','capacity'].forEach(key => {
-    const d = L[key];
-    const c = chart('lo-c-'+key);
-    c && c.setOption(base({
-      tooltip:Object.assign({}, TT, {trigger:'axis', axisPointer:{type:'shadow'}, formatter:ps =>
-        ttHead(esc(ps[0].name)) + ttRow(esc(d.label), fmt(ps[0].value), ps[0].color)}),
-      grid:{top:16, right:14, bottom:20, left:14, containLabel:true},
-      xAxis:catX(['خط الأساس','الحالي'], {axisLabel:{color:C.mut, fontSize:10.5, fontFamily:'Cairo'}}),
-      yAxis:valY(axK, {max:niceMax(d.current*1.2)}),
-      series:[{
-        type:'bar', barWidth:'40%',
-        data:[
-          {value:d.baseline, itemStyle:{color:'#D8DDD8', borderRadius:[5,5,0,0]}},
-          {value:d.current,  itemStyle:{color:C.accent,  borderRadius:[5,5,0,0]}}
-        ],
-        label:{show:true, position:'top', color:C.ink2, fontFamily:'IBM Plex Sans Arabic',
-          fontSize:10.5, fontWeight:600, formatter:p => fmt(p.value)}
-      }]
-    }));
-  });
-}
-
-/* ---------------- 2.2 المسار الشهري ---------------- */
-function sc_licFlow(host){
-  const M = D.licMonthly.filter(m => !m.isBaseline);
-  const base0 = D.licMonthly.find(m => m.isBaseline);
-  const best = M.reduce((a,b) => b.newCap > a.newCap ? b : a);
-  host.innerHTML = `
-    ${rail([
-      railCell('الطاقة المضافة خلال الفترة', fmt(D.licDelta.capacity.change), 'سرير',
-        `على مدى ${cnt(M.length,'شهر واحد','شهرين','أشهر','شهراً')} من سبتمبر 2025`),
-      railCell('أعلى شهر إضافةً', fmt(best.newCap), 'سرير', esc(best.label)),
-      railCell('متوسط الإضافة الشهرية', fmt(D.foresight.avgMonthlyCapacity), 'سرير',
-        `محسوب على ${cnt(D.foresight.activeMonths,'شهر','شهرين','أشهر','شهراً')} بإضافة فعلية`),
-      railCell('الرصيد التراكمي الحالي', fmt(D.totals.supply), 'سرير', 'يطابق الطاقة الاستيعابية المعلنة')
-    ])}
-    <div class="sc-body g-23" style="grid-template-rows:minmax(0,1fr)">
-      ${panel('الإضافات الشهرية والرصيد التراكمي للطاقة الاستيعابية',
-        'الأعمدة = المضاف شهرياً · الخط = الرصيد التراكمي', chartBody('c-licflow'), {tag:TAG.real})}
-      <div class="stack">
-        ${panel('الرصيد التراكمي للرخص', 'رخص البناء مقابل الرخص التشغيلية', chartBody('c-liccum'), {tag:TAG.real})}
-        ${panel('مسار الطلبات ومدة الإصدار', 'الطلبات المستلمة والمغلقة ومتوسط أيام المعالجة',
-          noData('licDuration'), {tag:TAG.none})}
-      </div>
-    </div>`;
-
-  const c1 = chart('c-licflow');
-  c1 && c1.setOption(base({
-    tooltip:Object.assign({}, TT, {trigger:'axis', axisPointer:{type:'shadow'}, formatter:ps => {
-      const m = M.find(x => x.label === ps[0].name);
-      return ttHead(esc(m.label)) + ttRow('الطاقة المضافة', fmt(m.newCap), C.accent) +
-        ttRow('الرصيد التراكمي', fmt(m.cumCap), C.gold) +
-        ttRow('رخص تشغيلية جديدة', fmt(m.newOp)) + ttRow('رخص بناء جديدة', fmt(m.newBuild));
-    }}),
-    legend:{data:['الطاقة المضافة شهرياً','الرصيد التراكمي'], bottom:0,
-      textStyle:{color:C.mut, fontSize:11, fontFamily:'Cairo'}, itemWidth:11, itemHeight:11, itemGap:16},
-    grid:{top:16, right:52, bottom:46, left:52, containLabel:true},
-    xAxis:catX(M.map(m => AR_MONTH_SHORT(m.label)), {axisLabel:{color:C.mut, fontSize:9.5,
-      fontFamily:'Cairo', interval:0, rotate:34}}),
-    yAxis:[
-      valY(axK),
-      Object.assign(valY(axK), {position:'left', splitLine:{show:false},
-        axisLabel:{color:C.faint, fontSize:9.5, fontFamily:'IBM Plex Sans Arabic', formatter:axK}})
+      {name:'العمالة (الطلب)',type:'bar',data:supRows.map(r=>r.dem),barMaxWidth:20,itemStyle:{color:C.gold,borderRadius:[6,6,0,0]}},
+      {name:'الأسرّة المرخصة',type:'bar',data:supRows.map(r=>r.beds),barMaxWidth:20,itemStyle:{color:C.teal,borderRadius:[6,6,0,0]}},
     ],
-    series:[
-      {name:'الطاقة المضافة شهرياً', type:'bar', color:C.accent, yAxisIndex:0,
-       data:M.map(m => m.newCap), barWidth:'46%', itemStyle:{borderRadius:[5,5,0,0]}},
-      {name:'الرصيد التراكمي', type:'line', color:C.gold, yAxisIndex:1, smooth:true,
-       symbol:'circle', symbolSize:5, lineStyle:{width:2.2},
-       data:M.map(m => m.cumCap)}
-    ]
   }));
+  reClick(sup,p=>toggleSector(supRows[p.dataIndex].s));
 
-  const c2 = chart('c-liccum');
-  c2 && c2.setOption(base({
-    tooltip:Object.assign({}, TT, {trigger:'axis', formatter:ps =>
-      ttHead(esc(ps[0].name)) + ps.map(p => ttRow(p.seriesName, fmt(p.value), p.color)).join('')}),
-    legend:{data:['الرخص التشغيلية','رخص البناء'], bottom:0,
-      textStyle:{color:C.mut, fontSize:10.5, fontFamily:'Cairo'}, itemWidth:10, itemHeight:10, itemGap:14},
-    grid:{top:12, right:44, bottom:44, left:16, containLabel:true},
-    xAxis:catX([base0, ...M].map(m => AR_MONTH_SHORT(m.label)),
-      {axisLabel:{color:C.mut, fontSize:9, fontFamily:'Cairo', interval:1, rotate:34}}),
-    yAxis:valY(axK),
-    series:[
-      {name:'الرخص التشغيلية', type:'line', color:C.accent, smooth:true, symbol:'circle', symbolSize:4,
-       lineStyle:{width:2.2}, areaStyle:{color:'rgba(14,107,57,.08)'},
-       data:[base0, ...M].map(m => m.cumOp)},
-      {name:'رخص البناء', type:'line', color:C.slate, smooth:true, symbol:'circle', symbolSize:4,
-       lineStyle:{width:1.8}, data:[base0, ...M].map(m => m.cumBuild)}
-    ]
-  }));
+  /* map + side panel */
+  /* الخريطة تعرض القطاعات فقط — لا يتضمن المصدر إحداثيات منشآت */
+  drawMap('map1',{
+    mode:'supply',
+    sectorTip:s=>{const x=sectorFacts(s);
+      return `<b>${s}</b>${ttRow('الأسرّة المرخصة',fmt(x.beds))}${ttRow('الرخص التشغيلية',fmt(x.opLic))}${ttRow('رخص البناء',fmt(x.buildLic))}${ttRow('العمالة (الطلب)',fmt(x.demand))}${ttRow('نسبة التغطية',fmt1(x.cov)+'٪')}`;},
+    onSector:toggleSector,
+    dots:[],
+    metric:s=>(D.capSector.find(r=>r.name===s)||{beds:0}).beds,
+  });
+  renderMap1Side(sec,sf);
+
+  /* سجل المنشآت — غير موجود في المصدر */
+  noData('tbl-fac','facilities');
+  el('fac-search').style.display='none';
+  T1FACS=[];
+  if(false){
+  const facCols=[
+    {k:'name',l:'المنشأة'},{k:'sector',l:'القطاع',f:v=>v.replace(/^(ال)?قطاع /,'')},{k:'district',l:'الحي'},{k:'type',l:'النوع'},
+    {k:'beds',l:'الأسرّة المرخصة',f:fmt,sort:true},{k:'occupied',l:'المشغولة',f:fmt},
+    {k:'occ_rate',l:'الإشغال',f:v=>`<span class="st ${v>95?'st-red':v>85?'st-amber':'st-green'}">${fmt1(v)}٪</span>`},
+    {k:'compliance',l:'الامتثال'},{k:'risk',l:'الخطورة',f:v=>`<span class="st ${RISK_CHIP[v]}">${v}</span>`},
+    {k:'lic_status',l:'الترخيص',f:v=>`<span class="st ${v==='ساري'?'st-green':'st-amber'}">${v}</span>`},
+  ];
+  facTable=makeTable('tbl-fac',facCols,filterFacs(),{onRow:facilityDrawer,sortKey:'beds'});
+  }
 }
-
-/* ---------------- 2.3 التوزيع القطاعي ---------------- */
-function sc_licDist(host){
-  const U = D.unassigned;
-  host.innerHTML = `
-    <div class="sc-body" style="grid-template-rows:minmax(0,1fr) auto">
-      <div class="sc-body g-3" style="grid-template-rows:minmax(0,1fr)">
-        ${panel('الرخص حسب القطاع البلدي', 'رخص البناء مقابل الرخص التشغيلية',
-          chartBody('c-licsec'), {tag:TAG.real})}
-        ${panel('الطاقة الاستيعابية حسب القطاع', 'عدد الأسرّة المرخصة', chartBody('c-capsec'), {tag:TAG.real})}
-        ${panel('أنواع المساكن', 'الرخص والطاقة ومتوسط السعة', `
-          <div class="tw"><table>
-            <thead><tr><th>نوع السكن</th><th class="n">الرخص</th><th class="n">الطاقة</th><th class="n">متوسط السعة</th></tr></thead>
-            <tbody>${D.housingTypes.map(h => `<tr>
-              <td class="nm">${esc(h.name)}</td>
-              <td class="n">${fmt(h.licenses)}</td>
-              <td class="n">${fmt(h.capacity)}</td>
-              <td class="n">${fmt1(h.avgBeds)}</td></tr>`).join('')}
-              <tr><td class="nm" style="color:var(--mut)">الإجمالي</td>
-                <td class="n">${fmt(D.totals.operationalLic)}</td>
-                <td class="n">${fmt(D.totals.supply)}</td>
-                <td class="n">${fmt1(D.totals.supply/D.totals.operationalLic)}</td></tr>
-            </tbody></table></div>`, {tag:TAG.real})}
-      </div>
-      <div class="note warn">
-        <b>بند يحتاج قراراً:</b> يتضمن المصدر صف «${esc(U.name)}» بـ ${cnt(U.buildLic,'رخصة بناء واحدة','رخصتَي بناء','رخص بناء','رخصة بناء')}
-        وبطاقة استيعابية صفرية. ${esc(U.note)}
-        هذه الرخص محتسبة ضمن إجمالي رخص البناء (${fmt(D.totals.buildingLic)}) وغير محتسبة في أي قطاع.
-      </div>
-    </div>`;
-
-  const secs = D.sectors;
-  const c1 = chart('c-licsec');
-  c1 && c1.setOption(base({
-    tooltip:Object.assign({}, TT, {trigger:'axis', axisPointer:{type:'shadow'}, formatter:ps => {
-      const s = secs.find(x => x.short === ps[0].name);
-      return ttHead(esc(s.name)) + ttRow('الرخص التشغيلية', fmt(s.opLic), C.accent) +
-        ttRow('رخص البناء', fmt(s.buildLic), C.slate) + ttRow('إجمالي الرخص', fmt(s.totalLic));
-    }}),
-    legend:{data:['الرخص التشغيلية','رخص البناء'], bottom:0,
-      textStyle:{color:C.mut, fontSize:10.5, fontFamily:'Cairo'}, itemWidth:10, itemHeight:10, itemGap:14},
-    grid:{top:12, right:60, bottom:38, left:20, containLabel:true},
-    xAxis:barX(v => fmt(v)), yAxis:barY(secs.map(s => s.short), 44),
-    series:[
-      {name:'الرخص التشغيلية', type:'bar', color:C.accent, data:secs.map(s => s.opLic),
-       itemStyle:{borderRadius:[5,0,0,5]}, label:LBL(p => fmt(p.value))},
-      {name:'رخص البناء', type:'bar', color:C.slate, data:secs.map(s => s.buildLic),
-       itemStyle:{borderRadius:[5,0,0,5]}, label:LBL(p => p.value ? fmt(p.value) : '')}
-    ]
+let T1FACS=[];
+function filterFacs(){ const q=S.facSearch.trim();
+  return T1FACS.filter(f=>!q||f.name.includes(q)||f.district.includes(q)); }
+function demandScaledVal(row,k){ return Math.round(demandVal(row)*k); }
+function colChart(id,cats,vals,colors,onClick){
+  const c=chart(id);
+  c.setOption(base({
+    grid:{containLabel:true,left:8,right:8,top:14,bottom:2},
+    tooltip:Object.assign({},TT,{formatter:p=>`<b>${p.name}</b>${ttRow('عدد العمالة',fmt(p.value),p.color)}`}),
+    xAxis:Object.assign({},AXC,{data:cats,inverse:true}),
+    yAxis:AXVY,
+    series:[{type:'bar',data:vals.map((v,i)=>({value:v,itemStyle:{color:colors[i],borderRadius:[6,6,0,0]}})),
+      barMaxWidth:26,label:{show:true,position:'top',formatter:p=>fmtAx(p.value),fontSize:10,color:C.muted,fontFamily:'Cairo'}}],
   }));
-  c1 && c1.on('click', p => { const s = secs.find(x => x.short === p.name); s && setSector(s.id); });
-
-  const capSorted = [...secs].sort((a,b) => b.capacity - a.capacity);
-  const c2 = chart('c-capsec');
-  c2 && c2.setOption(base({
-    tooltip:Object.assign({}, TT, {trigger:'item', formatter:p => {
-      const s = capSorted[p.dataIndex];
-      return ttHead(esc(s.name)) + ttRow('الطاقة الاستيعابية', fmt(s.capacity), C.accent) +
-        ttRow('من إجمالي الطاقة', pc(s.capacity/D.totals.supply,1)) +
-        ttRow('الرخص التشغيلية', fmt(s.opLic));
-    }}),
-    grid:{top:10, right:96, bottom:20, left:20, containLabel:true},
-    xAxis:barX(axK, {max:capSorted[0].capacity*1.3}), yAxis:barY(capSorted.map(s => s.short), 44),
-    series:[{type:'bar', color:C.accent, barWidth:'56%', data:capSorted.map(s => s.capacity),
-      itemStyle:{borderRadius:[6,0,0,6]},
-      label:LBL(p => `${fmt(p.value)} · ${pc(p.value/D.totals.supply,0)}`)}]
-  }));
-  c2 && c2.on('click', p => setSector(capSorted[p.dataIndex].id));
+  reClick(c,onClick? p=>onClick(p.dataIndex):null);
 }
-
-/* ---------------- 3.1 منظومة الرقابة ---------------- */
-function sc_ctlOverview(host){
-  const q = scope();
-  const rate = q.visits ? q.violations/q.visits : null;
-  const perInspector = q.inspectors ? q.visits/q.inspectors : null;
-  host.innerHTML = `
-    <div class="sc-body" style="grid-template-rows:minmax(96px,.62fr) auto minmax(0,1.5fr)">
-      ${imghead('الرقابة والامتثال', 'جولات ميدانية على مدى اثني عشر شهراً',
-        `${fmt(D.totals.visits)} زيارة رقابية رصدت ${fmt(D.totals.violations)} مخالفة، بنسبة امتثال معلنة قدرها ${pc(D.totals.compliance,1)}.`,
-        'ctl')}
-      ${rail([
-        railCell('عدد المراقبين', fmt(q.inspectors), 'مراقب', esc(q.label)),
-        railCell('الزيارات الرقابية', fmt(q.visits), 'زيارة', `${fmt(perInspector)} زيارة لكل مراقب`),
-        railCell('المخالفات المرصودة', fmt(q.violations), 'مخالفة',
-          `<b class="delta dn">${pc(rate,1)}</b> معدل المخالفة لكل زيارة`),
-        railCell('نسبة الامتثال', pc(D.totals.compliance,1), '',
-          scope().national ? 'قيمة معلنة على مستوى المدينة' : 'قيمة معلنة على مستوى المدينة — غير مفصّلة قطاعياً')
-      ])}
-      <div class="sc-body g-3" style="grid-template-rows:minmax(0,1fr)">
-        ${panel('الزيارات والمخالفات حسب القطاع', 'حجم النشاط الرقابي ومخرجاته',
-          chartBody('c-ctlsec'), {tag:TAG.real})}
-        ${panel('معدل المخالفة لكل زيارة', 'المخالفات ÷ الزيارات — لكل قطاع',
-          chartBody('c-ctlrate'), {tag:TAG.calc})}
-        ${panel('الإغلاقات', 'عدد المنشآت المغلقة إدارياً', noData('closures'), {tag:TAG.none})}
-      </div>
-    </div>`;
-
-  const secs = D.sectors;
-  const c1 = chart('c-ctlsec');
-  c1 && c1.setOption(base({
-    tooltip:Object.assign({}, TT, {trigger:'axis', axisPointer:{type:'shadow'}, formatter:ps => {
-      const s = secs.find(x => x.short === ps[0].name);
-      return ttHead(esc(s.name)) + ttRow('الزيارات', fmt(s.visits), C.accent) +
-        ttRow('المخالفات', fmt(s.violations), C.bad) +
-        ttRow('المراقبون', fmt(s.inspectors)) +
-        ttRow('معدل المخالفة', pc(s.violations/s.visits,1));
-    }}),
-    legend:{data:['الزيارات','المخالفات'], bottom:0,
-      textStyle:{color:C.mut, fontSize:10.5, fontFamily:'Cairo'}, itemWidth:10, itemHeight:10, itemGap:14},
-    grid:{top:12, right:66, bottom:38, left:20, containLabel:true},
-    xAxis:barX(axK), yAxis:barY(secs.map(s => s.short), 44),
-    series:[
-      {name:'الزيارات', type:'bar', color:C.accent, data:secs.map(s => s.visits),
-       itemStyle:{borderRadius:[5,0,0,5]}, label:LBL(p => fmt(p.value))},
-      {name:'المخالفات', type:'bar', color:C.bad, data:secs.map(s => s.violations),
-       itemStyle:{borderRadius:[5,0,0,5]}, label:LBL(p => fmt(p.value))}
-    ]
-  }));
-  c1 && c1.on('click', p => { const s = secs.find(x => x.short === p.name); s && setSector(s.id); });
-
-  const rt = [...secs].map(s => ({...s, r:s.violations/s.visits})).sort((a,b) => b.r - a.r);
-  const c2 = chart('c-ctlrate');
-  c2 && c2.setOption(base({
-    tooltip:Object.assign({}, TT, {trigger:'item', formatter:p => {
-      const s = rt[p.dataIndex];
-      return ttHead(esc(s.name)) + ttRow('معدل المخالفة', pc(s.r,1), C.bad) +
-        ttRow('المخالفات', fmt(s.violations)) + ttRow('الزيارات', fmt(s.visits));
-    }}),
-    grid:{top:10, right:66, bottom:20, left:20, containLabel:true},
-    xAxis:barX(v => pcRaw(v,0)+'٪', {max:rt[0].r*1.28}), yAxis:barY(rt.map(s => s.short), 44),
-    series:[{type:'bar', color:C.bad, barWidth:'56%', data:rt.map(s => s.r),
-      itemStyle:{borderRadius:[6,0,0,6]}, label:LBL(p => pc(p.value,1)),
-      markLine:{silent:true, symbol:'none', lineStyle:{color:C.gold, type:'dashed', width:1.6},
-        data:[{xAxis:D.totals.violations/D.totals.visits, label:{formatter:'متوسط المدينة',
-          color:C.gold, fontSize:9.5, fontFamily:'Cairo', position:'insideEndTop', rotate:0}}]}}]
-  }));
-  c2 && c2.on('click', p => setSector(rt[p.dataIndex].id));
-}
-
-/* ---------------- 3.2 الاتجاه الشهري ---------------- */
-function sc_ctlTrend(host){
-  const M = D.inspMonthly;
-  const maxV = M.reduce((a,b) => b.visits > a.visits ? b : a);
-  const maxX = M.reduce((a,b) => b.violations > a.violations ? b : a);
-  const avgR = D.totals.violations/D.totals.visits;
-  const first = M[0], last = M[M.length-1];
-  const dV = (last.visits - first.visits)/first.visits;
-  host.innerHTML = `
-    ${rail([
-      railCell('متوسط الزيارات الشهرية', fmt(D.totals.visits/M.length), 'زيارة',
-        `على مدى ${cnt(M.length,'شهر','شهرين','أشهر','شهراً')}`),
-      railCell('أعلى شهر زيارات', fmt(maxV.visits), 'زيارة', esc(maxV.label)),
-      railCell('أعلى شهر مخالفات', fmt(maxX.violations), 'مخالفة', esc(maxX.label)),
-      railCell('التغير في الزيارات', `${dV>=0?'+':''}${pcRaw(dV,1)}٪`, '',
-        `${esc(last.label)} مقابل ${esc(first.label)}`, dV>=0?'':'mut')
-    ])}
-    <div class="sc-body g-23" style="grid-template-rows:minmax(0,1fr)">
-      ${panel('الزيارات الرقابية والمخالفات شهرياً', 'الأعمدة = الزيارات · الخط = المخالفات',
-        chartBody('c-trend'), {tag:TAG.real})}
-      <div class="stack">
-        ${panel('معدل المخالفة لكل زيارة', 'شهرياً — الخط الذهبي هو متوسط الفترة',
-          chartBody('c-rate'), {tag:TAG.calc})}
-        ${panel('', '', `<div class="note">
-          <b>قراءة الفترة:</b> ارتفعت الزيارات من ${ltr(fmt(first.visits))} في ${esc(first.label)}
-          إلى ${ltr(fmt(last.visits))} في ${esc(last.label)}، بينما بقي معدل المخالفة لكل زيارة
-          في نطاق ضيق حول ${pc(avgR,1)} — أي أن الزيادة في المخالفات المرصودة تتبع اتساع التغطية
-          الرقابية أكثر من كونها تدهوراً في الامتثال.
-        </div>`, {cls:'bare'})}
-      </div>
-    </div>`;
-
-  const c1 = chart('c-trend');
-  c1 && c1.setOption(base({
-    tooltip:Object.assign({}, TT, {trigger:'axis', axisPointer:{type:'shadow'}, formatter:ps => {
-      const m = M.find(x => AR_MONTH_SHORT(x.label) === ps[0].name);
-      return ttHead(esc(m.label)) + ttRow('الزيارات', fmt(m.visits), C.accent) +
-        ttRow('المخالفات', fmt(m.violations), C.bad) + ttRow('معدل المخالفة', pc(m.rate,1));
-    }}),
-    legend:{data:['الزيارات الرقابية','المخالفات'], bottom:0,
-      textStyle:{color:C.mut, fontSize:11, fontFamily:'Cairo'}, itemWidth:11, itemHeight:11, itemGap:16},
-    grid:{top:16, right:50, bottom:46, left:46, containLabel:true},
-    xAxis:catX(M.map(m => AR_MONTH_SHORT(m.label)),
-      {axisLabel:{color:C.mut, fontSize:9.5, fontFamily:'Cairo', interval:0, rotate:34}}),
-    yAxis:[valY(axK), Object.assign(valY(axK), {position:'left', splitLine:{show:false}})],
-    series:[
-      {name:'الزيارات الرقابية', type:'bar', color:C.accent, yAxisIndex:0,
-       data:M.map(m => m.visits), barWidth:'48%', itemStyle:{borderRadius:[5,5,0,0]}},
-      {name:'المخالفات', type:'line', color:C.bad, yAxisIndex:1, smooth:true,
-       symbol:'circle', symbolSize:5, lineStyle:{width:2.2}, data:M.map(m => m.violations)}
-    ]
-  }));
-
-  const c2 = chart('c-rate');
-  c2 && c2.setOption(base({
-    tooltip:Object.assign({}, TT, {trigger:'axis', formatter:ps => {
-      const m = M.find(x => AR_MONTH_SHORT(x.label) === ps[0].name);
-      return ttHead(esc(m.label)) + ttRow('معدل المخالفة', pc(m.rate,2), C.info);
-    }}),
-    grid:{top:14, right:44, bottom:40, left:14, containLabel:true},
-    xAxis:catX(M.map(m => AR_MONTH_SHORT(m.label)),
-      {axisLabel:{color:C.mut, fontSize:9, fontFamily:'Cairo', interval:1, rotate:34}}),
-    yAxis:valY(v => pcRaw(v,0)+'٪'),
-    series:[{type:'line', color:C.info, smooth:true, symbol:'circle', symbolSize:4,
-      lineStyle:{width:2.2}, areaStyle:{color:'rgba(51,98,143,.07)'}, data:M.map(m => m.rate),
-      markLine:{silent:true, symbol:'none', lineStyle:{color:C.gold, type:'dashed', width:1.6},
-        data:[{yAxis:avgR, label:{formatter:'متوسط الفترة', color:C.gold, fontSize:9.5,
-          fontFamily:'Cairo', position:'insideEndTop', rotate:0}}]}}]
-  }));
-}
-
-/* ---------------- 3.3 أنواع المخالفات ---------------- */
-function sc_ctlViol(host){
-  const V = D.violTypes, T = D.totals.violations;
-  const top3 = V.slice(0,3).reduce((a,v) => a+v.count, 0);
-  host.innerHTML = `
-    ${rail([
-      railCell('إجمالي المخالفات', fmt(T), 'مخالفة', 'آخر 12 شهراً'),
-      railCell('أعلى فئة مخالفة', fmt(V[0].count), 'مخالفة', esc(V[0].name)),
-      railCell('تركّز الفئات الثلاث الأعلى', pc(top3/T,1), '', 'من إجمالي المخالفات'),
-      railCell('عدد فئات المخالفات', fmt(V.length), 'فئة', 'وفق تصنيف المصدر')
-    ])}
-    <div class="sc-body g-23" style="grid-template-rows:minmax(0,1fr)">
-      ${panel('المخالفات حسب النوع', 'ترتيب الفئات حسب عدد المخالفات المرصودة',
-        chartBody('c-violtype'), {tag:TAG.real})}
-      <div class="stack">
-        ${panel('توزيع المخالفات على القطاعات', 'إجمالي المخالفات لكل قطاع بلدي',
-          chartBody('c-violsec'), {tag:TAG.real})}
-        ${panel('الغرامات وأداء المراقبين', 'المبالغ المحصّلة وأداء كل مراقب على حدة',
-          noData('fines'), {tag:TAG.none})}
-      </div>
-    </div>`;
-
-  const c1 = chart('c-violtype');
-  c1 && c1.setOption(base({
-    tooltip:Object.assign({}, TT, {trigger:'item', formatter:p => {
-      const v = V[p.dataIndex];
-      return ttHead(esc(v.name)) + ttRow('عدد المخالفات', fmt(v.count), C.bad) +
-        ttRow('من الإجمالي', pc(v.count/T,1));
-    }}),
-    grid:{top:10, right:200, bottom:18, left:60, containLabel:true},
-    xAxis:barX(v => fmt(v), {max:V[0].count*1.24}),
-    yAxis:barY(V.map(v => v.name), 190),
-    series:[{type:'bar', color:C.bad, barWidth:'54%', data:V.map(v => v.count),
-      itemStyle:{borderRadius:[6,0,0,6]},
-      label:LBL(p => `${fmt(p.value)} · ${pc(p.value/T,1)}`)}]
-  }));
-
-  const vs = [...D.sectors].sort((a,b) => b.violations - a.violations);
-  const c2 = chart('c-violsec');
-  c2 && c2.setOption(base({
-    tooltip:Object.assign({}, TT, {trigger:'item', formatter:p => {
-      const s = vs[p.dataIndex];
-      return ttHead(esc(s.name)) + ttRow('المخالفات', fmt(s.violations), C.bad) +
-        ttRow('من الإجمالي', pc(s.violations/T,1)) + ttRow('الزيارات', fmt(s.visits));
-    }}),
-    grid:{top:10, right:76, bottom:18, left:20, containLabel:true},
-    xAxis:barX(v => fmt(v), {max:vs[0].violations*1.3}), yAxis:barY(vs.map(s => s.short), 44),
-    series:[{type:'bar', color:C.bad, barWidth:'56%', data:vs.map(s => s.violations),
-      itemStyle:{borderRadius:[6,0,0,6]},
-      label:LBL(p => `${fmt(p.value)} · ${pc(p.value/T,0)}`)}]
-  }));
-  c2 && c2.on('click', p => setSector(vs[p.dataIndex].id));
-}
-
-/* ---------------- 3.4 سجل الأحياء ---------------- */
-function sc_ctlAreas(host){
-  const all = D.neighborhoods;
-  const list = () => all.filter(n => !S.sector || n.sectorId === S.sector);
-  const N = list();
-  const totV = N.reduce((a,n) => a+n.violations, 0);
-  const totC = N.reduce((a,n) => a+n.capacity, 0);
-  const top = [...N].sort((a,b) => b.violations - a.violations).slice(0,10);
-  const mxV = Math.max(...N.map(n => n.violations), 1);
-
-  host.innerHTML = `
-    ${rail([
-      railCell('عدد الأحياء في السجل', fmt(N.length), 'حي', esc(SECNAME())),
-      railCell('الطاقة الاستيعابية المسجلة', fmt(totC), 'سرير', 'مجموع أحياء السجل'),
-      railCell('المخالفات المسجلة', fmt(totV), 'مخالفة', 'مجموع أحياء السجل'),
-      railCell('أعلى الأحياء مخالفات', fmt(top[0] ? top[0].violations : 0), 'مخالفة',
-        top[0] ? esc(top[0].name) : '—')
-    ])}
-    <div class="sc-body g-32" style="grid-template-rows:minmax(0,1fr)">
-      <div class="stack">
-        ${panel('أعلى الأحياء مخالفاتٍ', 'الأحياء العشرة الأولى في السجل',
-          chartBody('c-areas'), {tag:TAG.sample})}
-        ${panel('خريطة النقاط الساخنة', 'توطين المخالفات جغرافياً',
-          noData('hotspots'), {tag:TAG.none})}
-      </div>
-      ${panel('سجل الأحياء', `${fmt(N.length)} حياً — انقر أي صف لعرض تفاصيله`, `
-        <div class="tw"><table>
-          <thead><tr><th>الحي</th><th>القطاع</th><th class="n">رخص البناء</th>
-            <th class="n">التشغيلية</th><th class="n">الطاقة</th><th class="n">المخالفات</th></tr></thead>
-          <tbody>${N.map(n => `<tr data-nb="${n.id}" style="cursor:pointer">
-            <td class="nm">${esc(n.name)}</td>
-            <td style="color:var(--mut)">${esc(n.sector)}</td>
-            <td class="n">${fmt(n.buildLic)}</td>
-            <td class="n">${fmt(n.opLic)}</td>
-            <td class="n">${fmt(n.capacity)}</td>
-            <td class="n bar-cell"><span class="bc" style="width:${(n.violations/mxV*100).toFixed(1)}%"></span>
-              <span>${fmt(n.violations)}</span></td></tr>`).join('')}
-          </tbody></table></div>`, {tag:TAG.sample})}
+function renderMap1Side(sec,sf){
+  const side=el('map1-side');
+  const rows=[...sf.rs].sort((a,b)=>b.beds-a.beds);
+  side.innerHTML=`
+    <div class="ms-title">${sec||'كل القطاعات — نظرة عامة'}</div>
+    <div class="ms-stats">
+      <div class="ms-stat"><div class="l">الأسرّة المرخصة</div><div class="v">${fmt(sf.beds)}</div></div>
+      <div class="ms-stat"><div class="l">العمالة (الطلب)</div><div class="v">${fmt(sf.demand)}</div></div>
+      <div class="ms-stat"><div class="l">الرخص التشغيلية</div><div class="v">${fmt(sf.opLic)}</div></div>
+      <div class="ms-stat"><div class="l">نسبة التغطية</div><div class="v">${fmt1(sf.cov)}٪</div></div>
     </div>
-    <div class="note warn">
-      <b>تنبيه على الجودة:</b> يصنّف المصدر بيانات الأحياء بأنها «عينة» لم تُحدَّث، وعمودا خط العرض
-      وخط الطول فارغان — لذلك تُعرض هنا كسجل جدولي فقط، ولا تُبنى عليها خريطة أو أي رقم في المشاهد الأخرى.
+    <div><b style="font-size:12px">الطاقة المرخصة حسب القطاع</b>
+      <div class="chart short" id="side-cap"></div></div>
+    <div style="font-size:11px;color:var(--muted);font-weight:600;line-height:1.6">
+      يتضمن المصدر ${fmt(D.unassigned.constr)} رخصة بناء غير مصنفة قطاعياً بطاقة صفرية — محتسبة في الإجمالي وغير منسوبة لأي قطاع.
     </div>`;
-
-  host.querySelectorAll('tr[data-nb]').forEach(tr => {
-    tr.onclick = () => {
-      const n = all.find(x => x.id === tr.dataset.nb);
-      openDrawer(esc(n.name), esc(n.sector),
-        drSec('التراخيص والطاقة') +
-        fld('رخص البناء', fmt(n.buildLic)) +
-        fld('الرخص التشغيلية', fmt(n.opLic)) +
-        fld('الطاقة الاستيعابية', fmt(n.capacity) + ' سرير') +
-        drSec('الرقابة') +
-        fld('المخالفات المسجلة', fmt(n.violations)) +
-        fld('الزيارات الرقابية', n.visits == null ? '<span style="color:var(--faint)">غير متوفرة</span>' : fmt(n.visits)) +
-        drSec('الإحداثيات') +
-        fld('خط العرض', n.lat == null ? '<span style="color:var(--faint)">غير متوفر</span>' : n.lat) +
-        fld('خط الطول', n.lng == null ? '<span style="color:var(--faint)">غير متوفر</span>' : n.lng) +
-        drSec('المصدر') +
-        fld('جودة البيانات', `<span class="st st-warn">${esc(n.quality)}</span>`) +
-        fld('الورقة', '13_الأحياء'));
-    };
-  });
-
-  const c = chart('c-areas');
-  c && c.setOption(base({
-    tooltip:Object.assign({}, TT, {trigger:'item', formatter:p => {
-      const n = top[p.dataIndex];
-      return ttHead(esc(n.name)) + ttRow('المخالفات', fmt(n.violations), C.bad) +
-        ttRow('القطاع', esc(n.sector)) + ttRow('الطاقة', fmt(n.capacity));
-    }}),
-    grid:{top:8, right:66, bottom:18, left:20, containLabel:true},
-    xAxis:barX(v => fmt(v), {max:(top[0]?top[0].violations:1)*1.28}),
-    yAxis:barY(top.map(n => n.name), 92),
-    series:[{type:'bar', color:C.bad, barWidth:'62%', data:top.map(n => n.violations),
-      itemStyle:{borderRadius:[5,0,0,5]}, label:LBL(p => fmt(p.value))}]
+  const c=chart('side-cap');
+  c.setOption(base({
+    grid:{containLabel:true,left:44,right:52,top:6,bottom:2},
+    tooltip:Object.assign({},TT,{formatter:p=>`<b>${rows[p.dataIndex].name}</b>${ttRow('الأسرّة المرخصة',fmt(p.value),C.teal)}${ttRow('نسبة التغطية',fmt1(rows[p.dataIndex].cov)+'٪')}`}),
+    xAxis:Object.assign({},AXV,{inverse:true}),
+    yAxis:Object.assign({},AXC,{data:rows.map(r=>r.name.replace('قطاع ','')),position:'right'}),
+    series:[{type:'bar',data:rows.map(r=>({value:r.beds,itemStyle:{
+        color:S.sectors.has(r.name)?C.green:C.teal,
+        opacity:S.sectors.size&&!S.sectors.has(r.name)?0.4:1,borderRadius:[6,0,0,6]}})),
+      barMaxWidth:14,label:{show:true,position:'left',formatter:p=>fmtAx(p.value),fontSize:10,color:C.muted}}],
   }));
+  reClick(c,p=>toggleSector(rows[p.dataIndex].name));
 }
-
-/* ---------------- 4.1 حالة المبادرات ---------------- */
-const ST_COLOR = {'منجزة':C.ok, 'جاري العمل':C.info, 'متأخرة':C.bad, 'لم تبدأ بعد':C.slate};
-const ST_CLASS = {'منجزة':'st-ok', 'جاري العمل':'st-run', 'متأخرة':'st-late', 'لم تبدأ بعد':'st-wait'};
-const ST_ORDER = ['منجزة','جاري العمل','متأخرة','لم تبدأ بعد'];
-
-function sc_iniStatus(host){
-  const I = D.initiatives;
-  const byS = st => I.filter(x => x.status === st).length;
-  const late = I.filter(x => x.status === 'متأخرة');
-  host.innerHTML = `
-    <div class="sc-body" style="grid-template-rows:auto auto minmax(0,1fr)">
-      ${rail([
-        railCell('إجمالي المبادرات', fmt(I.length), 'مبادرة', 'موزعة على أربعة أهداف'),
-        railCell('منجزة', fmt(byS('منجزة')), 'مبادرة', `${pc(byS('منجزة')/I.length,0)} من الإجمالي`),
-        railCell('جاري العمل', fmt(byS('جاري العمل')), 'مبادرة', `${pc(byS('جاري العمل')/I.length,0)} من الإجمالي`),
-        railCell('متأخرة', fmt(byS('متأخرة')), 'مبادرة',
-          `<b class="delta dn">${pc(byS('متأخرة')/I.length,0)}</b> تجاوزت تاريخ الانتهاء`)
-      ])}
-      <div class="sc-body g-4" style="grid-template-rows:auto">
-        ${D.goals.map(g => {
-          const gi = I.filter(x => x.goalId === g.id);
-          const done = gi.filter(x => x.status === 'منجزة').length;
-          return `<div class="goal-card${S.goal===g.id?' on':''}" data-goal="${g.id}">
-            <div class="gc-k">${esc(g.name)}</div>
-            <div class="gc-t">${esc(g.desc)}</div>
-            <div class="gc-b">
-              <div class="gc-v">${fmt(gi.length)}</div>
-              <div class="gc-s">${cnt(gi.length,'مبادرة واحدة','مبادرتان','مبادرات','مبادرة').replace(/^[\d,]+\s/,'')} · ${fmt(done)} منجزة</div>
-            </div>
-            <div class="gc-bar">${ST_ORDER.map(s => {
-              const n = gi.filter(x => x.status === s).length;
-              return n ? `<i style="flex:${n};background:${ST_COLOR[s]}"></i>` : '';
-            }).join('')}</div>
-          </div>`;
-        }).join('')}
-      </div>
-      <div class="sc-body g-23" style="grid-template-rows:minmax(0,1fr)">
-        ${panel('المبادرات حسب الهدف والحالة', 'التوزيع التفصيلي لكل هدف',
-          chartBody('c-inigoal'), {tag:TAG.real})}
-        <div class="stack">
-          ${panel('المبادرات المتأخرة', `${cnt(late.length,'مبادرة واحدة','مبادرتان','مبادرات','مبادرة')} تجاوزت تاريخ الانتهاء المخطط`, `
-            <div class="scroll">${late.sort((a,b) => b.overdueDays - a.overdueDays).map(x => `
-              <div class="list-row" data-ini="${x.id}" style="cursor:pointer">
-                <span class="lr-n">${esc(x.num)}</span>
-                <span class="lr-t">${esc(x.name)}</span>
-                <span class="lr-d" style="color:var(--bad);font-weight:700">${fmt(x.overdueDays)} يوماً</span>
-              </div>`).join('')}</div>`, {tag:TAG.real})}
-          ${panel('نسب الإنجاز والميزانيات', 'نسبة إنجاز وميزانية ومعلم قادم لكل مبادرة',
-            noData('iniProgress'), {tag:TAG.none})}
-        </div>
-      </div>
-    </div>`;
-
-  host.querySelectorAll('[data-goal]').forEach(g => {
-    g.onclick = () => { S.goal = S.goal === g.dataset.goal ? '' : g.dataset.goal; goScene(sceneIdx('s4_register')); };
-  });
-  host.querySelectorAll('[data-ini]').forEach(r => {
-    r.onclick = () => iniDrawer(D.initiatives.find(x => x.id === r.dataset.ini));
-  });
-
-  const c = chart('c-inigoal');
-  c && c.setOption(base({
-    tooltip:Object.assign({}, TT, {trigger:'axis', axisPointer:{type:'shadow'}, formatter:ps => {
-      const g = D.goals.find(x => x.name === ps[0].name);
-      return ttHead(`${esc(g.name)} — ${esc(g.desc)}`) +
-        ps.filter(p => p.value).map(p => ttRow(p.seriesName, fmt(p.value), p.color)).join('') +
-        ttRow('الإجمالي', fmt(D.initiatives.filter(x => x.goalId === g.id).length));
-    }}),
-    legend:{data:ST_ORDER, bottom:0, textStyle:{color:C.mut, fontSize:10.5, fontFamily:'Cairo'},
-      itemWidth:10, itemHeight:10, itemGap:14},
-    grid:{top:12, right:52, bottom:38, left:20, containLabel:true},
-    xAxis:barX(v => fmt(v)), yAxis:barY(D.goals.map(g => g.name), 52),
-    series:ST_ORDER.map((st,i) => ({
-      name:st, type:'bar', stack:'s', color:ST_COLOR[st],
-      data:D.goals.map(g => D.initiatives.filter(x => x.goalId === g.id && x.status === st).length),
-      itemStyle:{borderRadius:i === ST_ORDER.length-1 ? [5,0,0,5] : 0},
-      label:{show:true, position:'inside', color:'#fff', fontSize:10, fontFamily:'IBM Plex Sans Arabic',
-        fontWeight:600, formatter:p => p.value || ''}
-    }))
-  }));
-}
-
-/* ---------------- 4.2 الجدول الزمني ---------------- */
-function sc_iniTimeline(host){
-  const I = D.initiatives.filter(x => x.start && x.end);
-  const noDates = D.initiatives.filter(x => !x.start || !x.end);
-  const t0 = Math.min(...I.map(x => +new Date(x.start)));
-  const t1 = Math.max(...I.map(x => +new Date(x.end)));
-  const span = t1 - t0;
-  const today = +new Date(D.meta.today);
-  const pos = t => ((t - t0)/span)*100;
-
-  /* أرباع السنة الممتدة على المدى */
-  const quarters = [];
-  let d = new Date(t0); d.setDate(1); d.setMonth(Math.floor(d.getMonth()/3)*3);
-  while(+d <= t1){
-    const nx = new Date(d); nx.setMonth(nx.getMonth()+3);
-    quarters.push({label:`الربع ${Math.floor(d.getMonth()/3)+1} · ${d.getFullYear()}`, a:+d, b:Math.min(+nx,t1)});
-    d = nx;
-  }
-
-  host.innerHTML = `
-    <div class="sc-body" style="grid-template-rows:minmax(0,1fr) auto">
-      ${panel('المخطط الزمني للمبادرات', `${fmt(I.length)} مبادرة ذات تواريخ محددة — الخط الرأسي هو تاريخ اليوم المرجعي ${fmtDate(D.meta.today)}`, `
-        <div class="gantt">
-          <div class="gt-scale" style="margin-inline-start:0">
-            <div style="width:230px;flex:0 0 auto"></div>
-            <div style="flex:1;display:flex;position:relative">
-              ${quarters.map(q => `<div class="q" style="flex:${q.b-q.a}">${esc(q.label)}</div>`).join('')}
-            </div>
-          </div>
-          <div class="gt-rows">
-            ${I.map(x => {
-              const a = pos(+new Date(x.start)), b = pos(+new Date(x.end));
-              return `<div class="gt-row" data-ini="${x.id}" style="cursor:pointer">
-                <div class="gt-name" title="${esc(x.name)}"><i>${esc(x.num)}</i>${esc(x.name)}</div>
-                <div class="gt-lane">
-                  <div class="gl" style="inset-inline-start:${a}%;width:${Math.max(0.8,b-a)}%;background:${ST_COLOR[x.status]}"
-                    title="${fmtDate(x.start)} ← ${fmtDate(x.end)}"></div>
-                  <div class="gt-today" style="inset-inline-start:${pos(today)}%"></div>
-                </div>
-              </div>`;
-            }).join('')}
-          </div>
-          <div class="gt-legend">
-            ${ST_ORDER.filter(s => I.some(x => x.status === s)).map(s =>
-              `<span class="lg" style="display:flex;align-items:center;gap:6px">
-                 <span style="width:14px;height:8px;border-radius:3px;background:${ST_COLOR[s]};display:inline-block"></span>${s}</span>`).join('')}
-            <span class="lg" style="display:flex;align-items:center;gap:6px;margin-inline-start:auto">
-              <span style="width:2px;height:12px;background:var(--ink);opacity:.42;display:inline-block"></span>
-              تاريخ اليوم المرجعي</span>
-          </div>
-        </div>`, {tag:TAG.real})}
-      ${noDates.length ? `<div class="note">
-        ${cnt(noDates.length,'مبادرة واحدة','مبادرتان','مبادرات','مبادرة')} بلا تواريخ في المصدر ولا تظهر في المخطط
-        (${noDates.map(x => esc(x.name)).join(' · ')}) — حالتها مسجلة صراحةً بأنها «منجزة».
-      </div>` : ''}
-    </div>`;
-
-  host.querySelectorAll('[data-ini]').forEach(r => {
-    r.onclick = () => iniDrawer(D.initiatives.find(x => x.id === r.dataset.ini));
-  });
-}
-
-/* ---------------- 4.3 سجل المبادرات ---------------- */
-function sc_iniRegister(host){
-  const g = S.goal;
-  const I = D.initiatives.filter(x => !g || x.goalId === g);
-  const goal = D.goals.find(x => x.id === g);
-  host.innerHTML = `
-    <div class="sc-body" style="grid-template-rows:auto minmax(0,1fr)">
-      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-        <div class="pillset" id="goal-pills">
-          <button class="pl${!g?' on':''}" data-g="">كل الأهداف</button>
-          ${D.goals.map(x => `<button class="pl${g===x.id?' on':''}" data-g="${x.id}">${esc(x.name)}</button>`).join('')}
-        </div>
-        <input class="tsearch" id="ini-q" placeholder="ابحث باسم المبادرة…">
-        <span style="margin-inline-start:auto;font-size:11.5px;color:var(--mut)">
-          ${goal ? `${esc(goal.name)} — ${esc(goal.desc)} · ` : ''}${cnt(I.length,'مبادرة واحدة','مبادرتان','مبادرات','مبادرة')}
-        </span>
-      </div>
-      ${panel('', '', `
-        <div class="tw"><table>
-          <thead><tr><th style="width:44px">الرقم</th><th>المبادرة</th><th style="width:96px">الهدف</th>
-            <th style="width:108px">الحالة</th><th style="width:104px">البدء</th><th style="width:104px">الانتهاء</th></tr></thead>
-          <tbody id="ini-tb"></tbody></table></div>`, {cls:'', bodyCls:'', tag:''})}
-    </div>`;
-
-  const tb = el('ini-tb');
-  function draw(q){
-    const rowsI = I.filter(x => !q || x.name.includes(q) || x.num.includes(q));
-    tb.innerHTML = rowsI.length ? rowsI.map(x => `<tr data-ini="${x.id}" style="cursor:pointer">
-      <td class="n" style="color:var(--faint);font-weight:700">${esc(x.num)}</td>
-      <td class="nm">${esc(x.name)}</td>
-      <td style="color:var(--mut)">${esc(x.goal)}</td>
-      <td><span class="st ${ST_CLASS[x.status]}">${esc(x.status)}</span></td>
-      <td class="n" style="color:var(--mut)">${x.start ? fmtDate(x.start) : '—'}</td>
-      <td class="n" style="color:var(--mut)">${x.end ? fmtDate(x.end) : '—'}</td></tr>`).join('')
-      : `<tr><td colspan="6" style="text-align:center;color:var(--faint);padding:26px">لا توجد مبادرات مطابقة</td></tr>`;
-    tb.querySelectorAll('[data-ini]').forEach(r => {
-      r.onclick = () => iniDrawer(D.initiatives.find(x => x.id === r.dataset.ini));
-    });
-  }
-  draw('');
-  el('ini-q').oninput = e => draw(e.target.value.trim());
-  host.querySelectorAll('#goal-pills .pl').forEach(b => {
-    b.onclick = () => { S.goal = b.dataset.g; renderScene(true); };
-  });
-}
-
-function iniDrawer(x){
-  if(!x) return;
-  const p = D.plan.find(y => y.initiativeId === x.id);
-  openDrawer(esc(x.name), `مبادرة رقم ${esc(x.num)} · ${esc(x.goal)}`,
-    drSec('الحالة') +
-    fld('الحالة المعروضة', `<span class="st ${ST_CLASS[x.status]}">${esc(x.status)}</span>`) +
-    fld('الحالة المسجلة في الملف', x.statusInFile
-      ? esc(x.statusInFile)
-      : '<span style="color:var(--faint)">غير مسجلة — محتسبة زمنياً</span>') +
-    (x.overdueDays != null ? fld('التأخر عن تاريخ الانتهاء', `<span style="color:var(--bad)">${fmt(x.overdueDays)} يوماً</span>`) : '') +
-    drSec('الجدول الزمني') +
-    fld('تاريخ البدء', x.start ? fmtDate(x.start) : '<span style="color:var(--faint)">غير محدد</span>') +
-    fld('تاريخ الانتهاء', x.end ? fmtDate(x.end) : '<span style="color:var(--faint)">غير محدد</span>') +
-    fld('المدة المخططة', x.start && x.end
-      ? `${fmt((new Date(x.end) - new Date(x.start))/864e5)} يوماً` : '—') +
-    drSec('الهدف الاستراتيجي') +
-    fld('الهدف', esc(x.goal)) +
-    fld('الوصف', esc((D.goals.find(g => g.id === x.goalId)||{}).desc || '—')) +
-    drSec('خطة التنفيذ') +
-    fld('عدد الأنشطة المسجلة', p ? '1' : '0') +
-    fld('الجهة المسؤولة', x.owner ? esc(x.owner) : '<span style="color:var(--faint)">غير محددة في المصدر</span>') +
-    `<div class="note" style="margin-top:16px">نسبة الإنجاز والميزانية والمعلم القادم غير متوفرة لهذه المبادرة —
-      المصدر يسجل الحالة والتواريخ فقط.</div>`);
-}
-
-/* ---------------- 5.1 قطع المسافة نحو المستهدف ---------------- */
-function sc_kpiGoals(host){
-  const K = D.kpis;
-  const withP = K.filter(k => k.progress != null);
-  const avg = withP.reduce((a,k) => a+k.progress, 0)/withP.length;
-  const met = K.filter(k => k.current >= k.target).length;
-  const low = withP.filter(k => k.progress < .5).length;
-  const sorted = [...withP].sort((a,b) => b.progress - a.progress);
-
-  host.innerHTML = `
-    ${rail([
-      railCell('عدد المؤشرات', fmt(K.length), 'مؤشراً', 'موزعة على أربعة أهداف'),
-      railCell('متوسط قطع المسافة', pc(avg,0), '', 'من خط الأساس إلى المستهدف'),
-      railCell('بلغت المستهدف', fmt(met), 'مؤشراً', met ? 'من إجمالي المؤشرات' : 'لم يبلغ أي مؤشر مستهدفه بعد'),
-      railCell('دون منتصف المسافة', fmt(low), 'مؤشراً',
-        `<b class="delta dn">${pc(low/withP.length,0)}</b> من المؤشرات`)
-    ])}
-    <div class="sc-body g-23" style="grid-template-rows:minmax(0,1fr)">
-      ${panel('قطع المسافة نحو المستهدف — لكل مؤشر',
-        'الشريط = ما قُطع من المسافة بين خط الأساس والمستهدف · الخط الذهبي = المستهدف',
-        chartBody('c-kpiprog'), {tag:TAG.real})}
-      <div class="stack">
-        ${panel('متوسط قطع المسافة حسب الهدف', 'أي الأهداف أقرب إلى مستهدفاته',
-          chartBody('c-kpigoal'), {tag:TAG.calc})}
-        ${panel('السلاسل الشهرية للمؤشرات', 'تتبّع القيمة شهرياً لكل مؤشر',
-          noData('kpiSeries'), {tag:TAG.none})}
-      </div>
-    </div>`;
-
-  const c1 = chart('c-kpiprog');
-  c1 && c1.setOption(base({
-    tooltip:Object.assign({}, TT, {trigger:'item', formatter:p => {
-      const k = sorted[p.dataIndex];
-      const v = x => k.unit === 'نسبة' ? pc(x,0) : fmt(x);
-      return ttHead(esc(k.name)) + ttRow('قطع المسافة', pc(k.progress,0), C.accent) +
-        ttRow('خط الأساس', v(k.baseline)) + ttRow('القيمة الحالية', v(k.current)) +
-        ttRow('المستهدف', v(k.target), C.gold) + ttRow('الهدف', esc(k.goal));
-    }}),
-    grid:{top:10, right:216, bottom:20, left:52, containLabel:true},
-    xAxis:barX(v => pcRaw(v,0)+'٪', {max:1.12}),
-    yAxis:barY(sorted.map(k => k.name), 206),
-    series:[{
-      type:'bar', color:C.accent, barWidth:'58%', data:sorted.map(k => k.progress),
-      itemStyle:{borderRadius:[5,0,0,5]}, label:LBL(p => pc(p.value,0)),
-      markLine:{silent:true, symbol:'none', lineStyle:{color:C.gold, type:'dashed', width:1.8},
-        data:[{xAxis:1, label:{formatter:'المستهدف', color:C.gold, fontSize:10,
-          fontFamily:'Cairo', position:'insideEndTop', rotate:0}}]}
-    }]
-  }));
-  c1 && c1.on('click', p => kpiDrawer(sorted[p.dataIndex]));
-
-  const gs = D.goals.map(g => {
-    const gk = withP.filter(k => k.goalId === g.id);
-    return {g, v:gk.length ? gk.reduce((a,k) => a+k.progress, 0)/gk.length : 0, n:gk.length};
-  }).sort((a,b) => b.v - a.v);
-  const c2 = chart('c-kpigoal');
-  c2 && c2.setOption(base({
-    tooltip:Object.assign({}, TT, {trigger:'item', formatter:p => {
-      const x = gs[p.dataIndex];
-      return ttHead(`${esc(x.g.name)} — ${esc(x.g.desc)}`) +
-        ttRow('متوسط قطع المسافة', pc(x.v,0), C.accent) +
-        ttRow('عدد المؤشرات', fmt(x.n));
-    }}),
-    grid:{top:10, right:92, bottom:18, left:20, containLabel:true},
-    xAxis:barX(v => pcRaw(v,0)+'٪', {max:1}),
-    yAxis:barY(gs.map(x => x.g.name), 86),
-    series:[{type:'bar', color:C.accent, barWidth:'54%', data:gs.map(x => x.v),
-      itemStyle:{borderRadius:[5,0,0,5]}, label:LBL(p => pc(p.value,0))}]
-  }));
-}
-
-/* ---------------- 5.2 بطاقات المؤشرات ---------------- */
-function sc_kpiCards(host){
-  const K = D.kpis;
-  const val = k => k.unit === 'نسبة' ? pc(k.current,0) : fmt(k.current);
-  const tgt = k => k.unit === 'نسبة' ? pc(k.target,0) : fmt(k.target);
-  host.innerHTML = `
-    <div class="sc-body" style="grid-template-rows:minmax(0,1fr)">
-      <div class="scroll">
-        <div class="sc-body g-4" style="grid-auto-rows:min-content;padding-bottom:6px">
-          ${K.map(k => {
-            const p = Math.max(0, Math.min(1, k.progress == null ? 0 : k.progress));
-            return `<div class="kpi-card" data-kpi="${k.id}">
-              <div class="k-n">${esc(k.name)}</div>
-              <div class="k-row">
-                <div class="k-v">${val(k)}</div>
-                <div class="k-t">المستهدف <b>${tgt(k)}</b></div>
-              </div>
-              <div class="meter">
-                <div class="m-track">
-                  <div class="m-goal" style="inset-inline-start:${(0.88*100).toFixed(0)}%;width:12%"></div>
-                  <div class="m-fill" style="width:${(p*100).toFixed(1)}%"></div>
-                  <div class="m-dot" style="inset-inline-start:${(p*100).toFixed(1)}%"></div>
-                </div>
-                <div class="m-scale">
-                  <span>خط الأساس ${k.unit === 'نسبة' ? pc(k.baseline,0) : fmt(k.baseline)}</span>
-                  <span><b>${pc(k.progress,0)}</b> من المسافة</span>
-                </div>
-              </div>
-              <div class="k-g">${esc(k.goal)} · ${esc(k.quality)}</div>
-            </div>`;
-          }).join('')}
-        </div>
-      </div>
-    </div>`;
-  host.querySelectorAll('[data-kpi]').forEach(c => {
-    c.onclick = () => kpiDrawer(K.find(k => k.id === c.dataset.kpi));
-  });
-}
-
-function kpiDrawer(k){
-  if(!k) return;
-  const v = x => k.unit === 'نسبة' ? pc(x,1) : `${fmt(x)} ${k.unit}`;
-  openDrawer(esc(k.name), `${esc(k.goal)} · ${esc(k.period)}`,
-    drSec('القيم') +
-    fld('خط الأساس', v(k.baseline)) +
-    fld('القيمة الحالية', v(k.current)) +
-    fld('المستهدف', `<span style="color:var(--gold)">${v(k.target)}</span>`) +
-    fld('قطع المسافة', pc(k.progress,0)) +
-    fld('المتبقي للمستهدف', v(k.target - k.current)) +
-    drSec('التعريف') +
-    fld('نوع المؤشر', esc(k.type)) +
-    fld('اتجاه الأداء', esc(k.direction)) +
-    fld('الوحدة', esc(k.unit)) +
-    drSec('المصدر والجودة') +
-    fld('جودة البيانات', `<span class="st st-warn">${esc(k.quality)}</span>`) +
-    fld('المصدر', esc(k.source || '—')) +
-    fld('حالة المصدر', esc(k.sourceStatus || '—')) +
-    `<div class="note" style="margin-top:16px">خط الأساس والمستهدف مأخوذان من وثيقة خطة العمل.
-      القيمة الحالية مصنّفة في المصدر بأنها تقديرية للعرض وتُستبدل بالقيمة الفعلية عند ورودها من جهتها.
-      لا تتوفر سلسلة شهرية لهذا المؤشر.</div>`);
-}
-
-/* ---------------- 6.1 الإسقاط المحتسب ---------------- */
-function sc_projection(host){
-  const F = D.foresight;
-  const hist = D.licMonthly.filter(m => !m.isBaseline);
-  const proj = D.projection;
-  const labels = [...hist.map(m => AR_MONTH_SHORT(m.label)), ...proj.map(p => AR_MONTH_SHORT(p.label))];
-  const actual = [...hist.map(m => m.cumCap), ...proj.map(() => null)];
-  /* وصل الخطين عند آخر نقطة فعلية حتى لا تظهر فجوة */
-  const projected = [...hist.map((m,i) => i === hist.length-1 ? m.cumCap : null), ...proj.map(p => p.capacity)];
-  const target = F.bedsTarget;
-
-  host.innerHTML = `
-    ${rail([
-      railCell('متوسط الإضافة الشهرية', fmt(F.avgMonthlyCapacity), 'سرير',
-        `محسوب على ${cnt(F.activeMonths,'شهر','شهرين','أشهر','شهراً')} بإضافة فعلية`),
-      railCell('الطاقة المتوقعة بعد 24 شهراً', fmt(F.capacityIn24), 'سرير',
-        `نسبة تغطية ${pc(F.coverageIn24,2)} من الطلب الحالي`),
-      railCell('المتبقي لبلوغ مستهدف الأسرّة', fmt(F.bedsRemaining), 'سرير',
-        `المستهدف المعتمد ${ltr(fmt(target))} سرير`),
-      railCell('الزمن اللازم بالوتيرة الحالية', fmt1(F.monthsToTarget), 'شهراً',
-        `أي نحو ${esc(F.targetDate)}`)
-    ])}
-    <div class="sc-body g-23" style="grid-template-rows:minmax(0,1fr)">
-      ${panel('الطاقة الاستيعابية — الفعلي والإسقاط الخطي',
-        'الخط المتصل = مسجّل فعلياً · المتقطع = امتداد خطي · الذهبي = المستهدف المعتمد',
-        chartBody('c-proj'), {tag:TAG.calc})}
-      <div class="stack">
-        ${panel('', '', `<div class="note">
-          <b>قاعدة الاحتساب المعلنة:</b> ${esc(F.rule)}
-          <br><br>هذا امتداد حسابي لوتيرة سابقة وليس نموذجاً تنبؤياً معتمداً: لا يأخذ في الحسبان
-          الموسمية ولا أثر المبادرات ولا الطاقة قيد الإنشاء. كل قيمة في هذا المشهد موسومة
-          «قيمة محتسبة» لتمييزها عن الأرقام المسجلة في المصدر.
-        </div>`, {cls:'bare'})}
-        ${panel('السيناريوهات ونطاقات الثقة', 'سيناريو متحفظ وأساسي ومتفائل بنطاقات ثقة',
-          noData('scenarios'), {tag:TAG.none})}
-      </div>
-    </div>`;
-
-  const c = chart('c-proj');
-  c && c.setOption(base({
-    tooltip:Object.assign({}, TT, {trigger:'axis', formatter:ps => {
-      const p = ps.find(x => x.value != null);
-      if(!p) return '';
-      const isProj = p.seriesName === 'إسقاط خطي';
-      return ttHead(esc(p.name) + (isProj ? ' — إسقاط' : '')) +
-        ttRow('الطاقة الاستيعابية', fmt(p.value), p.color) +
-        ttRow('نسبة تغطية الطلب', pc(p.value/D.totals.demand,2)) +
-        ttRow('من المستهدف', pc(p.value/target,0));
-    }}),
-    legend:{data:['مسجّل فعلياً','إسقاط خطي'], bottom:0,
-      textStyle:{color:C.mut, fontSize:11, fontFamily:'Cairo'}, itemWidth:14, itemHeight:10, itemGap:16},
-    grid:{top:24, right:54, bottom:48, left:20, containLabel:true},
-    xAxis:catX(labels, {axisLabel:{color:C.mut, fontSize:9, fontFamily:'Cairo', interval:2, rotate:38}}),
-    yAxis:valY(axK, {max:niceMax(Math.max(F.capacityIn24, target)*1.06)}),
-    series:[
-      {name:'مسجّل فعلياً', type:'line', color:C.accent, smooth:false, symbol:'circle', symbolSize:4,
-       lineStyle:{width:2.6}, areaStyle:{color:'rgba(14,107,57,.08)'}, data:actual, connectNulls:false},
-      {name:'إسقاط خطي', type:'line', color:C.info, smooth:false, symbol:'none',
-       lineStyle:{width:2.2, type:'dashed'}, data:projected, connectNulls:true,
-       markLine:{silent:true, symbol:'none', lineStyle:{color:C.gold, type:'dashed', width:1.8},
-         data:[{yAxis:target, label:{formatter:`المستهدف ${fmt(target)}`, color:C.gold, fontSize:10,
-           fontFamily:'Cairo', position:'insideStartTop', rotate:0}}]}}
-    ]
-  }));
-}
-
-/* ---------------- 7.1 سجل المصادر ---------------- */
-const SS_CLASS = {'معتمد':'st-ok', 'أولي':'st-warn', 'يحتاج مراجعة':'st-warn', 'غير محدد':'st-late'};
-function sc_sources(host){
-  const SRC = D.sources;
-  const byStatus = {};
-  SRC.forEach(s => { byStatus[s.status] = (byStatus[s.status]||0)+1; });
-  const known = SRC.filter(s => s.owner && !s.owner.includes('غير محدد')).length;
-
-  host.innerHTML = `
-    ${rail([
-      railCell('مجموعات البيانات', fmt(SRC.length), 'مجموعة', 'وفق سجل المصادر في المصنّف'),
-      railCell('محددة الجهة المنتجة', fmt(known), 'مجموعة',
-        `${fmt(SRC.length-known)} مجموعة جهتها غير محددة بعد`),
-      railCell('حالة المصدر «أولي»', fmt(byStatus['أولي']||0), 'مجموعة', 'تحتاج اعتماداً رسمياً'),
-      railCell('حالة المصدر «غير محدد»', fmt(byStatus['غير محدد']||0), 'مجموعة',
-        '<b class="delta dn">أعلى أولوية للاستكمال</b>')
-    ])}
-    <div class="sc-body g-32" style="grid-template-rows:minmax(0,1fr)">
-      <div class="stack">
-        ${panel('حالة المصادر', 'توزيع مجموعات البيانات حسب حالة اعتماد المصدر',
-          chartBody('c-srcstat'), {tag:TAG.real})}
-        ${panel('', '', `<div class="note">
-          <b>مبدأ الفصل:</b> تصنيف المؤشر داخل اللوحة لا يعني أن جهة واحدة تنتج كل بياناته.
-          الإدارة العامة للتراخيص مسؤولة عن <b>رخص البناء فقط</b>؛ أما الرخص التشغيلية والطاقة
-          الاستيعابية وأنواع المساكن فلا تُنسب إليها، وجهتها المنتجة تحتاج تحديداً.
-        </div>`, {cls:'bare'})}
-      </div>
-      ${panel('سجل مصادر البيانات', 'المرجع الحاكم لملكية كل مجموعة بيانات', `
-        <div class="tw"><table>
-          <thead><tr><th>البند</th><th style="width:120px">القسم في اللوحة</th>
-            <th style="width:180px">الجهة المنتجة</th><th style="width:110px">حالة المصدر</th></tr></thead>
-          <tbody>${SRC.map(s => `<tr data-src="${s.id}" style="cursor:pointer">
-            <td class="nm">${esc(s.item)}</td>
-            <td style="color:var(--mut)">${esc(s.section)}</td>
-            <td style="color:${s.owner && s.owner.includes('غير محدد') ? 'var(--faint)' : 'var(--ink2)'}">${esc(s.owner)}</td>
-            <td><span class="st ${SS_CLASS[s.status]||'st-wait'}">${esc(s.status)}</span></td></tr>`).join('')}
-          </tbody></table></div>`, {tag:TAG.real})}
-    </div>`;
-
-  host.querySelectorAll('[data-src]').forEach(r => {
-    r.onclick = () => {
-      const s = SRC.find(x => x.id === r.dataset.src);
-      openDrawer(esc(s.item), esc(s.section),
-        drSec('الملكية') +
-        fld('الجهة المنتجة', esc(s.owner)) +
-        fld('المصدر', esc(s.source || '—')) +
-        fld('حالة المصدر', `<span class="st ${SS_CLASS[s.status]||'st-wait'}">${esc(s.status)}</span>`) +
-        drSec('الموضع في المصنّف') +
-        fld('الورقة / العمود', esc(s.sheet)) +
-        fld('القسم في اللوحة', esc(s.section)) +
-        (s.notes ? `<div class="note" style="margin-top:16px">${esc(s.notes)}</div>` : ''));
-    };
-  });
-
-  const order = ['معتمد','أولي','يحتاج مراجعة','غير محدد'].filter(k => byStatus[k]);
-  const col = {'معتمد':C.ok, 'أولي':C.warn, 'يحتاج مراجعة':C.warn, 'غير محدد':C.bad};
-  const c = chart('c-srcstat');
-  c && c.setOption(base({
-    tooltip:Object.assign({}, TT, {trigger:'item', formatter:p =>
-      ttHead(esc(p.name)) + ttRow('عدد مجموعات البيانات', fmt(p.value), p.color) +
-      ttRow('من الإجمالي', pc(p.value/SRC.length,0))}),
-    grid:{top:10, right:60, bottom:18, left:20, containLabel:true},
-    xAxis:barX(v => fmt(v), {max:Math.max(...order.map(k => byStatus[k]))*1.3}),
-    yAxis:barY(order, 84),
-    series:[{type:'bar', barWidth:'52%', barMaxWidth:38,
-      data:order.map(k => ({value:byStatus[k], itemStyle:{color:col[k], borderRadius:[5,0,0,5]}})),
-      label:LBL(p => fmt(p.value))}]
-  }));
-}
-
-/* ---------------- 7.2 فجوات البيانات ---------------- */
-function sc_gaps(host){
-  const G = D.gaps;
-  const bySec = {};
-  G.forEach(g => { (bySec[g.section] = bySec[g.section] || []).push(g); });
-  host.innerHTML = `
-    ${rail([
-      railCell('رسوم معطّلة لعدم توفر بيانات', fmt(G.length), 'رسماً',
-        'معروضة في مواضعها بحالة «لا تتوفر بيانات فعلية»'),
-      railCell('الأقسام المتأثرة', fmt(Object.keys(bySec).length), 'أقسام',
-        Object.keys(bySec).join(' · ')),
-      railCell('أعلى قسم تأثراً', fmt(Math.max(...Object.values(bySec).map(a => a.length))), 'رسوم',
-        esc(Object.entries(bySec).sort((a,b) => b[1].length - a[1].length)[0][0])),
-      railCell('قيم تقديرية معروضة', '0', 'قيمة',
-        '<b class="delta up">لم يُعرض أي رقم غير مستند إلى المصدر</b>')
-    ])}
-    <div class="sc-body" style="grid-template-rows:minmax(0,1fr)">
-      ${panel('سجل فجوات البيانات', 'ما ينقص لتفعيل كل رسم — مرتباً حسب القسم', `
-        <div class="scroll">
-          ${Object.entries(bySec).map(([s, arr]) => `
-            <div class="dr-sec" style="margin-top:14px">${esc(s)} · ${cnt(arr.length,'رسم واحد','رسمان','رسوم','رسماً')}</div>
-            ${arr.map(g => `<div class="gap-row">
-              <div><div class="gr-t">${esc(g.title)}</div><div class="gr-s">المشهد: ${esc(sceneTitle(g.scene))}</div></div>
-              <div class="gr-n">${esc(g.need)}</div>
-              <div><button class="nv-btn" data-goto="${esc(g.scene)}" style="padding:6px 12px;font-size:11px">
-                الانتقال للمشهد</button></div>
-            </div>`).join('')}
-          `).join('')}
-        </div>`, {tag:TAG.real})}
-    </div>`;
-
-  host.querySelectorAll('[data-goto]').forEach(b => {
-    b.onclick = () => { const i = sceneIdx(b.dataset.goto); if(i >= 0) goScene(i); };
-  });
-}
-const sceneTitle = id => { const s = SCENES.find(x => x.id === id); return s ? s.title : id; };
 
 /* ============================================================
-   التنقل بين المشاهد
+   TAB 2 — التراخيص
    ============================================================ */
-function buildTabs(){
-  el('tabs').innerHTML = TABS.map((t,i) =>
-    `<button class="tab-btn" data-tab="${t.id}" role="tab"><span class="tnum">${i+1}</span>${esc(t.name)}</button>`).join('');
-  el('tabs').querySelectorAll('[data-tab]').forEach(b => {
-    b.onclick = () => { const sc = tabScenes(b.dataset.tab); goScene(sceneIdx(sc[0].id)); };
-  });
+function licWin(){ return D.licenses.filter(r=>inWin(r.month)&&secOK(r.sector)&&typOK(r.type)); }
+function kpiCard(label,valHTML,delta,cls,ico){
+  return `<div class="card kpi">${ico?`<div class="k-ico">${ico}</div>`:''}
+    <div class="k-label">${label}</div><div class="k-val">${valHTML}</div>
+    ${delta?`<span class="k-delta ${cls||'flat'}">${delta}</span>`:''}</div>`;
 }
-function buildDots(){
-  el('dots').innerHTML = TABS.map(t => {
-    const sc = tabScenes(t.id);
-    return `<div class="dgroup" data-tab="${t.id}">
-      <span class="dg-l">${esc(t.name)}</span>
-      ${sc.map(s => `<button class="dot" data-scene="${s.id}" role="tab"
-        title="${esc(s.title)}" aria-label="${esc(s.title)}"></button>`).join('')}
+function renderT2(){
+  const rows=licWin();
+  const agg=key=>rows.reduce((a,r)=>a+r[key],0);
+  const constr=agg('constr'), ops=agg('ops'), bedsAdded=agg('beds_added');
+  const sf=scopeFacts();
+  const L=D.licDelta;
+  /* النمو مقابل خط الأساس المعلن في ورقة 06 (أغسطس 2025) */
+  const baseTot=L.constr.baseline+L.ops.baseline, curTot=L.constr.current+L.ops.current;
+  const yoy=baseTot? (curTot/baseTot-1)*100 : 0;
+
+  el('t2-kpis').innerHTML =
+    kpiCard('إجمالي الأسرّة المرخصة',`<span id="k2-beds">0</span><small>سرير</small>`,
+      `${ltr('+'+fmt1(D.facts.bedsYoY)+'٪')} مقابل خط الأساس`,'up')+
+    kpiCard('نمو الرخص مقابل خط الأساس',`<span id="k2-yoy">0</span><small>٪</small>`,
+      `${fmt(baseTot)} ← ${fmt(curTot)} رخصة`,'up')+
+    kpiCard('رخص البناء الصادرة',`<span id="k2-constr">0</span><small>رخصة</small>`,
+      `خلال ${nounCount(rows.length,'شهر','أشهر')} مسجلة`,'flat')+
+    kpiCard('رخص التشغيل الصادرة',`<span id="k2-ops">0</span><small>رخصة</small>`,
+      `خلال ${nounCount(rows.length,'شهر','أشهر')} مسجلة`,'flat')+
+    kpiCard('الطاقة المضافة خلال الفترة',`<span id="k2-added">0</span><small>سرير</small>`,
+      `الرصيد التراكمي ${fmt(D.meta.totals.beds)}`,'up')+
+    kpiCard('متوسط الإضافة الشهرية',`<span id="k2-avg">0</span><small>سرير</small>`,
+      `محسوب على ${nounCount(D.foresight.activeMonths,'شهر بإضافة فعلية','أشهر بإضافة فعلية')}`,'flat')+
+    naCard('متوسط مدة إصدار الرخصة')+
+    naCard('الطلبات المستلمة ونسبة إغلاقها');
+  countUp(el('k2-beds'),sf.beds); countUp(el('k2-yoy'),yoy,{decimals:1});
+  countUp(el('k2-constr'),constr); countUp(el('k2-ops'),ops);
+  countUp(el('k2-added'),bedsAdded); countUp(el('k2-avg'),D.foresight.avgBeds);
+
+  /* monthly aggregation */
+  const mons=winMonths();
+  const byM=mons.map(m=>{
+    const rs=rows.filter(r=>r.month===m);
+    return {m,lbl:MLBL[m],constr:rs.reduce((a,r)=>a+r.constr,0),ops:rs.reduce((a,r)=>a+r.ops,0),
+      dc:rs.length?rs.reduce((a,r)=>a+r.days_constr,0)/rs.length:0,
+      do_:rs.length?rs.reduce((a,r)=>a+r.days_ops,0)/rs.length:0};
+  });
+  const trend=chart('c-lictrend');
+  trend.setOption(base({
+    grid:{containLabel:true,left:8,right:8,top:38,bottom:4},
+    legend:{top:0,icon:'circle',itemWidth:9,textStyle:{fontFamily:'Cairo',fontSize:11}},
+    tooltip:Object.assign({},TT,{trigger:'axis',axisPointer:{type:'cross',label:{fontFamily:'Cairo'}},
+      formatter:ps=>`<b>${ps[0].name}</b>`+ps.map(p=>ttRow(p.seriesName,fmt(p.value),p.color)).join('')+ttRow('','انقر لعرض تفاصيل الشهر')}),
+    xAxis:Object.assign({},AXC,{data:byM.map(r=>r.lbl),inverse:true,axisLabel:Object.assign({},AXC.axisLabel,{rotate:S.range===24?38:0})}),
+    yAxis:AXVY,
+    series:[
+      {name:'رخص البناء',type:'line',data:byM.map(r=>r.constr),smooth:.35,symbol:'circle',symbolSize:7,
+        lineStyle:{width:2,color:C.teal},itemStyle:{color:C.teal,borderColor:'#fff',borderWidth:2},areaStyle:{color:C.teal,opacity:.1}},
+      {name:'رخص التشغيل',type:'line',data:byM.map(r=>r.ops),smooth:.35,symbol:'circle',symbolSize:7,
+        lineStyle:{width:2,color:C.gold},itemStyle:{color:C.gold,borderColor:'#fff',borderWidth:2},areaStyle:{color:C.gold,opacity:.1}},
+    ],
+  }));
+  reClick(trend,p=>{
+    const row=D.licenses.find(r=>r.month_ar===byM[p.dataIndex].lbl); if(!row)return;
+    openDrawer(`تفاصيل ${row.month_ar}`,'الإصدار الشهري — مستوى المدينة',
+      fld('رخص البناء الجديدة',fmt(row.constr))+
+      fld('الرخص التشغيلية الجديدة',fmt(row.ops))+
+      fld('الطاقة الاستيعابية المضافة',fmt(row.beds_added)+' سرير')+
+      fld('رصيد رخص البناء التراكمي',fmt(row.cum_constr))+
+      fld('رصيد الرخص التشغيلية التراكمي',fmt(row.cum_ops))+
+      fld('رصيد الطاقة التراكمي',fmt(row.cum_beds)+' سرير')+
+      fldNA('الطلبات المستلمة والمغلقة')+
+      fldNA('متوسط مدة الإصدار')+
+      `<div class="dr-note">المصدر يسجل الإصدار الشهري على مستوى المدينة ولا يفصّله على القطاعات البلدية.</div>`);
+  });
+
+  /* by sector grouped */
+  /* الرصيد القطاعي من ورقة 08 — لقطة حالية لا سلسلة زمنية */
+  const bySec=D.licSector.filter(r=>secOK(r.name)).map(r=>({s:r.name,c:r.constr,o:r.ops,b:r.beds}));
+  const licsec=chart('c-licsec');
+  licsec.setOption(base({
+    grid:{containLabel:true,left:8,right:8,top:30,bottom:2},
+    legend:{top:0,icon:'circle',itemWidth:9,textStyle:{fontFamily:'Cairo',fontSize:11}},
+    tooltip:Object.assign({},TT,{trigger:'axis',axisPointer:{type:'shadow'},
+      formatter:ps=>`<b>${bySec[ps[0].dataIndex].s}</b>`+ps.map(p=>ttRow(p.seriesName,fmt(p.value),p.color)).join('')}),
+    xAxis:Object.assign({},AXC,{data:bySec.map(r=>r.s.replace(/^(ال)?قطاع /,'')),inverse:true}),
+    yAxis:AXVY,
+    series:[
+      {name:'رخص البناء',type:'bar',data:bySec.map(r=>r.c),barMaxWidth:18,itemStyle:{color:C.teal,borderRadius:[6,6,0,0]}},
+      {name:'رخص التشغيل',type:'bar',data:bySec.map(r=>r.o),barMaxWidth:18,itemStyle:{color:C.gold,borderRadius:[6,6,0,0]}},
+    ],
+  }));
+  reClick(licsec,p=>{
+    const r=bySec[p.dataIndex];
+    const cap=D.capSector.find(x=>x.name===r.s)||{};
+    openDrawer(r.s,'رصيد التراخيص الحالي — ورقة 08',
+      fld('رخص البناء',fmt(r.c))+
+      fld('الرخص التشغيلية',fmt(r.o))+
+      fld('إجمالي الرخص',fmt(r.c+r.o))+
+      fld('الطاقة الاستيعابية',fmt(r.b)+' سرير')+
+      fld('العمالة (الطلب)',fmt(cap.demand))+
+      fld('نسبة التغطية',fmt1(cap.cov)+'٪')+
+      fldNA('الطلبات ومدة الإصدار')+
+      `<div class="dr-note">رخص البناء مصدرها الإدارة العامة للتراخيص؛ أما الرخص التشغيلية والطاقة الاستيعابية فجهتها المنتجة غير محددة في المصدر بعد.</div>`);
+  });
+
+  /* ops by type donut — click filters */
+  const byType=TYPES.map(t=>({t,v:(D.licType.find(x=>x.name===t)||{ops:0}).ops}));
+  const lt=chart('c-lictype');
+  lt.setOption(base({
+    tooltip:Object.assign({},TT,{trigger:'item',formatter:p=>`<b>${p.name}</b>${ttRow('رخص التشغيل',fmt(p.value),p.color)}${ttRow('النسبة',p.percent+'٪')}${ttRow('','انقر للتصفية')}`}),
+    legend:{bottom:0,icon:'circle',itemWidth:9,textStyle:{fontFamily:'Cairo',fontSize:11}},
+    series:[{type:'pie',radius:['50%','74%'],center:['50%','44%'],
+      itemStyle:{borderColor:'#fff',borderWidth:2,borderRadius:6},
+      label:{show:true,formatter:p=>`${Math.round(p.percent)}٪`,fontFamily:'IBM Plex Sans Arabic',fontWeight:'bold',fontSize:12,color:C.ink},
+      data:byType.map(x=>({name:x.t,value:x.v,itemStyle:{color:TYPE_COLORS[x.t],opacity:S.types.size&&!S.types.has(x.t)?0.35:1}})),
+    }],
+  }));
+  reClick(lt,p=>{ if(S.types.has(p.name)) S.types.delete(p.name); else {S.types.clear(); S.types.add(p.name);} refresh(); });
+
+  /* مسار الطلبات ومدة الإصدار — غير موجودين في المصدر */
+  noData('c-funnel','licRequests');
+  noData('c-spark1','licDays');
+  noData('c-spark2','licDays');
+  el('spark1-delta').innerHTML=NA_CHIP; el('spark1-delta').className='';
+  el('spark2-delta').innerHTML=NA_CHIP; el('spark2-delta').className='';
+
+  /* monthly table */
+  /* ord = مفتاح ترتيب رقمي (YYYYMM) حتى يفرز عمود الشهر زمنياً لا أبجدياً */
+  T2ROWS=D.licenses.filter(r=>inWin(r.month)).map(r=>({
+    ord:+r.month.replace('-',''), lbl:r.month_ar,
+    c:r.constr, o:r.ops, b:r.beds_added, cb:r.cum_beds, co:r.cum_ops
+  }));
+  licTable=makeTable('tbl-lic',[
+    {k:'ord',l:'الشهر',f:(v,r)=>r.lbl,sort:true},
+    {k:'c',l:'رخص البناء',f:fmt,sort:true},{k:'o',l:'رخص التشغيل',f:fmt},
+    {k:'b',l:'الطاقة المضافة',f:fmt},
+    {k:'co',l:'الرصيد التراكمي للرخص',f:fmt},{k:'cb',l:'الرصيد التراكمي للطاقة',f:fmt},
+  ],filterLic(),{sortKey:'ord',desc:true});
+}
+let T2ROWS=[],licTable=null;
+function filterLic(){ const q=S.licSearch.trim();
+  return T2ROWS.filter(r=>!q||r.lbl.includes(q)); }
+function sparkline(id,labels,vals,deltaId){
+  const first=vals[0],last=vals[vals.length-1],improving=last<first;
+  const dEl=el(deltaId);
+  dEl.textContent=`${improving?'▼':'▲'} ${fmt1(Math.abs(last-first))} يوم`;
+  dEl.className='st '+(improving?'st-green':'st-red');
+  const c=chart(id);
+  c.setOption(base({
+    grid:{left:4,right:4,top:8,bottom:4},
+    tooltip:Object.assign({},TT,{trigger:'axis',formatter:ps=>`<b>${ps[0].name}</b>${ttRow('المدة',fmt1(ps[0].value)+' يوم',ps[0].color)}`}),
+    xAxis:Object.assign({},AXC,{data:labels,inverse:true,axisLabel:{show:false},axisLine:{show:false}}),
+    yAxis:{type:'value',show:false,min:v=>v.min*0.9},
+    series:[{type:'line',data:vals,smooth:.4,symbol:'none',
+      lineStyle:{width:2,color:improving?C.teal:C.clay},
+      areaStyle:{color:improving?C.teal:C.clay,opacity:.1},
+      markPoint:{symbol:'circle',symbolSize:8,itemStyle:{color:improving?C.teal:C.clay,borderColor:'#fff',borderWidth:2},
+        data:[{coord:[labels.length-1,last]}],label:{show:false}}}],
+  }));
+}
+
+/* ============================================================
+   TAB 3 — الرقابة والامتثال
+   ============================================================ */
+function inspWin(){ return D.inspections.filter(r=>inWin(r.month)&&secOK(r.sector)); }
+function renderT3(){
+  const rows=inspWin();
+  const visits=rows.reduce((a,r)=>a+r.visits,0), viol=rows.reduce((a,r)=>a+r.violations,0);
+  /* التصفية القطاعية تنطبق على الأرقام القطاعية (ورقة 11) لا على السلسلة الشهرية */
+  const secRows=D.inspSector.filter(r=>secOK(r.name));
+  const secVisits=secRows.reduce((a,r)=>a+r.visits,0);
+  const secViol=secRows.reduce((a,r)=>a+r.violations,0);
+  const nInsp=secRows.reduce((a,r)=>a+r.inspectors,0);
+  const compl=secVisits? (1-secViol/secVisits)*100 : 0;
+  const perInsp=nInsp? secVisits/nInsp : 0;
+
+  el('t3-kpis').innerHTML =
+    kpiCard('الزيارات الرقابية',`<span id="k3-v">0</span>`,'خلال آخر 12 شهراً','flat')+
+    kpiCard('المخالفات المرصودة',`<span id="k3-w">0</span>`,
+      `${fmt1(secVisits?secViol/secVisits*100:0)}٪ من الزيارات`,'flat')+
+    kpiCard('نسبة الامتثال',`<span id="k3-cp">0</span><small>٪</small>`,
+      'زيارات بلا مخالفة ÷ إجمالي الزيارات','up')+
+    kpiCard('عدد المراقبين',`<span id="k3-n">0</span><small>مراقباً</small>`,
+      `${fmt(perInsp)} زيارة لكل مراقب`,'flat')+
+    naCard('الغرامات المحصلة')+
+    naCard('المنشآت المغلقة');
+  countUp(el('k3-v'),secVisits); countUp(el('k3-w'),secViol);
+  countUp(el('k3-cp'),compl,{decimals:1}); countUp(el('k3-n'),nInsp);
+
+  /* map (monitor / hotspot) */
+  const secAgg=name=>{const r=D.inspSector.find(x=>x.name===name)||{};
+    return {v:r.visits||0,w:r.violations||0,i:r.inspectors||0};};
+  el('map2-title').textContent='خريطة الرقابة — القطاعات البلدية';
+  el('map2-sub').textContent='الزيارات والمخالفات لكل قطاع — انقر قطاعاً للتفاصيل';
+  /* لا إحداثيات في المصدر، فلا نقاط منشآت ولا خريطة كثافة */
+  drawMap('map2',{
+    mode:'monitor',
+    sectorTip:s=>{const a=secAgg(s);
+      return `<b>${s}</b>${ttRow('الزيارات الرقابية',fmt(a.v))}${ttRow('المخالفات',fmt(a.w))}${ttRow('المراقبون',fmt(a.i))}${ttRow('معدل المخالفة',fmt1(a.v?a.w/a.v*100:0)+'٪')}`;},
+    onSector:toggleSector,
+    dots:[],
+    metric:s=>(D.inspSector.find(r=>r.name===s)||{violations:0}).violations,
+  });
+  el('map2-legend').innerHTML=
+    `<span class="li"><span class="sw" style="background:${C.teal}"></span>كثافة اللون تعكس عدد المخالفات في القطاع</span>
+     <span class="li" style="margin-inline-start:auto">مخطط توضيحي لترتيب القطاعات — ليس خريطة حدود فعلية</span>`;
+  const sSel=S.sectors.size===1?[...S.sectors][0]:null;
+  const aSel=sSel? secAgg(sSel) : {v:secVisits,w:secViol,i:nInsp};
+  el('map2-side').innerHTML=`
+    <div class="ms-title">${sSel||'كل القطاعات — نظرة عامة'}</div>
+    <div class="ms-stats">
+      <div class="ms-stat"><div class="l">الزيارات الرقابية</div><div class="v">${fmt(aSel.v)}</div></div>
+      <div class="ms-stat"><div class="l">المخالفات المرصودة</div><div class="v">${fmt(aSel.w)}</div></div>
+      <div class="ms-stat"><div class="l">عدد المراقبين</div><div class="v">${fmt(aSel.i)}</div></div>
+      <div class="ms-stat"><div class="l">معدل المخالفة</div><div class="v">${fmt1(aSel.v?aSel.w/aSel.v*100:0)}٪</div></div>
+    </div>
+    <div><b style="font-size:12px">توزيع المخالفات بين القطاعات</b><div class="chart short" id="side-viol"></div></div>
+    <div style="flex:1;min-height:0;display:flex;flex-direction:column">
+      <b style="font-size:12px">أعلى الأحياء تسجيلاً للمخالفات
+        <span class="scope-note" style="margin-inline-start:4px">بيانات عينة</span></b>
+      <div class="tblwrap" style="margin-top:8px;flex:1;min-height:120px" id="side-nb"></div></div>`;
+  const sv=chart('side-viol');
+  const svRows=D.inspSector.map(r=>({s:r.name,w:r.violations}));
+  sv.setOption(base({
+    grid:{containLabel:true,left:44,right:10,top:6,bottom:2},
+    tooltip:Object.assign({},TT,{formatter:p=>`<b>${svRows[p.dataIndex].s}</b>${ttRow('المخالفات',fmt(p.value),p.color)}`}),
+    xAxis:Object.assign({},AXV,{inverse:true}),
+    yAxis:Object.assign({},AXC,{data:svRows.map(r=>r.s.replace(/^(ال)?قطاع /,'')),position:'right'}),
+    series:[{type:'bar',data:svRows.map(r=>({value:r.w,itemStyle:{color:S.sectors.has(r.s)?C.green:C.teal,opacity:S.sectors.size&&!S.sectors.has(r.s)?0.4:1,borderRadius:[6,0,0,6]}})),
+      barMaxWidth:14,label:{show:true,position:'left',formatter:p=>fmt(p.value),fontSize:10,color:C.muted}}],
+  }));
+  reClick(sv,p=>toggleSector(svRows[p.dataIndex].s));
+  makeTable('side-nb',[
+    {k:'name',l:'الحي'},
+    {k:'sector',l:'القطاع',f:v=>(v||'').replace(/^(ال)?قطاع /,'')},
+    {k:'violations',l:'المخالفات',f:fmt,sort:true},
+  ],D.neighborhoods.filter(x=>!S.sectors.size||S.sectors.has(x.sector)),{sortKey:'violations',max:8});
+
+  /* فئات المخالفات — ورقة 12 (أعداد فقط؛ لا غرامات ولا توزيع قطاعي في المصدر) */
+  const catRows=D.violCats.map(c=>({c,v:c.count})).sort((a,b)=>a.v-b.v);
+  const violTot=D.meta.totals.violations||1;
+  const vc=chart('c-violcat');
+  vc.setOption(base({
+    grid:{containLabel:true,left:48,right:14,top:6,bottom:2},
+    tooltip:Object.assign({},TT,{formatter:p=>`<b>${p.name}</b>${ttRow('المخالفات',fmt(p.value),C.teal)}${ttRow('من الإجمالي',(p.value/violTot*100).toFixed(1)+'٪')}${ttRow('','انقر لعرض التفاصيل')}`}),
+    xAxis:Object.assign({},AXV,{inverse:true}),
+    yAxis:Object.assign({},AXC,{data:catRows.map(r=>r.c.name),position:'right',axisLabel:Object.assign({},AXC.axisLabel,{width:185,overflow:'truncate'})}),
+    series:[{type:'bar',data:catRows.map(r=>r.v),barMaxWidth:18,itemStyle:{color:C.teal,borderRadius:[6,0,0,6]},
+      label:{show:true,position:'left',formatter:p=>fmt(p.value),fontSize:10.5,color:C.muted}}],
+  }));
+  reClick(vc,p=>{
+    const cat=catRows[p.dataIndex].c;
+    openDrawer(cat.name,'فئة المخالفة — التفاصيل',
+      fld('عدد المخالفات (آخر 12 شهراً)',fmt(cat.count))+
+      fld('النسبة من إجمالي المخالفات',(cat.count/violTot*100).toFixed(1)+'٪')+
+      fld('الترتيب',`${cat.rank} من ${D.violCats.length}`)+
+      fldNA('إجمالي الغرامات ومتوسطها')+
+      fldNA('التوزيع على القطاعات البلدية')+
+      fldNA('التوزيع حسب حجم المنشأة')+
+      `<div class="dr-note">ورقة 12 في المصدر تسجل عدد المخالفات لكل فئة فقط. إضافة الغرامات والتوزيع القطاعي وحجم المنشأة تفعّل هذه الحقول تلقائياً.</div>`);
+  });
+
+  /* visits vs violations trend */
+  const mons=winMonths();
+  const byM=mons.map(m=>{const rs=rows.filter(r=>r.month===m);
+    return {lbl:MLBL[m],v:rs.reduce((a,r)=>a+r.visits,0),w:rs.reduce((a,r)=>a+r.violations,0)};});
+  const vv=chart('c-vv');
+  vv.setOption(base({
+    grid:{containLabel:true,left:8,right:8,top:38,bottom:4},
+    legend:{top:0,icon:'circle',itemWidth:9,textStyle:{fontFamily:'Cairo',fontSize:11}},
+    tooltip:Object.assign({},TT,{trigger:'axis',formatter:ps=>`<b>${ps[0].name}</b>`+ps.map(p=>ttRow(p.seriesName,fmt(p.value),p.color)).join('')}),
+    xAxis:Object.assign({},AXC,{data:byM.map(r=>r.lbl),inverse:true,axisLabel:Object.assign({},AXC.axisLabel,{rotate:38,fontSize:9.5})}),
+    /* مقياسان: المخالفات نحو 300 مقابل زيارات نحو 1,600 — بمحور واحد يصبح الخطان مسطّحين */
+    yAxis:[AXVY,Object.assign({},AXVY,{position:'left',splitLine:{show:false}})],
+    series:[
+      {name:'الزيارات الرقابية',type:'line',yAxisIndex:0,data:byM.map(r=>r.v),smooth:.35,symbol:'circle',symbolSize:6,
+        lineStyle:{width:2,color:C.teal},itemStyle:{color:C.teal,borderColor:'#fff',borderWidth:2},areaStyle:{color:C.teal,opacity:.08}},
+      {name:'المخالفات المرصودة',type:'line',yAxisIndex:1,data:byM.map(r=>r.w),smooth:.35,symbol:'circle',symbolSize:6,
+        lineStyle:{width:2,color:C.clay},itemStyle:{color:C.clay,borderColor:'#fff',borderWidth:2}},
+    ],
+  }));
+
+  /* المخالفات حسب حجم المنشأة — غير موجودة في المصدر */
+  noData('c-violsme','violBySme');
+
+  /* نسبة الامتثال — محسوبة من الزيارات والمخالفات الفعلية وتطابق القيمة المعلنة */
+  const ring=chart('c-compring');
+  ring.setOption(gaugeOption({name:'نسبة الامتثال',unit:'٪',actual:+compl.toFixed(1),
+    target:88,dir:'أعلى أفضل',max:100}));
+  reClick(ring,null);
+
+  /* قراءات مولّدة من بيانات الفترة */
+  const worst=[...D.inspSector].map(r=>({s:r.name,rate:r.visits?r.violations/r.visits:0}))
+    .sort((a,b)=>b.rate-a.rate)[0];
+  const topCat=[...catRows].sort((a,b)=>b.v-a.v)[0];
+  const topNb=[...D.neighborhoods].sort((a,b)=>b.violations-a.violations)[0];
+  const worstCov=[...D.capSector].sort((a,b)=>a.cov-b.cov)[0];
+  const ic=`<svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 4.5-3.2 7.6-8 9-4.8-1.4-8-4.5-8-9V6l8-3z"/></svg>`;
+  el('t3-insights').innerHTML=[
+    {b:'القطاع الأعلى معدل مخالفات',s:`${worst.s} — ${fmt1(worst.rate*100)}٪ من زياراته تسفر عن مخالفة`},
+    {b:'أكثر فئات المخالفات تكراراً',s:`${topCat.c.name} (${fmt(topCat.v)} مخالفة)`},
+    {b:'أعلى الأحياء تسجيلاً للمخالفات',s:`${topNb.name} — ${fmt(topNb.violations)} مخالفة (بيانات عينة)`},
+    {b:'القطاع الأدنى تغطيةً',s:`${worstCov.name} — ${fmt1(worstCov.cov)}٪ فقط من طلبه مغطّى بأسرّة مرخصة`},
+  ].map(x=>`<div class="mini-ins"><div class="mi-ic">${ic}</div><div><b>${x.b}</b><span>${x.s}</span></div></div>`).join('');
+
+  /* أداء المفتشين فردياً — المصدر يوفر أعدادهم حسب القطاع فقط */
+  noData('c-insp','inspectors');
+  noData('tbl-insp','inspectors');
+
+  el('hot-toggle').style.display='none';
+}
+function colChart3(id,rows){
+  const c=chart(id);
+  c.setOption(base({
+    grid:{containLabel:true,left:8,right:8,top:14,bottom:2},
+    tooltip:Object.assign({},TT,{formatter:p=>`<b>${p.name}</b>${ttRow('المخالفات',fmt(p.value),p.color)}`}),
+    xAxis:Object.assign({},AXC,{data:rows.map(r=>r.n),inverse:true}),
+    yAxis:AXVY,
+    series:[{type:'bar',data:rows.map(r=>({value:r.v,itemStyle:{color:r.col,borderRadius:[6,6,0,0]}})),barMaxWidth:26,
+      label:{show:true,position:'top',formatter:p=>fmt(p.value),fontSize:10,color:C.muted}}],
+  }));
+}
+function inspectorDrawer(i){
+  const rate=i.violations/i.visits;
+  openDrawer(i.name,'ملف أداء المفتش — إجمالي 24 شهراً',
+    fld('القطاع البلدي',i.sector)+
+    fld('عدد الجولات',fmt(i.visits))+
+    fld('المخالفات المحررة',fmt(i.violations))+
+    fld('معدل المخالفات لكل جولة',fmt1(rate))+
+    fld('المسافة المقطوعة',fmt(i.distance)+' كم')+
+    fld('متوسط شهري',fmt(Math.round(i.visits/24))+' جولة / شهر')+
+    fld('التقييم',rate<0.16?'<span class="st st-green">أداء متوازن</span>':rate>0.24?'<span class="st st-amber">تركّز مخالفات مرتفع</span>':'<span class="st st-teal">ضمن المتوسط</span>'));
+}
+
+/* ============================================================
+   TAB 4 — المبادرات
+   ============================================================ */
+function renderT4(){
+  const inis=D.initiatives;
+  const by=st=>inis.filter(i=>i.status===st).length;
+  const horizon=new Date(new Date(D.meta.today).getTime()+90*864e5).toISOString().slice(0,10);
+  const due90=inis.filter(i=>i.end&&i.end>D.meta.today&&i.end<=horizon&&i.status!=='منجزة').length;
+  const maxLate=Math.max(0,...inis.filter(i=>i.overdue!=null).map(i=>i.overdue));
+  el('t4-kpis').innerHTML =
+    kpiCard('إجمالي المبادرات',`<span id="k4-n">0</span>`,'موزعة على 4 أهداف','flat')+
+    kpiCard('منجزة',`<span id="k4-done">0</span>`,'حالة صريحة في المصدر','up')+
+    kpiCard('جاري العمل',`<span id="k4-on">0</span>`,'ضمن الفترة المخططة','up')+
+    kpiCard('متأخرة',`<span id="k4-late">0</span>`,`أقصى تأخر ${fmt(maxLate)} يوماً`,'down')+
+    kpiCard('مستحقة خلال 90 يوماً',`<span id="k4-due">0</span>`,`حتى ${fmtDate(horizon)}`,'flat')+
+    naCard('متوسط نسبة الإنجاز والميزانيات');
+  countUp(el('k4-n'),inis.length); countUp(el('k4-done'),by('منجزة'));
+  countUp(el('k4-on'),by('جاري العمل')); countUp(el('k4-late'),by('متأخرة'));
+  countUp(el('k4-due'),due90);
+
+  /* pillar cards */
+  el('pillar-grid').innerHTML = D.pillars.map(p=>{
+    const ps=inis.filter(i=>i.pillar===p);
+    /* الحلقة تعرض نسبة المبادرات المنجزة — قيمة محسوبة من الحالات الفعلية،
+       وليست متوسط إنجاز (غير موجود في المصدر). */
+    const pavg=Math.round(ps.filter(i=>i.status==='منجزة').length/ps.length*100);
+    const late=ps.filter(i=>i.status==='متأخرة').length;
+    const sel=S.pillar===p;
+    const circ=2*Math.PI*30;
+    return `<div class="card pillar-card${sel?' sel':''}" data-p="${p}">
+      <div class="pc-name">${p}</div>
+      <div class="ring"><svg width="72" height="72">
+        <circle cx="36" cy="36" r="30" fill="none" stroke="#EDF1EE" stroke-width="7"/>
+        <circle class="ring-arc" cx="36" cy="36" r="30" fill="none" stroke="${pavg>=70?C.green2:pavg>=50?C.goldUi:C.amber}" stroke-width="7"
+          stroke-linecap="round" stroke-dasharray="${circ}" stroke-dashoffset="${REDUCED? circ*(1-pavg/100) : circ}"
+          data-off="${circ*(1-pavg/100)}"/></svg>
+        <div class="ring-val">${pavg}٪</div></div>
+      <div class="pc-cap">نسبة المنجزة</div>
+      <div class="pc-meta">${nounCount(ps.length,'مبادرة','مبادرات')} · ${late? `<span style="color:${C.amber}">${late} متأخرة</span>`:'لا تأخر'}</div>
     </div>`;
   }).join('');
-  el('dots').querySelectorAll('[data-scene]').forEach(d => {
-    d.onclick = () => goScene(sceneIdx(d.dataset.scene));
+  els('.pillar-card').forEach(pc=>pc.onclick=()=>{
+    S.pillar = S.pillar===pc.dataset.p? null : pc.dataset.p;
+    els('.pillar-card').forEach(x=>x.classList.toggle('sel',x.dataset.p===S.pillar));
+    el('t4-reset').classList.toggle('show',!!S.pillar);
+    renderIniList();
   });
+  if(!REDUCED) requestAnimationFrame(()=>els('.ring-arc').forEach(a=>{
+    a.style.transition='stroke-dashoffset 1.1s cubic-bezier(.25,.8,.3,1)';
+    a.style.strokeDashoffset=a.dataset.off;
+  }));
+  el('t4-reset').classList.toggle('show',!!S.pillar);
+  renderIniList();
 }
+function renderIniList(){
+  const inis=D.initiatives;
+  const q=S.iniSearch.trim();
+  const list=inis.filter(i=>(!S.pillar||i.pillar===S.pillar)&&(!q||i.name.includes(q)||i.num.includes(q)));
+  el('ini-list-title').textContent = S.pillar? `مبادرات ${S.pillar}` : 'جميع المبادرات';
+  el('ini-list').innerHTML = list.map(i=>`
+    <div class="ini-row" data-id="${i.id}">
+      <div><div class="in"><span class="ini-num">${i.num}</span>${i.name}</div>
+        <div class="own">${i.pillar} — ${i.goalDesc}</div></div>
+      <div class="ini-span">${i.start? fmtDate(i.start):'—'} ← ${i.end? fmtDate(i.end):'—'}</div>
+      <div><span class="st ${STATUS_CHIP[i.status]}">${i.status}</span></div>
+      <div class="ini-date cell-hide">${i.overdue!=null? `<span style="color:${C.amber};font-weight:700">متأخرة ${fmt(i.overdue)} يوماً</span>`:'ضمن الخطة'}</div>
+      <div class="cell-hide na-txt">نسبة الإنجاز غير متوفرة</div>
+    </div>`).join('') || '<div style="padding:24px;text-align:center;color:var(--muted)">لا توجد نتائج مطابقة</div>';
+  els('.ini-row').forEach(r=>r.onclick=()=>initiativeDrawer(D.initiatives.find(i=>i.id===r.dataset.id)));
 
-let lastIdx = -1;
-function goScene(i, force){
-  const n = SCENES.length;
-  i = Math.max(0, Math.min(n-1, i));
-  if(i === S.scene && !force) return;
-  const dir = i > S.scene ? 'next' : 'prev';
-  S.scene = i;
-  S.tab = SCENES[i].tab;
-  renderScene(false, dir);
+  /* gantt by target quarter */
+  const qtr=d=>{const [y,m]=d.split('-').map(Number);return `${y} Q${Math.ceil(m/3)}`;};
+  const quarters=[...new Set(inis.filter(i=>i.end).map(i=>qtr(i.end)))].sort();
+  el('gantt').innerHTML=quarters.map(qt=>{
+    const qs=inis.filter(i=>i.end&&qtr(i.end)===qt&&(!S.pillar||i.pillar===S.pillar));
+    const QN={'1':'الأول','2':'الثاني','3':'الثالث','4':'الرابع'};
+    const [qy,qq]=qt.split(' ');
+    return `<div class="gq"><div class="gq-h">الربع ${QN[qq.replace('Q','')]} ${qy}</div>${
+      qs.map(i=>`<div class="gi ${i.status==='متأخرة'?'st-late':i.status==='منجزة'?'st-done':''}"
+        title="${i.num} · ${i.name} — ${i.status}" data-id="${i.id}">${i.name}</div>`).join('')||'<div style="text-align:center;color:#B8C4BE;font-size:10px">—</div>'
+    }</div>`;
+  }).join('');
+  els('.gi').forEach(g=>g.onclick=()=>initiativeDrawer(D.initiatives.find(i=>i.id===g.dataset.id)));
 }
-
-function renderScene(keep, dir){
-  const sc = SCENES[S.scene];
-  const stage = el('stage');
-
-  /* تخلص من الرسوم السابقة قبل استبدال الحاوية */
-  Object.keys(CH).forEach(k => { try{ CH[k].dispose(); }catch(e){} delete CH[k]; });
-
-  const sec = document.createElement('section');
-  sec.className = 'scene live' + (RM ? '' : (dir === 'prev' ? ' enter-prev' : ' enter-next'));
-  sec.id = 'scene-' + sc.id;
-  sec.innerHTML = `
-    <div class="sc-head">
-      <div class="sh-main">
-        <div class="sc-kick">${esc(sc.kick)}</div>
-        <h2>${esc(sc.title)}</h2>
-        <div class="sh-sub">${esc(sc.sub)}${S.sector ? ` — <b style="color:var(--accent)">${esc(SECNAME())}</b>` : ''}</div>
-      </div>
-      <div class="sc-tools" id="sc-tools"></div>
-    </div>`;
-  stage.innerHTML = '';
-  stage.appendChild(sec);
-
-  const host = document.createElement('div');
-  host.style.cssText = 'flex:1;min-height:0;display:flex;flex-direction:column;gap:14px';
-  sec.appendChild(host);
-  sc.build(host);
-
-  /* تحديث الشريط العلوي والتنقل */
-  el('tabs').querySelectorAll('[data-tab]').forEach(b => b.classList.toggle('on', b.dataset.tab === S.tab));
-  el('dots').querySelectorAll('[data-scene]').forEach(d => d.classList.toggle('on', d.dataset.scene === sc.id));
-  el('dots').querySelectorAll('.dgroup').forEach(g => g.classList.toggle('on', g.dataset.tab === S.tab));
-  el('nv-i').textContent = S.scene + 1;
-  el('nv-n').textContent = SCENES.length;
-  el('nv-title').textContent = sc.title;
-  el('nv-prev').disabled = S.scene === 0;
-  el('nv-next').disabled = S.scene === SCENES.length - 1;
-
-  const act = el('dots').querySelector('[data-scene].on');
-  act && act.scrollIntoView({block:'nearest', inline:'center', behavior:RM?'auto':'smooth'});
-
-  requestAnimationFrame(() => requestAnimationFrame(resizeAll));
-  lastIdx = S.scene;
-}
-
-function setSector(id){
-  S.sector = (S.sector === id) ? '' : id;
-  el('f-sector').value = S.sector;
-  renderScene(true);
+function initiativeDrawer(i){
+  const hasSpan=i.start&&i.end;
+  const t0=hasSpan? new Date(i.start).getTime():0, t1=hasSpan? new Date(i.end).getTime():0;
+  const now=new Date(D.meta.today).getTime();
+  const pos=hasSpan? Math.max(0,Math.min(100,(now-t0)/(t1-t0)*100)) : 0;
+  openDrawer(i.name,`مبادرة رقم ${i.num} — ${i.pillar}`,
+    fld('الهدف',`${i.pillar} — ${i.goalDesc}`)+
+    fld('الحالة',`<span class="st ${STATUS_CHIP[i.status]}">${i.status}</span>`)+
+    fld('الحالة المسجلة في الملف', i.statusInFile? i.statusInFile
+      : '<span class="na-txt">غير مسجلة — محتسبة زمنياً</span>')+
+    (i.overdue!=null? fld('التأخر عن تاريخ الانتهاء',`<span style="color:var(--amber);font-weight:700">${fmt(i.overdue)} يوماً</span>`):'')+
+    fld('تاريخ البدء', i.start? fmtDate(i.start):'<span class="na-txt">غير محدد</span>')+
+    fld('تاريخ الانتهاء', i.end? fmtDate(i.end):'<span class="na-txt">غير محدد</span>')+
+    fld('المدة المخططة', hasSpan? `${fmt((t1-t0)/864e5)} يوماً` : '—')+
+    fldNA('نسبة الإنجاز')+ fldNA('الميزانية')+ fldNA('الجهة المسؤولة')+
+    fldNA('المعلم القادم ومستوى المخاطر')+
+    (hasSpan? `<div class="tl">
+      <div class="tl-track"><div class="tl-today" style="inset-inline-start:${pos}%" title="اليوم"></div></div>
+      <div class="tl-caps"><span>البداية: ${fmtDate(i.start)}</span><span style="color:var(--gold);font-weight:700">▲ اليوم</span><span>الاستحقاق: ${fmtDate(i.end)}</span></div>
+    </div>`:'')+
+    `<div class="dr-note">يسجل المصدر لكل مبادرة الحالة والتواريخ فقط (ورقتا 14 و15). إضافة نسبة الإنجاز والميزانية والجهة المسؤولة تفعّل هذه الحقول تلقائياً.</div>`);
 }
 
 /* ============================================================
-   الإقلاع
+   TAB 5 — مؤشرات الأداء
    ============================================================ */
-function boot(){
-  /* الغلاف */
-  el('cv-img').style.backgroundImage = `url('${IMAGES.cover}')`;
-  countUp(el('cv-demand'), D.totals.demand);
-  countUp(el('cv-supply'), D.totals.supply);
-  el('cv-cov').textContent = pc(D.totals.coverage, 2);
-  el('cv-note').innerHTML =
-    `المصدر: ${esc(D.meta.source)} · فترة العرض: ${esc(D.meta.asOf)} · تاريخ اليوم المرجعي: ${fmtDate(D.meta.today)}<br>` +
-    `الرسوم التي لا يتوفر لها مصدر فعلي معروضة بحالة «لا تتوفر بيانات فعلية» — ` +
-    `وعددها ${cnt(D.gaps.length,'رسم واحد','رسمان','رسوم','رسماً')}، مفصّلة في قسم حوكمة البيانات.`;
-  el('tp-asof').textContent = D.meta.asOf;
-
-  /* التصفية القطاعية */
-  const fs = el('f-sector');
-  D.sectors.forEach(s => {
-    const o = document.createElement('option');
-    o.value = s.id; o.textContent = s.name; fs.appendChild(o);
+function kpiStatus(k){
+  const r = k.dir==='أقل أفضل'? k.target/Math.max(k.actual,0.001) : k.actual/Math.max(k.target,0.001);
+  return r>=0.975? 'green' : r>=0.85? 'amber' : 'red';
+}
+function gaugeOption({name,unit,actual,target,dir,max,compact}){
+  const mx = max || Math.max(dir==='أقل أفضل'? target*2 : target*1.4, actual*1.2);
+  const bands = dir==='أقل أفضل'
+    ? [[target/mx,'#177A5B'],[Math.min(1,target*1.15/mx),'#D68910'],[1,'#C0392B']]
+    : [[target*0.85/mx,'#C0392B'],[target/mx,'#D68910'],[1,'#177A5B']];
+  return base({
+    tooltip:Object.assign({},TT,{formatter:()=>`<b>${name}</b>${ttRow('المتحقق',fmt1(actual)+' '+unit)}${ttRow('المستهدف',fmt1(target)+' '+unit)}${ttRow('الاتجاه',dir)}`}),
+    series:[
+      {type:'gauge',startAngle:205,endAngle:-25,min:0,max:mx,
+        axisLine:{lineStyle:{width:compact?9:13,color:bands.map(b=>[b[0],b[1]+'33'])}},
+        progress:{show:true,width:compact?9:13,itemStyle:{color:kpiStatus({actual,target,dir})==='green'?'#177A5B':kpiStatus({actual,target,dir})==='amber'?'#D68910':'#C0392B'}},
+        pointer:{length:'58%',width:4,itemStyle:{color:C.ink}},anchor:{show:true,size:8,itemStyle:{color:C.ink}},
+        axisTick:{show:false},splitLine:{show:false},
+        axisLabel:{show:false},
+        detail:{valueAnimation:!REDUCED,offsetCenter:[0,'62%'],fontSize:compact?16:21,fontFamily:'IBM Plex Sans Arabic',
+          fontWeight:'bold',color:C.ink,formatter:v=>fmt1(v)},
+        data:[{value:actual}],title:{show:false}},
+    ],
   });
-  fs.onchange = () => { S.sector = fs.value; renderScene(true); };
-
-  buildTabs();
-  buildDots();
-
-  /* أزرار التنقل */
-  el('nv-next').onclick = () => goScene(S.scene + 1);
-  el('nv-prev').onclick = () => goScene(S.scene - 1);
-  el('btn-home').onclick = () => {
-    const cv = el('cover');
-    cv.style.display = '';
-    requestAnimationFrame(() => cv.classList.remove('gone'));
-    el('app').classList.remove('ready');
-  };
-  el('btn-print').onclick = () => print();
-  el('btn-fs').onclick = () => {
-    const b = el('btn-fs');
-    if(!document.fullscreenElement){ document.documentElement.requestFullscreen && document.documentElement.requestFullscreen(); }
-    else { document.exitFullscreen && document.exitFullscreen(); }
-    setTimeout(() => { b.classList.toggle('on', !!document.fullscreenElement); resizeAll(); }, 220);
-  };
-  addEventListener('fullscreenchange', () => {
-    el('btn-fs').classList.toggle('on', !!document.fullscreenElement);
-    setTimeout(resizeAll, 160);
+}
+function renderT5(){
+  const groups=[['kpi-strategic','استراتيجي',false],['kpi-operational','تشغيلي',true]];
+  groups.forEach(([gid,level,compact])=>{
+    const ks=D.kpis.filter(k=>k.level===level).filter(k=>!S.kpiWeak||kpiStatus(k)!=='green');
+    el(gid).innerHTML=ks.map(k=>{
+      const st=kpiStatus(k);
+      const diff=k.dir==='أقل أفضل'? k.target-k.actual : k.actual-k.target;
+      const good=diff>=0;
+      return `<div class="card gauge-card" data-k="${k.id}">
+        <div class="g-name">${k.name}</div>
+        <div class="gauge${compact?' sm':''}" id="g-${k.id}"></div>
+        <div class="g-meta"><span class="gv">${fmt1(k.actual)}</span><span class="gu">${k.unit}</span>
+          <span class="st ${st==='green'?'st-green':st==='amber'?'st-amber':'st-red'}">${ltr((diff>=0?'+':'-')+fmt1(Math.abs(diff)))} مقابل المستهدف</span></div>
+        <div class="c-sub" style="margin:4px 0 0">المستهدف: ${fmt1(k.target)} ${k.unit} · ${k.dir}</div>
+      </div>`;
+    }).join('')||'<div class="card" style="grid-column:1/-1;text-align:center;color:var(--muted)">كل المؤشرات ضمن المستهدف ✓</div>';
+    ks.forEach(k=>{
+      const g=chart('g-'+k.id);
+      g.setOption(gaugeOption({name:k.name,unit:k.unit,actual:k.actual,target:k.target,dir:k.dir,
+        max:k.unit==='٪'?100:null,compact}));
+      reClick(g,null);
+    });
+    els(`#${gid} .gauge-card`).forEach(c=>{
+      c.style.cursor='pointer';
+      c.onclick=()=>kpiDrawer(D.kpis.find(k=>k.id===c.dataset.k));
+    });
   });
-
-  /* الدرج */
-  el('dr-x').onclick = closeDrawer;
-  el('veil').onclick = closeDrawer;
-
-  /* لوحة المفاتيح — في العربية: اليسار = التالي، اليمين = السابق */
-  addEventListener('keydown', e => {
-    if(e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
-    if(!el('cover').classList.contains('gone')){
-      if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); enter(); }
-      return;
-    }
-    switch(e.key){
-      case 'ArrowLeft': case 'PageDown': e.preventDefault(); goScene(S.scene + 1); break;
-      case 'ArrowRight': case 'PageUp': e.preventDefault(); goScene(S.scene - 1); break;
-      case 'Home': e.preventDefault(); goScene(0); break;
-      case 'End': e.preventDefault(); goScene(SCENES.length - 1); break;
-      case 'Escape': closeDrawer(); break;
-      case 'f': case 'F': el('btn-fs').click(); break;
-    }
-  });
-
-  /* الدخول من الغلاف */
-  function enter(target){
-    const cv = el('cover');
-    cv.classList.add('gone');
-    el('app').classList.add('ready');
-    goScene(typeof target === 'number' ? target : 0, true);
-    setTimeout(resizeAll, 420);
-    /* إخفاؤه فعلياً بعد التلاشي: يوقف حركة الغلاف ويمنعه من التأثير في عرض المستند */
-    setTimeout(() => { if(cv.classList.contains('gone')) cv.style.display = 'none'; }, 780);
-  }
-  el('cv-enter').onclick = () => enter(0);
-  el('cv-gov').onclick = () => enter(sceneIdx('s7_sources'));
-
-  /* تحضير المشهد الأول خلف الغلاف حتى يظهر جاهزاً */
-  renderScene(true);
+  el('kpi-weak').classList.toggle('on',S.kpiWeak);
+}
+function kpiCommentary(k){
+  const span=k.target-k.baseline, done=k.progress;
+  if(done==null) return 'لا يمكن احتساب قطع المسافة لعدم اكتمال خط الأساس أو المستهدف في المصدر.';
+  const rem=k.target-k.actual;
+  return `قُطع ${fmt1(done)}٪ من المسافة بين خط الأساس (${fmt1(k.baseline)} ${k.unit}) `+
+    `والمستهدف (${fmt1(k.target)} ${k.unit})، ويتبقى ${fmt1(Math.abs(rem))} ${k.unit} لبلوغه.`;
+}
+function kpiDrawer(k){
+  openDrawer(k.name,`${k.pillar} · ${k.level} · ${k.dir}`,
+    fld('خط الأساس',fmt1(k.baseline)+' '+k.unit)+
+    fld('القيمة الحالية',fmt1(k.actual)+' '+k.unit)+
+    fld('المستهدف',`<span style="color:var(--gold);font-weight:700">${fmt1(k.target)} ${k.unit}</span>`)+
+    fld('قطع المسافة', k.progress!=null? fmt1(k.progress)+'٪' : '—')+
+    fld('المتبقي للمستهدف',fmt1(Math.abs(k.target-k.actual))+' '+k.unit)+
+    fld('الحالة',`<span class="st ${kpiStatus(k)==='green'?'st-green':kpiStatus(k)==='amber'?'st-amber':'st-red'}">${kpiStatus(k)==='green'?'على المسار':kpiStatus(k)==='amber'?'يحتاج متابعة':'حرج'}</span>`)+
+    fld('جودة البيانات',`<span class="st st-amber">${k.quality}</span>`)+
+    fld('المصدر',k.source||'—')+
+    fld('حالة المصدر',k.srcStatus||'—')+
+    `<div class="kpi-meter">
+       <div class="km-track"><div class="km-fill" style="width:${Math.max(0,Math.min(100,k.progress||0))}%"></div></div>
+       <div class="km-caps"><span>خط الأساس ${fmt1(k.baseline)}</span><span style="color:var(--gold);font-weight:700">المستهدف ${fmt1(k.target)}</span></div>
+     </div>
+     <div style="background:var(--tint2);border-radius:10px;padding:10px 14px;font-size:12px;font-weight:600;margin-top:10px">💡 ${kpiCommentary(k)}</div>`+
+    `<div class="dr-note">لا توفر ورقة 16 سلسلة شهرية لهذا المؤشر — خط الأساس والمستهدف من وثيقة خطة العمل، والقيمة الحالية مصنّفة تقديريةً للعرض حتى ترد الفعلية من جهتها.</div>`);
 }
 
-if(document.readyState === 'loading') addEventListener('DOMContentLoaded', boot);
-else boot();
+/* ============================================================
+   TAB 6 — التوقعات المستقبلية
+   ============================================================ */
+function renderT6(){
+  const F=D.projection, PJ=D.foresight;
+  const at6=F[5], atEnd=F[F.length-1];
+  const horizon=new Date(new Date(D.meta.today).getTime()+90*864e5).toISOString().slice(0,10);
+  const due90=D.initiatives.filter(i=>i.end&&i.end>D.meta.today&&i.end<=horizon&&i.status!=='منجزة').length;
+
+  el('t6-kpis').innerHTML =
+    kpiCard('متوسط الإضافة الشهرية',`<span id="k6-a">0</span><small>سرير</small>`,
+      `محسوب على ${nounCount(PJ.activeMonths,'شهر بإضافة فعلية','أشهر بإضافة فعلية')}`,'flat')+
+    kpiCard('الطاقة المتوقعة بعد 6 أشهر',`<span id="k6-s">0</span><small>سرير</small>`,at6.month_ar,'flat')+
+    kpiCard('الفجوة المتوقعة بعد 6 أشهر',`<span id="k6-g">0</span><small>سرير</small>`,
+      'وفق الوتيرة الحالية','down')+
+    kpiCard('المتبقي لبلوغ مستهدف الأسرّة',`<span id="k6-r">0</span><small>سرير</small>`,
+      `المستهدف المعتمد ${fmt(PJ.bedsTarget)}`,'flat')+
+    kpiCard('الزمن اللازم بالوتيرة الحالية',`<span id="k6-m">0</span><small>شهراً</small>`,
+      `أي نحو ${PJ.targetDate}`,'flat')+
+    kpiCard('مبادرات مستحقة خلال 90 يوماً',`<span id="k6-i">0</span>`,`حتى ${fmtDate(horizon)}`,'flat');
+  countUp(el('k6-a'),PJ.avgBeds); countUp(el('k6-s'),at6.supply);
+  countUp(el('k6-g'),at6.gap); countUp(el('k6-r'),PJ.bedsRemaining);
+  countUp(el('k6-m'),PJ.monthsToTarget,{decimals:1}); countUp(el('k6-i'),due90);
+
+  el('fc-sub').innerHTML=`الخط المتصل = مسجّل فعلياً · المتقطع = امتداد خطي محتسب · الذهبي = المستهدف المعتمد (${fmt(PJ.bedsTarget)} سرير)`;
+
+  /* الفعلي ثم الإسقاط — سلسلة واحدة متصلة */
+  const hist=D.licenses;
+  const labels=[...hist.map(r=>r.month_ar),...F.map(r=>r.month_ar)];
+  const actual=[...hist.map(r=>r.cum_beds),...F.map(()=>null)];
+  const proj=[...hist.map((r,i)=>i===hist.length-1?r.cum_beds:null),...F.map(r=>r.supply)];
+  const fc=chart('c-forecast');
+  fc.setOption(base({
+    grid:{containLabel:true,left:64,right:14,top:38,bottom:4},
+    legend:{top:0,icon:'circle',itemWidth:9,textStyle:{fontFamily:'Cairo',fontSize:11},data:['مسجّل فعلياً','إسقاط خطي محتسب']},
+    tooltip:Object.assign({},TT,{trigger:'axis',formatter:ps=>{
+      const p=ps.find(x=>x.value!=null); if(!p) return '';
+      return `<b>${p.name}</b>${ttRow('الطاقة الاستيعابية',fmt(p.value),p.color)}`+
+        ttRow('نسبة تغطية الطلب',(p.value/D.meta.totals.demand*100).toFixed(2)+'٪')+
+        ttRow('من المستهدف',(p.value/PJ.bedsTarget*100).toFixed(0)+'٪');}}),
+    xAxis:Object.assign({},AXC,{data:labels,inverse:true,boundaryGap:false,
+      axisLabel:Object.assign({},AXC.axisLabel,{rotate:34,fontSize:9,interval:1})}),
+    yAxis:Object.assign({},AXVY,{max:Math.ceil(Math.max(PJ.supplyIn12,PJ.bedsTarget)*1.08/50000)*50000}),
+    series:[
+      {name:'مسجّل فعلياً',type:'line',data:actual,smooth:false,symbol:'circle',symbolSize:5,
+        lineStyle:{width:2.4,color:C.teal},itemStyle:{color:C.teal,borderColor:'#fff',borderWidth:2},
+        areaStyle:{color:C.teal,opacity:.09},connectNulls:false},
+      {name:'إسقاط خطي محتسب',type:'line',data:proj,smooth:false,symbol:'none',connectNulls:true,
+        lineStyle:{width:2,color:C.gold,type:'dashed'},itemStyle:{color:C.gold},
+        markLine:{symbol:'none',lineStyle:{color:C.goldUi,width:2,type:'dashed'},
+          label:{formatter:`المستهدف ${fmt(PJ.bedsTarget)}`,fontFamily:'Cairo',color:'#8A6D24',position:'insideStartTop'},
+          data:[{yAxis:PJ.bedsTarget}]}},
+    ],
+  }),true);
+
+  /* الفجوة المتوقعة شهرياً */
+  el('gap-sub').textContent='محتسبة: الطلب المسجّل − الطاقة المتوقعة';
+  const gp=chart('c-gapbar');
+  gp.setOption(base({
+    grid:{containLabel:true,left:8,right:8,top:14,bottom:4},
+    tooltip:Object.assign({},TT,{formatter:p=>`<b>${F[p.dataIndex].month_ar}</b>${ttRow('الفجوة المتوقعة',fmt(p.value)+' سرير',p.color)}${ttRow('نسبة التغطية',fmt1(F[p.dataIndex].cov)+'٪')}`}),
+    xAxis:Object.assign({},AXC,{data:F.map(r=>r.month_ar),inverse:true,axisLabel:Object.assign({},AXC.axisLabel,{rotate:32,fontSize:9})}),
+    yAxis:Object.assign({},AXVY,{min:v=>Math.floor(v.min*0.999),
+      axisLabel:Object.assign({},AXVY.axisLabel,{
+        formatter:v=>(v/1e6).toFixed(2)+' مليون'})}),
+    series:[{type:'bar',data:F.map(r=>r.gap),barMaxWidth:16,
+      itemStyle:{color:C.gold,borderRadius:[5,5,0,0]},label:{show:false}}],
+  }));
+
+  /* ماذا تغيّر — آخر شهرين مسجلين */
+  const posted=hist.filter(r=>(r.constr+r.ops+r.beds_added)>0);
+  const l1=posted[posted.length-1], l0=posted[posted.length-2];
+  const i1=D.inspections.find(r=>r.month===l1.month)||D.inspections[D.inspections.length-1];
+  const i0=D.inspections.find(r=>r.month===l0.month)||D.inspections[D.inspections.length-2];
+  const unposted=hist.filter(r=>r.month>l1.month);
+  const rowsWC=[
+    {l:'الرخص الصادرة (بناء + تشغيل)',v0:l0.constr+l0.ops,v1:l1.constr+l1.ops,goodUp:true},
+    {l:'الطاقة الاستيعابية المضافة',v0:l0.beds_added,v1:l1.beds_added,goodUp:true},
+    {l:'الزيارات الرقابية',v0:i0.visits,v1:i1.visits,goodUp:true},
+    {l:'المخالفات المرصودة',v0:i0.violations,v1:i1.violations,goodUp:false},
+  ];
+  el('fc-changed-sub').textContent=`${l1.month_ar} مقابل ${l0.month_ar}`;
+  el('what-changed').innerHTML=
+    (unposted.length? `<div class="wc-cap">آخر شهر مُرحَّل في المصدر هو ${l1.month_ar}؛ `+
+      `${unposted.map(r=>r.month_ar).join(' و')} لم تُرحَّل بياناته بعد.</div>` : '')+
+    rowsWC.map(r=>{
+      const d=r.v1-r.v0, pct=r.v0? d/r.v0*100 : 0, up=d>=0, good=up===r.goodUp;
+      return `<div class="mini-ins" style="background:#fff">
+        <div class="mi-ic" style="color:${d===0?C.muted:good?C.green2:C.red}">${d===0?'=':up?'▲':'▼'}</div>
+        <div style="flex:1"><b>${r.l}</b><span>${fmt(r.v0)} ← ${fmt(r.v1)}</span></div>
+        <span class="st ${d===0?'st-grey':good?'st-green':'st-red'}">${d===0?'بلا تغيّر':ltr((up?'+':'-')+fmt1(Math.abs(pct))+'٪')}</span></div>`;
+    }).join('');
+
+  /* السيناريوهات والتنبؤات — لا نموذج معتمد في المصدر */
+  el('alert-cards').innerHTML=
+    `<div class="card" style="grid-column:1/-1"><div id="na-predict"></div></div>`;
+  noData('na-predict','forecastScenarios');
+  el('reco-list').innerHTML=
+    `<div class="reco-note">قاعدة الاحتساب المعلنة: ${PJ.rule}<br><br>
+      هذا امتداد حسابي لوتيرة سابقة وليس نموذجاً تنبؤياً معتمداً: لا يأخذ في الحسبان الموسمية
+      ولا أثر المبادرات ولا الطاقة قيد الإنشاء، ويثبّت الطلب عند قيمته المسجلة لعدم توفر سلسلة
+      زمنية له في المصدر.</div>`;
+  els('#scen-chips').forEach&&0;
+  const sc=el('scen-chips');
+  if(sc){ sc.style.display='none';
+    const lbl=sc.previousElementSibling;
+    if(lbl && lbl.classList.contains('f-cap')) lbl.style.display='none'; }
+  S.t6shown=true;
+}
+
+/* ============================================================
+   router + skeleton + wiring
+   ============================================================ */
+const RENDER={t1:renderT1,t2:renderT2,t3:renderT3,t4:renderT4,t5:renderT5,t6:renderT6};
+let skelTimer=null;
+function renderNow(tab){
+  el('tab-'+tab).classList.add('active');
+  RENDER[tab]();
+  syncSecNav();
+  requestAnimationFrame(()=>Object.values(CH).forEach(c=>{try{c.resize();}catch(e){}}));
+}
+function go(tab){
+  if(S.tab===tab){ return; }
+  S.tab=tab;
+  els('.rail-tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
+  els('.tab').forEach(t=>t.classList.remove('active'));
+  clearTimeout(skelTimer);
+  window.scrollTo({top:0,behavior:REDUCED?'auto':'smooth'});
+  if(REDUCED){ renderNow(tab); }
+  else { el('skel').classList.add('show');
+    skelTimer=setTimeout(()=>{ el('skel').classList.remove('show'); renderNow(tab); },460); }
+}
+function renderTab(tab){ renderNow(tab); }
+
+/* ---------- التنقل بين الأقسام: السابق / التالي + نقاط + لوحة المفاتيح ---------- */
+const TABS=['t1','t2','t3','t4','t5','t6'];
+const TAB_NAME={t1:'العرض والطلب',t2:'التراخيص',t3:'الرقابة والامتثال',
+  t4:'المبادرات',t5:'مؤشرات الأداء',t6:'التوقعات المستقبلية'};
+function tabIdx(){ return TABS.indexOf(S.tab); }
+function syncSecNav(){
+  const i=tabIdx(), prev=TABS[i-1], next=TABS[i+1];
+  el('sn-prev').disabled=!prev; el('sn-next').disabled=!next;
+  el('sn-prev-t').textContent=prev? TAB_NAME[prev] : 'بداية اللوحة';
+  el('sn-next-t').textContent=next? TAB_NAME[next] : 'نهاية اللوحة';
+  els('#sn-dots .sn-dot').forEach(d=>{
+    d.classList.toggle('on',d.dataset.t===S.tab);
+    d.setAttribute('aria-selected',d.dataset.t===S.tab);
+  });
+}
+el('sn-dots').innerHTML=TABS.map(t=>
+  `<button class="sn-dot" role="tab" data-t="${t}" title="${TAB_NAME[t]}" aria-label="${TAB_NAME[t]}"></button>`).join('');
+els('#sn-dots .sn-dot').forEach(d=>d.onclick=()=>go(d.dataset.t));
+el('sn-prev').onclick=()=>{const p=TABS[tabIdx()-1]; if(p) go(p);};
+el('sn-next').onclick=()=>{const nx=TABS[tabIdx()+1]; if(nx) go(nx);};
+/* في العربية: السهم الأيسر يتقدم، والأيمن يرجع */
+addEventListener('keydown',e=>{
+  const t=e.target.tagName;
+  if(t==='INPUT'||t==='SELECT'||t==='TEXTAREA') return;
+  if(el('drawer').classList.contains('open')&&e.key==='Escape'){ closeDrawer(); return; }
+  if(e.key==='ArrowLeft'||e.key==='PageDown'){ const nx=TABS[tabIdx()+1]; if(nx){e.preventDefault(); go(nx);} }
+  if(e.key==='ArrowRight'||e.key==='PageUp'){ const p=TABS[tabIdx()-1]; if(p){e.preventDefault(); go(p);} }
+});
+
+els('.rail-tab').forEach(b=>b.onclick=()=>go(b.dataset.tab));
+el('btn-ai').onclick=()=>go('t6');
+/* الصور مضمّنة كـ data URI عبر build.py — لا طلبات خارجية */
+if(typeof IMAGES!=='undefined'){
+  el('hero-img').style.backgroundImage=`url('${IMAGES.cover}')`;
+  el('img-t2').style.backgroundImage=`url('${IMAGES.lic}')`;
+  el('img-t3').style.backgroundImage=`url('${IMAGES.ctl}')`;
+}
+el('img-t2-d').textContent=
+  `خلال اثني عشر شهراً ارتفعت الطاقة الاستيعابية المرخصة من ${fmt(D.licDelta.beds.baseline)} `+
+  `إلى ${fmt(D.licDelta.beds.current)} سرير — بزيادة قدرها ${fmt1(D.licDelta.beds.pct)}٪.`;
+el('img-t3-d').textContent=
+  `${fmt(D.meta.totals.visits)} زيارة رقابية رصدت ${fmt(D.meta.totals.violations)} مخالفة، `+
+  `بنسبة امتثال ${fmt1(D.meta.totals.compliance)}٪.`;
+
+el('updated-at').textContent=D.meta.updated;
+el('page-foot').innerHTML=
+  `المصدر: ${D.meta.source} · فترة العرض: ${D.meta.asOf} · تاريخ اليوم المرجعي: ${fmtDate(D.meta.today)}`+
+  `<br>الرسوم التي لا يتوفر لها مصدر فعلي معروضة بحالة «لا تتوفر بيانات فعلية» — وعددها `+
+  `${nounCount(D.gaps.length,'رسم','رسوم')}؛ يمكن تنزيل سجلها من قائمة التصدير.`;
+
+/* header filters */
+el('g-range').onchange=e=>{S.range=+e.target.value; refresh();};
+el('g-sector').onchange=e=>{S.sectors.clear(); if(e.target.value) S.sectors.add(e.target.value); refresh();};
+el('g-type').onchange=e=>{S.types.clear(); if(e.target.value) S.types.add(e.target.value); refresh();};
+el('g-reset').onclick=resetAll;
+el('t1-reset').onclick=()=>{S.collar=null;S.sectors.clear();refresh();};
+el('t4-reset').onclick=()=>{S.pillar=null; renderT4();};
+D.sectors.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;el('g-sector').append(o);});
+
+/* filter bars (tabs 2/3) */
+['fb2','fb3'].forEach(fb=>{
+  const bar=el(fb);
+  bar.querySelector('[data-role="sectors"]').innerHTML=D.sectors.map(s=>`<button class="pill" data-v="${s}">${s.replace(/^(ال)?قطاع /,'')}</button>`).join('');
+  bar.querySelector('[data-role="types"]').innerHTML=TYPES.map(t=>`<button class="pill" data-v="${t}">${t}</button>`).join('');
+  bar.querySelectorAll('[data-role="range"] .pill').forEach(p=>p.onclick=()=>{S.range=+p.dataset.v; refresh();});
+  bar.querySelectorAll('[data-role="sectors"] .pill').forEach(p=>p.onclick=()=>{
+    S.sectors.has(p.dataset.v)? S.sectors.delete(p.dataset.v):S.sectors.add(p.dataset.v); refresh();});
+  bar.querySelectorAll('[data-role="types"] .pill').forEach(p=>p.onclick=()=>{
+    S.types.has(p.dataset.v)? S.types.delete(p.dataset.v):S.types.add(p.dataset.v); refresh();});
+  bar.querySelector('[data-role="reset"]').onclick=()=>{S.sectors.clear();S.types.clear();S.range=12;refresh();};
+});
+
+/* hotspot toggle + weak KPIs + scenario */
+el('hot-toggle').onclick=()=>{S.hotspot=!S.hotspot; renderT3();};
+el('kpi-weak').onclick=()=>{S.kpiWeak=!S.kpiWeak; renderT5();};
+els('#scen-chips .pill').forEach(p=>p.onclick=()=>{
+  S.scenario=p.dataset.v;
+  els('#scen-chips .pill').forEach(x=>x.classList.toggle('on',x.dataset.v===S.scenario));
+  renderT6();
+});
+
+/* searches — redraw the target table/list only */
+el('fac-search').oninput=e=>{S.facSearch=e.target.value; if(facTable) facTable.redraw(filterFacs());};
+el('lic-search').oninput=e=>{S.licSearch=e.target.value; if(licTable) licTable.redraw(filterLic());};
+el('ini-search').oninput=e=>{S.iniSearch=e.target.value; renderIniList();};
+
+/* export */
+el('btn-export').onclick=e=>{e.stopPropagation(); el('export-menu').classList.toggle('open');};
+document.addEventListener('click',()=>el('export-menu').classList.remove('open'));
+function dlCSV(name,head,rows){
+  const bom='﻿';
+  const csv=bom+[head.join(','),...rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(','))].join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+  a.download=name; a.click(); URL.revokeObjectURL(a.href);
+}
+els('#export-menu button').forEach(b=>b.onclick=()=>{
+  const x=b.dataset.x;
+  if(x==='print') window.print();
+  if(x==='sec') dlCSV('sectors.csv',
+    ['القطاع','الطلب','الطاقة المرخصة','الفجوة','نسبة التغطية٪','رخص البناء','الرخص التشغيلية','المراقبون','الزيارات','المخالفات'],
+    D.capSector.map(r=>{const c=D.inspSector.find(x=>x.name===r.name)||{};
+      return [r.name,r.demand,r.beds,r.gap,r.cov.toFixed(2),r.buildLic,r.opLic,c.inspectors,c.visits,c.violations];}));
+  if(x==='kpi') dlCSV('kpis.csv',['المؤشر','الهدف','النوع','الوحدة','خط الأساس','القيمة الحالية','المستهدف','قطع المسافة٪','جودة البيانات'],
+    D.kpis.map(k=>[k.name,k.pillar,k.level,k.unit,k.baseline,k.actual,k.target,k.progress,k.quality]));
+  if(x==='gap') dlCSV('data-gaps.csv',['المفتاح','التبويب','الرسم','المطلوب لتفعيله'],
+    D.gaps.map(g=>[g.key,g.tab,g.title,g.need]));
+});
+
+/* resize */
+let rzT=null;
+addEventListener('resize',()=>{clearTimeout(rzT); rzT=setTimeout(()=>Object.values(CH).forEach(c=>{try{c.resize();}catch(e){}}),150);});
+
+/* boot */
+syncFilterUI();
+renderT1();

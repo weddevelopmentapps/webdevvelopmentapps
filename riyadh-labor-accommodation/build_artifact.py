@@ -1,16 +1,15 @@
 # -*- coding: utf-8 -*-
 """يجمّع artifact.html — نسخة مستقلة تماماً بلا أي طلب خارجي.
 
-مكتبة ECharts والخطوط العربية مضمّنة من vendor/، والصور من assets/ كـ data URI.
+ECharts والخطوط العربية مضمّنة من vendor/، والصور من assets/ كـ data URI.
 الملف محتوى جسم فقط (بلا <html>/<head>/<body>) لأن المضيف يغلّفه.
 """
 import os
 from build import bundle, read, TITLE
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-
 b = bundle()
-fonts = read("vendor/fonts-embedded.css") + "\n" + read("vendor/fonts-light.css")
+fonts = read("vendor/fonts-embedded.css")
 echarts = read("vendor/echarts.min.js")
 
 html = f"""<title>{TITLE}</title>
