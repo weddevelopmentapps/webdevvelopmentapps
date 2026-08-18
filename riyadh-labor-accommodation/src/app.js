@@ -1228,7 +1228,8 @@ addEventListener('keydown',e=>{
 
 els('.rail-tab').forEach(b=>b.onclick=()=>go(b.dataset.tab));
 el('btn-ai').onclick=()=>go('t6');
-/* الصور مضمّنة كـ data URI عبر build.py — لا طلبات خارجية */
+/* الشعار الرسمي والصور مضمّنة كـ data URI عبر build.py — لا طلبات خارجية */
+if(typeof BRAND!=='undefined' && BRAND.mark) el('rail-logo').src=BRAND.mark;
 if(typeof IMAGES!=='undefined'){
   el('hero-img').style.backgroundImage=`url('${IMAGES.cover}')`;
   el('img-t2').style.backgroundImage=`url('${IMAGES.lic}')`;
