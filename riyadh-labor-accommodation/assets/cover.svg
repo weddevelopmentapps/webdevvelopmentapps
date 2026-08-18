@@ -1,0 +1,192 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900">
+<!-- صورة الغلاف: مجمع سكن جماعي مخطط على أطراف مدينة صحراوية عند الأصيل.
+     رسم متجهي مضمّن (لا طلبات خارجية). لاستبدالها بصورة فوتوغرافية فعلية:
+     ضع الملف في assets/cover.jpg وحدّث IMAGES['cover'] في build.py. -->
+<defs>
+  <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%"   stop-color="#EDE4D6"/>
+    <stop offset="42%"  stop-color="#F5EFE4"/>
+    <stop offset="72%"  stop-color="#FAF6EE"/>
+    <stop offset="100%" stop-color="#F7F2E8"/>
+  </linearGradient>
+  <radialGradient id="sun" cx="0.29" cy="0.52" r="0.42">
+    <stop offset="0%"   stop-color="#FFF3DC" stop-opacity="0.95"/>
+    <stop offset="55%"  stop-color="#FBEAD0" stop-opacity="0.42"/>
+    <stop offset="100%" stop-color="#FBEAD0" stop-opacity="0"/>
+  </radialGradient>
+  <linearGradient id="ground" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%"   stop-color="#EFE7D8"/>
+    <stop offset="100%" stop-color="#E4DAC7"/>
+  </linearGradient>
+  <linearGradient id="fg" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%"   stop-color="#E7DECB"/>
+    <stop offset="100%" stop-color="#DCD1BB"/>
+  </linearGradient>
+  <linearGradient id="roofA" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0%" stop-color="#D9D2C2"/><stop offset="100%" stop-color="#C9C1AF"/>
+  </linearGradient>
+  <linearGradient id="faceA" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0%" stop-color="#FBF8F2"/><stop offset="100%" stop-color="#EDE7DA"/>
+  </linearGradient>
+  <linearGradient id="faceB" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0%" stop-color="#EFE9DC"/><stop offset="100%" stop-color="#DFD7C6"/>
+  </linearGradient>
+  <linearGradient id="haze" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#F7F2E8" stop-opacity="0.85"/>
+    <stop offset="100%" stop-color="#F7F2E8" stop-opacity="0"/>
+  </linearGradient>
+
+  <!-- وحدة سكنية: واجهة بشبكة نوافذ ومظلات أفقية -->
+  <symbol id="blk" viewBox="0 0 200 96" preserveAspectRatio="none">
+    <rect x="0" y="10" width="200" height="86" fill="url(#faceA)"/>
+    <rect x="0" y="4"  width="200" height="9"  fill="url(#roofA)"/>
+    <g fill="#B9C3BA" opacity="0.62">
+      <rect x="12" y="24" width="17" height="12" rx="1.5"/><rect x="41" y="24" width="17" height="12" rx="1.5"/>
+      <rect x="70" y="24" width="17" height="12" rx="1.5"/><rect x="99" y="24" width="17" height="12" rx="1.5"/>
+      <rect x="128" y="24" width="17" height="12" rx="1.5"/><rect x="157" y="24" width="17" height="12" rx="1.5"/>
+      <rect x="12" y="49" width="17" height="12" rx="1.5"/><rect x="41" y="49" width="17" height="12" rx="1.5"/>
+      <rect x="70" y="49" width="17" height="12" rx="1.5"/><rect x="99" y="49" width="17" height="12" rx="1.5"/>
+      <rect x="128" y="49" width="17" height="12" rx="1.5"/><rect x="157" y="49" width="17" height="12" rx="1.5"/>
+      <rect x="12" y="74" width="17" height="12" rx="1.5"/><rect x="41" y="74" width="17" height="12" rx="1.5"/>
+      <rect x="70" y="74" width="17" height="12" rx="1.5"/><rect x="99" y="74" width="17" height="12" rx="1.5"/>
+      <rect x="128" y="74" width="17" height="12" rx="1.5"/><rect x="157" y="74" width="17" height="12" rx="1.5"/>
+    </g>
+    <rect x="0" y="41" width="200" height="3" fill="#CFC7B6" opacity="0.85"/>
+    <rect x="0" y="66" width="200" height="3" fill="#CFC7B6" opacity="0.85"/>
+    <rect x="0" y="91" width="200" height="5" fill="#C6BDA9" opacity="0.7"/>
+  </symbol>
+
+  <!-- نخلة -->
+  <symbol id="plm" viewBox="0 0 60 100">
+    <path d="M29 100 L29 44 Q30 40 31.5 44 L31.5 100Z" fill="#7E7256"/>
+    <g fill="#5E7A5C" opacity="0.9">
+      <path d="M30 44 Q12 34 3 40 Q14 30 30 41Z"/>
+      <path d="M30 44 Q48 34 57 40 Q46 30 30 41Z"/>
+      <path d="M30 43 Q17 26 9 20 Q24 26 31 40Z"/>
+      <path d="M30 43 Q43 26 51 20 Q36 26 29 40Z"/>
+      <path d="M30 42 Q28 24 30 12 Q34 26 32 42Z"/>
+    </g>
+  </symbol>
+</defs>
+
+<!-- السماء -->
+<rect width="1600" height="900" fill="url(#sky)"/>
+<rect width="1600" height="900" fill="url(#sun)"/>
+
+<!-- الأفق البعيد: هضاب -->
+<path d="M0 388 L150 372 L300 382 L470 362 L640 379 L820 366 L1010 381 L1200 369 L1400 380 L1600 371 L1600 420 L0 420Z"
+      fill="#E0D9CB" opacity="0.75"/>
+
+<!-- أفق المدينة البعيد -->
+<g fill="#D5D8D0" opacity="0.62">
+  <rect x="1042" y="318" width="17" height="72"/><rect x="1066" y="296" width="13" height="94"/>
+  <rect x="1086" y="330" width="21" height="60"/><rect x="1114" y="272" width="11" height="118"/>
+  <path d="M1119.5 272 L1114 286 L1125 286Z"/>
+  <rect x="1132" y="312" width="16" height="78"/><rect x="1155" y="336" width="24" height="54"/>
+  <rect x="1186" y="304" width="14" height="86"/><rect x="1207" y="326" width="19" height="64"/>
+  <rect x="1234" y="286" width="12" height="104"/><rect x="1253" y="332" width="22" height="58"/>
+  <rect x="1282" y="314" width="15" height="76"/><rect x="1304" y="340" width="26" height="50"/>
+  <rect x="1337" y="322" width="14" height="68"/><rect x="1358" y="344" width="20" height="46"/>
+  <rect x="238" y="344" width="13" height="46"/><rect x="258" y="332" width="10" height="58"/>
+  <rect x="275" y="352" width="17" height="38"/>
+</g>
+<rect x="0" y="300" width="1600" height="120" fill="url(#haze)"/>
+
+<!-- الأرض -->
+<rect x="0" y="390" width="1600" height="510" fill="url(#ground)"/>
+
+<!-- ===== الصف الخلفي (بعيد) ===== -->
+<g opacity="0.5">
+  <use href="#blk" x="60"   y="352" width="150" height="46"/>
+  <use href="#blk" x="232"  y="352" width="150" height="46"/>
+  <use href="#blk" x="404"  y="352" width="150" height="46"/>
+  <use href="#blk" x="576"  y="352" width="150" height="46"/>
+  <use href="#blk" x="748"  y="352" width="150" height="46"/>
+  <use href="#blk" x="920"  y="352" width="150" height="46"/>
+</g>
+<rect x="0" y="398" width="1600" height="12" fill="#E6DCC9" opacity="0.8"/>
+
+<!-- ===== الصف الأوسط ===== -->
+<rect x="0" y="410" width="1600" height="46" fill="#DFE8DC" opacity="0.5"/>
+<g opacity="0.74">
+  <use href="#blk" x="20"   y="392" width="196" height="62"/>
+  <use href="#blk" x="242"  y="392" width="196" height="62"/>
+  <use href="#blk" x="464"  y="392" width="196" height="62"/>
+  <use href="#blk" x="686"  y="392" width="196" height="62"/>
+  <use href="#blk" x="908"  y="392" width="196" height="62"/>
+  <use href="#blk" x="1130" y="392" width="196" height="62"/>
+  <use href="#blk" x="1352" y="392" width="196" height="62"/>
+</g>
+<g opacity="0.55">
+  <use href="#plm" x="222" y="404" width="26" height="52"/>
+  <use href="#plm" x="444" y="404" width="26" height="52"/>
+  <use href="#plm" x="666" y="404" width="26" height="52"/>
+  <use href="#plm" x="888" y="404" width="26" height="52"/>
+  <use href="#plm" x="1110" y="404" width="26" height="52"/>
+  <use href="#plm" x="1332" y="404" width="26" height="52"/>
+</g>
+
+<!-- ممر مشجّر -->
+<rect x="0" y="456" width="1600" height="30" fill="#E9E1D1"/>
+<rect x="0" y="470" width="1600" height="3" fill="#DAD1BE" opacity="0.9"/>
+
+<!-- ===== الصف الأمامي (قريب) ===== -->
+<rect x="0" y="486" width="1600" height="72" fill="#DCE7DA" opacity="0.55"/>
+<g opacity="0.92">
+  <use href="#blk" x="-40"  y="452" width="268" height="102"/>
+  <use href="#blk" x="252"  y="452" width="268" height="102"/>
+  <use href="#blk" x="544"  y="452" width="268" height="102"/>
+  <use href="#blk" x="836"  y="452" width="268" height="102"/>
+  <use href="#blk" x="1128" y="452" width="268" height="102"/>
+  <use href="#blk" x="1420" y="452" width="268" height="102"/>
+</g>
+<!-- ألواح شمسية على الأسطح -->
+<g fill="#8FA0A8" opacity="0.5">
+  <rect x="-20" y="450" width="80" height="6" rx="1"/><rect x="76" y="450" width="80" height="6" rx="1"/>
+  <rect x="272" y="450" width="80" height="6" rx="1"/><rect x="368" y="450" width="80" height="6" rx="1"/>
+  <rect x="564" y="450" width="80" height="6" rx="1"/><rect x="660" y="450" width="80" height="6" rx="1"/>
+  <rect x="856" y="450" width="80" height="6" rx="1"/><rect x="952" y="450" width="80" height="6" rx="1"/>
+  <rect x="1148" y="450" width="80" height="6" rx="1"/><rect x="1244" y="450" width="80" height="6" rx="1"/>
+  <rect x="1440" y="450" width="80" height="6" rx="1"/><rect x="1536" y="450" width="80" height="6" rx="1"/>
+</g>
+<g opacity="0.8">
+  <use href="#plm" x="222" y="474" width="40" height="80"/>
+  <use href="#plm" x="514" y="474" width="40" height="80"/>
+  <use href="#plm" x="806" y="474" width="40" height="80"/>
+  <use href="#plm" x="1098" y="474" width="40" height="80"/>
+  <use href="#plm" x="1390" y="474" width="40" height="80"/>
+</g>
+
+<!-- ===== المقدمة: ساحة وطريق ===== -->
+<rect x="0" y="554" width="1600" height="346" fill="url(#fg)"/>
+<rect x="0" y="554" width="1600" height="5" fill="#CFC5AF" opacity="0.7"/>
+<!-- شريط أخضر -->
+<rect x="0" y="576" width="1600" height="34" fill="#D9E4D6" opacity="0.6"/>
+<!-- طريق -->
+<rect x="0" y="628" width="1600" height="96" fill="#DAD2C2"/>
+<rect x="0" y="628" width="1600" height="2.5" fill="#CBC2AF"/>
+<rect x="0" y="722" width="1600" height="2.5" fill="#CBC2AF"/>
+<g fill="#EFE9DC" opacity="0.85">
+  <rect x="30"  y="674" width="58" height="4" rx="2"/><rect x="138" y="674" width="58" height="4" rx="2"/>
+  <rect x="246" y="674" width="58" height="4" rx="2"/><rect x="354" y="674" width="58" height="4" rx="2"/>
+  <rect x="462" y="674" width="58" height="4" rx="2"/><rect x="570" y="674" width="58" height="4" rx="2"/>
+  <rect x="678" y="674" width="58" height="4" rx="2"/><rect x="786" y="674" width="58" height="4" rx="2"/>
+  <rect x="894" y="674" width="58" height="4" rx="2"/><rect x="1002" y="674" width="58" height="4" rx="2"/>
+  <rect x="1110" y="674" width="58" height="4" rx="2"/><rect x="1218" y="674" width="58" height="4" rx="2"/>
+  <rect x="1326" y="674" width="58" height="4" rx="2"/><rect x="1434" y="674" width="58" height="4" rx="2"/>
+  <rect x="1542" y="674" width="58" height="4" rx="2"/>
+</g>
+<!-- رصيف ومواقف -->
+<rect x="0" y="740" width="1600" height="160" fill="#E2D9C8"/>
+<g stroke="#D3C9B5" stroke-width="2.5" opacity="0.85">
+  <path d="M90 762 V836"/><path d="M198 762 V836"/><path d="M306 762 V836"/><path d="M414 762 V836"/>
+  <path d="M522 762 V836"/><path d="M630 762 V836"/><path d="M738 762 V836"/><path d="M846 762 V836"/>
+  <path d="M954 762 V836"/><path d="M1062 762 V836"/><path d="M1170 762 V836"/><path d="M1278 762 V836"/>
+  <path d="M1386 762 V836"/><path d="M1494 762 V836"/>
+</g>
+<!-- شجيرات المقدمة -->
+<g fill="#6E8A69" opacity="0.34">
+  <ellipse cx="120" cy="866" rx="72" ry="21"/><ellipse cx="470" cy="874" rx="90" ry="24"/>
+  <ellipse cx="880" cy="866" rx="76" ry="20"/><ellipse cx="1290" cy="874" rx="96" ry="25"/>
+</g>
+</svg>

@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 320" width="1200" height="320">
+<!-- رأس قسم التراخيص: مبانٍ سكنية قيد الإنشاء والتشغيل -->
+<defs>
+  <linearGradient id="lsky" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#EEF2F1"/><stop offset="100%" stop-color="#F8F9F6"/>
+  </linearGradient>
+  <linearGradient id="lfa" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0%" stop-color="#FBF9F4"/><stop offset="100%" stop-color="#E9E3D6"/>
+  </linearGradient>
+  <linearGradient id="lfb" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0%" stop-color="#EFEADE"/><stop offset="100%" stop-color="#DDD5C4"/>
+  </linearGradient>
+</defs>
+<rect width="1200" height="320" fill="url(#lsky)"/>
+
+<!-- مبنى منجز (يمين) -->
+<rect x="742" y="86" width="212" height="234" fill="url(#lfa)"/>
+<rect x="742" y="78" width="212" height="12" fill="#D6CFBF"/>
+<g fill="#AEBCB4" opacity="0.55">
+  <rect x="760" y="104" width="26" height="18" rx="2"/><rect x="800" y="104" width="26" height="18" rx="2"/>
+  <rect x="840" y="104" width="26" height="18" rx="2"/><rect x="880" y="104" width="26" height="18" rx="2"/>
+  <rect x="920" y="104" width="26" height="18" rx="2"/>
+  <rect x="760" y="146" width="26" height="18" rx="2"/><rect x="800" y="146" width="26" height="18" rx="2"/>
+  <rect x="840" y="146" width="26" height="18" rx="2"/><rect x="880" y="146" width="26" height="18" rx="2"/>
+  <rect x="920" y="146" width="26" height="18" rx="2"/>
+  <rect x="760" y="188" width="26" height="18" rx="2"/><rect x="800" y="188" width="26" height="18" rx="2"/>
+  <rect x="840" y="188" width="26" height="18" rx="2"/><rect x="880" y="188" width="26" height="18" rx="2"/>
+  <rect x="920" y="188" width="26" height="18" rx="2"/>
+  <rect x="760" y="230" width="26" height="18" rx="2"/><rect x="800" y="230" width="26" height="18" rx="2"/>
+  <rect x="840" y="230" width="26" height="18" rx="2"/><rect x="880" y="230" width="26" height="18" rx="2"/>
+  <rect x="920" y="230" width="26" height="18" rx="2"/>
+</g>
+<g fill="#D2CAB8" opacity="0.9">
+  <rect x="742" y="128" width="212" height="5"/><rect x="742" y="170" width="212" height="5"/>
+  <rect x="742" y="212" width="212" height="5"/><rect x="742" y="254" width="212" height="5"/>
+</g>
+
+<!-- مبنى قيد الإنشاء (وسط) — هياكل خرسانية -->
+<g fill="url(#lfb)">
+  <rect x="470" y="120" width="238" height="200"/>
+</g>
+<g fill="#CFC7B5" opacity="0.95">
+  <rect x="470" y="120" width="238" height="9"/><rect x="470" y="166" width="238" height="9"/>
+  <rect x="470" y="212" width="238" height="9"/><rect x="470" y="258" width="238" height="9"/>
+</g>
+<g fill="#C6BDA9" opacity="0.8">
+  <rect x="482" y="129" width="10" height="191"/><rect x="546" y="129" width="10" height="191"/>
+  <rect x="610" y="129" width="10" height="191"/><rect x="674" y="129" width="10" height="191"/>
+</g>
+<!-- سقالات -->
+<g stroke="#B9AF99" stroke-width="2" opacity="0.55" fill="none">
+  <path d="M462 132 H716 M462 178 H716 M462 224 H716 M462 270 H716"/>
+  <path d="M466 122 V320 M714 122 V320"/>
+</g>
+
+<!-- رافعة برجية -->
+<g stroke="#BFB39A" stroke-width="3.5" fill="none" opacity="0.75">
+  <path d="M392 320 V64"/>
+  <path d="M392 64 H236"/>
+  <path d="M392 64 H448"/>
+  <path d="M392 42 L392 64"/>
+  <path d="M392 42 L266 64 M392 42 L440 64"/>
+  <path d="M300 64 V102" stroke-width="2"/>
+</g>
+<rect x="288" y="102" width="24" height="16" rx="2" fill="#C9BFA8" opacity="0.7"/>
+
+<!-- مبنى منخفض (يسار) -->
+<rect x="60" y="176" width="192" height="144" fill="url(#lfa)"/>
+<rect x="60" y="168" width="192" height="11" fill="#D6CFBF"/>
+<g fill="#AEBCB4" opacity="0.5">
+  <rect x="78" y="194" width="24" height="16" rx="2"/><rect x="116" y="194" width="24" height="16" rx="2"/>
+  <rect x="154" y="194" width="24" height="16" rx="2"/><rect x="192" y="194" width="24" height="16" rx="2"/>
+  <rect x="78" y="234" width="24" height="16" rx="2"/><rect x="116" y="234" width="24" height="16" rx="2"/>
+  <rect x="154" y="234" width="24" height="16" rx="2"/><rect x="192" y="234" width="24" height="16" rx="2"/>
+  <rect x="78" y="274" width="24" height="16" rx="2"/><rect x="116" y="274" width="24" height="16" rx="2"/>
+  <rect x="154" y="274" width="24" height="16" rx="2"/><rect x="192" y="274" width="24" height="16" rx="2"/>
+</g>
+
+<!-- مبانٍ رابطة تملأ الفجوات بين الكتل فيقرأ الشريط متصلاً -->
+<g opacity="0.5">
+  <rect x="252" y="212" width="106" height="108" fill="url(#lfb)"/>
+  <rect x="252" y="205" width="106" height="9" fill="#D6CFBF"/>
+  <rect x="708" y="196" width="42" height="124" fill="url(#lfb)"/>
+  <rect x="708" y="189" width="42" height="9" fill="#D6CFBF"/>
+  <rect x="954" y="182" width="126" height="138" fill="url(#lfa)"/>
+  <rect x="954" y="175" width="126" height="10" fill="#D6CFBF"/>
+  <rect x="1080" y="228" width="120" height="92" fill="url(#lfb)"/>
+  <rect x="1080" y="221" width="120" height="9" fill="#D6CFBF"/>
+  <rect x="0" y="238" width="62" height="82" fill="url(#lfb)"/>
+  <g fill="#AEBCB4" opacity="0.5">
+    <rect x="268" y="230" width="20" height="15" rx="2"/><rect x="302" y="230" width="20" height="15" rx="2"/>
+    <rect x="268" y="266" width="20" height="15" rx="2"/><rect x="302" y="266" width="20" height="15" rx="2"/>
+    <rect x="970" y="200" width="22" height="16" rx="2"/><rect x="1006" y="200" width="22" height="16" rx="2"/>
+    <rect x="1042" y="200" width="22" height="16" rx="2"/>
+    <rect x="970" y="242" width="22" height="16" rx="2"/><rect x="1006" y="242" width="22" height="16" rx="2"/>
+    <rect x="1042" y="242" width="22" height="16" rx="2"/>
+    <rect x="1096" y="248" width="20" height="15" rx="2"/><rect x="1130" y="248" width="20" height="15" rx="2"/>
+    <rect x="1164" y="248" width="20" height="15" rx="2"/>
+  </g>
+</g>
+
+<!-- أرضية -->
+<rect x="0" y="296" width="1200" height="24" fill="#E6E0D2" opacity="0.85"/>
+<g fill="#6E8A69" opacity="0.24">
+  <ellipse cx="300" cy="312" rx="58" ry="13"/><ellipse cx="1040" cy="310" rx="70" ry="14"/>
+</g>
+</svg>

@@ -273,7 +273,7 @@ table.tbl{width:100%;border-collapse:collapse;font-size:12px;min-width:720px}
 
 /* ---------- Riyadh map ---------- */
 .mapwrap{position:relative}
-.mapwrap svg{width:100%;height:auto;display:block}
+.mapwrap>svg{width:100%;height:auto;display:block}
 .sector-poly{
   fill:#EDF3EF;stroke:#FFFFFF;stroke-width:1.2;cursor:pointer;
   transition:fill .25s;
@@ -532,3 +532,194 @@ table.tbl{width:100%;border-collapse:collapse;font-size:12px;min-width:720px}
   #shell{margin:0}
   .card{box-shadow:none;break-inside:avoid}
 }
+
+
+/* ============================================================
+   إضافات: حالات «لا تتوفر بيانات فعلية» · الصور · التنقل بين الأقسام
+   ============================================================ */
+
+/* ---------- حالة لا تتوفر بيانات ---------- */
+.nodata{
+  height:100%;min-height:120px;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;text-align:center;padding:14px;overflow:auto;
+  border:1px dashed #CFD9D4;border-radius:12px;
+  background:repeating-linear-gradient(-45deg,#FCFDFC 0 8px,#F5F8F6 8px 16px);
+}
+.nodata svg{width:24px;height:24px;stroke:#9BAAA3;fill:none;stroke-width:1.5;
+  stroke-linecap:round;stroke-linejoin:round;margin-bottom:7px;flex:0 0 auto}
+.nodata .nd-t{font-family:var(--ff-d);font-weight:700;font-size:12.5px;color:var(--ink);margin-bottom:4px}
+.nodata .nd-d{font-size:10.5px;color:var(--muted);line-height:1.6;max-width:330px}
+.nodata .nd-n{font-size:10px;color:#8D9C95;line-height:1.55;max-width:350px;margin-top:7px;
+  padding-top:7px;border-top:1px solid var(--line)}
+.nodata .nd-n b{color:var(--ink);font-weight:700}
+
+.na-val{color:#A9B6AF;font-weight:300}
+.na-chip{
+  display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;
+  color:#A0522D;background:#FBF1EC;border:1px solid #EAD3C6;border-radius:999px;padding:3px 9px;
+}
+.na-chip::before{content:"";width:5px;height:5px;border-radius:50%;background:currentColor}
+.k-delta.na{background:none;padding:0}
+.na-txt{color:#A9B6AF;font-weight:600}
+.scope-note{
+  display:inline-block;font-size:10.5px;font-weight:700;color:#8A6D24;background:var(--gold-soft);
+  border:1px solid #E5D5AC;border-radius:999px;padding:2px 10px;margin-inline-start:6px;
+}
+.dr-note{
+  font-size:11px;color:var(--muted);line-height:1.7;margin-top:14px;padding:11px 13px;
+  background:var(--tint2);border:1px solid var(--line);border-radius:10px;
+}
+.st-grey{background:#EEF1EF;color:#6B7A74}
+
+/* ---------- قيم الخريطة ---------- */
+.sector-val{
+  font-family:var(--ff-d);font-size:3.2px;font-weight:700;fill:var(--green);text-anchor:middle;
+  pointer-events:none;paint-order:stroke;stroke:rgba(255,255,255,.85);stroke-width:.7px;
+}
+.sector-val.on-dark{fill:#fff;stroke:rgba(10,60,40,.5)}
+
+/* ---------- الصور ---------- */
+.hero{position:relative;overflow:hidden}
+.hero-img{
+  position:absolute;inset:0;background-size:cover;background-position:center 72%;
+  opacity:.5;pointer-events:none;
+  -webkit-mask-image:linear-gradient(to left,rgba(0,0,0,0) 34%,rgba(0,0,0,.85) 100%);
+  mask-image:linear-gradient(to left,rgba(0,0,0,0) 34%,rgba(0,0,0,.85) 100%);
+}
+.hero>*:not(.hero-img){position:relative;z-index:1}
+
+.sec-img{
+  position:relative;height:132px;border-radius:var(--r);overflow:hidden;margin-bottom:16px;
+  border:1px solid var(--line);background-size:cover;background-position:center 74%;
+  display:flex;align-items:flex-end;
+}
+.sec-img .si-veil{position:absolute;inset:0;
+  background:linear-gradient(to left,rgba(255,255,255,.95) 0%,rgba(255,255,255,.8) 46%,rgba(255,255,255,.36) 100%)}
+.sec-img .si-c{position:relative;z-index:2;padding:16px 20px;max-width:76%}
+.sec-img .si-k{font-size:10.5px;font-weight:700;color:var(--green);letter-spacing:.07em;margin-bottom:4px}
+.sec-img .si-t{font-family:var(--ff-d);font-size:16.5px;font-weight:700;letter-spacing:-.3px}
+.sec-img .si-d{font-size:11.5px;color:var(--ink);opacity:.82;margin-top:4px;line-height:1.6}
+
+/* ---------- التنقل بين الأقسام ---------- */
+#sec-nav{
+  display:flex;align-items:center;gap:16px;margin:30px 0 10px;padding-top:18px;
+  border-top:1px solid var(--line);
+}
+.sn-btn{
+  display:inline-flex;align-items:center;gap:10px;padding:10px 16px;border-radius:12px;
+  border:1px solid var(--line);background:var(--card);transition:all .22s cubic-bezier(.22,.8,.36,1);
+  min-width:190px;
+}
+.sn-btn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;
+  stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
+.sn-btn .sn-l{display:flex;flex-direction:column;align-items:flex-start;line-height:1.35;min-width:0}
+.sn-btn .sn-l i{font-style:normal;font-size:10px;color:var(--muted);font-weight:600}
+.sn-btn .sn-l b{font-family:var(--ff-d);font-size:13px;font-weight:700;white-space:nowrap}
+.sn-btn:hover:not(:disabled){border-color:var(--green2);color:var(--green);
+  box-shadow:var(--shadow);transform:translateY(-1px)}
+.sn-btn:disabled{opacity:.4;cursor:not-allowed}
+.sn-btn.pri{background:var(--green);border-color:var(--green);color:#fff;margin-inline-start:auto}
+.sn-btn.pri .sn-l i{color:rgba(255,255,255,.72)}
+.sn-btn.pri:hover:not(:disabled){background:#0B4A37;border-color:#0B4A37;color:#fff}
+
+.sn-dots{display:flex;align-items:center;gap:7px;flex:1;justify-content:center}
+.sn-dot{
+  width:9px;height:9px;border-radius:50%;background:#D3DDD8;padding:0;
+  transition:all .25s cubic-bezier(.22,.8,.36,1);
+}
+.sn-dot:hover{background:var(--green2);transform:scale(1.25)}
+.sn-dot.on{background:var(--green);width:26px;border-radius:5px}
+
+/* ---------- المبادرات: صف بلا شريط إنجاز ---------- */
+.ini-num{
+  font-family:var(--ff-d);font-size:10.5px;font-weight:700;color:var(--muted);
+  background:var(--tint2);border-radius:6px;padding:1px 7px;margin-inline-end:8px;
+}
+.ini-span{font-size:11px;color:var(--muted);font-weight:600;font-family:var(--ff-d);white-space:nowrap}
+.pc-cap{font-size:10px;color:var(--muted);font-weight:700;margin-top:2px}
+
+/* ---------- مقياس المؤشر في الدرج ---------- */
+.kpi-meter{margin-top:16px}
+.kpi-meter .km-track{position:relative;height:9px;border-radius:5px;background:#EDF1EE;overflow:hidden}
+.kpi-meter .km-fill{position:absolute;inset-block:0;inset-inline-start:0;border-radius:5px;
+  background:linear-gradient(to left,var(--green),var(--green2));transition:width .9s cubic-bezier(.22,.8,.36,1)}
+.kpi-meter .km-caps{display:flex;justify-content:space-between;margin-top:7px;
+  font-size:10.5px;color:var(--muted);font-weight:600}
+
+/* ---------- التوقعات ---------- */
+.reco-note{
+  padding:16px 18px;font-size:12px;color:var(--muted);font-weight:600;line-height:1.85;
+}
+.wc-cap{font-size:11px;color:var(--muted);font-weight:700;margin-bottom:2px}
+
+@media(max-width:900px){
+  #sec-nav{flex-wrap:wrap;gap:10px}
+  .sn-btn{min-width:0;flex:1}
+  .sn-dots{order:3;width:100%}
+  .sec-img{height:112px}
+  .sec-img .si-c{max-width:92%}
+}
+
+/* لوح جانب الخريطة يوزع ارتفاعه بين الرسم والسجل بدل ترك فراغ أسفله */
+.map-side{display:flex;flex-direction:column;gap:12px}
+.map-side>*{min-width:0}
+
+
+/* ============================================================
+   خريطة OpenStreetMap — Leaflet
+   ============================================================ */
+.mapwrap{height:460px;border-radius:12px;overflow:hidden;border:1px solid var(--line);background:#EDF1EF}
+.mapwrap.map-offline::after{
+  content:"تعذّر تحميل بلاطات الخريطة — تظهر القطاعات وقيمها دون خلفية الشارع";
+  position:absolute;inset-inline:10px;top:10px;z-index:500;pointer-events:none;
+  background:rgba(255,255,255,.94);border:1px solid var(--line);border-radius:8px;
+  padding:7px 11px;font-size:11px;font-weight:700;color:var(--muted);text-align:center;
+}
+.leaflet-container{
+  font-family:var(--ff-b);background:#EDF1EF;
+  direction:ltr;               /* Leaflet يحسب المواضع بمنطق LTR */
+}
+.leaflet-container .leaflet-control-attribution{
+  direction:ltr;font-size:9.5px;background:rgba(255,255,255,.86);
+  padding:2px 7px;border-radius:6px 0 0 0;color:#6B7A74;
+}
+.leaflet-container .leaflet-control-attribution a{color:var(--green)}
+.leaflet-control-zoom a{
+  color:var(--ink)!important;border-radius:8px!important;font-weight:700;
+  border-color:var(--line)!important;
+}
+.leaflet-control-zoom a:hover{color:var(--green)!important;background:var(--tint2)!important}
+.leaflet-bar{box-shadow:0 1px 3px rgba(14,90,67,.18)!important;border:none!important}
+
+/* دائرة القطاع */
+.sec-poly-l{cursor:pointer;transition:fill-opacity .2s}
+
+/* تسمية القطاع فوق الدائرة */
+.sec-lab{
+  display:flex!important;flex-direction:column;align-items:center;justify-content:center;
+  width:0;height:0;overflow:visible;pointer-events:none;direction:rtl;
+}
+.sec-lab .sl-n,.sec-lab .sl-v{
+  white-space:nowrap;text-align:center;line-height:1.25;
+  paint-order:stroke;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 5px #fff;
+}
+.sec-lab .sl-n{font-family:var(--ff-b);font-weight:700;font-size:12.5px;color:#173A2B;margin-bottom:1px}
+.sec-lab .sl-v{font-family:var(--ff-d);font-weight:700;font-size:13px;color:var(--green)}
+/* على التعبئة الغامقة يُقلب النص إلى أبيض بهالة داكنة */
+.sec-lab.on-dark .sl-n,.sec-lab.on-dark .sl-v{
+  color:#fff;text-shadow:0 0 3px rgba(8,40,26,.9),0 0 6px rgba(8,40,26,.75)}
+
+/* تلميح الخريطة بنفس هوية تلميحات الرسوم */
+.leaflet-tooltip.map-tip-l{
+  direction:rtl;text-align:right;background:#12241B;color:#EAF2ED;border:none;
+  border-radius:12px;padding:10px 13px;font-family:var(--ff-b);font-size:11.5px;
+  box-shadow:0 12px 32px rgba(10,30,20,.32);white-space:nowrap;
+}
+.leaflet-tooltip.map-tip-l::before{border-top-color:#12241B}
+.leaflet-tooltip.map-tip-l b{color:#fff;font-family:var(--ff-d);font-size:12.5px}
+.leaflet-tooltip.map-tip-l .row{display:flex;justify-content:space-between;gap:18px;margin-top:4px}
+.leaflet-tooltip.map-tip-l .row span:first-child{color:#A9BCB2}
+
+@media(max-width:1200px){.mapwrap{height:380px}}
+@media(max-width:768px){.mapwrap{height:320px}}
+@media print{.leaflet-control-zoom{display:none}}

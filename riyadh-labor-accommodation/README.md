@@ -1,55 +1,131 @@
 # لوحة معلومات السكن الجماعي للأفراد بمدينة الرياض — أمانة منطقة الرياض
 
-Executive Arabic (RTL) command-center dashboard for labor accommodation management in Riyadh, plus the fully reconciled dummy dataset that powers it.
+لوحة تنفيذية عربية (RTL) لإدارة منظومة السكن الجماعي، مبنية بالكامل على
+**مصنّف البيانات الرئيسي الفعلي V2**. بنية اللوحة وتبويباتها ورسومها كما هي؛
+التغيير انصبّ على ربط الأرقام بالمصدر الفعلي، وإضافة التنقل بين الأقسام والصور،
+وإعلان الرسوم التي لا مصدر لها بدل تعبئتها بقيم تقديرية.
 
-## Deliverables
+## المخرجات
 
-| File | Description |
+| الملف | الوصف |
 |---|---|
-| `index.html` | **The dashboard** — a single self-contained file (HTML + CSS + vanilla JS). Opens by double-click; only CDN dependencies are Apache ECharts 5 and Google Fonts (IBM Plex Sans Arabic + Cairo). All data is embedded as a `window.DATA` object. No backend, no localStorage. |
-| `labor_accommodation_data.xlsx` | **The dummy dataset** — 20 sheets with Arabic headers, RTL sheet views, internally consistent numbers. |
-| `generate_data.py` | Regenerates the workbook **and** `data.json` from a single source of truth, with hard reconciliation assertions. |
-| `build.py` | Reassembles `index.html` from `src/` + `data.json`. |
-| `src/` | Dashboard source (styles.css / markup.html / app.js) for maintainability. |
+| `index.html` | **اللوحة** — ملف واحد يُفتح بالنقر المزدوج (ECharts وخطوط Google عبر CDN). |
+| `artifact.html` | نسخة **مستقلة تماماً** بلا أي طلب خارجي (ECharts والخطوط والصور مضمّنة). |
+| `master_data_V2.xlsx` | مصنّف البيانات الرئيسي — المصدر الوحيد للحقيقة. |
+| `generate_data.py` | يقرأ المصنّف ويُخرج `data.json` مع 19 اختبار تطابق إلزامياً. |
+| `build.py` / `build_artifact.py` | يجمّعان المخرجات من `src/` + `data.json` + `assets/`. |
+| `src/` | المصدر: `markup.html` · `styles.css` · `app.js`. |
+| `assets/` | صور الغلاف ورؤوس الأقسام (رسوم متجهية مضمّنة كـ data URI). |
 
-## Seed totals (everything reconciles to these)
+## إعادة البناء
 
-- **الطلب (إجمالي العمالة):** 1,420,000 — every `Demand_*` sheet sums to this exactly
-- **العرض (الأسرّة المرخصة):** 612,400 — equals the sum of the 140 rows in `Facilities`
-- **فجوة الإيواء:** 807,600 · **نسبة التغطية:** 43.1%
-- **معدل الإشغال:** 91.7% (occupied beds = 561,571)
-- **نمو الرخص السنوي:** ≈ +18% · **توقع الفجوة بنهاية يونيو 2027 (أساسي):** ~865,008 سرير
+```bash
+python3 generate_data.py     # المصنّف → data.json (يفشل عند أي عدم تطابق)
+python3 build.py             # → index.html
+python3 build_artifact.py    # → artifact.html
+```
 
-## Data model (sheets)
+## الأقسام الستة
 
-- **Demand:** `Demand_ByOccupation` (SSCO groups + collar type), `Demand_ByEconomicSector`, `Demand_BySMESize`, `Demand_ByNationality`, `Demand_ByAge`, `Demand_ByMunicipalSector`. Each carries exact blue/white collar splits so the collar cross-filter is exact, not approximated.
-- **Supply:** `Facilities` — 140 licensed facilities with type, sector, district, X/Y map coordinates (0–100 SVG space), licensed/occupied beds, occupancy, license status/date, compliance score, risk level, last inspection.
-- **Licensing:** `Licenses_Monthly` — 24 months × 5 sectors × 3 accommodation types (issuance, requests, processing days; improving trend).
-- **Monitoring:** `Inspections_Monthly` (24 × 5), `Violation_Categories` (6 categories with fines + SME-size + sector splits), `Inspectors` (18, totals reconcile to inspections), `Hotspots` (40 points, skewed south/east).
-- **Strategy:** `Initiatives` (28 across the 4 strategic pillars; 3 close within 90 days of 2026-07-08), `KPIs` (6 strategic + 8 operational, targets, direction, 12 monthly actuals).
-- **Foresight:** `Predictions` (10 grounded insights + recommendations), `Forecast_Series` (12 months × 3 scenarios with confidence bounds).
-- **Reference:** `README`, `dim_sector`, `dim_district`, `dim_accommodation_type`.
+كما هي في النسخة السابقة: **العرض والطلب · التراخيص · الرقابة والامتثال ·
+المبادرات · مؤشرات الأداء · التوقعات المستقبلية**.
 
-## Replacing dummy data with real data
+يُنتقل بينها من الشريط الجانبي، أو من شريط **«القسم السابق / القسم التالي»**
+أسفل كل قسم مع نقاط تُظهر الموضع، أو بلوحة المفاتيح — وفي العربية:
+**←** للقسم التالي، **→** للقسم السابق (و`Esc` لإغلاق الدرج).
 
-1. **Preferred:** edit the constants and tables at the top of `generate_data.py` (or replace its builders with real extracts), run `python3 generate_data.py` — assertions guarantee reconciliation — then `python3 build.py`.
-2. **Direct:** overwrite sheet contents in the workbook keeping column names, export each sheet to the matching key in `data.json`, then run `python3 build.py`.
-3. Keep the invariants: demand sheets sum to one total; facility beds sum to the supply total; violation categories sum to inspection totals; KPI actuals derive from the operational sheets.
+## الأرقام الحاكمة (من المصنّف — أغسطس 2026)
 
-## Recommended assets to further improve the build
+- **الطلب:** 2,800,000 فرد — يساوي مجموع القطاعات الخمسة ومجموع المجموعات المهنية ومجموع الياقات
+- **الطاقة الاستيعابية المرخصة:** 136,437 سرير · **الفجوة:** 2,663,563 · **نسبة التغطية:** 4.87٪
+- **رخص البناء:** 165 · **الرخص التشغيلية:** 715 (من 63 و218 عند خط الأساس في أغسطس 2025)
+- **الرقابة:** 18 مراقباً · 19,651 زيارة · 3,617 مخالفة · نسبة امتثال 81.6٪
+- **المبادرات:** 18 على 4 أهداف (2 منجزة · 9 جاري العمل · 7 متأخرة) · **المؤشرات:** 14
 
-- شعار أمانة منطقة الرياض الرسمي (SVG)
-- خريطة GIS فعلية لحدود القطاعات البلدية (GeoJSON) لاستبدال المضلعات التقريبية
-- القائمة الفعلية للمبادرات الاستراتيجية ومستهدفاتها
-- تعريفات ومستهدفات المؤشرات المعتمدة
-- بيانات الترخيص والرقابة الفعلية (وفق قوالب الأوراق أعلاه)
-- دليل الهوية البصرية الرسمي (الألوان والخطوط المعتمدة)
+`generate_data.py` يتحقق من كل هذه العلاقات ويتوقف عند أول خلل.
 
-## Mobile & hosted build
+## الرسوم المعطّلة لعدم توفر مصدر (16)
 
-- The dashboard is fully responsive: on phones (≤768px) the right rail becomes a bottom navigation bar, grids collapse to one column, tables scroll inside their own containers, and all tap interactions (sector select, facility drawer, filters) work with touch. Verified at 390×844.
-- `build_artifact.py` produces `artifact.html` — a fully self-contained build (ECharts + Arabic fonts inlined from `vendor/`, zero external requests) for hosting behind a strict CSP. `index.html` remains the CDN-based double-click build.
+تبقى في مواضعها الأصلية وتعرض بطاقة **«لا تتوفر بيانات فعلية»** تبيّن ما يلزم
+لتفعيل كل رسم. لم تُعرض أي قيمة تقديرية في أي موضع، ويمكن تنزيل السجل كاملاً من
+قائمة **تصدير ← سجل فجوات البيانات (CSV)**.
 
-## Verified quality bar
+| القسم | الرسوم |
+|---|---|
+| العرض والطلب | معدل الإشغال · سجل المنشآت · الطلب حسب القطاع الاقتصادي وحجم المنشأة والفئة العمرية والجنسية |
+| التراخيص | مسار طلبات الترخيص · متوسط مدة الإصدار |
+| الرقابة والامتثال | الغرامات · المنشآت المغلقة · أداء المفتشين فردياً · خريطة النقاط الساخنة · المخالفات حسب حجم المنشأة |
+| المبادرات | نسب الإنجاز والميزانيات والجهات المسؤولة |
+| مؤشرات الأداء | السلاسل الشهرية للمؤشرات |
+| التوقعات | سيناريوهات التوقع ونطاقات الثقة |
 
-Checked headless (Chromium, 1920×1080 and 1366×768): zero console errors; all six tabs; map hover/click/dots/hotspot toggle; drawers (facility/month/category/inspector/initiative/KPI); cross-filters and reset chips; single-needle gauges with target bands and inverted "أقل أفضل" logic; scenario switching; `prefers-reduced-motion` respected; totals in the UI reconcile exactly with the workbook.
+## قيود المصدر المعلنة داخل اللوحة
+
+1. **السلاسل الشهرية على مستوى المدينة** — الإصدار الشهري والزيارات الشهرية غير
+   مفصّلة قطاعياً في المصدر، فلا تتأثر بتصفية القطاع أو نوع السكن، ويظهر تنبيه بذلك.
+2. **تركيبة الطلب** — الياقات والمجموعات المهنية متاحة على مستوى المدينة فقط،
+   ولا تُشتق منها قيم قطاعية تناسبية.
+3. **صف «غير مصنف قطاعياً»** — 57 رخصة بناء بطاقة صفرية محتسبة في الإجمالي وغير
+   منسوبة لأي قطاع؛ يحتاج قراراً بتوزيعها أو اعتمادها بنداً مستقلاً.
+4. **ملكية البيانات** — 9 من 10 مجموعات جهتها المنتجة «غير محددة». الجهة المؤكدة
+   الوحيدة هي الإدارة العامة للتراخيص، ونطاقها **رخص البناء فقط**.
+5. **سجل الأحياء** — بيانات عينة وعمودا خط العرض والطول فارغان، فيُعرض كسجل
+   جدولي فقط ولا تُبنى عليه خريطة.
+6. **قسم التوقعات** — امتداد خطي محتسب بقاعدة معلنة داخل الشاشة، وليس نموذجاً
+   تنبؤياً معتمداً. يثبّت الطلب عند قيمته المسجلة لعدم توفر سلسلة زمنية له.
+7. **أغسطس 2026** — لم تُرحَّل بيانات التراخيص لهذا الشهر بعد، فتُقارن المقارنة
+   الشهرية آخر شهرين مُرحَّلين ويظهر تنبيه بذلك.
+
+## الخريطة
+
+خريطة الأساس **OpenStreetMap** عبر Leaflet 1.9.4 (مضمّنة من `vendor/`، بلا CDN).
+تُرسم فوقها **حدود القطاعات البلدية الخمسة** بتعبئة متدرّجة تعكس قيمة المقياس —
+الطاقة الاستيعابية في قسم العرض والطلب، والمخالفات في قسم الرقابة.
+
+### مصدر الحدود وطريقة اشتقاقها
+
+الحدود مرقمنة آلياً من **خريطة القطاعات الرسمية لأمانة منطقة الرياض** بالخطوات التالية:
+
+1. تصنيف كل بكسل إلى أقرب لون قطاع (winner-take-all) مع اشتراط تشبّع لوني لاستبعاد الخلفية.
+2. ملء ممرات الطرق البيضاء داخل كل قطاع، ثم إسناد البكسلات غير المصنّفة إلى **أقرب بذرة**
+   — وهو ما يضمن قطاعات **غير متداخلة** (تحقّق آلي: أقل من 1 كم² تداخل بين أي قطاعين).
+3. تتبّع الحدود وتبسيطها عند تفاوت ~100 متر.
+4. إسقاط تآلفي شمالي الاتجاه بنسبة أبعاد مثبّتة (بلا تشويه)، معايَر بموقع الدرعية
+   وباشتراط وقوع أحياء ورقة 13 داخل قطاعاتها المعلنة.
+
+**تحقّقات الجودة:** المساحة الكلية الناتجة ≈ **1,570 كم²** مقابل نحو 1,800 كم² لمدينة
+الرياض؛ ومقياس الإسقاط 56.5 متر/بكسل؛ و13 من 20 حياً تقع داخل قطاعها المعلن
+(الفروق دون كيلومترين وتعود إلى تقريب إحداثيات الأحياء لا إلى الحدود).
+
+**حدود الدقة:** هذه حدود **تقريبية للعرض** مشتقة من صورة، وليست حدوداً مساحية معتمدة،
+ولا تصلح لأي استخدام تنظيمي أو قانوني. عند توفر ملف حدود رسمي (GeoJSON) يُستبدل
+`assets/riyadh-sectors.geojson` مباشرةً دون تغيير أي كود.
+
+بلاطات الخريطة تحتاج اتصالاً بالإنترنت. في `artifact.html` (بناء دون اتصال) تظهر
+القطاعات وقيمها فوق خلفية فارغة مع تنبيه صريح. حقوق الإسناد
+«© OpenStreetMap contributors» ظاهرة كما تشترط الرخصة.
+
+## الصور
+
+صور الغلاف ورأسَي قسمَي التراخيص والرقابة رسوم متجهية (SVG) من إنتاج المشروع،
+مضمّنة كـ data URI فلا يصدر عن اللوحة أي طلب لصور خارجية. لاستبدالها بصور
+فوتوغرافية فعلية: ضع الملفات في `assets/` وحدّث المسارات في `IMAGES` أعلى
+`build.py` — لا يلزم تغيير أي كود آخر.
+
+## استبدال البيانات ببيانات محدّثة
+
+عدّل `master_data_V2.xlsx` مع الحفاظ على أسماء الأوراق والأعمدة والمعرفات، ثم
+أعد التوليد والبناء. عند إضافة مصدر لأحد الرسوم المعطّلة: بدّل قيمته في `avail`
+داخل `generate_data.py` إلى `True`، واحذف مدخله من `gaps`، واستبدل استدعاء
+`noData('<id>','<key>')` في `src/app.js` برسم فعلي.
+
+## معايير الجودة المتحققة
+
+مفحوصة آلياً (Chromium) على 1920×1080 و1366×768:
+
+- صفر أخطاء في وحدة التحكم عبر الأقسام الستة في المقاسين
+- لا تمرير أفقي ولا رسم فارغ ولا أي `NaN` أو `undefined` في أي قسم
+- التصفية القطاعية تعمل عبر الأقسام الستة · نقر الخريطة يصفّي اللوحة
+- الأدراج (فئة مخالفة · شهر إصدار · مبادرة · مؤشر) تفتح وتُغلق سليمة
+- التنقل بالسابق/التالي والنقاط ولوحة المفاتيح صحيح الاتجاه في RTL
+- العدّادات تُثبَّت على قيمها النهائية قبل الطباعة

@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 320" width="1200" height="320">
+<!-- رأس قسم الرقابة والامتثال: ممر مرفق سكني مشترك بإضاءة نهارية -->
+<defs>
+  <linearGradient id="cwall" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#FBFBF8"/><stop offset="100%" stop-color="#EFEEE8"/>
+  </linearGradient>
+  <linearGradient id="cfloor" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#E8E5DC"/><stop offset="100%" stop-color="#DAD6CA"/>
+  </linearGradient>
+  <linearGradient id="clight" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0%" stop-color="#FFFDF6" stop-opacity="0.9"/>
+    <stop offset="100%" stop-color="#FFFDF6" stop-opacity="0"/>
+  </linearGradient>
+</defs>
+<rect width="1200" height="320" fill="url(#cwall)"/>
+
+<!-- أرضية بمنظور -->
+<path d="M0 320 L0 246 L1200 214 L1200 320Z" fill="url(#cfloor)"/>
+<g stroke="#CFCABC" stroke-width="1.6" opacity="0.7" fill="none">
+  <path d="M0 268 L1200 240"/><path d="M0 292 L1200 268"/>
+  <path d="M140 320 L286 246"/><path d="M380 320 L472 240"/>
+  <path d="M640 320 L672 234"/><path d="M900 320 L868 228"/>
+</g>
+
+<!-- الجدار الأيمن: أبواب الغرف -->
+<path d="M1200 0 L1200 320 L980 268 L980 46Z" fill="#F4F2EC"/>
+<g fill="#DCD6C7" opacity="0.9">
+  <path d="M1176 62 L1176 268 L1128 256 L1128 56Z"/>
+  <path d="M1090 74 L1090 250 L1046 240 L1046 70Z"/>
+  <path d="M1016 84 L1016 236 L982 228 L982 80Z"/>
+</g>
+<g fill="#B4A98D" opacity="0.65">
+  <circle cx="1134" cy="162" r="4"/><circle cx="1051" cy="162" r="3.4"/><circle cx="986" cy="160" r="3"/>
+</g>
+
+<!-- الجدار الأيسر: نوافذ كبيرة -->
+<path d="M0 0 L0 320 L250 258 L250 32Z" fill="#F6F5EF"/>
+<g fill="#CEDCE2" opacity="0.7">
+  <path d="M36 58 L36 268 L104 250 L104 50Z"/>
+  <path d="M136 46 L136 244 L206 228 L206 38Z"/>
+</g>
+<g stroke="#E2DFD4" stroke-width="3" fill="none" opacity="0.9">
+  <path d="M36 152 L104 146"/><path d="M136 142 L206 136"/>
+  <path d="M70 54 L70 259"/><path d="M171 42 L171 236"/>
+</g>
+<!-- ضوء نهاري داخل -->
+<path d="M104 60 L520 214 L520 320 L104 258Z" fill="url(#clight)" opacity="0.55"/>
+
+<!-- منطقة طعام مشتركة في العمق -->
+<g opacity="0.9">
+  <rect x="470" y="176" width="252" height="9" rx="2" fill="#C9B899"/>
+  <rect x="470" y="185" width="252" height="4" fill="#B7A585" opacity="0.8"/>
+  <g fill="#D6D2C6">
+    <rect x="486" y="189" width="7" height="34"/><rect x="700" y="189" width="7" height="34"/>
+  </g>
+  <!-- مقاعد -->
+  <g fill="#CFCABB">
+    <rect x="452" y="196" width="30" height="6" rx="2"/><rect x="710" y="196" width="30" height="6" rx="2"/>
+    <rect x="452" y="202" width="5" height="22"/><rect x="477" y="202" width="5" height="22"/>
+    <rect x="710" y="202" width="5" height="22"/><rect x="735" y="202" width="5" height="22"/>
+  </g>
+</g>
+
+<!-- سقف وإضاءة -->
+<path d="M250 32 L980 46 L980 30 L250 14Z" fill="#EFEDE6"/>
+<g fill="#FBF6E4" opacity="0.85">
+  <rect x="356" y="30" width="120" height="8" rx="4"/>
+  <rect x="556" y="34" width="120" height="8" rx="4"/>
+  <rect x="756" y="38" width="120" height="8" rx="4"/>
+</g>
+
+<!-- طفاية حريق ولوحة سلامة (بلا نص) -->
+<g opacity="0.6">
+  <rect x="1104" y="176" width="13" height="34" rx="4" fill="#B3705F"/>
+  <rect x="1103" y="171" width="15" height="6" rx="2" fill="#9C9284"/>
+  <rect x="1058" y="104" width="26" height="19" rx="2.5" fill="#8FA98F"/>
+</g>
+
+<!-- نباتات -->
+<g fill="#6E8A69" opacity="0.3">
+  <ellipse cx="286" cy="276" rx="30" ry="11"/>
+  <path d="M286 276 Q272 250 262 244 Q282 250 288 272Z"/>
+  <path d="M286 276 Q300 248 312 242 Q294 250 290 272Z"/>
+  <path d="M286 276 Q286 244 290 232 Q296 250 292 274Z"/>
+</g>
+</svg>

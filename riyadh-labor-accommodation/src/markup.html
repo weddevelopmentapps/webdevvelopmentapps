@@ -55,7 +55,7 @@
     <div class="tb-controls">
       <select id="g-range" class="sel" title="نطاق التاريخ">
         <option value="12">آخر 12 شهراً</option>
-        <option value="24">آخر 24 شهراً</option>
+        <option value="6">آخر 6 أشهر</option>
       </select>
       <select id="g-sector" class="sel" title="القطاع البلدي">
         <option value="">كل القطاعات</option>
@@ -76,8 +76,9 @@
         </button>
         <div id="export-menu" class="menu">
           <button data-x="print">🖨️ طباعة اللوحة (PDF)</button>
-          <button data-x="fac">📄 تنزيل بيانات المنشآت (CSV)</button>
+          <button data-x="sec">📄 تنزيل بيانات القطاعات (CSV)</button>
           <button data-x="kpi">📄 تنزيل مؤشرات الأداء (CSV)</button>
+          <button data-x="gap">📄 تنزيل سجل فجوات البيانات (CSV)</button>
         </div>
       </div>
     </div>
@@ -87,6 +88,7 @@
     <!-- ======================= TAB 1 — العرض والطلب ======================= -->
     <section class="tab active" id="tab-t1">
       <div class="hero" id="hero">
+        <div class="hero-img" id="hero-img" aria-hidden="true"></div>
         <div class="hero-cols">
           <div class="hero-side">
             <div class="h-cap"><span class="sq" style="background:#C89B4B"></span>الطلب — إجمالي العمالة في الرياض</div>
@@ -141,10 +143,10 @@
           <div class="k-label">متوسط معدل الإشغال</div><div class="k-val"><span data-count="occupancy">0</span><small>٪</small></div>
           <span class="k-delta flat" id="chip-occ-note">إشغال مرتفع — قرب الطاقة القصوى</span></div>
         <div class="card kpi"><div class="k-ico"><svg viewBox="0 0 24 24"><path d="M4 21V9l8-6 8 6v12M9 21v-6h6v6"/></svg></div>
-          <div class="k-label">عدد المنشآت المرخصة</div><div class="k-val"><span data-count="facilities">0</span><small>منشأة</small></div>
+          <div class="k-label">الرخص التشغيلية السارية</div><div class="k-val"><span data-count="facilities">0</span><small>رخصة</small></div>
           <span class="k-delta up" id="chip-fac-note">—</span></div>
         <div class="card kpi"><div class="k-ico"><svg viewBox="0 0 24 24"><path d="M12 21s-7-5.6-7-11a7 7 0 0114 0c0 5.4-7 11-7 11z"/><circle cx="12" cy="10" r="2.6"/></svg></div>
-          <div class="k-label">أعلى قطاع إشغالاً</div><div class="k-val" id="chip-topsec" style="font-size:22px">—</div>
+          <div class="k-label">أعلى قطاع طاقةً استيعابية</div><div class="k-val" id="chip-topsec" style="font-size:22px">—</div>
           <span class="k-delta down" id="chip-topsec-note">—</span></div>
       </div>
       <div class="grid g2" style="margin-bottom:16px">
@@ -153,14 +155,13 @@
       </div>
       <div class="grid g32">
         <div class="card flat">
-          <h3>خريطة الرياض — القطاعات البلدية ومواقع السكن الجماعي</h3>
-          <div class="c-sub">حجم النقطة = الأسرّة المرخصة، لونها = معدل الإشغال. انقر قطاعاً لتصفية اللوحة بالكامل.</div>
+          <h3>خريطة الرياض — الطاقة الاستيعابية حسب القطاع البلدي</h3>
+          <div class="c-sub">خريطة الرياض الفعلية بحدود القطاعات البلدية — كثافة اللون تعكس الطاقة الاستيعابية المرخصة. انقر قطاعاً لتصفية اللوحة بالكامل.</div>
           <div class="mapwrap" id="map1"></div>
           <div class="map-legend">
-            <span class="li"><span class="sw" style="background:#177A5B"></span>إشغال ≤ 85٪</span>
-            <span class="li"><span class="sw" style="background:#D68910"></span>إشغال 85–95٪</span>
-            <span class="li"><span class="sw" style="background:#C0392B"></span>إشغال &gt; 95٪</span>
-            <span class="li" style="margin-inline-start:auto">حجم النقطة ∝ الأسرّة المرخصة</span>
+            <span class="li"><span class="sw" style="background:linear-gradient(to left,#E8F3EE,#0E5A43)"></span>أسرّة أقل ← أسرّة أكثر</span>
+            <span class="li">خريطة الأساس: OpenStreetMap</span>
+            <span class="li" style="margin-inline-start:auto">الحدود مرقمنة من خريطة القطاعات الرسمية للأمانة — تقريبية للعرض</span>
           </div>
         </div>
         <div class="card flat map-side" id="map1-side"></div>
@@ -172,11 +173,17 @@
 
     <!-- ======================= TAB 2 — التراخيص ======================= -->
     <section class="tab" id="tab-t2">
+      <div class="sec-img" id="img-t2">
+        <div class="si-veil"></div>
+        <div class="si-c"><div class="si-k">التراخيص</div>
+          <div class="si-t">من خط الأساس إلى الوضع الحالي</div>
+          <div class="si-d" id="img-t2-d">—</div></div>
+      </div>
       <div class="filterbar" id="fb2">
         <span class="f-cap">نطاق التاريخ</span>
         <div class="pillset" data-role="range">
           <button class="pill on" data-v="12">آخر 12 شهراً</button>
-          <button class="pill" data-v="24">آخر 24 شهراً</button>
+          <button class="pill" data-v="6">آخر 6 أشهر</button>
         </div>
         <span class="fdiv"></span>
         <span class="f-cap">القطاع البلدي</span>
@@ -210,11 +217,17 @@
 
     <!-- ======================= TAB 3 — الرقابة والامتثال ======================= -->
     <section class="tab" id="tab-t3">
+      <div class="sec-img" id="img-t3">
+        <div class="si-veil"></div>
+        <div class="si-c"><div class="si-k">الرقابة والامتثال</div>
+          <div class="si-t">جولات ميدانية على مدى اثني عشر شهراً</div>
+          <div class="si-d" id="img-t3-d">—</div></div>
+      </div>
       <div class="filterbar" id="fb3">
         <span class="f-cap">نطاق التاريخ</span>
         <div class="pillset" data-role="range">
           <button class="pill on" data-v="12">آخر 12 شهراً</button>
-          <button class="pill" data-v="24">آخر 24 شهراً</button>
+          <button class="pill" data-v="6">آخر 6 أشهر</button>
         </div>
         <span class="fdiv"></span>
         <span class="f-cap">القطاع البلدي</span>
@@ -259,8 +272,8 @@
     <!-- ======================= TAB 4 — المبادرات ======================= -->
     <section class="tab" id="tab-t4">
       <div class="grid g6" id="t4-kpis"></div>
-      <div class="section-h"><span class="bar"></span><h2>الركائز الاستراتيجية الأربع</h2>
-        <span class="hint">انقر ركيزة لتصفية قائمة المبادرات</span>
+      <div class="section-h"><span class="bar"></span><h2>الأهداف الاستراتيجية الأربعة</h2>
+        <span class="hint">انقر هدفاً لتصفية قائمة المبادرات</span>
         <span class="grow"></span><button id="t4-reset" class="chip-reset">✕ إعادة التعيين</button></div>
       <div class="grid g4" id="pillar-grid"></div>
       <div class="section-h"><span class="bar"></span><h2 id="ini-list-title">جميع المبادرات</h2>
@@ -303,7 +316,7 @@
         <div class="card"><h3>توقعات الطلب والعرض — الأشهر الـ 12 القادمة</h3>
           <div class="c-sub" id="fc-sub">الخطوط المتقطعة = الإسقاط، النطاق المظلل = نطاق الثقة</div>
           <div class="chart tall" id="c-forecast"></div></div>
-        <div class="card"><h3>ماذا تغيّر؟ — مقارنة شهرية</h3><div class="c-sub">يونيو 2026 مقابل مايو 2026</div>
+        <div class="card"><h3>ماذا تغيّر؟ — مقارنة شهرية</h3><div class="c-sub" id="fc-changed-sub">—</div>
           <div style="display:flex;flex-direction:column;gap:9px;margin-top:8px" id="what-changed"></div></div>
       </div>
       <div class="section-h"><span class="bar"></span><h2>بطاقات التنبيه</h2>
@@ -319,7 +332,20 @@
       </div>
     </section>
 
-    <div class="foot">بيانات تجريبية لأغراض العرض — لوحة معلومات السكن الجماعي للأفراد بمدينة الرياض · أمانة منطقة الرياض · يوليو 2026</div>
+    <!-- التنقل بين الأقسام الرئيسية -->
+    <nav id="sec-nav" aria-label="التنقل بين الأقسام">
+      <button class="sn-btn" id="sn-prev">
+        <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        <span class="sn-l"><i>القسم السابق</i><b id="sn-prev-t">—</b></span>
+      </button>
+      <div class="sn-dots" id="sn-dots" role="tablist" aria-label="الأقسام"></div>
+      <button class="sn-btn pri" id="sn-next">
+        <span class="sn-l"><i>القسم التالي</i><b id="sn-next-t">—</b></span>
+        <svg viewBox="0 0 24 24"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+      </button>
+    </nav>
+
+    <div class="foot" id="page-foot">—</div>
   </main>
 </div>
 
