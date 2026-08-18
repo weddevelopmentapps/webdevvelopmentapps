@@ -125,7 +125,7 @@ button{font-family:var(--ff-b);cursor:pointer;border:none;background:none;color:
 
 .section-h{display:flex;align-items:center;gap:10px;margin:26px 0 14px}
 .section-h .bar{width:4px;height:20px;border-radius:3px;background:var(--green)}
-.section-h h2{font-size:16.5px}
+.section-h h2{font-size:22px;font-weight:800;letter-spacing:-.4px}
 .section-h .hint{font-size:11.5px;color:var(--muted);font-weight:600}
 .section-h .grow{flex:1}
 
@@ -152,8 +152,7 @@ button{font-family:var(--ff-b);cursor:pointer;border:none;background:none;color:
 }
 .card:hover{box-shadow:var(--shadow-lift);transform:translateY(-2px)}
 .card.flat:hover{transform:none;box-shadow:var(--shadow)}
-.card h3{font-size:13.5px;margin-bottom:4px}
-.card .c-sub{font-size:11px;color:var(--muted);font-weight:600;margin-bottom:8px}
+.card h3{font-size:16px;font-weight:800;letter-spacing:-.3px;margin-bottom:10px}
 .chart{width:100%;height:290px}
 .chart.tall{height:340px}
 .chart.short{height:220px}
@@ -598,9 +597,8 @@ table.tbl{width:100%;border-collapse:collapse;font-size:12px;min-width:720px}
 .sec-img .si-veil{position:absolute;inset:0;
   background:linear-gradient(to left,rgba(255,255,255,.95) 0%,rgba(255,255,255,.8) 46%,rgba(255,255,255,.36) 100%)}
 .sec-img .si-c{position:relative;z-index:2;padding:16px 20px;max-width:76%}
-.sec-img .si-k{font-size:10.5px;font-weight:700;color:var(--green);letter-spacing:.07em;margin-bottom:4px}
-.sec-img .si-t{font-family:var(--ff-d);font-size:16.5px;font-weight:700;letter-spacing:-.3px}
-.sec-img .si-d{font-size:11.5px;color:var(--ink);opacity:.82;margin-top:4px;line-height:1.6}
+.sec-img .si-k{font-size:12px;font-weight:700;color:var(--green);letter-spacing:.09em;margin-bottom:6px}
+.sec-img .si-t{font-family:var(--ff-d);font-size:30px;font-weight:800;letter-spacing:-.8px;line-height:1.2}
 
 /* ---------- التنقل بين الأقسام ---------- */
 #sec-nav{
@@ -806,3 +804,45 @@ table.tbl{width:100%;border-collapse:collapse;font-size:12px;min-width:720px}
   .hero-chips{grid-template-columns:1fr}
   .chart.wf{height:210px}
 }
+
+
+/* ============================================================
+   شريط نطاق التصفية · الرقم الحاكم لبطاقات الشلال
+   ============================================================ */
+.scope-bar{
+  display:flex;flex-wrap:wrap;align-items:center;gap:8px;
+  margin:0 0 4px;padding:9px 16px;border-radius:12px;
+  background:var(--gold-soft);border:1px solid #E5D5AC;
+}
+.scope-bar .sb-on{font-size:13px;font-weight:800;color:#7A5E14}
+.scope-bar .sb-off{
+  font-size:11.5px;font-weight:700;color:#8A6D24;background:rgba(255,255,255,.7);
+  border:1px solid #E5D5AC;border-radius:999px;padding:2px 10px;
+}
+.card h3 .scope-note{font-size:10.5px;font-weight:700;vertical-align:middle}
+
+.wf-card .wf-row{display:flex;align-items:stretch;gap:14px}
+.wf-card .wf-stat{
+  flex:0 0 190px;display:flex;flex-direction:column;justify-content:center;gap:8px;
+  padding-inline-end:16px;border-inline-end:1px solid var(--line);
+}
+.wf-card .wf-v{
+  font-family:var(--ff-d);font-size:44px;font-weight:800;line-height:1;
+  color:var(--green);letter-spacing:-1.4px;white-space:nowrap;
+}
+.wf-card .wf-v small{font-size:15px;font-weight:600;color:var(--muted);margin-inline-start:7px;letter-spacing:0}
+.wf-card .wf-d{
+  display:inline-flex;align-items:baseline;gap:6px;align-self:flex-start;
+  background:var(--tint);border-radius:10px;padding:6px 12px;
+}
+.wf-card .wf-d b{font-family:var(--ff-d);font-size:19px;font-weight:800;color:var(--green2)}
+.wf-card .wf-d span{font-size:11.5px;font-weight:700;color:var(--muted)}
+.wf-card .chart.wf{flex:1 1 auto;width:auto;min-width:0;height:210px}
+
+@media (max-width:1200px){
+  .wf-card .wf-stat{flex-basis:150px}
+  .wf-card .wf-v{font-size:34px}
+}
+
+/* حاشية أسفل الرسم — تُستخدم فقط لبيان قيد مصدر، لا كعنوان فرعي */
+.chart-foot{font-size:11.5px;font-weight:600;color:var(--muted);margin-top:8px;line-height:1.7}

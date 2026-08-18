@@ -102,9 +102,24 @@ const inWin = m => winMonths().includes(m);
    فتمر دون تأثر بالتصفية بدل أن تُفرَّغ منها. */
 const secOK = s => s==null || !S.sectors.size || S.sectors.has(s);
 const typOK = t => t==null || !S.types.size || S.types.has(t);
-/* هل التصفية الحالية غير قابلة للتطبيق على سلسلة مدينة-المستوى؟ */
-const cityOnlyNote = () => (S.sectors.size||S.types.size)
-  ? '<span class="scope-note">هذه السلسلة على مستوى المدينة في المصدر — لا تتأثر بتصفية القطاع أو نوع السكن</span>' : '';
+/* شريط النطاق: يوضّح للقارئ ما الذي طُبّقت عليه التصفية وما الذي يتعذّر
+   تطبيقها عليه لعدم تفصيله في المصدر — بدل تركه يظن أن التصفية لم تعمل. */
+function scopeBar(){
+  const bar = el('scope-bar');
+  const secs = [...S.sectors], typs = [...S.types];
+  if(!secs.length && !typs.length){ bar.hidden = true; bar.innerHTML=''; return; }
+  const on = [];
+  if(secs.length) on.push(`<b>${secs.join(' · ')}</b>`);
+  if(typs.length) on.push(`<b>${typs.join(' · ')}</b>`);
+  const off = [];
+  if(secs.length && typs.length)
+    off.push('المصدر لا يوفّر تقاطع القطاع مع نوع السكن — الأرقام معروضة على نطاق القطاع');
+  off.push('السلاسل الشهرية (الإصدار والزيارات) على مستوى المدينة في المصدر ولا تتأثر بالتصفية');
+  if(typs.length) off.push('تركيبة الطلب والمخالفات غير مفصّلة حسب نوع السكن');
+  bar.innerHTML = `<span class="sb-on">التصفية النشطة: ${on.join(' + ')}</span>`+
+    off.map(t=>`<span class="sb-off">${t}</span>`).join('');
+  bar.hidden = false;
+}
 const TYPES = ['مجمع سكني','مبنى سكني','كبائن متنقلة'];
 const TYPE_COLORS = {'مجمع سكني':C.teal,'مبنى سكني':C.gold,'كبائن متنقلة':C.clay};
 const STATUS_CHIP = {'منجزة':'st-green','جاري العمل':'st-teal','متأخرة':'st-amber','لم تبدأ بعد':'st-grey'};
@@ -126,7 +141,7 @@ function syncFilterUI(){
   });
   el('t1-reset').classList.toggle('show', !!(S.collar||S.sectors.size));
 }
-function refresh(){ syncFilterUI(); renderTab(S.tab); }
+function refresh(){ syncFilterUI(); scopeBar(); renderTab(S.tab); }
 function toggleSector(sec){
   if(S.sectors.size===1 && S.sectors.has(sec)) S.sectors.clear();
   else { S.sectors.clear(); S.sectors.add(sec); }
@@ -170,6 +185,18 @@ function noData(id,key){
 }
 const NA_CHIP = '<span class="na-chip">لا تتوفر بيانات فعلية</span>';
 const naCard = (label,ico)=>kpiCard(label,'<span class="na-val">—</span>',NA_CHIP,'na',ico);
+
+/* ملاحظة نطاق تُلحق بعنوان البطاقة الحاضنة لرسم ما — تُمسح تلقائياً عند
+   زوال السبب، فلا تتراكم عبر عمليات إعادة الرسم. */
+function cardNote(chartId, text){
+  const c = el(chartId); if(!c) return;
+  const card = c.closest('.card'); if(!card) return;
+  const h = card.querySelector('h3'); if(!h) return;
+  const old = h.querySelector('.scope-note'); if(old) old.remove();
+  if(text) h.insertAdjacentHTML('beforeend', `<span class="scope-note">${text}</span>`);
+}
+const TYPE_SPLIT_NOTE = 'كل الأنواع — المصدر لا يفصّل القطاع حسب نوع السكن';
+const CITY_ONLY_NOTE  = 'على مستوى المدينة في المصدر';
 
 /* ---------- sortable/searchable table ---------- */
 function makeTable(containerId, cols, rows, {onRow, sortKey, desc=true, max}={}) {
@@ -320,14 +347,27 @@ function sectorFacts(sec){
    تناسبية: تُعرض أرقام المدينة كما هي مع تنبيه على النطاق. */
 function demandVal(row){ return row.total; }
 
+/* المصدر يفصّل الطاقة والرخص التشغيلية حسب القطاع (ورقة الطاقة) وحسب نوع
+   السكن (ورقة الأنواع) — لكن لا يوفّر التقاطع بين البعدين. فتُطبَّق تصفية
+   النوع على أرقام المدينة، وتصفية القطاع على أرقام القطاعات، ويُعلن صراحةً
+   في شريط النطاق أن الجمع بين البعدين غير متاح في المصدر. */
+function typeFacts(){
+  if(!S.types.size) return null;
+  const rs = D.licType.filter(r=>S.types.has(r.name));
+  return {beds:rs.reduce((a,r)=>a+r.beds,0), opLic:rs.reduce((a,r)=>a+r.ops,0)};
+}
 function scopeFacts(){
   const rs = D.capSector.filter(r=>secOK(r.name));
-  const beds = rs.reduce((a,r)=>a+r.beds,0);
+  const tf = typeFacts();
+  /* النوع وحده → أرقام ورقة الأنواع · القطاع (وحده أو مع النوع) → أرقام القطاعات */
+  const useType = tf && !S.sectors.size;
+  const beds  = useType ? tf.beds  : rs.reduce((a,r)=>a+r.beds,0);
+  const opLic = useType ? tf.opLic : rs.reduce((a,r)=>a+r.opLic,0);
   const demand = S.sectors.size
     ? D.demand.sector.filter(r=>S.sectors.has(r.name)).reduce((a,r)=>a+r.total,0)
     : D.meta.totals.demand;
   return {rs,beds,demand,gap:demand-beds,cov:beds?beds/demand*100:0,
-    opLic:rs.reduce((a,r)=>a+r.opLic,0), buildLic:rs.reduce((a,r)=>a+r.buildLic,0)};
+    opLic, buildLic:rs.reduce((a,r)=>a+r.buildLic,0), typeScoped:!!useType};
 }
 function scopeLabel(){
   const n=S.sectors.size;
@@ -354,8 +394,7 @@ function renderT1(){
 
   const k = 1;
   el('t1-demand-hint').innerHTML =
-    'إجمالي العمالة حسب أبعاد التصنيف المتاحة في المصدر' +
-    (sec? ` <span class="scope-note">تركيبة الطلب (الياقات والمجموعات المهنية) متاحة على مستوى المدينة فقط — لا تتأثر بتصفية ${sec}</span>` : '');
+    (sec? `<span class="scope-note">تركيبة الطلب على مستوى المدينة — لا تتأثر بتصفية ${sec}</span>` : '');
 
   /* donut — collar */
   const collar = chart('c-collar');
@@ -385,7 +424,7 @@ function renderT1(){
     yAxis:Object.assign({},AXC,{data:occRows.map(r=>r.name),position:'right',axisLabel:Object.assign({},AXC.axisLabel,{width:170,overflow:'truncate'})}),
     series:[{type:'bar',data:occRows.map(r=>r.v),barMaxWidth:18,
       itemStyle:{color:C.teal,borderRadius:[6,0,0,6]},
-      label:{show:true,position:'left',formatter:p=>fmtAx(p.value),fontSize:10.5,color:C.muted,fontFamily:'Cairo'}}],
+      label:{show:true,position:'left',formatter:p=>fmtAx(p.value),fontSize:12,color:C.ink,fontWeight:'bold',fontFamily:'Cairo'}}],
   }));
   reClick(ssco,null);
 
@@ -406,7 +445,7 @@ function renderT1(){
     yAxis:AXVY,
     series:[{type:'bar',data:dsecRows.map(r=>({value:demandVal(r),
       itemStyle:{color:S.sectors.has(r.name)?C.green:C.teal,borderRadius:[6,6,0,0],opacity:S.sectors.size&&!S.sectors.has(r.name)?0.35:1}})),
-      barMaxWidth:24,label:{show:true,position:'top',formatter:p=>fmtAx(p.value),fontSize:10,color:C.muted,fontFamily:'Cairo'}}],
+      barMaxWidth:24,label:{show:true,position:'top',formatter:p=>fmtAx(p.value),fontSize:12,color:C.ink,fontWeight:'bold',fontFamily:'Cairo'}}],
   }));
   reClick(dsec,p=>toggleSector(dsecRows[p.dataIndex].name));
 
@@ -415,12 +454,12 @@ function renderT1(){
   occCard.textContent='—'; occCard.classList.add('na-val');
   el('chip-occ-note').innerHTML=NA_CHIP; el('chip-occ-note').className='k-delta na';
   countUp(document.querySelector('[data-count="facilities"]'),sf.opLic);
-  el('chip-fac-note').textContent=`${fmt(sf.buildLic)} رخصة بناء · ${fmt(sf.beds)} سرير مرخص`;
+  el('chip-fac-note').innerHTML=sinceBase(D.facts.opsYoY);
   el('chip-fac-note').className='k-delta up';
   const topCap=[...D.capSector].sort((a,b)=>b.beds-a.beds)[0];
   el('chip-topsec').textContent=topCap.name;
-  el('chip-topsec-note').textContent=`${fmt(topCap.beds)} سرير · تغطية ${fmt1(topCap.cov)}٪`;
-  el('chip-topsec-note').className='k-delta flat';
+  el('chip-topsec-note').textContent='';
+  el('chip-topsec-note').className='k-delta';
 
   /* stacked bar by type */
   /* الطاقة حسب نوع السكن — ورقة 09 (على مستوى المدينة؛ المصدر لا يوزعها قطاعياً) */
@@ -461,15 +500,16 @@ function renderT1(){
     series:[
       {name:'الطلب',type:'bar',data:supRows.map(r=>r.dem),barMaxWidth:34,barGap:'12%',
         itemStyle:{color:'#A8C6B5',borderRadius:[3,3,0,0]},
-        label:{show:true,position:'top',formatter:p=>fmtAx(p.value),fontSize:11.5,
-          fontWeight:'bold',color:C.ink,fontFamily:'Cairo'}},
+        label:{show:true,position:'top',formatter:p=>fmtAx(p.value),fontSize:12.5,fontWeight:'bold',color:C.ink,fontFamily:'Cairo'}},
       {name:'العرض',type:'bar',data:supRows.map(r=>r.beds),barMaxWidth:34,
         itemStyle:{color:'#1E5B44',borderRadius:[3,3,0,0]},
-        label:{show:true,position:'top',formatter:p=>fmtAx(p.value),fontSize:11.5,
-          fontWeight:'bold',color:'#1E5B44',fontFamily:'Cairo'}},
+        label:{show:true,position:'top',formatter:p=>fmtAx(p.value),fontSize:12.5,fontWeight:'bold',color:'#1E5B44',fontFamily:'Cairo'}},
     ],
   }));
   reClick(sup,p=>toggleSector(supRows[p.dataIndex].s));
+  /* الطاقة القطاعية غير مفصّلة حسب نوع السكن — يُعلن ذلك على البطاقة نفسها */
+  const tNote = S.types.size ? TYPE_SPLIT_NOTE : null;
+  cardNote('c-supsec',tNote); cardNote('map1',tNote); cardNote('c-dsec',tNote);
 
   /* map + side panel */
   /* خريطة فعلية للرياض؛ القطاعات كدوائر متناسبة — لا إحداثيات منشآت في المصدر */
@@ -509,7 +549,7 @@ function colChart(id,cats,vals,colors,onClick){
     xAxis:Object.assign({},AXC,{data:cats,inverse:true}),
     yAxis:AXVY,
     series:[{type:'bar',data:vals.map((v,i)=>({value:v,itemStyle:{color:colors[i],borderRadius:[6,6,0,0]}})),
-      barMaxWidth:26,label:{show:true,position:'top',formatter:p=>fmtAx(p.value),fontSize:10,color:C.muted,fontFamily:'Cairo'}}],
+      barMaxWidth:26,label:{show:true,position:'top',formatter:p=>fmtAx(p.value),fontSize:12,color:C.ink,fontWeight:'bold',fontFamily:'Cairo'}}],
   }));
   reClick(c,onClick? p=>onClick(p.dataIndex):null);
 }
@@ -538,7 +578,7 @@ function renderMap1Side(sec,sf){
     series:[{type:'bar',data:rows.map(r=>({value:r.beds,itemStyle:{
         color:S.sectors.has(r.name)?C.green:C.teal,
         opacity:S.sectors.size&&!S.sectors.has(r.name)?0.4:1,borderRadius:[6,0,0,6]}})),
-      barMaxWidth:14,label:{show:true,position:'left',formatter:p=>fmtAx(p.value),fontSize:10,color:C.muted}}],
+      barMaxWidth:14,label:{show:true,position:'left',formatter:p=>fmtAx(p.value),fontSize:12,color:C.ink,fontWeight:'bold'}}],
   }));
   reClick(c,p=>toggleSector(rows[p.dataIndex].name));
 }
@@ -547,6 +587,7 @@ function renderMap1Side(sec,sf){
    TAB 2 — التراخيص
    ============================================================ */
 function licWin(){ return D.licenses.filter(r=>inWin(r.month)&&secOK(r.sector)&&typOK(r.type)); }
+const sinceBase = pct => `${ltr('+'+fmt1(pct)+'٪')} منذ سبتمبر 2025`;
 function kpiCard(label,valHTML,delta,cls,ico){
   return `<div class="card kpi">${ico?`<div class="k-ico">${ico}</div>`:''}
     <div class="k-label">${label}</div><div class="k-val">${valHTML}</div>
@@ -564,17 +605,15 @@ function renderT2(){
 
   el('t2-kpis').innerHTML =
     kpiCard('إجمالي الأسرّة المرخصة',`<span id="k2-beds">0</span><small>سرير</small>`,
-      `${ltr('+'+fmt1(D.facts.bedsYoY)+'٪')} مقابل خط الأساس`,'up')+
-    kpiCard('نمو الرخص مقابل خط الأساس',`<span id="k2-yoy">0</span><small>٪</small>`,
-      `${fmt(baseTot)} ← ${fmt(curTot)} رخصة`,'up')+
+      sinceBase(D.facts.bedsYoY),'up')+
+    kpiCard('نمو الرخص مقابل خط الأساس',`<span id="k2-yoy">0</span><small>٪</small>`,'')+
     kpiCard('رخص البناء الصادرة',`<span id="k2-constr">0</span><small>رخصة</small>`,
-      `خلال ${nounCount(rows.length,'شهر','أشهر')} مسجلة`,'flat')+
+      sinceBase(D.facts.constrYoY),'up')+
     kpiCard('رخص التشغيل الصادرة',`<span id="k2-ops">0</span><small>رخصة</small>`,
-      `خلال ${nounCount(rows.length,'شهر','أشهر')} مسجلة`,'flat')+
+      sinceBase(D.facts.opsYoY),'up')+
     kpiCard('الطاقة المضافة خلال الفترة',`<span id="k2-added">0</span><small>سرير</small>`,
-      `الرصيد التراكمي ${fmt(D.meta.totals.beds)}`,'up')+
-    kpiCard('متوسط الإضافة الشهرية',`<span id="k2-avg">0</span><small>سرير</small>`,
-      `محسوب على ${nounCount(D.foresight.activeMonths,'شهر بإضافة فعلية','أشهر بإضافة فعلية')}`,'flat')+
+      sinceBase(D.facts.bedsYoY),'up')+
+    kpiCard('متوسط الإضافة الشهرية',`<span id="k2-avg">0</span><small>سرير</small>`,'')+
     naCard('متوسط مدة إصدار الرخصة')+
     naCard('الطلبات المستلمة ونسبة إغلاقها');
   countUp(el('k2-beds'),sf.beds); countUp(el('k2-yoy'),yoy,{decimals:1});
@@ -671,11 +710,16 @@ function renderT2(){
 
   /* ── مخططات شلالية: خط الأساس ← الإضافات الشهرية ← الرصيد الحالي ── */
   const WF=[
-    {id:'c-wf-constr', add:'constr', cum:'cum_constr'},
-    {id:'c-wf-ops',    add:'ops',    cum:'cum_ops'},
-    {id:'c-wf-beds',   add:'beds_added', cum:'cum_beds'},
+    {id:'c-wf-constr', add:'constr', cum:'cum_constr', unit:'رخصة', delta:D.licDelta.constr},
+    {id:'c-wf-ops',    add:'ops',    cum:'cum_ops',    unit:'رخصة', delta:D.licDelta.ops},
+    {id:'c-wf-beds',   add:'beds_added', cum:'cum_beds', unit:'سرير', delta:D.licDelta.beds},
   ];
   WF.forEach(w=>{
+    /* الرقم الحاكم للبطاقة: الرصيد الحالي ونموّه منذ خط الأساس */
+    el(w.id+'-u').textContent = w.unit;
+    countUp(el(w.id+'-v'), w.delta.current);
+    el(w.id+'-d').innerHTML =
+      `<b>${ltr('+'+fmt(w.delta.change))}</b><span>منذ سبتمبر 2025</span>`;
     const b0=D.licBaseline[w.cum];
     const ms=D.licenses.filter(r=>inWin(r.month));
     const cats=['الأساس',...ms.map(r=>r.month_ar.replace(/\s+\d{4}$/,'')),'الإجمالي'];
@@ -695,20 +739,25 @@ function renderT2(){
         return `<b>${cats[i]}</b>`+ttRow(kind[i]==='base'?'رصيد خط الأساس':'الرصيد الحالي',fmt(val[i]),C.green);
       }}),
       xAxis:Object.assign({},AXC,{data:cats,inverse:true,
-        axisLabel:Object.assign({},AXC.axisLabel,{fontSize:9.5,interval:0})}),
+        axisLabel:Object.assign({},AXC.axisLabel,{fontSize:11,interval:0})}),
       yAxis:Object.assign({},AXVY,{max:v=>v.max*1.18}),
       series:[
         {type:'bar',stack:'w',silent:true,itemStyle:{color:'transparent'},data:pad,tooltip:{show:false}},
-        {type:'bar',stack:'w',barMaxWidth:26,data:val.map((v,i)=>({value:v,itemStyle:{
-            color: kind[i]==='base'? '#C9D6CF' : kind[i]==='total'? C.green : C.green2,
-            borderRadius:[3,3,0,0]}})),
-         label:{show:true,position:'top',fontSize:10,fontFamily:'Cairo',fontWeight:'bold',
-           color:p=>kind[p.dataIndex]==='add'? C.green2 : C.ink,
+        {type:'bar',stack:'w',barMaxWidth:26,data:val.map((v,i)=>({value:v,
+            itemStyle:{color: kind[i]==='base'? '#C9D6CF' : kind[i]==='total'? C.green : C.green2,
+              borderRadius:[3,3,0,0]},
+            /* حجم الخط يُضبط لكل عمود على حدة — ECharts لا يقبل دالة لـ fontSize */
+            label:{fontSize: kind[i]==='add'? 12 : 15, color: kind[i]==='add'? C.green2 : C.ink}})),
+         label:{show:true,position:'top',fontFamily:'Cairo',fontWeight:'bold',
            formatter:p=>kind[p.dataIndex]==='add'? (p.value? fmtAx(p.value)+'+' : '') : fmtAx(p.value)}},
       ],
     }));
     reClick(c,null);
   });
+
+  /* السلاسل الشهرية على مستوى المدينة في المصدر — تُعلن حين تكون تصفية نشطة */
+  const cityNote = (S.sectors.size||S.types.size) ? CITY_ONLY_NOTE : null;
+  ['c-lictrend','c-wf-constr','c-wf-ops','c-wf-beds'].forEach(id=>cardNote(id,cityNote));
 
   /* monthly table */
   /* ord = مفتاح ترتيب رقمي (YYYYMM) حتى يفرز عمود الشهر زمنياً لا أبجدياً */
@@ -763,13 +812,10 @@ function renderT3(){
   const perInsp=nInsp? secVisits/nInsp : 0;
 
   el('t3-kpis').innerHTML =
-    kpiCard('الزيارات الرقابية',`<span id="k3-v">0</span>`,'خلال آخر 12 شهراً','flat')+
-    kpiCard('المخالفات المرصودة',`<span id="k3-w">0</span>`,
-      `${fmt1(secVisits?secViol/secVisits*100:0)}٪ من الزيارات`,'flat')+
-    kpiCard('نسبة الامتثال',`<span id="k3-cp">0</span><small>٪</small>`,
-      'زيارات بلا مخالفة ÷ إجمالي الزيارات','up')+
-    kpiCard('عدد المراقبين',`<span id="k3-n">0</span><small>مراقباً</small>`,
-      `${fmt(perInsp)} زيارة لكل مراقب`,'flat')+
+    kpiCard('الزيارات الرقابية',`<span id="k3-v">0</span>`,'')+
+    kpiCard('المخالفات المرصودة',`<span id="k3-w">0</span>`,'')+
+    kpiCard('نسبة الامتثال',`<span id="k3-cp">0</span><small>٪</small>`,'')+
+    kpiCard('عدد المراقبين',`<span id="k3-n">0</span><small>مراقباً</small>`,'')+
     naCard('الغرامات المحصلة')+
     naCard('المنشآت المغلقة');
   countUp(el('k3-v'),secVisits); countUp(el('k3-w'),secViol);
@@ -779,7 +825,6 @@ function renderT3(){
   const secAgg=name=>{const r=D.inspSector.find(x=>x.name===name)||{};
     return {v:r.visits||0,w:r.violations||0,i:r.inspectors||0};};
   el('map2-title').textContent='خريطة الرقابة — القطاعات البلدية';
-  el('map2-sub').textContent='الزيارات والمخالفات لكل قطاع بلدي — انقر قطاعاً للتفاصيل';
   /* لا إحداثيات منشآت في المصدر، فلا نقاط ولا خريطة كثافة */
   drawMap('map2',{
     sectorTip:s=>{const a=secAgg(s);
@@ -815,7 +860,7 @@ function renderT3(){
     xAxis:Object.assign({},AXV,{inverse:true}),
     yAxis:Object.assign({},AXC,{data:svRows.map(r=>r.s.replace(/^(ال)?قطاع /,'')),position:'right'}),
     series:[{type:'bar',data:svRows.map(r=>({value:r.w,itemStyle:{color:S.sectors.has(r.s)?C.green:C.teal,opacity:S.sectors.size&&!S.sectors.has(r.s)?0.4:1,borderRadius:[6,0,0,6]}})),
-      barMaxWidth:14,label:{show:true,position:'left',formatter:p=>fmt(p.value),fontSize:10,color:C.muted}}],
+      barMaxWidth:14,label:{show:true,position:'left',formatter:p=>fmt(p.value),fontSize:12,color:C.ink,fontWeight:'bold'}}],
   }));
   reClick(sv,p=>toggleSector(svRows[p.dataIndex].s));
   makeTable('side-nb',[
@@ -834,7 +879,7 @@ function renderT3(){
     xAxis:Object.assign({},AXV,{inverse:true}),
     yAxis:Object.assign({},AXC,{data:catRows.map(r=>r.c.name),position:'right',axisLabel:Object.assign({},AXC.axisLabel,{width:185,overflow:'truncate'})}),
     series:[{type:'bar',data:catRows.map(r=>r.v),barMaxWidth:18,itemStyle:{color:C.teal,borderRadius:[6,0,0,6]},
-      label:{show:true,position:'left',formatter:p=>fmt(p.value),fontSize:10.5,color:C.muted}}],
+      label:{show:true,position:'left',formatter:p=>fmt(p.value),fontSize:12,color:C.ink,fontWeight:'bold'}}],
   }));
   reClick(vc,p=>{
     const cat=catRows[p.dataIndex].c;
@@ -905,7 +950,7 @@ function colChart3(id,rows){
     xAxis:Object.assign({},AXC,{data:rows.map(r=>r.n),inverse:true}),
     yAxis:AXVY,
     series:[{type:'bar',data:rows.map(r=>({value:r.v,itemStyle:{color:r.col,borderRadius:[6,6,0,0]}})),barMaxWidth:26,
-      label:{show:true,position:'top',formatter:p=>fmt(p.value),fontSize:10,color:C.muted}}],
+      label:{show:true,position:'top',formatter:p=>fmt(p.value),fontSize:12,color:C.ink,fontWeight:'bold'}}],
   }));
 }
 function inspectorDrawer(i){
@@ -930,11 +975,11 @@ function renderT4(){
   const due90=inis.filter(i=>i.end&&i.end>D.meta.today&&i.end<=horizon&&i.status!=='منجزة').length;
   const maxLate=Math.max(0,...inis.filter(i=>i.overdue!=null).map(i=>i.overdue));
   el('t4-kpis').innerHTML =
-    kpiCard('إجمالي المبادرات',`<span id="k4-n">0</span>`,'موزعة على 4 أهداف','flat')+
-    kpiCard('منجزة',`<span id="k4-done">0</span>`,'حالة صريحة في المصدر','up')+
-    kpiCard('جاري العمل',`<span id="k4-on">0</span>`,'ضمن الفترة المخططة','up')+
-    kpiCard('متأخرة',`<span id="k4-late">0</span>`,`أقصى تأخر ${fmt(maxLate)} يوماً`,'down')+
-    kpiCard('مستحقة خلال 90 يوماً',`<span id="k4-due">0</span>`,`حتى ${fmtDate(horizon)}`,'flat')+
+    kpiCard('إجمالي المبادرات',`<span id="k4-n">0</span>`,'')+
+    kpiCard('منجزة',`<span id="k4-done">0</span>`,'')+
+    kpiCard('جاري العمل',`<span id="k4-on">0</span>`,'')+
+    kpiCard('متأخرة',`<span id="k4-late">0</span>`,'')+
+    kpiCard('مستحقة خلال 90 يوماً',`<span id="k4-due">0</span>`,'')+
     naCard('متوسط نسبة الإنجاز والميزانيات');
   countUp(el('k4-n'),inis.length); countUp(el('k4-done'),by('منجزة'));
   countUp(el('k4-on'),by('جاري العمل')); countUp(el('k4-late'),by('متأخرة'));
@@ -1119,16 +1164,12 @@ function renderT6(){
   const due90=D.initiatives.filter(i=>i.end&&i.end>D.meta.today&&i.end<=horizon&&i.status!=='منجزة').length;
 
   el('t6-kpis').innerHTML =
-    kpiCard('متوسط الإضافة الشهرية',`<span id="k6-a">0</span><small>سرير</small>`,
-      `محسوب على ${nounCount(PJ.activeMonths,'شهر بإضافة فعلية','أشهر بإضافة فعلية')}`,'flat')+
-    kpiCard('الطاقة المتوقعة بعد 6 أشهر',`<span id="k6-s">0</span><small>سرير</small>`,at6.month_ar,'flat')+
-    kpiCard('الفجوة المتوقعة بعد 6 أشهر',`<span id="k6-g">0</span><small>سرير</small>`,
-      'وفق الوتيرة الحالية','down')+
-    kpiCard('المتبقي لبلوغ مستهدف الأسرّة',`<span id="k6-r">0</span><small>سرير</small>`,
-      `المستهدف المعتمد ${fmt(PJ.bedsTarget)}`,'flat')+
-    kpiCard('الزمن اللازم بالوتيرة الحالية',`<span id="k6-m">0</span><small>شهراً</small>`,
-      `أي نحو ${PJ.targetDate}`,'flat')+
-    kpiCard('مبادرات مستحقة خلال 90 يوماً',`<span id="k6-i">0</span>`,`حتى ${fmtDate(horizon)}`,'flat');
+    kpiCard('متوسط الإضافة الشهرية',`<span id="k6-a">0</span><small>سرير</small>`,'')+
+    kpiCard('الطاقة المتوقعة بعد 6 أشهر',`<span id="k6-s">0</span><small>سرير</small>`,'')+
+    kpiCard('الفجوة المتوقعة بعد 6 أشهر',`<span id="k6-g">0</span><small>سرير</small>`,'')+
+    kpiCard('المتبقي لبلوغ مستهدف الأسرّة',`<span id="k6-r">0</span><small>سرير</small>`,'')+
+    kpiCard('الزمن اللازم بالوتيرة الحالية',`<span id="k6-m">0</span><small>شهراً</small>`,'')+
+    kpiCard('مبادرات مستحقة خلال 90 يوماً',`<span id="k6-i">0</span>`,'');
   countUp(el('k6-a'),PJ.avgBeds); countUp(el('k6-s'),at6.supply);
   countUp(el('k6-g'),at6.gap); countUp(el('k6-r'),PJ.bedsRemaining);
   countUp(el('k6-m'),PJ.monthsToTarget,{decimals:1}); countUp(el('k6-i'),due90);
@@ -1165,7 +1206,6 @@ function renderT6(){
   }),true);
 
   /* الفجوة المتوقعة شهرياً */
-  el('gap-sub').textContent='محتسبة: الطلب المسجّل − الطاقة المتوقعة';
   const gp=chart('c-gapbar');
   gp.setOption(base({
     grid:{containLabel:true,left:8,right:8,top:14,bottom:4},
@@ -1190,7 +1230,6 @@ function renderT6(){
     {l:'الزيارات الرقابية',v0:i0.visits,v1:i1.visits,goodUp:true},
     {l:'المخالفات المرصودة',v0:i0.violations,v1:i1.violations,goodUp:false},
   ];
-  el('fc-changed-sub').textContent=`${l1.month_ar} مقابل ${l0.month_ar}`;
   el('what-changed').innerHTML=
     (unposted.length? `<div class="wc-cap">آخر شهر مُرحَّل في المصدر هو ${l1.month_ar}؛ `+
       `${unposted.map(r=>r.month_ar).join(' و')} لم تُرحَّل بياناته بعد.</div>` : '')+
@@ -1280,13 +1319,6 @@ if(typeof IMAGES!=='undefined'){
   el('img-t2').style.backgroundImage=`url('${IMAGES.lic}')`;
   el('img-t3').style.backgroundImage=`url('${IMAGES.ctl}')`;
 }
-el('img-t2-d').textContent=
-  `خلال اثني عشر شهراً ارتفعت الطاقة الاستيعابية المرخصة من ${fmt(D.licDelta.beds.baseline)} `+
-  `إلى ${fmt(D.licDelta.beds.current)} سرير — بزيادة قدرها ${fmt1(D.licDelta.beds.pct)}٪.`;
-el('img-t3-d').textContent=
-  `${fmt(D.meta.totals.visits)} زيارة رقابية رصدت ${fmt(D.meta.totals.violations)} مخالفة، `+
-  `بنسبة امتثال ${fmt1(D.meta.totals.compliance)}٪.`;
-
 el('updated-at').textContent=D.meta.updated;
 el('page-foot').innerHTML=
   `المصدر: ${D.meta.source} · فترة العرض: ${D.meta.asOf} · تاريخ اليوم المرجعي: ${fmtDate(D.meta.today)}`+

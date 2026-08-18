@@ -75,6 +75,7 @@
     </div>
   </header>
 
+  <div id="scope-bar" class="scope-bar" hidden></div>
   <main id="view">
     <!-- ======================= TAB 1 — العرض والطلب ======================= -->
     <section class="tab active" id="tab-t1">
@@ -110,21 +111,20 @@
       </div>
 
       <div class="section-h"><span class="bar"></span><h2>تفاصيل الطلب</h2>
-        <span class="hint" id="t1-demand-hint">إجمالي العمالة حسب أبعاد التصنيف — انقر شريحة الياقات لتصفية بقية الرسوم البيانية</span>
+        <span class="hint" id="t1-demand-hint"></span>
         <span class="grow"></span><button id="t1-reset" class="chip-reset">✕ إعادة التعيين</button>
       </div>
       <div class="grid g3">
-        <div class="card"><h3>نوع الياقة</h3><div class="c-sub">ياقات زرقاء مقابل ياقات بيضاء</div><div class="chart" id="c-collar"></div></div>
-        <div class="card" style="grid-column:span 2"><h3>المجموعات المهنية — التصنيف السعودي الموحد للمهن</h3><div class="c-sub">عدد العمالة لكل مجموعة رئيسية</div><div class="chart" id="c-ssco"></div></div>
-        <div class="card"><h3>القطاع الاقتصادي</h3><div class="c-sub">توزيع العمالة على الأنشطة</div><div class="chart" id="c-econ"></div></div>
-        <div class="card"><h3>حجم المنشأة</h3><div class="c-sub">حسب تصنيف المنشآت</div><div class="chart" id="c-sme"></div></div>
-        <div class="card"><h3>الفئات العمرية</h3><div class="c-sub">التوزيع العمري للعمالة</div><div class="chart" id="c-age"></div></div>
-        <div class="card" style="grid-column:span 2"><h3>الجنسيات — أعلى 10</h3><div class="c-sub">عدد العمالة حسب الجنسية</div><div class="chart" id="c-nat"></div></div>
-        <div class="card"><h3>القطاع البلدي</h3><div class="c-sub">توزيع الطلب جغرافياً</div><div class="chart" id="c-dsec"></div></div>
+        <div class="card"><h3>نوع الياقة</h3><div class="chart" id="c-collar"></div></div>
+        <div class="card" style="grid-column:span 2"><h3>المجموعات المهنية — التصنيف السعودي الموحد للمهن</h3><div class="chart" id="c-ssco"></div></div>
+        <div class="card"><h3>القطاع الاقتصادي</h3><div class="chart" id="c-econ"></div></div>
+        <div class="card"><h3>حجم المنشأة</h3><div class="chart" id="c-sme"></div></div>
+        <div class="card"><h3>الفئات العمرية</h3><div class="chart" id="c-age"></div></div>
+        <div class="card" style="grid-column:span 2"><h3>الجنسيات — أعلى 10</h3><div class="chart" id="c-nat"></div></div>
+        <div class="card"><h3>القطاع البلدي</h3><div class="chart" id="c-dsec"></div></div>
       </div>
 
-      <div class="section-h"><span class="bar"></span><h2>تفاصيل العرض</h2>
-        <span class="hint">الأسرّة المرخصة والمنشآت — انقر قطاعاً على الخريطة أو نقطة منشأة للتفاصيل</span></div>
+      <div class="section-h"><span class="bar"></span><h2>تفاصيل العرض</h2></div>
       <div class="grid g3" style="margin-bottom:16px">
         <div class="card kpi"><div class="k-ico"><svg viewBox="0 0 24 24"><path d="M4 17a8 8 0 1116 0"/><path d="M12 17l3.8-4.6"/></svg></div>
           <div class="k-label">متوسط معدل الإشغال</div><div class="k-val"><span data-count="occupancy">0</span><small>٪</small></div>
@@ -137,13 +137,13 @@
           <span class="k-delta down" id="chip-topsec-note">—</span></div>
       </div>
       <div class="grid g2" style="margin-bottom:16px">
-        <div class="card"><h3>الأسرّة المرخصة حسب نوع السكن</h3><div class="c-sub">مجمعات سكنية / مبانٍ سكنية / كبائن متنقلة</div><div class="chart short" id="c-type"></div></div>
-        <div class="card"><h3>العرض مقابل الطلب حسب القطاع البلدي</h3><div class="c-sub">الأسرّة المرخصة مقابل العمالة — نسبة التغطية لكل قطاع</div><div class="chart short" id="c-supsec"></div></div>
+        <div class="card"><h3>الأسرّة المرخصة حسب نوع السكن</h3><div class="chart short" id="c-type"></div></div>
+        <div class="card"><h3>العرض مقابل الطلب حسب القطاع البلدي</h3><div class="chart short" id="c-supsec"></div></div>
       </div>
       <div class="grid g32">
         <div class="card flat">
           <h3>خريطة الرياض — الطاقة الاستيعابية حسب القطاع البلدي</h3>
-          <div class="c-sub">خريطة الرياض الفعلية بحدود القطاعات البلدية — كثافة اللون تعكس الطاقة الاستيعابية المرخصة. انقر قطاعاً لتصفية اللوحة بالكامل.</div>
+          
           <div class="mapwrap" id="map1"></div>
           <div class="map-legend">
             <span class="li"><span class="sw" style="background:linear-gradient(to left,#E8F3EE,#0E5A43)"></span>أسرّة أقل ← أسرّة أكثر</span>
@@ -162,8 +162,7 @@
       <div class="sec-img" id="img-t2">
         <div class="si-veil"></div>
         <div class="si-c"><div class="si-k">التراخيص</div>
-          <div class="si-t">من خط الأساس إلى الوضع الحالي</div>
-          <div class="si-d" id="img-t2-d">—</div></div>
+          <div class="si-t">من خط الأساس إلى الوضع الحالي</div></div>
       </div>
       <div class="filterbar" id="fb2">
         <span class="f-cap">نطاق التاريخ</span>
@@ -182,26 +181,49 @@
       </div>
       <div class="grid g4" id="t2-kpis"></div>
       <div class="grid g23" style="margin-top:16px">
-        <div class="card"><h3>اتجاه رخص البناء ورخص التشغيل</h3><div class="c-sub">شهرياً — انقر أي شهر لعرض تفاصيله حسب القطاع</div><div class="chart tall" id="c-lictrend"></div></div>
-        <div class="card"><h3>مسار طلبات الترخيص</h3><div class="c-sub">من الاستلام إلى إصدار الرخصة</div><div class="chart tall" id="c-funnel"></div></div>
+        <div class="card"><h3>اتجاه رخص البناء ورخص التشغيل</h3><div class="chart tall" id="c-lictrend"></div></div>
+        <div class="card"><h3>مسار طلبات الترخيص</h3><div class="chart tall" id="c-funnel"></div></div>
       </div>
       <div class="grid g3" style="margin-top:16px">
-        <div class="card"><h3>الرخص حسب القطاع البلدي</h3><div class="c-sub">بناء مقابل تشغيل</div><div class="chart" id="c-licsec"></div></div>
-        <div class="card"><h3>رخص التشغيل حسب نوع السكن</h3><div class="c-sub">انقر شريحة لتصفية التبويب</div><div class="chart" id="c-lictype"></div></div>
+        <div class="card"><h3>الرخص حسب القطاع البلدي</h3><div class="chart" id="c-licsec"></div></div>
+        <div class="card"><h3>رخص التشغيل حسب نوع السكن</h3><div class="chart" id="c-lictype"></div></div>
         <div class="card">
-          <h3>متوسط مدة الإصدار</h3><div class="c-sub">اتجاه تنازلي = تحسّن</div>
+          <h3>متوسط مدة الإصدار</h3>
           <div style="display:flex;flex-direction:column;gap:4px">
             <div><div style="display:flex;justify-content:space-between;align-items:center"><b style="font-size:11.5px">رخصة البناء (يوم)</b><span class="st st-green" id="spark1-delta">—</span></div><div class="chart mini" id="c-spark1"></div></div>
             <div><div style="display:flex;justify-content:space-between;align-items:center"><b style="font-size:11.5px">رخصة التشغيل (يوم)</b><span class="st st-green" id="spark2-delta">—</span></div><div class="chart mini" id="c-spark2"></div></div>
           </div>
         </div>
       </div>
-      <div class="section-h"><span class="bar"></span><h2>النمو الشهري — من خط الأساس إلى الوضع الحالي</h2>
-        <span class="hint">مخطط شلالي: كل عمود هو إضافة الشهر فوق رصيد ما قبله</span></div>
+      <div class="section-h"><span class="bar"></span><h2>النمو الشهري — من خط الأساس إلى الوضع الحالي</h2></div>
       <div class="grid" style="gap:14px;margin-bottom:16px">
-        <div class="card"><h3>رخص البناء</h3><div class="c-sub">رخصة</div><div class="chart wf" id="c-wf-constr"></div></div>
-        <div class="card"><h3>الرخص التشغيلية</h3><div class="c-sub">رخصة</div><div class="chart wf" id="c-wf-ops"></div></div>
-        <div class="card"><h3>الطاقة الاستيعابية</h3><div class="c-sub">سرير</div><div class="chart wf" id="c-wf-beds"></div></div>
+        <div class="card wf-card"><h3>رخص البناء</h3>
+          <div class="wf-row">
+            <div class="wf-stat">
+              <div class="wf-v"><span id="c-wf-constr-v">0</span><small id="c-wf-constr-u"></small></div>
+              <div class="wf-d" id="c-wf-constr-d">—</div>
+            </div>
+            <div class="chart wf" id="c-wf-constr"></div>
+          </div>
+        </div>
+        <div class="card wf-card"><h3>الرخص التشغيلية</h3>
+          <div class="wf-row">
+            <div class="wf-stat">
+              <div class="wf-v"><span id="c-wf-ops-v">0</span><small id="c-wf-ops-u"></small></div>
+              <div class="wf-d" id="c-wf-ops-d">—</div>
+            </div>
+            <div class="chart wf" id="c-wf-ops"></div>
+          </div>
+        </div>
+        <div class="card wf-card"><h3>الطاقة الاستيعابية</h3>
+          <div class="wf-row">
+            <div class="wf-stat">
+              <div class="wf-v"><span id="c-wf-beds-v">0</span><small id="c-wf-beds-u"></small></div>
+              <div class="wf-d" id="c-wf-beds-d">—</div>
+            </div>
+            <div class="chart wf" id="c-wf-beds"></div>
+          </div>
+        </div>
       </div>
 
       <div class="section-h"><span class="bar"></span><h2>سجل الإصدار الشهري</h2>
@@ -214,8 +236,7 @@
       <div class="sec-img" id="img-t3">
         <div class="si-veil"></div>
         <div class="si-c"><div class="si-k">الرقابة والامتثال</div>
-          <div class="si-t">جولات ميدانية على مدى اثني عشر شهراً</div>
-          <div class="si-d" id="img-t3-d">—</div></div>
+          <div class="si-t">جولات ميدانية على مدى اثني عشر شهراً</div></div>
       </div>
       <div class="filterbar" id="fb3">
         <span class="f-cap">نطاق التاريخ</span>
@@ -237,7 +258,7 @@
         <div class="card flat">
           <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
             <div style="flex:1"><h3 id="map2-title">خريطة الرقابة — القطاعات البلدية</h3>
-            <div class="c-sub" id="map2-sub">مؤشرات الزيارات والمخالفات لكل قطاع — انقر قطاعاً للتفاصيل</div></div>
+            </div>
             <label class="toggle" id="hot-toggle"><span>خريطة النقاط الساخنة</span><span class="tr"></span></label>
           </div>
           <div class="mapwrap" id="map2"></div>
@@ -246,20 +267,20 @@
         <div class="card flat map-side" id="map2-side"></div>
       </div>
       <div class="grid g2" style="margin-top:16px">
-        <div class="card"><h3>أعلى فئات المخالفات</h3><div class="c-sub">انقر فئة لعرض الغرامات وتوزيعها القطاعي</div><div class="chart" id="c-violcat"></div></div>
-        <div class="card"><h3>اتجاه الزيارات والمخالفات</h3><div class="c-sub">سردية الامتثال — زيارات أكثر ومخالفات أقل</div><div class="chart" id="c-vv"></div></div>
+        <div class="card"><h3>أعلى فئات المخالفات</h3><div class="chart" id="c-violcat"></div></div>
+        <div class="card"><h3>اتجاه الزيارات والمخالفات</h3><div class="chart" id="c-vv"></div></div>
       </div>
       <div class="grid g3" style="margin-top:16px">
-        <div class="card"><h3>المخالفات حسب حجم المنشأة</h3><div class="c-sub">توزيع مخالفات الفترة</div><div class="chart" id="c-violsme"></div></div>
-        <div class="card"><h3>نسبة الامتثال في الجولات الرقابية</h3><div class="c-sub">زيارات بدون مخالفات ÷ إجمالي الزيارات الميدانية</div><div class="chart" id="c-compring"></div></div>
+        <div class="card"><h3>المخالفات حسب حجم المنشأة</h3><div class="chart" id="c-violsme"></div></div>
+        <div class="card"><h3>نسبة الامتثال في الجولات الرقابية</h3><div class="chart" id="c-compring"></div></div>
         <div class="card">
-          <h3>مؤشرات تستدعي الانتباه</h3><div class="c-sub">مولّدة آلياً من بيانات الفترة</div>
+          <h3>مؤشرات تستدعي الانتباه</h3>
           <div style="display:flex;flex-direction:column;gap:9px;margin-top:6px" id="t3-insights"></div>
         </div>
       </div>
       <div class="grid g23" style="margin-top:16px">
-        <div class="card"><h3>أداء المفتشين</h3><div class="c-sub">أفقي: الجولات — رأسي: المخالفات — حجم الفقاعة: المسافة المقطوعة (كم). انقر مفتشاً للتفاصيل.</div><div class="chart tall" id="c-insp"></div></div>
-        <div class="card flat"><h3>سجل المفتشين</h3><div class="c-sub">قابل للفرز — انقر عموداً للفرز</div><div class="tblwrap" id="tbl-insp" style="max-height:340px"></div></div>
+        <div class="card"><h3>أداء المفتشين</h3><div class="chart tall" id="c-insp"></div></div>
+        <div class="card flat"><h3>سجل المفتشين</h3><div class="tblwrap" id="tbl-insp" style="max-height:340px"></div></div>
       </div>
     </section>
 
@@ -267,7 +288,6 @@
     <section class="tab" id="tab-t4">
       <div class="grid g6" id="t4-kpis"></div>
       <div class="section-h"><span class="bar"></span><h2>الأهداف الاستراتيجية الأربعة</h2>
-        <span class="hint">انقر هدفاً لتصفية قائمة المبادرات</span>
         <span class="grow"></span><button id="t4-reset" class="chip-reset">✕ إعادة التعيين</button></div>
       <div class="grid g4" id="pillar-grid"></div>
       <div class="section-h"><span class="bar"></span><h2 id="ini-list-title">جميع المبادرات</h2>
@@ -280,7 +300,6 @@
     <!-- ======================= TAB 5 — مؤشرات الأداء ======================= -->
     <section class="tab" id="tab-t5">
       <div class="section-h" style="margin-top:4px"><span class="bar"></span><h2>المؤشرات الاستراتيجية</h2>
-        <span class="hint">انقر أي مؤشر لعرض اتجاهه الشهري — ألوان النطاقات تعكس الموقع من المستهدف</span>
         <span class="grow"></span>
         <button class="pill" id="kpi-weak">إظهار ما دون المستهدف فقط</button></div>
       <div class="grid g6" id="kpi-strategic"></div>
@@ -295,7 +314,7 @@
           <div class="spark"><svg viewBox="0 0 24 24"><path d="M12 2l2 5.5L19.5 9.5 14 11.5 12 17l-2-5.5L4.5 9.5 10 7.5 12 2z"/><path d="M19 14l1 2.6 2.6 1-2.6 1-1 2.6-1-2.6-2.6-1 2.6-1 1-2.6z"/></svg></div>
           <div style="flex:1">
             <h2 style="font-size:17px">تحليلات وتوصيات مولّدة بالذكاء الاصطناعي</h2>
-            <div class="c-sub" style="margin:0">نماذج تنبؤية مبنية على بيانات 24 شهراً — جميع الأرقام مستندة إلى مجموعة البيانات الحالية</div>
+            
           </div>
           <span class="f-cap">السيناريو:</span>
           <div class="scen-chips pillset" id="scen-chips">
@@ -308,21 +327,20 @@
       <div class="grid g6" id="t6-kpis"></div>
       <div class="grid g23" style="margin-top:16px">
         <div class="card"><h3>توقعات الطلب والعرض — الأشهر الـ 12 القادمة</h3>
-          <div class="c-sub" id="fc-sub">الخطوط المتقطعة = الإسقاط، النطاق المظلل = نطاق الثقة</div>
-          <div class="chart tall" id="c-forecast"></div></div>
-        <div class="card"><h3>ماذا تغيّر؟ — مقارنة شهرية</h3><div class="c-sub" id="fc-changed-sub">—</div>
+          <div class="chart tall" id="c-forecast"></div>
+          <div class="chart-foot" id="fc-sub"></div></div>
+        <div class="card"><h3>ماذا تغيّر؟ — مقارنة شهرية</h3>
           <div style="display:flex;flex-direction:column;gap:9px;margin-top:8px" id="what-changed"></div></div>
       </div>
-      <div class="section-h"><span class="bar"></span><h2>بطاقات التنبيه</h2>
-        <span class="hint">مرتّبة حسب الأولوية — كل بطاقة مدعومة برقم من البيانات</span></div>
+      <div class="section-h"><span class="bar"></span><h2>بطاقات التنبيه</h2></div>
       <div class="grid g2" id="alert-cards"></div>
       <div class="grid g23" style="margin-top:16px">
         <div class="card flat" style="padding:6px 0">
           <div style="padding:14px 18px 6px"><h3>التوصيات التنفيذية</h3>
-          <div class="c-sub">انقر أي توصية للانتقال إلى علامة التبويب ذات الصلة</div></div>
+          </div>
           <div id="reco-list"></div>
         </div>
-        <div class="card"><h3>الفجوة المتوقعة شهرياً</h3><div class="c-sub" id="gap-sub">وفق السيناريو المحدد</div><div class="chart" id="c-gapbar"></div></div>
+        <div class="card"><h3>الفجوة المتوقعة شهرياً</h3><div class="chart" id="c-gapbar"></div></div>
       </div>
     </section>
 
