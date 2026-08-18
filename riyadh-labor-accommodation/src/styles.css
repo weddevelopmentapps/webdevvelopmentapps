@@ -668,15 +668,9 @@ table.tbl{width:100%;border-collapse:collapse;font-size:12px;min-width:720px}
 
 
 /* ============================================================
-   خريطة OpenStreetMap — Leaflet
+   خريطة القطاعات المسطّحة — Leaflet
    ============================================================ */
 .mapwrap{height:460px;border-radius:12px;overflow:hidden;border:1px solid var(--line);background:#EDF1EF}
-.mapwrap.map-offline::after{
-  content:"تعذّر تحميل بلاطات الخريطة — تظهر القطاعات وقيمها دون خلفية الشارع";
-  position:absolute;inset-inline:10px;top:10px;z-index:500;pointer-events:none;
-  background:rgba(255,255,255,.94);border:1px solid var(--line);border-radius:8px;
-  padding:7px 11px;font-size:11px;font-weight:700;color:var(--muted);text-align:center;
-}
 .leaflet-container{
   font-family:var(--ff-b);background:#EDF1EF;
   direction:ltr;               /* Leaflet يحسب المواضع بمنطق LTR */
@@ -801,7 +795,6 @@ table.tbl{width:100%;border-collapse:collapse;font-size:12px;min-width:720px}
 /* ---------- الخريطة المسطّحة (بلا بلاطات) ---------- */
 .mapwrap{background:#FBFCFB}
 .leaflet-container{background:#FBFCFB}
-.mapwrap.map-offline::after{display:none}   /* لا بلاطات تُحمَّل أصلاً */
 .sec-poly-l{transition:fill-opacity .2s}
 
 @media(max-width:1100px){

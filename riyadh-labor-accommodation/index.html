@@ -1341,15 +1341,9 @@ table.tbl{width:100%;border-collapse:collapse;font-size:12px;min-width:720px}
 
 
 /* ============================================================
-   خريطة OpenStreetMap — Leaflet
+   خريطة القطاعات المسطّحة — Leaflet
    ============================================================ */
 .mapwrap{height:460px;border-radius:12px;overflow:hidden;border:1px solid var(--line);background:#EDF1EF}
-.mapwrap.map-offline::after{
-  content:"تعذّر تحميل بلاطات الخريطة — تظهر القطاعات وقيمها دون خلفية الشارع";
-  position:absolute;inset-inline:10px;top:10px;z-index:500;pointer-events:none;
-  background:rgba(255,255,255,.94);border:1px solid var(--line);border-radius:8px;
-  padding:7px 11px;font-size:11px;font-weight:700;color:var(--muted);text-align:center;
-}
 .leaflet-container{
   font-family:var(--ff-b);background:#EDF1EF;
   direction:ltr;               /* Leaflet يحسب المواضع بمنطق LTR */
@@ -1474,7 +1468,6 @@ table.tbl{width:100%;border-collapse:collapse;font-size:12px;min-width:720px}
 /* ---------- الخريطة المسطّحة (بلا بلاطات) ---------- */
 .mapwrap{background:#FBFCFB}
 .leaflet-container{background:#FBFCFB}
-.mapwrap.map-offline::after{display:none}   /* لا بلاطات تُحمَّل أصلاً */
 .sec-poly-l{transition:fill-opacity .2s}
 
 @media(max-width:1100px){
@@ -1639,7 +1632,6 @@ table.tbl{width:100%;border-collapse:collapse;font-size:12px;min-width:720px}
           <div class="mapwrap" id="map1"></div>
           <div class="map-legend">
             <span class="li"><span class="sw" style="background:linear-gradient(to left,#E8F3EE,#0E5A43)"></span>أسرّة أقل ← أسرّة أكثر</span>
-            <span class="li">خريطة الأساس: OpenStreetMap</span>
             <span class="li" style="margin-inline-start:auto">الحدود مرقمنة من خريطة القطاعات الرسمية للأمانة — تقريبية للعرض</span>
           </div>
         </div>
@@ -2069,9 +2061,9 @@ function showTip(html,x,y){
 function hideTip(){ tip.style.display='none'; }
 
 /* ============================================================
-   خريطة الرياض الفعلية — OpenStreetMap عبر Leaflet
-   القطاعات تُمثَّل بدوائر متناسبة عند نقاط ارتكاز تقريبية، لأن المصدر
-   لا يتضمن حدوداً جغرافية للقطاعات البلدية. لا تُرسم حدود مُختلَقة.
+   خريطة القطاعات المسطّحة — Leaflet بلا بلاطات أساس
+   تُرسم حدود القطاعات الخمسة وحدها بتعبئة متدرّجة، فلا يصدر عن الخريطة
+   أي طلب شبكي وتظهر متطابقة دون اتصال.
    ============================================================ */
 const LMAP = {};
 
@@ -2082,8 +2074,8 @@ function shadeFill(t){
 }
 
 /* ============================================================
-   خريطة الرياض الفعلية — أساس OpenStreetMap عبر Leaflet،
-   وحدود القطاعات الخمسة مرقمنة من خريطة القطاعات الرسمية للأمانة.
+   خريطة مسطّحة عبر Leaflet — حدود القطاعات الخمسة مرقمنة من خريطة
+   القطاعات الرسمية للأمانة، بلا خريطة أساس.
    ============================================================ */
 function drawMap(wrapId, {metric, metricLabel, sectorTip, onSector, fmtV}){
   const wrap = el(wrapId);
@@ -2660,7 +2652,6 @@ function renderT3(){
   });
   el('map2-legend').innerHTML=
     `<span class="li"><span class="sw" style="background:linear-gradient(to left,#E8F3EE,#0E5A43)"></span>مخالفات أقل ← مخالفات أكثر</span>
-     <span class="li">خريطة الأساس: OpenStreetMap</span>
      <span class="li" style="margin-inline-start:auto">الحدود مرقمنة من خريطة القطاعات الرسمية للأمانة — تقريبية للعرض</span>`;
   const sSel=S.sectors.size===1?[...S.sectors][0]:null;
   const aSel=sSel? secAgg(sSel) : {v:secVisits,w:secViol,i:nInsp};
