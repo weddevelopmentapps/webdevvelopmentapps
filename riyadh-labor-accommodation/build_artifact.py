@@ -1,37 +1,37 @@
 # -*- coding: utf-8 -*-
-"""Assemble artifact.html — a fully self-contained build for hosting behind a
-strict CSP (no external hosts): ECharts and the Arabic fonts are inlined.
-The file is body-content only (no <html>/<head>/<body>) because the host wraps it."""
-import json, os
+"""يجمّع artifact.html — نسخة مستقلة تماماً بلا أي طلب خارجي.
+
+مكتبة ECharts والخطوط العربية مضمّنة من vendor/، والصور من assets/ كـ data URI.
+الملف محتوى جسم فقط (بلا <html>/<head>/<body>) لأن المضيف يغلّفه.
+"""
+import os
+from build import bundle, read, TITLE
+
 HERE = os.path.dirname(os.path.abspath(__file__))
-read = lambda p: open(os.path.join(HERE, p), encoding="utf-8").read()
 
-css     = read("src/styles.css")
-fonts   = read("vendor/fonts-embedded.css")
+b = bundle()
+fonts = read("vendor/fonts-embedded.css") + "\n" + read("vendor/fonts-light.css")
 echarts = read("vendor/echarts.min.js")
-markup  = read("src/markup.html")
-app     = read("src/app.js")
-data    = json.dumps(json.load(open(os.path.join(HERE, "data.json"), encoding="utf-8")),
-                     ensure_ascii=False, separators=(",", ":"))
 
-html = f"""<title>لوحة معلومات السكن الجماعي للأفراد بمدينة الرياض — أمانة منطقة الرياض</title>
+html = f"""<title>{TITLE}</title>
 <script>document.documentElement.setAttribute('dir','rtl');document.documentElement.setAttribute('lang','ar');</script>
 <style>
 html{{direction:rtl}}
 {fonts}
-{css}
+{b['css']}
 </style>
-{markup}
+{b['markup']}
 <script>
 {echarts}
 </script>
 <script>
-window.DATA = {data};
+window.DATA = {b['data']};
+const IMAGES = {b['images']};
 </script>
 <script>
-{app}
+{b['app']}
 </script>
 """
 out = os.path.join(HERE, "artifact.html")
 open(out, "w", encoding="utf-8").write(html)
-print(f"✓ artifact.html written ({os.path.getsize(out)//1024} KB)")
+print(f"✓ artifact.html — {os.path.getsize(out)//1024} KB")
