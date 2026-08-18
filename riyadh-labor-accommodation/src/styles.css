@@ -33,12 +33,14 @@ button{font-family:var(--ff-b);cursor:pointer;border:none;background:none;color:
   background:linear-gradient(180deg,#0B4A37 0%,#0E5A43 55%,#0F614A 100%);
   display:flex;flex-direction:column;align-items:center;padding:14px 0 12px;
 }
+/* الشعار الرسمي مصمَّم لخلفية فاتحة، فيوضع على قرص أبيض فوق الشريط الداكن */
 #rail .logo{
-  width:62px;height:62px;border-radius:50%;background:none;border:none;
+  width:62px;height:62px;border-radius:50%;background:#fff;
+  border:1px solid rgba(255,255,255,.55);
   display:flex;align-items:center;justify-content:center;margin-bottom:6px;
-  filter:drop-shadow(0 2px 6px rgba(0,0,0,.28));
+  box-shadow:0 2px 8px rgba(0,0,0,.26);overflow:hidden;
 }
-#rail .logo svg{display:block}
+#rail .logo img{display:block;width:54px;height:54px;object-fit:contain}
 #rail .logo-cap{color:#EAF4EF;font-family:var(--ff-d);font-weight:700;font-size:9.5px;
   text-align:center;line-height:1.5;margin-bottom:14px;opacity:.92}
 #rail nav{display:flex;flex-direction:column;gap:6px;width:100%;padding:0 10px;flex:1}

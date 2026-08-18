@@ -16,6 +16,11 @@ IMAGES = {
     "ctl":   "assets/sec-monitoring.svg",
 }
 
+# الهوية الرسمية لأمانة منطقة الرياض — استبدال الملف هنا يكفي لتحديث الشعار
+BRAND = {
+    "mark": "assets/brand/logo-mark.png",
+}   # logo-full/logo-white متاحان في assets/brand/ عند الحاجة — لا يُحقنان ما لم يُستخدما
+
 TITLE = "لوحة معلومات السكن الجماعي للأفراد بمدينة الرياض — أمانة منطقة الرياض"
 
 
@@ -37,6 +42,7 @@ def bundle():
                            ensure_ascii=False, separators=(",", ":")),
         "images": json.dumps({k: data_uri(v) for k, v in IMAGES.items()}, ensure_ascii=False),
         "sectorsGeo": read("assets/riyadh-sectors.geojson"),
+        "brand": json.dumps({k: data_uri(v) for k, v in BRAND.items()}, ensure_ascii=False),
     }
 
 
@@ -66,6 +72,7 @@ if __name__ == "__main__":
 window.DATA = {b['data']};
 const IMAGES = {b['images']};
 const SECTORS_GEO = {b['sectorsGeo']};
+const BRAND = {b['brand']};
 </script>
 <script>
 {b['app']}

@@ -31,6 +31,7 @@ html{{direction:rtl}}
 window.DATA = {b['data']};
 const IMAGES = {b['images']};
 const SECTORS_GEO = {b['sectorsGeo']};
+const BRAND = {b['brand']};
 </script>
 <script>
 {b['app']}
