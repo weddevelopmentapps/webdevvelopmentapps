@@ -1399,6 +1399,94 @@ table.tbl{width:100%;border-collapse:collapse;font-size:12px;min-width:720px}
 @media(max-width:768px){.mapwrap{height:320px}}
 @media print{.leaflet-control-zoom{display:none}}
 
+
+/* ============================================================
+   تعديلات: بطل العرض والطلب · الشلال · الخريطة المسطّحة · نمط الأمانة
+   ============================================================ */
+
+/* ---------- النمط الهندسي لهوية أمانة منطقة الرياض ---------- */
+#topbar>*:not(.brand-pattern-layer){position:relative;z-index:1}
+.brand-pattern-layer{
+  position:absolute;inset:0;pointer-events:none;user-select:none;z-index:0;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='108' height='108'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%23178C7A'/><stop offset='1' stop-color='%230A5E3E'/></linearGradient></defs><g transform='rotate(-8 54 54)'><g transform='skewX(-18)'><rect x='-6' y='-44' width='45' height='196' fill='url(%23g)'/><rect x='30' y='-44' width='32' height='196' fill='url(%23g)' opacity='.62'/><rect x='66' y='-44' width='22' height='196' fill='url(%23g)' opacity='.34'/></g></g></svg>");
+  background-size:108px 108px;opacity:.07;
+}
+/* شريط الهوية أعلى المحتوى */
+#topbar::after{
+  content:"";position:absolute;inset-inline:0;bottom:-4px;height:4px;
+  background:linear-gradient(90deg,#0A5E3E,#178C7A 45%,#0E5A43);
+  opacity:.9;
+}
+#topbar{position:sticky}
+
+/* ---------- بطل العرض والطلب ---------- */
+.hero{position:relative;overflow:hidden;background:var(--card);
+  border:1px solid var(--line);border-radius:var(--r);padding:22px 26px 20px;
+  box-shadow:var(--shadow);margin-bottom:4px}
+.hero>*:not(.hero-pattern){position:relative;z-index:1}
+.hero-pattern{
+  position:absolute;inset:0;pointer-events:none;z-index:0;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='108' height='108'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%23178C7A'/><stop offset='1' stop-color='%230A5E3E'/></linearGradient></defs><g transform='rotate(-8 54 54)'><g transform='skewX(-18)'><rect x='-6' y='-44' width='45' height='196' fill='url(%23g)'/><rect x='30' y='-44' width='32' height='196' fill='url(%23g)' opacity='.62'/><rect x='66' y='-44' width='22' height='196' fill='url(%23g)' opacity='.34'/></g></g></svg>");background-size:108px 108px;opacity:.055;
+}
+.hero-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-bottom:20px}
+.hero-stats .hs{padding:0 26px;position:relative;text-align:center}
+.hero-stats .hs+.hs::after{content:"";position:absolute;inset-block:6px;
+  inset-inline-end:0;width:1px;background:var(--line)}
+.hs-top{display:flex;align-items:baseline;justify-content:center;gap:8px}
+.hs-v{font-family:var(--ff-d);font-weight:700;font-size:clamp(30px,3.2vw,44px);
+  letter-spacing:-1.4px;line-height:1.05}
+.hs-u{font-size:13px;font-weight:700;color:var(--muted)}
+.hs-l{font-size:13px;color:var(--ink);opacity:.72;font-weight:600;margin-top:6px}
+.hs-supply .hs-v{color:#1E5B44}
+.hs-gap .hs-v{color:#B3402F}
+.hs-demand .hs-v{color:var(--ink)}
+
+/* شريط الفجوة */
+.gapbar{
+  position:relative;height:64px;border-radius:8px;overflow:hidden;
+  background:repeating-linear-gradient(-45deg,#B3402F 0 9px,#C2543F 9px 18px);
+}
+.gapbar .gb-fill{
+  position:absolute;inset-block:0;inset-inline-start:0;width:0;
+  background:#1E5B44;transition:width 1s cubic-bezier(.25,.8,.3,1);
+}
+.gapbar .gb-lab{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  color:#fff;font-family:var(--ff-d);font-weight:700;font-size:17px;letter-spacing:-.2px;
+  text-shadow:0 1px 3px rgba(0,0,0,.28);
+}
+.gapbar-caps{display:flex;justify-content:space-between;margin-top:7px;
+  font-size:12px;color:var(--muted);font-weight:600}
+
+/* شرائح السياق */
+.hero-chips{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}
+.hchip{
+  background:#EFF2EF;border-radius:12px;padding:14px 20px;
+  display:flex;align-items:baseline;justify-content:center;gap:9px;
+  font-size:14px;color:var(--ink);font-weight:600;
+}
+.hchip b{font-family:var(--ff-d);font-weight:700;font-size:22px;color:#8A6D24;letter-spacing:-.5px}
+.hero-chips .hchip:last-child b{color:#1E5B44}
+
+/* ---------- الشلال ---------- */
+.chart.wf{height:190px}
+
+/* ---------- الخريطة المسطّحة (بلا بلاطات) ---------- */
+.mapwrap{background:#FBFCFB}
+.leaflet-container{background:#FBFCFB}
+.mapwrap.map-offline::after{display:none}   /* لا بلاطات تُحمَّل أصلاً */
+.sec-poly-l{transition:fill-opacity .2s}
+
+@media(max-width:1100px){
+  .hero-stats{grid-template-columns:1fr;gap:14px}
+  .hero-stats .hs{text-align:start;padding:0}
+  .hero-stats .hs+.hs::after{display:none}
+  .hero-stats .hs+.hs{border-top:1px solid var(--line);padding-top:12px}
+  .hs-top{justify-content:flex-start}
+  .hero-chips{grid-template-columns:1fr}
+  .chart.wf{height:210px}
+}
+
 </style>
 </head>
 <body>
@@ -1440,6 +1528,7 @@ table.tbl{width:100%;border-collapse:collapse;font-size:12px;min-width:720px}
 <!-- ======================= shell ======================= -->
 <div id="shell">
   <header id="topbar">
+    <div class="brand-pattern-layer" aria-hidden="true"></div>
     <div class="tb-title">
       <h1 id="page-title">لوحة معلومات السكن الجماعي للأفراد بمدينة الرياض</h1>
       <div class="sub"><b>أمانة منطقة الرياض</b> — وكالة التنمية الحضرية</div>
@@ -1482,37 +1571,33 @@ table.tbl{width:100%;border-collapse:collapse;font-size:12px;min-width:720px}
     <!-- ======================= TAB 1 — العرض والطلب ======================= -->
     <section class="tab active" id="tab-t1">
       <div class="hero" id="hero">
-        <div class="hero-img" id="hero-img" aria-hidden="true"></div>
-        <div class="hero-cols">
-          <div class="hero-side">
-            <div class="h-cap"><span class="sq" style="background:#C89B4B"></span>الطلب — إجمالي العمالة في الرياض</div>
-            <div class="hero-num" id="hero-demand">0</div>
-            <div class="h-note" id="hero-demand-note">عامل وافد ضمن نطاق أمانة منطقة الرياض</div>
+        <div class="hero-pattern" aria-hidden="true"></div>
+        <div class="hero-stats">
+          <div class="hs hs-supply">
+            <div class="hs-top"><span class="hs-v num" id="hero-supply">0</span><span class="hs-u">سرير</span></div>
+            <div class="hs-l">العرض الحالي (الطاقة المرخصة)</div>
           </div>
-          <div class="hero-mid">
-            <div class="gap-badge">
-              <div class="gb-cap">فجوة الإيواء</div>
-              <div class="gb-val"><span id="hero-gap">0</span> سرير</div>
-            </div>
-            <div class="cov">نسبة التغطية: <span id="hero-cov">0</span>%</div>
+          <div class="hs hs-gap">
+            <div class="hs-top"><span class="hs-v num" id="hero-gap">0</span><span class="hs-u">سرير</span></div>
+            <div class="hs-l">فجوة الإيواء غير المغطاة</div>
           </div>
-          <div class="hero-side">
-            <div class="h-cap"><span class="sq" style="background:#0E5A43"></span>العرض — الأسرّة المرخصة</div>
-            <div class="hero-num" id="hero-supply">0</div>
-            <div class="h-note" id="hero-supply-note">سرير مرخص في 140 منشأة سكن جماعي</div>
+          <div class="hs hs-demand">
+            <div class="hs-top"><span class="hs-v num" id="hero-demand">0</span><span class="hs-u">فرد</span></div>
+            <div class="hs-l">إجمالي الطلب</div>
           </div>
         </div>
-        <div class="hero-bridge">
-          <div class="bridge-track">
-            <div class="bridge-gapzone" id="bridge-gap"></div>
-            <div class="bridge-fill" id="bridge-fill"></div>
-            <div class="bridge-marker" id="bridge-marker"></div>
-          </div>
-          <div class="bridge-legend">
-            <span class="lg"><span class="sw" style="background:#0E5A43"></span>أسرّة مرخصة (مغطّى)</span>
-            <span class="lg" id="bridge-cap">—</span>
-            <span class="lg"><span class="sw" style="background:repeating-linear-gradient(-45deg,#E8B25C 0 3px,#F3D9AC 3px 6px)"></span>فجوة غير مغطّاة</span>
-          </div>
+
+        <div class="gapbar" id="gapbar">
+          <div class="gb-fill" id="bridge-fill"></div>
+          <div class="gb-lab" id="gb-lab">—</div>
+        </div>
+        <div class="gapbar-caps">
+          <span id="gb-sup">—</span><span id="gb-dem">—</span>
+        </div>
+
+        <div class="hero-chips">
+          <div class="hchip"><span>الطلب يعادل</span><b id="hero-mult">—</b><span>أضعاف العرض الحالي</span></div>
+          <div class="hchip"><span>نسبة تغطية الطلب</span><b id="hero-cov">—</b></div>
         </div>
       </div>
 
@@ -1604,6 +1689,14 @@ table.tbl{width:100%;border-collapse:collapse;font-size:12px;min-width:720px}
           </div>
         </div>
       </div>
+      <div class="section-h"><span class="bar"></span><h2>النمو الشهري — من خط الأساس إلى الوضع الحالي</h2>
+        <span class="hint">مخطط شلالي: كل عمود هو إضافة الشهر فوق رصيد ما قبله</span></div>
+      <div class="grid" style="gap:14px;margin-bottom:16px">
+        <div class="card"><h3>رخص البناء</h3><div class="c-sub">رخصة</div><div class="chart wf" id="c-wf-constr"></div></div>
+        <div class="card"><h3>الرخص التشغيلية</h3><div class="c-sub">رخصة</div><div class="chart wf" id="c-wf-ops"></div></div>
+        <div class="card"><h3>الطاقة الاستيعابية</h3><div class="c-sub">سرير</div><div class="chart wf" id="c-wf-beds"></div></div>
+      </div>
+
       <div class="section-h"><span class="bar"></span><h2>سجل الإصدار الشهري</h2>
         <span class="grow"></span><input id="lic-search" class="tsearch" placeholder="ابحث بالشهر أو القطاع…"></div>
       <div class="card flat"><div class="tblwrap" id="tbl-lic"></div></div>
@@ -1980,13 +2073,11 @@ function hideTip(){ tip.style.display='none'; }
    القطاعات تُمثَّل بدوائر متناسبة عند نقاط ارتكاز تقريبية، لأن المصدر
    لا يتضمن حدوداً جغرافية للقطاعات البلدية. لا تُرسم حدود مُختلَقة.
    ============================================================ */
-const OSM_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
-const OSM_ATTR = '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors';
 const LMAP = {};
 
 /* تدرّج أخضر يعكس قيمة المقياس داخل حدود القطاع */
 function shadeFill(t){
-  const a=[232,243,238], b=[14,90,67], k=Math.max(0,Math.min(1,t));
+  const a=[228,240,234], b=[93,159,127], k=Math.max(0,Math.min(1,t));
   return `rgb(${a.map((v,i)=>Math.round(v+(b[i]-v)*k)).join(',')})`;
 }
 
@@ -2001,16 +2092,12 @@ function drawMap(wrapId, {metric, metricLabel, sectorTip, onSector, fmtV}){
 
   if(!M || !wrap.contains(M.getContainer())){
     wrap.innerHTML = '';
+    /* خريطة مسطّحة بهوية الأمانة — بلا بلاطات خارجية، فتعمل دون اتصال */
     M = L.map(wrap, {
       center:[24.68,46.72], zoom:10,
-      scrollWheelZoom:false,          /* الصفحة تُمرَّر؛ التكبير بالأزرار */
-      zoomControl:true, attributionControl:true, zoomSnap:.5, minZoom:8, maxZoom:16,
+      scrollWheelZoom:false, dragging:true, doubleClickZoom:false,
+      zoomControl:false, attributionControl:false, zoomSnap:.25, minZoom:8, maxZoom:14,
     });
-    L.tileLayer(OSM_URL, {maxZoom:16, attribution:OSM_ATTR}).addTo(M)
-      .on('tileerror', function(){
-        if(!wrap.dataset.offline){ wrap.dataset.offline='1'; wrap.classList.add('map-offline'); }
-      });
-    M.attributionControl.setPrefix('');
     LMAP[wrapId] = M;
     M._marks = L.layerGroup().addTo(M);
     M._fitted = false;
@@ -2027,11 +2114,11 @@ function drawMap(wrapId, {metric, metricLabel, sectorTip, onSector, fmtV}){
       const sec = f.properties.name, v = vals[sec];
       const selected = S.sectors.has(sec), dimmed = S.sectors.size && !selected;
       return {
-        color: selected? '#0A3D22' : '#FFFFFF',
-        weight: selected? 3 : 1.6,
-        opacity: dimmed? .5 : 1,
-        fillColor: v==null? '#D9E2DD' : shadeFill(norm(v)),
-        fillOpacity: dimmed? .28 : .78,
+        color: '#FFFFFF',
+        weight: selected? 2.8 : 1.4,
+        opacity: 1,
+        fillColor: v==null? '#DCE7E1' : shadeFill(norm(v)),
+        fillOpacity: dimmed? .38 : 1,      /* تعبئة مسطّحة كاملة */
         className: 'sec-poly-l',
       };
     },
@@ -2120,20 +2207,19 @@ function scopeLabel(){
 function renderT1(){
   const sec = scopeLabel();
   const sf = scopeFacts();
-  /* hero */
+  /* hero — العرض · الفجوة · الطلب */
   countUp(el('hero-demand'), sf.demand);
   countUp(el('hero-supply'), sf.beds);
   countUp(el('hero-gap'), sf.gap);
-  countUp(el('hero-cov'), sf.cov, {decimals:1});
-  el('hero-demand-note').textContent = sec? `عامل وافد ضمن ${sec}` : 'عامل وافد ضمن نطاق أمانة منطقة الرياض';
-  el('hero-supply-note').textContent =
-    `سرير مرخص ضمن ${fmt(sf.opLic)} رخصة تشغيلية سارية`;
-  el('bridge-cap').textContent = `التغطية ${fmt1(sf.cov)}٪ من إجمالي الطلب`;
-  const covW = Math.max(2,Math.min(100,sf.cov));
-  requestAnimationFrame(()=>{ el('bridge-fill').style.width=covW+'%';
-    el('bridge-marker').style.insetInlineStart=`calc(${covW}% - 2px)`;
-    el('bridge-gap').style.width=(100-covW)+'%'; });
-  if(!REDUCED){ ['hero-demand','hero-supply'].forEach(id=>{ el(id).classList.remove('glow'); void el(id).offsetWidth; el(id).classList.add('glow'); }); }
+  const covPct = sf.cov, gapPct = 100 - covPct;
+  el('hero-cov').textContent = fmt1(covPct)+'٪';
+  el('hero-mult').innerHTML = ltr(fmt1(sf.beds? sf.demand/sf.beds : 0)+'×');
+  el('gb-lab').textContent = `الفجوة ${fmt1(gapPct)}٪`;
+  el('gb-sup').textContent = `العرض ${fmt1(covPct)}٪`;
+  el('gb-dem').textContent = `إجمالي الطلب: ${fmt(sf.demand)}`;
+  requestAnimationFrame(()=>{ el('bridge-fill').style.width = Math.max(0.6, covPct)+'%'; });
+  if(!REDUCED){ ['hero-demand','hero-supply'].forEach(id=>{
+    el(id).classList.remove('glow'); void el(id).offsetWidth; el(id).classList.add('glow'); }); }
 
   const k = 1;
   el('t1-demand-hint').innerHTML =
@@ -2227,18 +2313,29 @@ function renderT1(){
 
   /* supply vs demand per sector */
   const sup=chart('c-supsec');
-  const supRows=D.capSector.map(r=>({s:r.name,beds:r.beds,dem:r.demand}));
+  const supRows=D.capSector.map(r=>({s:r.name,beds:r.beds,dem:r.demand}))
+    .sort((a,b)=>b.dem-a.dem);            /* الأكبر إلى اليمين في الاتجاه العربي */
   sup.setOption(base({
-    grid:{containLabel:true,left:8,right:8,top:30,bottom:2},
-    legend:{top:0,icon:'circle',itemWidth:9,textStyle:{fontFamily:'Cairo',fontSize:11}},
+    grid:{containLabel:true,left:10,right:10,top:44,bottom:2},
+    legend:{top:0,right:0,icon:'rect',itemWidth:13,itemHeight:13,itemGap:16,
+      textStyle:{fontFamily:'Cairo',fontSize:12,color:C.ink},data:['العرض','الطلب']},
+    graphic:[{type:'text',left:6,top:6,style:{text:'سرير',font:'600 11px Cairo',fill:C.muted}}],
     tooltip:Object.assign({},TT,{trigger:'axis',axisPointer:{type:'shadow'},formatter:ps=>{
       const r=supRows[ps[0].dataIndex];
-      return `<b>${r.s}</b>${ttRow('العمالة (الطلب)',fmt(r.dem),C.gold)}${ttRow('الأسرّة المرخصة',fmt(r.beds),C.teal)}${ttRow('نسبة التغطية',(r.beds/r.dem*100).toFixed(1)+'٪')}`;}}),
-    xAxis:Object.assign({},AXC,{data:supRows.map(r=>r.s.replace(/^(ال)?قطاع /,'')),inverse:true}),
-    yAxis:AXVY,
+      return `<b>${r.s}</b>${ttRow('الطلب',fmt(r.dem),'#A8C6B5')}${ttRow('العرض',fmt(r.beds),'#1E5B44')}`+
+        ttRow('نسبة التغطية',(r.beds/r.dem*100).toFixed(2)+'٪');}}),
+    xAxis:Object.assign({},AXC,{data:supRows.map(r=>r.s),inverse:true,
+      axisLabel:Object.assign({},AXC.axisLabel,{fontSize:12,color:C.ink})}),
+    yAxis:Object.assign({},AXVY,{splitNumber:5}),
     series:[
-      {name:'العمالة (الطلب)',type:'bar',data:supRows.map(r=>r.dem),barMaxWidth:20,itemStyle:{color:C.gold,borderRadius:[6,6,0,0]}},
-      {name:'الأسرّة المرخصة',type:'bar',data:supRows.map(r=>r.beds),barMaxWidth:20,itemStyle:{color:C.teal,borderRadius:[6,6,0,0]}},
+      {name:'الطلب',type:'bar',data:supRows.map(r=>r.dem),barMaxWidth:34,barGap:'12%',
+        itemStyle:{color:'#A8C6B5',borderRadius:[3,3,0,0]},
+        label:{show:true,position:'top',formatter:p=>fmtAx(p.value),fontSize:11.5,
+          fontWeight:'bold',color:C.ink,fontFamily:'Cairo'}},
+      {name:'العرض',type:'bar',data:supRows.map(r=>r.beds),barMaxWidth:34,
+        itemStyle:{color:'#1E5B44',borderRadius:[3,3,0,0]},
+        label:{show:true,position:'top',formatter:p=>fmtAx(p.value),fontSize:11.5,
+          fontWeight:'bold',color:'#1E5B44',fontFamily:'Cairo'}},
     ],
   }));
   reClick(sup,p=>toggleSector(supRows[p.dataIndex].s));
@@ -2441,6 +2538,47 @@ function renderT2(){
   el('spark1-delta').innerHTML=NA_CHIP; el('spark1-delta').className='';
   el('spark2-delta').innerHTML=NA_CHIP; el('spark2-delta').className='';
 
+  /* ── مخططات شلالية: خط الأساس ← الإضافات الشهرية ← الرصيد الحالي ── */
+  const WF=[
+    {id:'c-wf-constr', add:'constr', cum:'cum_constr'},
+    {id:'c-wf-ops',    add:'ops',    cum:'cum_ops'},
+    {id:'c-wf-beds',   add:'beds_added', cum:'cum_beds'},
+  ];
+  WF.forEach(w=>{
+    const b0=D.licBaseline[w.cum];
+    const ms=D.licenses.filter(r=>inWin(r.month));
+    const cats=['الأساس',...ms.map(r=>r.month_ar.replace(/\s+\d{4}$/,'')),'الإجمالي'];
+    const total=ms.length? ms[ms.length-1][w.cum] : b0;
+    /* عمود شفاف يرفع كل إضافة إلى مستوى الرصيد السابق */
+    const pad=[0], val=[b0], kind=['base'];
+    let run=b0;
+    ms.forEach(r=>{ pad.push(run); val.push(r[w.add]); kind.push('add'); run=r[w.cum]; });
+    pad.push(0); val.push(total); kind.push('total');
+    const c=chart(w.id);
+    c.setOption(base_wf({
+      grid:{containLabel:true,left:8,right:8,top:26,bottom:2},
+      tooltip:Object.assign({},TT,{trigger:'axis',axisPointer:{type:'shadow'},formatter:ps=>{
+        const i=ps[0].dataIndex;
+        if(kind[i]==='add') return `<b>${ms[i-1].month_ar}</b>`+
+          ttRow('المضاف',ltr('+'+fmt(val[i])),C.green2)+ttRow('الرصيد بعده',fmt(ms[i-1][w.cum]));
+        return `<b>${cats[i]}</b>`+ttRow(kind[i]==='base'?'رصيد خط الأساس':'الرصيد الحالي',fmt(val[i]),C.green);
+      }}),
+      xAxis:Object.assign({},AXC,{data:cats,inverse:true,
+        axisLabel:Object.assign({},AXC.axisLabel,{fontSize:9.5,interval:0})}),
+      yAxis:Object.assign({},AXVY,{max:v=>v.max*1.18}),
+      series:[
+        {type:'bar',stack:'w',silent:true,itemStyle:{color:'transparent'},data:pad,tooltip:{show:false}},
+        {type:'bar',stack:'w',barMaxWidth:26,data:val.map((v,i)=>({value:v,itemStyle:{
+            color: kind[i]==='base'? '#C9D6CF' : kind[i]==='total'? C.green : C.green2,
+            borderRadius:[3,3,0,0]}})),
+         label:{show:true,position:'top',fontSize:10,fontFamily:'Cairo',fontWeight:'bold',
+           color:p=>kind[p.dataIndex]==='add'? C.green2 : C.ink,
+           formatter:p=>kind[p.dataIndex]==='add'? (p.value? fmtAx(p.value)+'+' : '') : fmtAx(p.value)}},
+      ],
+    }));
+    reClick(c,null);
+  });
+
   /* monthly table */
   /* ord = مفتاح ترتيب رقمي (YYYYMM) حتى يفرز عمود الشهر زمنياً لا أبجدياً */
   T2ROWS=D.licenses.filter(r=>inWin(r.month)).map(r=>({
@@ -2457,6 +2595,8 @@ function renderT2(){
 let T2ROWS=[],licTable=null;
 function filterLic(){ const q=S.licSearch.trim();
   return T2ROWS.filter(r=>!q||r.lbl.includes(q)); }
+/* الشلال: حركة قصيرة حتى لا تُلتقط القيم وهي معلّقة فوق العمود الشفاف */
+function base_wf(o){ const b=base(o); b.animationDuration=260; return b; }
 function sparkline(id,labels,vals,deltaId){
   const first=vals[0],last=vals[vals.length-1],improving=last<first;
   const dEl=el(deltaId);
@@ -3007,7 +3147,6 @@ el('btn-ai').onclick=()=>go('t6');
 /* الشعار الرسمي والصور مضمّنة كـ data URI عبر build.py — لا طلبات خارجية */
 if(typeof BRAND!=='undefined' && BRAND.mark) el('rail-logo').src=BRAND.mark;
 if(typeof IMAGES!=='undefined'){
-  el('hero-img').style.backgroundImage=`url('${IMAGES.cover}')`;
   el('img-t2').style.backgroundImage=`url('${IMAGES.lic}')`;
   el('img-t3').style.backgroundImage=`url('${IMAGES.ctl}')`;
 }

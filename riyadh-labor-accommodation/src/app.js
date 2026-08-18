@@ -204,13 +204,11 @@ function hideTip(){ tip.style.display='none'; }
    القطاعات تُمثَّل بدوائر متناسبة عند نقاط ارتكاز تقريبية، لأن المصدر
    لا يتضمن حدوداً جغرافية للقطاعات البلدية. لا تُرسم حدود مُختلَقة.
    ============================================================ */
-const OSM_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
-const OSM_ATTR = '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors';
 const LMAP = {};
 
 /* تدرّج أخضر يعكس قيمة المقياس داخل حدود القطاع */
 function shadeFill(t){
-  const a=[232,243,238], b=[14,90,67], k=Math.max(0,Math.min(1,t));
+  const a=[228,240,234], b=[93,159,127], k=Math.max(0,Math.min(1,t));
   return `rgb(${a.map((v,i)=>Math.round(v+(b[i]-v)*k)).join(',')})`;
 }
 
@@ -225,16 +223,12 @@ function drawMap(wrapId, {metric, metricLabel, sectorTip, onSector, fmtV}){
 
   if(!M || !wrap.contains(M.getContainer())){
     wrap.innerHTML = '';
+    /* خريطة مسطّحة بهوية الأمانة — بلا بلاطات خارجية، فتعمل دون اتصال */
     M = L.map(wrap, {
       center:[24.68,46.72], zoom:10,
-      scrollWheelZoom:false,          /* الصفحة تُمرَّر؛ التكبير بالأزرار */
-      zoomControl:true, attributionControl:true, zoomSnap:.5, minZoom:8, maxZoom:16,
+      scrollWheelZoom:false, dragging:true, doubleClickZoom:false,
+      zoomControl:false, attributionControl:false, zoomSnap:.25, minZoom:8, maxZoom:14,
     });
-    L.tileLayer(OSM_URL, {maxZoom:16, attribution:OSM_ATTR}).addTo(M)
-      .on('tileerror', function(){
-        if(!wrap.dataset.offline){ wrap.dataset.offline='1'; wrap.classList.add('map-offline'); }
-      });
-    M.attributionControl.setPrefix('');
     LMAP[wrapId] = M;
     M._marks = L.layerGroup().addTo(M);
     M._fitted = false;
@@ -251,11 +245,11 @@ function drawMap(wrapId, {metric, metricLabel, sectorTip, onSector, fmtV}){
       const sec = f.properties.name, v = vals[sec];
       const selected = S.sectors.has(sec), dimmed = S.sectors.size && !selected;
       return {
-        color: selected? '#0A3D22' : '#FFFFFF',
-        weight: selected? 3 : 1.6,
-        opacity: dimmed? .5 : 1,
-        fillColor: v==null? '#D9E2DD' : shadeFill(norm(v)),
-        fillOpacity: dimmed? .28 : .78,
+        color: '#FFFFFF',
+        weight: selected? 2.8 : 1.4,
+        opacity: 1,
+        fillColor: v==null? '#DCE7E1' : shadeFill(norm(v)),
+        fillOpacity: dimmed? .38 : 1,      /* تعبئة مسطّحة كاملة */
         className: 'sec-poly-l',
       };
     },
@@ -344,20 +338,19 @@ function scopeLabel(){
 function renderT1(){
   const sec = scopeLabel();
   const sf = scopeFacts();
-  /* hero */
+  /* hero — العرض · الفجوة · الطلب */
   countUp(el('hero-demand'), sf.demand);
   countUp(el('hero-supply'), sf.beds);
   countUp(el('hero-gap'), sf.gap);
-  countUp(el('hero-cov'), sf.cov, {decimals:1});
-  el('hero-demand-note').textContent = sec? `عامل وافد ضمن ${sec}` : 'عامل وافد ضمن نطاق أمانة منطقة الرياض';
-  el('hero-supply-note').textContent =
-    `سرير مرخص ضمن ${fmt(sf.opLic)} رخصة تشغيلية سارية`;
-  el('bridge-cap').textContent = `التغطية ${fmt1(sf.cov)}٪ من إجمالي الطلب`;
-  const covW = Math.max(2,Math.min(100,sf.cov));
-  requestAnimationFrame(()=>{ el('bridge-fill').style.width=covW+'%';
-    el('bridge-marker').style.insetInlineStart=`calc(${covW}% - 2px)`;
-    el('bridge-gap').style.width=(100-covW)+'%'; });
-  if(!REDUCED){ ['hero-demand','hero-supply'].forEach(id=>{ el(id).classList.remove('glow'); void el(id).offsetWidth; el(id).classList.add('glow'); }); }
+  const covPct = sf.cov, gapPct = 100 - covPct;
+  el('hero-cov').textContent = fmt1(covPct)+'٪';
+  el('hero-mult').innerHTML = ltr(fmt1(sf.beds? sf.demand/sf.beds : 0)+'×');
+  el('gb-lab').textContent = `الفجوة ${fmt1(gapPct)}٪`;
+  el('gb-sup').textContent = `العرض ${fmt1(covPct)}٪`;
+  el('gb-dem').textContent = `إجمالي الطلب: ${fmt(sf.demand)}`;
+  requestAnimationFrame(()=>{ el('bridge-fill').style.width = Math.max(0.6, covPct)+'%'; });
+  if(!REDUCED){ ['hero-demand','hero-supply'].forEach(id=>{
+    el(id).classList.remove('glow'); void el(id).offsetWidth; el(id).classList.add('glow'); }); }
 
   const k = 1;
   el('t1-demand-hint').innerHTML =
@@ -451,18 +444,29 @@ function renderT1(){
 
   /* supply vs demand per sector */
   const sup=chart('c-supsec');
-  const supRows=D.capSector.map(r=>({s:r.name,beds:r.beds,dem:r.demand}));
+  const supRows=D.capSector.map(r=>({s:r.name,beds:r.beds,dem:r.demand}))
+    .sort((a,b)=>b.dem-a.dem);            /* الأكبر إلى اليمين في الاتجاه العربي */
   sup.setOption(base({
-    grid:{containLabel:true,left:8,right:8,top:30,bottom:2},
-    legend:{top:0,icon:'circle',itemWidth:9,textStyle:{fontFamily:'Cairo',fontSize:11}},
+    grid:{containLabel:true,left:10,right:10,top:44,bottom:2},
+    legend:{top:0,right:0,icon:'rect',itemWidth:13,itemHeight:13,itemGap:16,
+      textStyle:{fontFamily:'Cairo',fontSize:12,color:C.ink},data:['العرض','الطلب']},
+    graphic:[{type:'text',left:6,top:6,style:{text:'سرير',font:'600 11px Cairo',fill:C.muted}}],
     tooltip:Object.assign({},TT,{trigger:'axis',axisPointer:{type:'shadow'},formatter:ps=>{
       const r=supRows[ps[0].dataIndex];
-      return `<b>${r.s}</b>${ttRow('العمالة (الطلب)',fmt(r.dem),C.gold)}${ttRow('الأسرّة المرخصة',fmt(r.beds),C.teal)}${ttRow('نسبة التغطية',(r.beds/r.dem*100).toFixed(1)+'٪')}`;}}),
-    xAxis:Object.assign({},AXC,{data:supRows.map(r=>r.s.replace(/^(ال)?قطاع /,'')),inverse:true}),
-    yAxis:AXVY,
+      return `<b>${r.s}</b>${ttRow('الطلب',fmt(r.dem),'#A8C6B5')}${ttRow('العرض',fmt(r.beds),'#1E5B44')}`+
+        ttRow('نسبة التغطية',(r.beds/r.dem*100).toFixed(2)+'٪');}}),
+    xAxis:Object.assign({},AXC,{data:supRows.map(r=>r.s),inverse:true,
+      axisLabel:Object.assign({},AXC.axisLabel,{fontSize:12,color:C.ink})}),
+    yAxis:Object.assign({},AXVY,{splitNumber:5}),
     series:[
-      {name:'العمالة (الطلب)',type:'bar',data:supRows.map(r=>r.dem),barMaxWidth:20,itemStyle:{color:C.gold,borderRadius:[6,6,0,0]}},
-      {name:'الأسرّة المرخصة',type:'bar',data:supRows.map(r=>r.beds),barMaxWidth:20,itemStyle:{color:C.teal,borderRadius:[6,6,0,0]}},
+      {name:'الطلب',type:'bar',data:supRows.map(r=>r.dem),barMaxWidth:34,barGap:'12%',
+        itemStyle:{color:'#A8C6B5',borderRadius:[3,3,0,0]},
+        label:{show:true,position:'top',formatter:p=>fmtAx(p.value),fontSize:11.5,
+          fontWeight:'bold',color:C.ink,fontFamily:'Cairo'}},
+      {name:'العرض',type:'bar',data:supRows.map(r=>r.beds),barMaxWidth:34,
+        itemStyle:{color:'#1E5B44',borderRadius:[3,3,0,0]},
+        label:{show:true,position:'top',formatter:p=>fmtAx(p.value),fontSize:11.5,
+          fontWeight:'bold',color:'#1E5B44',fontFamily:'Cairo'}},
     ],
   }));
   reClick(sup,p=>toggleSector(supRows[p.dataIndex].s));
@@ -665,6 +669,47 @@ function renderT2(){
   el('spark1-delta').innerHTML=NA_CHIP; el('spark1-delta').className='';
   el('spark2-delta').innerHTML=NA_CHIP; el('spark2-delta').className='';
 
+  /* ── مخططات شلالية: خط الأساس ← الإضافات الشهرية ← الرصيد الحالي ── */
+  const WF=[
+    {id:'c-wf-constr', add:'constr', cum:'cum_constr'},
+    {id:'c-wf-ops',    add:'ops',    cum:'cum_ops'},
+    {id:'c-wf-beds',   add:'beds_added', cum:'cum_beds'},
+  ];
+  WF.forEach(w=>{
+    const b0=D.licBaseline[w.cum];
+    const ms=D.licenses.filter(r=>inWin(r.month));
+    const cats=['الأساس',...ms.map(r=>r.month_ar.replace(/\s+\d{4}$/,'')),'الإجمالي'];
+    const total=ms.length? ms[ms.length-1][w.cum] : b0;
+    /* عمود شفاف يرفع كل إضافة إلى مستوى الرصيد السابق */
+    const pad=[0], val=[b0], kind=['base'];
+    let run=b0;
+    ms.forEach(r=>{ pad.push(run); val.push(r[w.add]); kind.push('add'); run=r[w.cum]; });
+    pad.push(0); val.push(total); kind.push('total');
+    const c=chart(w.id);
+    c.setOption(base_wf({
+      grid:{containLabel:true,left:8,right:8,top:26,bottom:2},
+      tooltip:Object.assign({},TT,{trigger:'axis',axisPointer:{type:'shadow'},formatter:ps=>{
+        const i=ps[0].dataIndex;
+        if(kind[i]==='add') return `<b>${ms[i-1].month_ar}</b>`+
+          ttRow('المضاف',ltr('+'+fmt(val[i])),C.green2)+ttRow('الرصيد بعده',fmt(ms[i-1][w.cum]));
+        return `<b>${cats[i]}</b>`+ttRow(kind[i]==='base'?'رصيد خط الأساس':'الرصيد الحالي',fmt(val[i]),C.green);
+      }}),
+      xAxis:Object.assign({},AXC,{data:cats,inverse:true,
+        axisLabel:Object.assign({},AXC.axisLabel,{fontSize:9.5,interval:0})}),
+      yAxis:Object.assign({},AXVY,{max:v=>v.max*1.18}),
+      series:[
+        {type:'bar',stack:'w',silent:true,itemStyle:{color:'transparent'},data:pad,tooltip:{show:false}},
+        {type:'bar',stack:'w',barMaxWidth:26,data:val.map((v,i)=>({value:v,itemStyle:{
+            color: kind[i]==='base'? '#C9D6CF' : kind[i]==='total'? C.green : C.green2,
+            borderRadius:[3,3,0,0]}})),
+         label:{show:true,position:'top',fontSize:10,fontFamily:'Cairo',fontWeight:'bold',
+           color:p=>kind[p.dataIndex]==='add'? C.green2 : C.ink,
+           formatter:p=>kind[p.dataIndex]==='add'? (p.value? fmtAx(p.value)+'+' : '') : fmtAx(p.value)}},
+      ],
+    }));
+    reClick(c,null);
+  });
+
   /* monthly table */
   /* ord = مفتاح ترتيب رقمي (YYYYMM) حتى يفرز عمود الشهر زمنياً لا أبجدياً */
   T2ROWS=D.licenses.filter(r=>inWin(r.month)).map(r=>({
@@ -681,6 +726,8 @@ function renderT2(){
 let T2ROWS=[],licTable=null;
 function filterLic(){ const q=S.licSearch.trim();
   return T2ROWS.filter(r=>!q||r.lbl.includes(q)); }
+/* الشلال: حركة قصيرة حتى لا تُلتقط القيم وهي معلّقة فوق العمود الشفاف */
+function base_wf(o){ const b=base(o); b.animationDuration=260; return b; }
 function sparkline(id,labels,vals,deltaId){
   const first=vals[0],last=vals[vals.length-1],improving=last<first;
   const dEl=el(deltaId);
@@ -1231,7 +1278,6 @@ el('btn-ai').onclick=()=>go('t6');
 /* الشعار الرسمي والصور مضمّنة كـ data URI عبر build.py — لا طلبات خارجية */
 if(typeof BRAND!=='undefined' && BRAND.mark) el('rail-logo').src=BRAND.mark;
 if(typeof IMAGES!=='undefined'){
-  el('hero-img').style.backgroundImage=`url('${IMAGES.cover}')`;
   el('img-t2').style.backgroundImage=`url('${IMAGES.lic}')`;
   el('img-t3').style.backgroundImage=`url('${IMAGES.ctl}')`;
 }
